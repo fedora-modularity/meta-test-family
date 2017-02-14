@@ -1,8 +1,5 @@
 Modularity prototype testing
 
- * dependencies:
- {{{
-  python2
-  avocado-framework
-  }}}
+ * base dependencies: python2 
+ * python dependencies: avocado-framework
 
