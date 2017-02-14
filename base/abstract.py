@@ -16,8 +16,7 @@ class ContainerHelper():
         self.prepareEnv()
         self.startDocker()
         self.pullImage()
-        
-        
+
     def prepareEnv(self):
         process.run("yum -y install docker")
 
@@ -39,6 +38,9 @@ class ContainerHelper():
     
 
     def containerExec(self, args = "-t -i", command = "/bin/bash"):
+        return process.run("docker run %s %s %s" % (args, self.name, command))
+
+    def containerStart(self, args = "-t -i", command = "/bin/bash"):
         process.run("docker run %s %s %s" % (args, self.name, command))
         process.run("docker ps | grep  %s" % self.name)
         self.docker_id = process.run("docker ps | grep %s |cut -d " " -f 1" % self.name,shell=True).stdout
@@ -46,19 +48,15 @@ class ContainerHelper():
     def containerStop():
         process.run("docker stop %s" % self.docker_id)
         process.run("docker rm %s" % self.docker_id)
-    
 
     def cockpitSigning():
         # TODO not working because of "'
-        process.run("docker run --entrypoint /bin/bash %s -c 'ls / | grep bin'" % self.name , shell = True)
-        packages = process.run("docker run --entrypoint /bin/bash %s -c 'rpm -qa --qf=\"%{name}-%{version}-%{release} %{SIGPGP:pgpsig}\n\"'")
-        process.run("docker run --entrypoint /bin/bash %s -c 'yum repolist | grep \"repolist: 0\"'", shell = True)
+        if "bin" in self.containerExec(args="--entrypoint /bin/bash",command="ls /"): ...
+        if "repolist: 0" in self.containerExec(args="--entrypoint /bin/bash",command="yum repolist"): ...
+        packages=self.containerExec(args="--entrypoint /bin/bash",command='rpm -qa --qf="%{name}-%{version}-%{release} %{SIGPGP:pgpsig}\n"').stdout
 
-    def CockcpitLabelCheck(){
-        XLABEL=$@
-        rlRun "docker inspect $ATOMIC |grep '$XLABEL'"
-}
-
+    def CockcpitLabelCheck(self,text):
+        if text in process.run("docker inspect %s"):...
 
 
 if __name__ == '__main__':
