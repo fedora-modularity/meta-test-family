@@ -49,6 +49,7 @@ class ContainerHelper():
     
 
     def cockpitSigning():
+        # TODO not working because of "'
         process.run("docker run --entrypoint /bin/bash %s -c 'ls / | grep bin'" % self.name , shell = True)
         packages = process.run("docker run --entrypoint /bin/bash %s -c 'rpm -qa --qf=\"%{name}-%{version}-%{release} %{SIGPGP:pgpsig}\n\"'")
         process.run("docker run --entrypoint /bin/bash %s -c 'yum repolist | grep \"repolist: 0\"'", shell = True)
