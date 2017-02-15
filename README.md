@@ -1,13 +1,13 @@
 # Modularity prototype testing
 
 ## General Structure
- * ** YAML Config file **
+ * __YAML Config file__
   * Each module will need to have yaml config file
   * Config file should cover non generic part - part focused on general module testing
   * It cloud contain also simple test 
- * ** Avocado tests **
+ * __Avocado tests__
   * General tests using avocado framework
- * ** Scheduler **
+ * __Scheduler__
   * `MODULE=docker avocado run *.py`
 
 Each Module contains own 
