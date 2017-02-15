@@ -13,8 +13,9 @@ class CommonFunctions(Test):
     """
     :avocado: disable
     """
-    def __init__(self, config):
-        
+    def __init__(self, config="config.yaml"):
+        with open(config, 'r') as ymlfile:
+            self.config = yaml.load(ymlfile)
 
 class ContainerHelper(CommonFunctions):
     def __init__(self, icontainer):
@@ -47,8 +48,8 @@ class ContainerHelper(CommonFunctions):
             self.name = self.icontainer
     
 
-    def exec(self, args = "-it -d", command = "/bin/bash"):
-        return process.run("docker run %s %s %s" % (args, self.name, command))
+    def exec(self, command = "ls /", args=""):
+        return process.run("docker exec %s %s %s" % (args, self.docker_id, command))
 
     def run(self, args = "-it -d", command = "/bin/bash"):
         self.docker_id = process.run("docker run %s %s %s" % (args, self.name, command)).stdout
@@ -67,7 +68,9 @@ class ContainerHelper(CommonFunctions):
     def labels(self,text):
         if text in process.run("docker inspect %s"):...
 
-class dockerGeneral():
+# to have a general class
+if 
+dockerGeneral config
     
 
 if __name__ == '__main__':
