@@ -16,7 +16,7 @@ nd then there will be just general tests,
 ## Dependencies 
  * base dependencies: python2
  * python dependencies: avocado-framework yaml
-```bash
+   ```
 dnf -y install python2 python2-pip
 pip install avocado-framework yaml
 ```
