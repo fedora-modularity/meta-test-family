@@ -1,0 +1,30 @@
+document: modularity-testing
+version: 1
+service:
+    name: memcached
+    port: 11211
+packages: 
+    rpms:
+        - memcached
+        - perl-Carp
+module-docker:
+    start:
+        - "docker run -it -e CACHE_SIZE=128 -p 11211:11211"
+    stop:
+    labels:
+        description: "memcached is a high-performance, distributed memory"
+        io.k8s.description: "memcached is a high-performance, distributed memory"
+    source: https://github.com/container-images/memcached.git
+    container: docker.io/phracek/memcached
+module-rpm:
+    start:
+        - systemctl start memcached
+    stop:
+        - systemctl stop memcached
+    repos:
+        https://fedorapeople.org/groups/modularity/repos/base-runtime/26/
+        https://fedorapeople.org/groups/modularity/repos/fedora/25/memcahced/x86_64/os/
+test:
+    sanity1:
+        - 'echo set KEY META_DATA EXPIRY_TIME LENGTH_IN_BYTES | ncat localhost 11211'
+        - 'echo get KEY | ncat localhost 11211'
