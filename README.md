@@ -9,7 +9,7 @@
   * General tests using avocado framework
   * There is General test for modules: `./base/modulelint.py` (in progress)
   * Example test in `memcached` module
- * __Scheduler__
+ * __Schedule Tests__
   * Run tests of all modules in this repo:
    ```
 ./run-tests
