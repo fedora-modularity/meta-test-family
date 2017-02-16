@@ -7,15 +7,22 @@
   * It cloud contain also simple test 
  * __Avocado tests__
   * General tests using avocado framework
+  * There is General test for modules: `./base/modulelint.py` (in progress)
+  * Example test in `memcached` module
  * __Scheduler__
-  * `MODULE=docker avocado run *.py`
+  * Run tests of all modules in this repo:
+   ```
+./run-tests
+```
+  * Run Tests in module directory:
+   ```
+MODULE=docker aavocado run ./*.py ../base/modulelint.py
+```
 
-Each Module contains own 
-nd then there will be just general tests, 
 
 ## Dependencies 
  * base dependencies: python2
- * python dependencies: avocado-framework yaml
+ * python dependencies: avocado-framework yaml json
    ```
 dnf -y install python2 python2-pip
 pip install avocado-framework yaml
