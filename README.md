@@ -16,7 +16,7 @@
 ```
   * Run Tests in module directory:
    ```
-MODULE=docker aavocado run ./*.py ../base/modulelint.py
+MODULE=docker avocado run ./*.py ../base/modulelint.py
 ```
 
 
@@ -25,6 +25,6 @@ MODULE=docker aavocado run ./*.py ../base/modulelint.py
  * python dependencies: avocado-framework yaml json
    ```
 dnf -y install python2 python2-pip
-pip install avocado-framework yaml
+pip install avocado-framework yaml json
 ```
 
