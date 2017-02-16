@@ -10,6 +10,7 @@
   * There is General test for modules: `./base/modulelint.py` (in progress)
   * Example test in `memcached` module
  * __Schedule Tests__
+  * Now it is expected to run this __under root__ 
   * Run tests of all modules in this repo:
    ```
 ./run-tests
