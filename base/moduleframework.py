@@ -139,7 +139,7 @@ gpgcheck=0
             f.close()
 
     def prepareSetup(self):
-        utils.process.run("dnf -y --disablerepo=* --enablerepo=%s* install %s rpm" % (self.moduleName, self.installroot, self.moduleName))
+        utils.process.run("dnf -y --disablerepo=* --enablerepo=%s* install %s rpm" % (self.moduleName, self.moduleName))
             
     def status(self, command = "systemctl status"):
         if self.info.has_key('status'):
