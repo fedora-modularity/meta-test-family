@@ -15,13 +15,13 @@
    ```
 make check
 ```
-  * Run Tests in module directory:
+  * Run Tests in module directory, ensure you installed new version via `make install`:
    ```
 MODULE=docker avocado run ./*.py ../base/modulelint.py
 ```
  * __Using Makefile__
-  * it installs framework inside side packages, it create directory /usr/share/moduleframework and link it into  python site-packages
-  * `make check` - runs test
+  * `make intall` - installs packages to python site-packages and to /usr/share/moduleframework
+  * `make check` -  run tests
 
 ## Dependencies 
  * base dependencies: python2
