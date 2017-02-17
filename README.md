@@ -22,7 +22,7 @@ MODULE=rpm avocado run ./*.py ../base/modulelint.py
 ```
 
  * __Using Makefile__
-  * `make intall` - installs packages to python site-packages and to /usr/share/moduleframework
+  * `make install` - installs packages to python site-packages and to /usr/share/moduleframework
   * `make check` -  run tests
 
 ## Dependencies 
