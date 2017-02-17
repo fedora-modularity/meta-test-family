@@ -6,6 +6,7 @@ import re
 import shutil
 import yaml
 import json
+import time
 from avocado import Test
 from avocado import utils
 
@@ -150,6 +151,7 @@ gpgcheck=0
             utils.process.run(self.info['start'])
         else:
             utils.process.run("%s %s" % (command, self.moduleName))
+        time.sleep(2)
 
     def stop(self, command = "systemctl stop"):
         if self.info.has_key('stop'):
