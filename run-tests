@@ -5,7 +5,7 @@ TYPES="docker"
 for SERVICE in $TESTING; do
     for TYPE in $TYPES; do (
         cd $SERVICE
-        MODULE=$TYPE avocado run ./*.py /usr/share/moduleframework/*.py
+        MODULE=$TYPE avocado run ./*.py /usr/share/moduleframework/modulelint.py
     )
     done
 done

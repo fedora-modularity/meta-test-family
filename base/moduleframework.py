@@ -8,6 +8,8 @@ import json
 from avocado import Test
 from avocado import utils
 
+MODULE = os.environ.get('MODULE')
+
 class CommonFunctions():
 
     def loadconfig(self):
@@ -30,6 +32,7 @@ class ContainerHelper(Test, CommonFunctions):
         #/mnt/redhat/brewroot/packages/cockpit-ws-docker/131/1/images/docker-image-sha256:71df4da82ff401d88e31604439b5ce67563e6bae7056f75f8f6dc715b64b4e02.x86_64.tar.gz
         self.tarbased=None
         self.name=None
+        self.docker_id=None
         self.icontainer = self.info['container']
         self.prepare()
         self.prepareContainer()
@@ -60,7 +63,8 @@ class ContainerHelper(Test, CommonFunctions):
                     myfile.write("INSECURE_REGISTRY='--insecure-registry $REGISTRY %s'" % registry)
         try:
             utils.process.run("systemctl status docker")
-        except e:
+        except Exception as e:
+            print e
             utils.process.run("systemctl restart docker")
 
     def pullContainer(self):
@@ -71,35 +75,30 @@ class ContainerHelper(Test, CommonFunctions):
         self.containerInfo = json.loads(utils.process.run("docker inspect --format='{{json .Config}}'  %s" % self.name ).stdout)
 
     def start(self, args = "-it -d", command = "/bin/bash"):
-        if self.info.has_key('start'):
-            self.docker_id = utils.process.run("%s -d %s" % (self.info['start'], self.name)).stdout
-        else:
-            self.docker_id = utils.process.run("docker run %s %s %s" % (args, self.name, command)).stdout
+        if not self.docker_id:
+            if self.info.has_key('start'):
+                self.docker_id = utils.process.run("%s -d %s" % (self.info['start'], self.name)).stdout
+            else:
+                self.docker_id = utils.process.run("docker run %s %s %s" % (args, self.name, command)).stdout
 
     def stop(self):
         try:
             utils.process.run("docker stop %s" % self.docker_id)
             utils.process.run("docker rm %s" % self.docker_id)
-        except e:
+        except Exception as e:
+            print e
             print "docker already removed"
+            pass
 
     def run(self, command = "ls /", args=""):
-        
+        self.start()
         return utils.process.run("docker exec %s %s %s" % (args, self.docker_id, command))
-
-    
-    def SanityConnection():
-        return "bin" in self.run("ls /").stdout
 
     def checkLabel(self, key, value):
         if self.containerInfo['Labels'].has_key(key) and (value in self.containerInfo['Labels'][key]):
-            return 0
-        return 1
+            return True
+        return False
 
-    def SanityLabels(self):
-        for key,value in self.info['labels']:
-                print self.checkLabel(key, value), key, value 
-    
-if "docker" in os.environ.get('MODULE'):
+if "docker" in MODULE:
     AvocadoTest = ContainerHelper
     
