@@ -109,7 +109,8 @@ class RpmHelper(Test, CommonFunctions):
     """
     def setUp(self):
         self.loadconfig()
-        self.installroot=os.path.join("/opt", self.moduleName)
+        #self.installroot=os.path.join("/opt", self.moduleName)
+        #self.installroot="/"
         self.yumrepo=os.path.join("/etc","yum.repos.d","%s.repo" % self.moduleName)
         self.info = self.config['module']['rpm']
         self.prepare()
@@ -119,11 +120,9 @@ class RpmHelper(Test, CommonFunctions):
         self.stop()
 
     def prepare(self):
-        # TODO wokaround for modularity
-        utils.process.run("dnf -y install memcached", ignore_status=True)
-        if not os.path.exists(self.installroot):
+        #if not os.path.exists(self.installroot):
         #    shutil.rmtree(self.installroot)
-            os.makedirs(self.installroot)
+         #   os.makedirs(self.installroot)
         if not os.path.isfile(self.yumrepo):
             counter=0
             f=open(self.yumrepo, 'w')
@@ -140,7 +139,7 @@ gpgcheck=0
             f.close()
 
     def prepareSetup(self):
-        utils.process.run("dnf -y --disablerepo=* --enablerepo=%s* --installroot=%s --releasever=25 install %s rpm" % (self.moduleName, self.installroot, self.moduleName))
+        utils.process.run("dnf -y --disablerepo=* --enablerepo=%s* install %s rpm" % (self.moduleName, self.installroot, self.moduleName))
             
     def status(self, command = "systemctl status"):
         if self.info.has_key('status'):
@@ -162,7 +161,7 @@ gpgcheck=0
             utils.process.run("%s %s" % (command, self.moduleName))
 
     def run(self, command = "ls /"):
-        return utils.process.run("chroot %s /bin/bash -c '%s'" % (self.installroot, command))
+        return utils.process.run(command)
 
 if "docker" in MODULE:
     AvocadoTest = ContainerHelper
