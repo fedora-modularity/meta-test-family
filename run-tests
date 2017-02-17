@@ -3,9 +3,9 @@
 TESTING="memcached"
 TYPES="rpm docker"
 for SERVICE in $TESTING; do
-echo "> > > > $SERVICE BASED TESTING"
+echo "> > > > MODULE: $SERVICE"
     for TYPE in $TYPES; do (
-        echo "> > > >   $TYPE BASED TESTING"
+        echo "> > > >   $TYPE based testing"
         cd $SERVICE
         MODULE=$TYPE avocado run ./*.py /usr/share/moduleframework/modulelint.py
     )
