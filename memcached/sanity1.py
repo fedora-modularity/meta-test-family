@@ -6,9 +6,6 @@ import socket
 import time
 from avocado import utils
 from avocado import main
-machine_test_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)),"..","base")
-if not machine_test_dir in sys.path:
-    sys.path.insert(1, machine_test_dir)
 import moduleframework
 
 class SanityCheck1(moduleframework.AvocadoTest):

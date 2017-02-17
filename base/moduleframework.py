@@ -8,7 +8,6 @@ import json
 from avocado import Test
 from avocado import utils
 
-
 class CommonFunctions():
 
     def loadconfig(self):

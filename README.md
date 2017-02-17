@@ -13,13 +13,15 @@
   * Now it is expected to run this __under root__ 
   * Run tests of all modules in this repo:
    ```
-./run-tests
+make check
 ```
   * Run Tests in module directory:
    ```
 MODULE=docker avocado run ./*.py ../base/modulelint.py
 ```
-
+ * __Using Makefile__
+  * it installs framework inside side packages, it create directory /usr/share/moduleframework and link it into  python site-packages
+  * `make check` - runs test
 
 ## Dependencies 
  * base dependencies: python2
