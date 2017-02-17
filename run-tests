@@ -1,7 +1,7 @@
 #!/bin/bash
 
 TESTING="memcached"
-TYPES="docker"
+TYPES="rpm docker"
 for SERVICE in $TESTING; do
     for TYPE in $TYPES; do (
         cd $SERVICE
