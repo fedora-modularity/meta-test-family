@@ -24,7 +24,7 @@ Vagrant.configure(2) do |config|
     config.vm.provision "shell", inline: <<-SHELL
         set -eu
         #dnf update -y
-        dnf install -y memcached python-pip make docker
+        dnf install -y python-pip make docker
         cd /vagrant
         make install
         make check

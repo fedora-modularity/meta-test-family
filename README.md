@@ -9,7 +9,12 @@
   * General tests using avocado framework
   * There is General test for modules: `./base/modulelint.py`
   * Example test in `memcached` module
- * __Schedule Tests__
+
+## Running using VAGRANT
+ * install vagrant `dnf -y install vagrant`
+ * just run `vagrant up`
+
+## Schedule Tests
   * Now it is expected to run this __under root__ 
   * ensure you installed new version via `make install`
   * * __Docker base module testing:__
@@ -26,9 +31,9 @@ MODULE=rpm avocado run ./*.py ../base/modulelint.py
   * `make check` -  run tests
 
 ## Dependencies 
- * base dependencies: python2-pip
+ * base dependencies: docker python-pip
  * python dependencies: avocado-framework yaml json
    ```
-dnf -y instal python2-pip
+dnf -y instal docker python-pip
 ```
 

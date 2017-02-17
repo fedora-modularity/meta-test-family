@@ -119,6 +119,8 @@ class RpmHelper(Test, CommonFunctions):
         self.stop()
 
     def prepare(self):
+        # TODO wokaround for modularity
+        utils.process.run("dnf -y install memcached", ignore_status=True)
         if not os.path.exists(self.installroot):
         #    shutil.rmtree(self.installroot)
             os.makedirs(self.installroot)
