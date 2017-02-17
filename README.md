@@ -24,10 +24,9 @@ MODULE=docker avocado run ./*.py ../base/modulelint.py
   * `make check` -  run tests
 
 ## Dependencies 
- * base dependencies: python2
+ * base dependencies: python2-pip
  * python dependencies: avocado-framework yaml json
    ```
-dnf -y install python2 python2-pip
-pip install avocado-framework yaml json
+dnf -y instal python2-pip
 ```
 
