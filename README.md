@@ -5,10 +5,15 @@
   * Each module will need to have yaml config file
   * Config file should cover non generic part - part focused on general module testing
   * It cloud contain also simple test 
+  * __Self generated tests__
+   * there is possible to write simple tests directly in yaml config file
+   * Bash style testing
+   * It has  to have solved dependencies inside each module type
  * __Avocado tests__
-  * General tests using avocado framework
-  * There is General test for modules: `./base/modulelint.py`
-  * Example test in `memcached` module
+  * There is wrapper class what helps you to tests modules not focusing on module type
+  * It uses avocado-framwork
+  * General test for modules: `./base/modulelint.py`
+  * Example tests in `memcached` module
 
 ## Running using VAGRANT
  * install vagrant `dnf -y install vagrant`
