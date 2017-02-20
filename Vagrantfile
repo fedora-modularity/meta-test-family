@@ -24,7 +24,6 @@ Vagrant.configure(2) do |config|
 
     config.vm.provision "shell", inline: <<-SHELL
         set -x
-        #dnf update -y
         dnf install -y python-pip make docker httpd git
         pip install avocado-framework
         git clone https://github.com/avocado-framework/avocado.git
