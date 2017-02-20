@@ -46,4 +46,4 @@ mkdir yourcomponent
 cd yourcomponent
 # CREATE your config.yaml
 ```
-  * __additional tests__ - see https://gitlab.cee.redhat.com/jscotka/modularity-testing/blob/master/memcached/sanity1.py as an example for you
+ * __additional tests__ - see https://gitlab.cee.redhat.com/jscotka/modularity-testing/blob/master/memcached/sanity1.py as an example for you
