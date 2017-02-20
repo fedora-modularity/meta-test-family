@@ -8,8 +8,9 @@ Vagrant.configure(2) do |config|
     config.vm.box = "fedora/25-cloud-base"
     config.vm.synced_folder ".", "/vagrant"
     config.vm.network "private_network", ip: "192.168.50.10"
+    config.vm.network "forwarded_port", guest: 8000, host: 8000
     config.vm.hostname = "moduletesting"
-    config.vm.post_up_message = "Nothing important"
+    config.vm.post_up_message = "Results: http://localhost:8000"
 
     config.vm.provider "libvirt" do |libvirt|
         libvirt.memory = 1024
@@ -22,11 +23,15 @@ Vagrant.configure(2) do |config|
     end
 
     config.vm.provision "shell", inline: <<-SHELL
-        set -eu
+        set -x
         #dnf update -y
-        dnf install -y python-pip make docker
+        dnf install -y python-pip make docker python-libs
         cd /vagrant
         make install
         make check
+
+        cd /root/avocado/
+        nohup python –m SimpleHTTPServer&
+        sleep 2
     SHELL
 end

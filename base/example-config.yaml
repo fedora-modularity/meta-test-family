@@ -25,5 +25,5 @@ module:
             https://fedorapeople.org/groups/modularity/repos/fedora/25/memcahced/x86_64/os/
 test:
     sanity1:
-        - 'echo set KEY META_DATA EXPIRY_TIME LENGTH_IN_BYTES | ncat localhost 11211'
-        - 'echo get KEY | ncat localhost 11211'
+        - 'echo set KEY META_DATA EXPIRY_TIME LENGTH_IN_BYTES | nc localhost 11211'
+        - 'echo get KEY | nc localhost 11211'

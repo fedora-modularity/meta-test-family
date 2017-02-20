@@ -8,7 +8,7 @@ check: clean
 .PHONY: clean
 
 clean:
-	rm -fv */*.pyc
+	rm -fv */*.pyc */generated.py
 
 install: clean
 	pip install PyYAML avocado-framework
@@ -16,6 +16,7 @@ install: clean
 	mkdir -p $(INSTALLPATH)
 	cp base/moduleframework.py $(INSTALLPATH)/__init__.py
 	cp base/modulelint.py $(INSTALLPATH)/
+	cp base/generator.py $(INSTALLPATH)/
 	ln -sf $(INSTALLPATH) $(PYTHONSITE)/$(NAME)
 
 all: install check

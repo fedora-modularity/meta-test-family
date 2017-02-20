@@ -23,6 +23,9 @@ module:
             - http://download.englab.brq.redhat.com/pub/fedora/releases/25/Everything/x86_64/os/
             - https://phracek.fedorapeople.org/memcached-module-repo/
 test:
-    sanity1:
-        - 'echo set KEY META_DATA EXPIRY_TIME LENGTH_IN_BYTES | ncat localhost 11211'
-        - 'echo get KEY | ncat localhost 11211'
+    processrunnig:
+        - 'ls  /proc/*/exe -alh | grep memcached'
+    selfcheck:
+        - 'echo errr | nc localhost 11211'
+        - 'echo errr | nc localhost 11211 |grep ERROR'
+

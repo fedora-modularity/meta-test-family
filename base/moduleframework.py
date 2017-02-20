@@ -94,9 +94,9 @@ class ContainerHelper(Test, CommonFunctions):
             print "docker already removed"
             pass
 
-    def run(self, command = "ls /", args=""):
+    def run(self, command = "ls /"):
         self.start()
-        return utils.process.run("docker exec %s %s %s" % (args, self.docker_id, command))
+        return utils.process.run("docker exec %s bash -c '%s'" % (self.docker_id, command))
 
     def checkLabel(self, key, value):
         if self.containerInfo['Labels'].has_key(key) and (value in self.containerInfo['Labels'][key]):
@@ -161,10 +161,10 @@ gpgcheck=0
             utils.process.run("%s %s" % (command, self.moduleName))
 
     def run(self, command = "ls /"):
-        return utils.process.run(command)
+        return utils.process.run("bash -c '%s'" % command)
 
-if "docker" in MODULE:
+if MODULE and "docker" in MODULE:
     AvocadoTest = ContainerHelper
-elif "rpm" in MODULE:
+elif MODULE and "rpm" in MODULE:
     AvocadoTest = RpmHelper
     

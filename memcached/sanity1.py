@@ -1,10 +1,6 @@
 #!/usr/bin/python
 
-import os
-import sys
 import socket
-import time
-from avocado import utils
 from avocado import main
 import moduleframework
 
@@ -27,7 +23,7 @@ class SanityCheck1(moduleframework.AvocadoTest):
         
     def test2(self):
         self.start()
-        self.run("ls /")
+        self.run("ls / | grep bin")
 
 if __name__ == '__main__':
     main()
