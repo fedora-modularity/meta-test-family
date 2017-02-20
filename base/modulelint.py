@@ -11,7 +11,7 @@ class DockerLint(moduleframework.AvocadoTest):
     """
     def setUp(self):
         if moduleframework.MODULE != "docker":
-            self.skip("Dcoker specific test")
+            self.skip("Docker specific test")
         super(DockerLint, self).setUp()
 
 
