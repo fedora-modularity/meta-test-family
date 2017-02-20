@@ -37,3 +37,13 @@ MODULE=rpm avocado run ./*.py ../base/modulelint.py
 dnf -y instal docker python-pip
 ```
 
+## How to write tests
+ * __minimal path creation__
+  ```
+git clone git@gitlab.cee.redhat.com:jscotka/modularity-testing.git
+cd modularity-testing
+mkdir yourcomponent
+cd yourcomponent
+# CREATE your config.yaml
+```
+  * __additional tests__ - see https://gitlab.cee.redhat.com/jscotka/modularity-testing/blob/master/memcached/sanity1.py as an example for you
