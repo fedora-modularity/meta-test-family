@@ -167,52 +167,54 @@ class AvocadoTest(Test):
     """
     :avocado: disable
     """
-    _hidden = None
+    backend = None
 
     def __init__(self, *args, **kwargs):
         Test.__init__(self, **kwargs)
         if os.environ.get('MODULE'):
             if os.environ.get('MODULE') == "docker":
-                self._hidden = ContainerHelper()
+                self.backend = ContainerHelper()
                 self.moduleType = "docker"
             elif os.environ.get('MODULE') == "rpm":
-                self._hidden = RpmHelper()
+                self.backend = RpmHelper()
                 self.moduleType = "rpm"
         if self.params.get('module-type'):
             print ">>>>>", self.params.get('module-type')
             if self.params.get('module-type')['module'] == "docker":
-                self._hidden = ContainerHelper()
+                self.backend = ContainerHelper()
                 self.moduleType = "docker"
             elif self.params.get('module-type')['module'] == "rpm":
-                self._hidden = RpmHelper()
+                self.backend = RpmHelper()
                 self.moduleType = "rpm"
+
     def setUp(self, *args, **kwargs):
-        return self._hidden.setUp( *args, **kwargs)
+        return self.backend.setUp( *args, **kwargs)
 
     def tearDown(self, *args, **kwargs):
-        return self._hidden.tearDown( *args, **kwargs)
+        return self.backend.tearDown( *args, **kwargs)
 
     def start(self, *args, **kwargs):
-        return self._hidden.start( *args, **kwargs)
+        return self.backend.start( *args, **kwargs)
 
     def stop(self, *args, **kwargs):
-        return self._hidden.stop( *args, **kwargs)
+        return self.backend.stop( *args, **kwargs)
 
     def run(self, *args, **kwargs):
-        return self._hidden.run( *args, **kwargs)
+        return self.backend.run( *args, **kwargs)
 
     def getConfig(self):
-        return self._hidden.config
+        return self.backend.config
 
     def getConfigModule(self):
-        return self._hidden.info
+        return self.backend.info
 
 class ContainerAvocadoTest(AvocadoTest):
     """
     :avocado: disable
     """
+
     def checkLabel(self, key, value):
-        if self.getConfigModule()['Labels'].has_key(key) and (value in self.getConfigModule()['Labels'][key]):
+        if self.backend.containerInfo['Labels'].has_key(key) and (value in self.backend.containerInfo['Labels'][key]):
             return True
         return False
 
