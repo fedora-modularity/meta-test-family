@@ -15,9 +15,10 @@ MODULE = os.environ.get('MODULE')
 class CommonFunctions():
 
     def loadconfig(self):
-        config = os.environ.get('CONFIG') if os.environ.get('CONFIG') else "config.yaml"
-        with open(config, 'r') as ymlfile:
-            self.config = yaml.load(ymlfile)
+        xconfig = os.environ.get('CONFIG') if os.environ.get('CONFIG') else "config.yaml"
+        with open(xconfig, 'r') as xymlfile:
+            self.config = yaml.load(xymlfile)
+            print self.config
             if self.config['document'] != 'modularity-testing':
                 print "Bad config file"
                 sys.exit(1)
@@ -178,7 +179,7 @@ class AvocadoTest(Test):
             elif os.environ.get('MODULE') == "rpm":
                 self.backend = RpmHelper()
                 self.moduleType = "rpm"
-        if self.params.get('module'):
+        elif self.params.get('module'):
             if self.params.get('module') == "docker":
                 self.backend = ContainerHelper()
                 self.moduleType = "docker"

@@ -11,7 +11,6 @@ clean:
 	rm -fv */*.pyc */generated.py
 
 install: clean
-	pip install PyYAML avocado-framework
 	
 	mkdir -p $(INSTALLPATH)/tools
 	cp base/moduleframework.py $(INSTALLPATH)/__init__.py

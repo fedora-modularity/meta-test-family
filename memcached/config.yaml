@@ -3,7 +3,7 @@ version: 1
 name: memcached
 service:
     port: 11211
-packages: 
+packages:
     rpms:
         - memcached
         - perl-Carp

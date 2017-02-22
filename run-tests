@@ -1,14 +1,26 @@
 #!/bin/bash
 
-TESTING="memcached"
+SERVICES="memcached"
 TYPES="rpm docker"
+
+#for SERVICE in $TESTING; do
+#echo "> > > > MODULE: $SERVICE"
+#    for TYPE in $TYPES; do (
+#        echo "> > > >   $TYPE based testing"
+#        cd $SERVICE
+#        /usr/share/moduleframework/generator.py
+#        MODULE=$TYPE avocado run ./*.py /usr/share/moduleframework/modulelint.py
+#    )
+#    done
+#done
+
 PTH="/usr/share/moduleframework/tools"
 
-for SERVICE in $TESTING; do
+for SERVICE in $SERVICES; do
 echo "> > > > SERVICE: $SERVICE"
     (
         cd $SERVICE
         $PTH/generator.py
-        MODULE=$TYPE avocado run -m $PTH/general_multiplex.yaml -- ./*.py $PTH/modulelint.py
+        avocado run -m $PTH/general_multiplex.yaml -- ./*.py $PTH/modulelint.py
     )
 done
