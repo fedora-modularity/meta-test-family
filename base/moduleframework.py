@@ -178,12 +178,11 @@ class AvocadoTest(Test):
             elif os.environ.get('MODULE') == "rpm":
                 self.backend = RpmHelper()
                 self.moduleType = "rpm"
-        if self.params.get('module-type'):
-            print ">>>>>", self.params.get('module-type')
-            if self.params.get('module-type')['module'] == "docker":
+        if self.params.get('module'):
+            if self.params.get('module') == "docker":
                 self.backend = ContainerHelper()
                 self.moduleType = "docker"
-            elif self.params.get('module-type')['module'] == "rpm":
+            elif self.params.get('module') == "rpm":
                 self.backend = RpmHelper()
                 self.moduleType = "rpm"
 

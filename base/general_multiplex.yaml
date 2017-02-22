@@ -1,0 +1,5 @@
+module-type: !mux
+    docker:
+        module: 'docker'
+    rpm:
+        module: 'rpm'
