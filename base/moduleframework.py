@@ -24,7 +24,7 @@ class CommonFunctions():
             self.packages = self.config['packages']['rpms']
             self.moduleName = self.config['name']
 
-class ContainerHelper(Test, CommonFunctions):
+class ContainerHelper(CommonFunctions):
     """
     :avocado: disable
     """
@@ -98,12 +98,7 @@ class ContainerHelper(Test, CommonFunctions):
         self.start()
         return utils.process.run("docker exec %s bash -c '%s'" % (self.docker_id, command))
 
-    def checkLabel(self, key, value):
-        if self.containerInfo['Labels'].has_key(key) and (value in self.containerInfo['Labels'][key]):
-            return True
-        return False
-
-class RpmHelper(Test, CommonFunctions):
+class RpmHelper(CommonFunctions):
     """
     :avocado: disable
     """
@@ -163,8 +158,65 @@ gpgcheck=0
     def run(self, command = "ls /"):
         return utils.process.run("bash -c '%s'" % command)
 
-if MODULE and "docker" in MODULE:
-    AvocadoTest = ContainerHelper
-elif MODULE and "rpm" in MODULE:
-    AvocadoTest = RpmHelper
-    
+#if MODULE and "docker" in MODULE:
+#    AvocadoTest = ContainerHelper
+#elif MODULE and "rpm" in MODULE:
+#    AvocadoTest = RpmHelper
+
+class AvocadoTest(Test):
+    """
+    :avocado: disable
+    """
+    _hidden = None
+
+    def __init__(self, *args, **kwargs):
+        Test.__init__(self, **kwargs)
+        if os.environ.get('MODULE'):
+            if os.environ.get('MODULE') == "docker":
+                self._hidden = ContainerHelper()
+                self.moduleType = "docker"
+            elif os.environ.get('MODULE') == "rpm":
+                self._hidden = RpmHelper()
+                self.moduleType = "rpm"
+        if self.params.get('module-type'):
+            if self.params.get('module-type')['module'] == "docker":
+                self._hidden = ContainerHelper()
+                self.moduleType = "docker"
+            elif self.params.get('module-type')['module'] == "rpm":
+                self._hidden = RpmHelper()
+                self.moduleType = "rpm"
+    def setUp(self, *args, **kwargs):
+        return self._hidden.setUp( *args, **kwargs)
+
+    def tearDown(self, *args, **kwargs):
+        return self._hidden.tearDown( *args, **kwargs)
+
+    def start(self, *args, **kwargs):
+        return self._hidden.start( *args, **kwargs)
+
+    def stop(self, *args, **kwargs):
+        return self._hidden.stop( *args, **kwargs)
+
+    def run(self, *args, **kwargs):
+        return self._hidden.run( *args, **kwargs)
+
+    def getConfig(self):
+        return self._hidden.config
+
+    def getConfigModule(self):
+        return self._hidden.info
+
+class ContainerAvocadoTest(AvocadoTest):
+    """
+    :avocado: disable
+    """
+    def checkLabel(self, key, value):
+        if self.containerInfo['Labels'].has_key(key) and (value in self.containerInfo['Labels'][key]):
+            return True
+        return False
+
+class RpmAvocadoTest(AvocadoTest):
+    """
+    :avocado: disable
+    """
+    pass

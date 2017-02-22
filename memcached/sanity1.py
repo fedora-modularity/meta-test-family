@@ -11,7 +11,7 @@ class SanityCheck1(moduleframework.AvocadoTest):
     def test1(self):
         self.start()
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(('localhost', self.config['service']['port']))
+        s.connect(('localhost', self.getConfig()['service']['port']))
         s.sendall('set Test 0 100 4\r\n\n')
         #data = s.recv(1024)
         #print data

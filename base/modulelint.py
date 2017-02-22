@@ -5,24 +5,23 @@ import moduleframework
 from avocado import utils
 from avocado import main
 
-class DockerLint(moduleframework.AvocadoTest):
+class DockerLint(moduleframework.ContainerAvocadoTest):
     """
     :avocado: enable
     """
     def setUp(self):
-        if moduleframework.MODULE != "docker":
+        if self.moduleType != "docker":
             self.skip("Docker specific test")
         super(DockerLint, self).setUp()
-
 
     def testBasic(self):
         self.start()
         self.assertTrue("bin" in self.run("ls /").stdout)
 
     def testLabels(self):
-        for key in self.info['labels']:
-            aaa = self.checkLabel(key, self.info['labels'][key])
-            self.log.debug(aaa, key, self.info['labels'][key])
+        for key in self.getConfigModule()['labels']:
+            aaa = self.checkLabel(key, self.getConfigModule()['labels'][key])
+            self.log.debug(aaa, key, self.getConfigModule()['labels'][key])
             self.assertTrue(aaa)
 
 

@@ -34,7 +34,7 @@ Vagrant.configure(2) do |config|
         make check
 
         cp -r /root/avocado/* /var/www/html/
-        chmod -r a+x /var/www/html/
+        chmod -R a+x /var/www/html/
         restorecon -r /var/www/html/
         systemctl start httpd
 
