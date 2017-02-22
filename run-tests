@@ -2,13 +2,13 @@
 
 TESTING="memcached"
 TYPES="rpm docker"
+PTH="/usr/share/moduleframework/tools"
+
 for SERVICE in $TESTING; do
-echo "> > > > MODULE: $SERVICE"
-    for TYPE in $TYPES; do (
-        echo "> > > >   $TYPE based testing"
+echo "> > > > SERVICE: $SERVICE"
+    (
         cd $SERVICE
-        /usr/share/moduleframework/generator.py
-        MODULE=$TYPE avocado run ./*.py /usr/share/moduleframework/modulelint.py
+        $PTH/generator.py
+        MODULE=$TYPE avocado run -m $PTH/general_multiplex.yaml -- ./*.py $PTH/modulelint.py
     )
-    done
 done

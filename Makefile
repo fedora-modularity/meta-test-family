@@ -13,10 +13,12 @@ clean:
 install: clean
 	pip install PyYAML avocado-framework
 	
-	mkdir -p $(INSTALLPATH)
+	mkdir -p $(INSTALLPATH)/tools
 	cp base/moduleframework.py $(INSTALLPATH)/__init__.py
-	cp base/modulelint.py $(INSTALLPATH)/
-	cp base/generator.py $(INSTALLPATH)/
+	cp base/modulelint.py $(INSTALLPATH)/tools
+	cp base/generator.py $(INSTALLPATH)/tools
+	cp base/general_multiplex.yaml $(INSTALLPATH)/tools
+	cp base/example-config.yaml $(INSTALLPATH)/tools
 	ln -sf $(INSTALLPATH) $(PYTHONSITE)/$(NAME)
 
 all: install check
