@@ -179,6 +179,7 @@ class AvocadoTest(Test):
                 self._hidden = RpmHelper()
                 self.moduleType = "rpm"
         if self.params.get('module-type'):
+            print ">>>>>", self.params.get('module-type')
             if self.params.get('module-type')['module'] == "docker":
                 self._hidden = ContainerHelper()
                 self.moduleType = "docker"
@@ -211,7 +212,7 @@ class ContainerAvocadoTest(AvocadoTest):
     :avocado: disable
     """
     def checkLabel(self, key, value):
-        if self.containerInfo['Labels'].has_key(key) and (value in self.containerInfo['Labels'][key]):
+        if self.getConfigModule()['Labels'].has_key(key) and (value in self.getConfigModule()['Labels'][key]):
             return True
         return False
 
