@@ -7,10 +7,12 @@ class TestGenerator(CommonFunctions):
         self.loadconfig()
         self.output=""
         self.templateClassBefore()
-        for testname  in self.config['test']:
-            self.templateTest(testname, self.config['test'][testname])
-        for testname  in self.config['testlocal']:
-            self.templateTest(testname, self.config['testlocal'][testname], method="runLocal")
+        if self.config.has_key('test'):
+            for testname  in self.config['test']:
+                self.templateTest(testname, self.config['test'][testname])
+        if self.config.has_key('testlocal'):
+            for testname  in self.config['testlocal']:
+                self.templateTest(testname, self.config['testlocal'][testname], method="runLocal")
 
     def templateClassBefore(self):
         self.output = """#!/usr/bin/python

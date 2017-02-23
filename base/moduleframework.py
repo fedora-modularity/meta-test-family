@@ -137,7 +137,8 @@ gpgcheck=0
             f.close()
 
     def prepareSetup(self):
-        utils.process.run("dnf -y --disablerepo=* --enablerepo=%s* install %s rpm" % (self.moduleName, self.moduleName))
+        whattoinstall = " ".join(self.packages) + " rpm"
+        utils.process.run("dnf -y --disablerepo=* --enablerepo=%s* install %s" % (self.moduleName, whattoinstall))
             
     def status(self, command = "/bin/true"):
         if self.info.has_key('status') and self.info['status']:
