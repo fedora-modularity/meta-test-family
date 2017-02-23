@@ -2,6 +2,7 @@
 
 import socket
 from avocado import main
+from avocado.core import exceptions
 import moduleframework
 
 class SanityCheck1(moduleframework.AvocadoTest):
@@ -20,10 +21,16 @@ class SanityCheck1(moduleframework.AvocadoTest):
         #data = s.recv(1024)
         #print data
         s.close()
-        
+
     def test2(self):
         self.start()
         self.run("ls / | grep bin")
+
+    def test3GccSkipped(self):
+        if "gcc" not in self.getActualProfile():
+            raise exceptions.TestDecoratorSkip("gcc is not installed")
+        self.start()
+        self.run("gcc -v")
 
 if __name__ == '__main__':
     main()

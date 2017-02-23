@@ -7,14 +7,15 @@ import shutil
 import yaml
 import json
 import time
+import urllib
 from avocado import Test
 from avocado import utils
 
 MODULE = os.environ.get('MODULE')
 
 class CommonFunctions():
-
     def loadconfig(self):
+        self.__modulemdConf = None
         xconfig = os.environ.get('CONFIG') if os.environ.get('CONFIG') else "config.yaml"
         with open(xconfig, 'r') as ymlfile:
             self.config = yaml.load(ymlfile)
@@ -24,8 +25,6 @@ class CommonFunctions():
             self.packages = self.config['packages']['rpms']
             self.moduleName = self.config['name']
 
-    def runLocal(self, command = "ls /", **kwargs):
-        return utils.process.run("%s" % command, **kwargs)
 
 class ContainerHelper(CommonFunctions):
     """
@@ -83,7 +82,7 @@ class ContainerHelper(CommonFunctions):
 
     def start(self, args = "-it -d", command = "/bin/bash"):
         if not self.docker_id:
-            if self.info.has_key('start'):
+            if self.info.has_key('start') and self.info['start']:
                 self.docker_id = utils.process.run("%s -d %s" % (self.info['start'], self.jmeno)).stdout
             else:
                 self.docker_id = utils.process.run("docker run %s %s %s" % (args, self.jmeno, command)).stdout
@@ -140,24 +139,24 @@ gpgcheck=0
     def prepareSetup(self):
         utils.process.run("dnf -y --disablerepo=* --enablerepo=%s* install %s rpm" % (self.moduleName, self.moduleName))
             
-    def status(self, command = "systemctl status"):
-        if self.info.has_key('status'):
+    def status(self, command = "/bin/true"):
+        if self.info.has_key('status') and self.info['status']:
             utils.process.run(self.info['status'])
         else:
-            utils.process.run("%s %s" % (command, self.moduleName))
+            utils.process.run("%s" % command)
     
-    def start(self, command = "systemctl start"):
-        if self.info.has_key('start'):
+    def start(self, command = "/bin/true"):
+        if self.info.has_key('start') and self.info['start']:
             utils.process.run(self.info['start'])
         else:
-            utils.process.run("%s %s" % (command, self.moduleName))
+            utils.process.run("%s" % command)
         time.sleep(2)
 
-    def stop(self, command = "systemctl stop"):
-        if self.info.has_key('stop'):
+    def stop(self, command = "/bin/true"):
+        if self.info.has_key('stop') and self.info['stop']:
             utils.process.run(self.info['stop'])
         else:
-            utils.process.run("%s %s" % (command, self.moduleName))
+            utils.process.run("%s" % command)
 
     def run(self, command = "ls /", **kwargs):
         return utils.process.run("bash -c '%s'" % command, **kwargs)
@@ -208,8 +207,19 @@ class AvocadoTest(Test):
     def getConfigModule(self):
         return self.backend.info
 
-    def runLocal(self, *args, **kwargs):
-        return self.backend.runLocal( *args,  **kwargs)
+    def runLocal(self, command = "ls /", **kwargs):
+        return utils.process.run("%s" % command, **kwargs)
+
+    def getModulemdYamlconfig(self):
+        if not self.backend.__modulemdConf:
+            with urllib.urlopen(self.getConfig()['modulemd-url']) as ymlfile:
+                self.backend.__modulemdConf = yaml.load(ymlfile)
+        return self.backend.__modulemdConf
+
+    def getActualProfile(self):
+        self.start()
+        allpackages = self.run(r'rpm -qa --qf="%{name}\n"').stdout.split('\n')
+        return allpackages
 
 # INTERFACE CLASSES FOR SPECIFIC MODULE TESTS
 class ContainerAvocadoTest(AvocadoTest):

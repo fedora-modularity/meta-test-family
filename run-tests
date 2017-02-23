@@ -1,6 +1,6 @@
 #!/bin/bash
 set -x
-SERVICES="memcached"
+SERVICES="memcached baseruntime"
 
 
 function runclassic(){
