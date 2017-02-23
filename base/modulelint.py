@@ -20,9 +20,8 @@ class DockerLint(moduleframework.ContainerAvocadoTest):
 
     def testLabels(self):
         for key in self.getConfigModule()['labels']:
-            print ">>>>>> ",  key
             aaa = self.checkLabel(key, self.getConfigModule()['labels'][key])
-            self.log.debug(aaa, key, self.getConfigModule()['labels'][key])
+            print ">>>>>> ", aaa,  key
             self.assertTrue(aaa)
 
 
