@@ -22,7 +22,7 @@
 ## Schedule Tests
   * Now it is expected to run this __under root__ 
   * ensure you installed new version via `make install`
-  * * __Docker base module testing:__
+  * __Docker base module testing:__
    ```
 MODULE=docker avocado run ./*.py ../base/modulelint.py
 ```
