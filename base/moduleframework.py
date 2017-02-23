@@ -16,14 +16,16 @@ class CommonFunctions():
 
     def loadconfig(self):
         xconfig = os.environ.get('CONFIG') if os.environ.get('CONFIG') else "config.yaml"
-        with open(xconfig, 'r') as xymlfile:
-            self.config = yaml.load(xymlfile)
-            print self.config
+        with open(xconfig, 'r') as ymlfile:
+            self.config = yaml.load(ymlfile)
             if self.config['document'] != 'modularity-testing':
                 print "Bad config file"
                 sys.exit(1)
             self.packages = self.config['packages']['rpms']
             self.moduleName = self.config['name']
+
+    def runLocal(self, command = "ls /", **kwargs):
+        return utils.process.run("%s" % command, **kwargs)
 
 class ContainerHelper(CommonFunctions):
     """
@@ -95,9 +97,10 @@ class ContainerHelper(CommonFunctions):
             print "docker already removed"
             pass
 
-    def run(self, command = "ls /"):
+    def run(self, command = "ls /", **kwargs):
         self.start()
-        return utils.process.run("docker exec %s bash -c '%s'" % (self.docker_id, command))
+        return utils.process.run("docker exec %s bash -c '%s'" % (self.docker_id, command), **kwargs)
+
 
 class RpmHelper(CommonFunctions):
     """
@@ -156,14 +159,11 @@ gpgcheck=0
         else:
             utils.process.run("%s %s" % (command, self.moduleName))
 
-    def run(self, command = "ls /"):
-        return utils.process.run("bash -c '%s'" % command)
+    def run(self, command = "ls /", **kwargs):
+        return utils.process.run("bash -c '%s'" % command, **kwargs)
 
-#if MODULE and "docker" in MODULE:
-#    AvocadoTest = ContainerHelper
-#elif MODULE and "rpm" in MODULE:
-#    AvocadoTest = RpmHelper
 
+# INTERFACE CLASS FOR GENERAL TESTS OF MODULES
 class AvocadoTest(Test):
     """
     :avocado: disable
@@ -208,6 +208,10 @@ class AvocadoTest(Test):
     def getConfigModule(self):
         return self.backend.info
 
+    def runLocal(self, *args, **kwargs):
+        return self.backend.runLocal( *args,  **kwargs)
+
+# INTERFACE CLASSES FOR SPECIFIC MODULE TESTS
 class ContainerAvocadoTest(AvocadoTest):
     """
     :avocado: disable

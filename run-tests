@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -x
 SERVICES="memcached"
 TYPES="rpm docker"
 

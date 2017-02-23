@@ -9,6 +9,8 @@ class TestGenerator(CommonFunctions):
         self.templateClassBefore()
         for testname  in self.config['test']:
             self.templateTest(testname, self.config['test'][testname])
+        for testname  in self.config['testlocal']:
+            self.templateTest(testname, self.config['testlocal'][testname], method="runLocal")
 
     def templateClassBefore(self):
         self.output = """#!/usr/bin/python
@@ -26,15 +28,17 @@ class GeneratedTestsConfig(moduleframework.AvocadoTest):
     \"\"\"
 """
 
-    def templateTest(self, testname, testlines):
+    def templateTest(self, testname, testlines, method="run"):
         self.output=self.output+"""
     def test_%s(self):
         self.start()
 """ % testname
         for line in testlines:
-            self.output = self.output + """        self.run("%s")\n""" % line
+            self.output = self.output + """        self.%s("%s")\n""" % (method, line)
+        print "Added test (runmethod: %s): %s" % (method, testname)
 
-config = TestGenerator()
-configout = open('generated.py', 'w')
-configout.write(config.output)
-configout.close()
+if __name__ == '__main__':
+    config = TestGenerator()
+    configout = open('generated.py', 'w')
+    configout.write(config.output)
+    configout.close()

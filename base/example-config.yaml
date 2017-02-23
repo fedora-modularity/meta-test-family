@@ -1,9 +1,9 @@
 document: modularity-testing
 version: 1
+name: memcached
 service:
-    name: memcached
     port: 11211
-packages: 
+packages:
     rpms:
         - memcached
         - perl-Carp
@@ -16,14 +16,20 @@ module:
         source: https://github.com/container-images/memcached.git
         container: docker.io/phracek/memcached
     rpm:
-        start:
-            - systemctl start memcached
-        stop:
-            - systemctl stop memcached
+        start: systemctl start memcached
+        stop: systemctl stop memcached
+        status: systemctl status memcached
         repos:
-            https://fedorapeople.org/groups/modularity/repos/base-runtime/26/
-            https://fedorapeople.org/groups/modularity/repos/fedora/25/memcahced/x86_64/os/
+            - http://download.englab.brq.redhat.com/pub/fedora/releases/25/Everything/x86_64/os/
+            - https://phracek.fedorapeople.org/memcached-module-repo/
 test:
-    sanity1:
-        - 'echo set KEY META_DATA EXPIRY_TIME LENGTH_IN_BYTES | nc localhost 11211'
-        - 'echo get KEY | nc localhost 11211'
+    processrunnig:
+        - 'ls  /proc/*/exe -alh | grep memcached'
+testlocal:
+    selfcheck:
+        - 'echo errr | nc localhost 11211'
+        - 'echo set AAA 0 4 2 | nc localhost 11211'
+        - 'echo get AAA | nc localhost 11211'
+    selcheckError:
+        - 'echo errr | nc localhost 11211 |grep ERROR'
+

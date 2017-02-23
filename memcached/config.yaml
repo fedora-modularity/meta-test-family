@@ -25,7 +25,11 @@ module:
 test:
     processrunnig:
         - 'ls  /proc/*/exe -alh | grep memcached'
+testlocal:
     selfcheck:
         - 'echo errr | nc localhost 11211'
+        - 'echo set AAA 0 4 2 | nc localhost 11211'
+        - 'echo get AAA | nc localhost 11211'
+    selcheckError:
         - 'echo errr | nc localhost 11211 |grep ERROR'
 
