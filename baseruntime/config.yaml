@@ -1,0 +1,28 @@
+document: modularity-testing
+version: 1
+name: baseruntime
+modulemd-url: http://raw.githubusercontent.com/container-images/memcached/master/memcached.yaml
+service:
+    port:
+packages:
+    rpms:
+        - bash
+        - coreutils
+module:
+    docker:
+        start:
+        labels:
+            description: "I dont know"
+            io.k8s.description: "I dont know too"
+        source: https://github.com/container-images/memcached.git
+        container: docker.io/fedora
+    rpm:
+        start:
+        stop:
+        status:
+        repos:
+            - https://kojipkgs.stg.fedoraproject.org/repos/module-base-runtime-master-3/latest/x86_64/
+test:
+    processrunnig:
+        - 'ls  / |grep bin'
+
