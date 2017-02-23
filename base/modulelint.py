@@ -18,6 +18,10 @@ class DockerLint(moduleframework.ContainerAvocadoTest):
         self.start()
         self.assertTrue("bin" in self.run("ls /").stdout)
 
+    def testContainerIsRunning(self):
+        self.start()
+        self.assertIn(self.backend.jmeno, self.runLocal("docker ps").stdout)
+
     def testLabels(self):
         for key in self.getConfigModule()['labels']:
             aaa = self.checkLabel(key, self.getConfigModule()['labels'][key])
