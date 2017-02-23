@@ -20,6 +20,7 @@ class DockerLint(moduleframework.ContainerAvocadoTest):
 
     def testLabels(self):
         for key in self.getConfigModule()['labels']:
+            print ">>>>>> ",  key
             aaa = self.checkLabel(key, self.getConfigModule()['labels'][key])
             self.log.debug(aaa, key, self.getConfigModule()['labels'][key])
             self.assertTrue(aaa)
@@ -29,7 +30,7 @@ class ModuleLint(moduleframework.AvocadoTest):
     """
     :avocado: enable
     """
-    def testPackages(self):
+    def testPackagesSign(self):
         RHKEY = "fd431d51"
         FEDKEY = "73bde98381b46521"
         KEY = FEDKEY
@@ -38,10 +39,13 @@ class ModuleLint(moduleframework.AvocadoTest):
         for package in allpackages.split('\n'):
             pinfo = package.split(', ')
             if len(pinfo)==3:
-                if KEY not in pinfo[2]:
-                    print "FAIL", pinfo[0]
-                else:
-                    print "PASS", pinfo[0]
+                self.assertIn(KEY,pinfo[2])
+
+    def testPackagesRpms(self):
+        self.start()
+        allpackages = self.run(r'rpm -qa --qf="%{name}\n"').stdout.split('\n')
+        for pkg in self.backend.packages:
+            self.assertIn(pkg,allpackages)
 
 if __name__ == '__main__':
     main()
