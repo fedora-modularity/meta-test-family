@@ -1,26 +1,33 @@
 #!/bin/bash
 set -x
 SERVICES="memcached"
-TYPES="rpm docker"
 
-#for SERVICE in $TESTING; do
-#echo "> > > > MODULE: $SERVICE"
-#    for TYPE in $TYPES; do (
-#        echo "> > > >   $TYPE based testing"
-#        cd $SERVICE
-#        /usr/share/moduleframework/generator.py
-#        MODULE=$TYPE avocado run ./*.py /usr/share/moduleframework/modulelint.py
-#    )
-#    done
-#done
 
-PTH="/usr/share/moduleframework/tools"
+function runclassic(){
+    TYPES="rpm docker"
+    for SERVICE in $TESTING; do
+        echo "> > > > SERVICE: $SERVICE"
+        for TYPE in $TYPES; do
+        (
+            echo "> > > >   $TYPE based testing"
+            cd $SERVICE
+            /usr/share/moduleframework/generator.py
+            MODULE=$TYPE avocado run ./*.py /usr/share/moduleframework/modulelint.py
+        )
+        done
+    done
+}
 
-for SERVICE in $SERVICES; do
-echo "> > > > SERVICE: $SERVICE"
+function runmultiplexer(){
+    PTH="/usr/share/moduleframework/tools"
+    for SERVICE in $SERVICES; do
     (
+        echo "> > > > SERVICE: $SERVICE"
         cd $SERVICE
         $PTH/generator.py
         avocado run -m $PTH/general_multiplex.yaml -- ./*.py $PTH/modulelint.py
     )
-done
+    done
+}
+
+runmultiplexer
