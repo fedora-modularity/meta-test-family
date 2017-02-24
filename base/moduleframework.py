@@ -13,9 +13,14 @@ from avocado import utils
 from avocado.core import exceptions
 
 MODULE = os.environ.get('MODULE')
+PROFILE = os.environ.get('PROFILE')
+URL = os.environ.get('URL')
+
 
 def skipTestIf(value, text="Test not intended for this module profile"):
-    if value:
+    if PROFILE and (value in PROFILE):
+        raise exceptions.TestDecoratorSkip(text)
+    elif value:
         raise exceptions.TestDecoratorSkip(text)
 
 class CommonFunctions():
@@ -43,7 +48,7 @@ class ContainerHelper(CommonFunctions):
         self.tarbased=None
         self.jmeno=None
         self.docker_id=None
-        self.icontainer = self.info['container']
+        self.icontainer = URL if URL else self.info['container']
         self.prepare()
         self.prepareContainer()
         self.pullContainer()

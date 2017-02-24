@@ -38,9 +38,9 @@ Vagrant.configure(2) do |config|
         make install
         for foo in baseruntime memcached; do
             ./run-tests $foo
-            mkdir /var/www/html/$foo
-            cp -r /root/avocado/job-results/latest/html/* /var/www/html/$foo
-            ln -sf /var/www/html/$foo/results.html /var/www/html/$foo/index.html
+            mkdir -p /var/www/html/job-results/$foo
+            cp -r /root/avocado/job-results/latest/* /var/www/html/job-results/$foo
+            ln -sf /var/www/html/job-results/$foo/html/results.html /var/www/html/job-results/$foo/index.html
         done
         chmod -R a+x /var/www/html/
         restorecon -r /var/www/html/
