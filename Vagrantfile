@@ -40,7 +40,7 @@ Vagrant.configure(2) do |config|
             ./run-tests $foo
             mkdir -p /var/www/html/job-results/$foo
             cp -r /root/avocado/job-results/latest/* /var/www/html/job-results/$foo
-            ln -sf /var/www/html/job-results/$foo/html/results.html /var/www/html/job-results/$foo/index.html
+            ln -sf /var/www/html/job-results/$foo/html/results.html /var/www/html/job-results/$foo/html/index.html
         done
         chmod -R a+x /var/www/html/
         restorecon -r /var/www/html/

@@ -8,6 +8,7 @@ import yaml
 import json
 import time
 import urllib
+import logging
 from avocado import Test
 from avocado import utils
 from avocado.core import exceptions
@@ -16,6 +17,7 @@ MODULE = os.environ.get('MODULE')
 PROFILE = os.environ.get('PROFILE')
 URL = os.environ.get('URL')
 
+LOGPARAMS = logging.getLogger('params')
 
 def skipTestIf(value, text="Test not intended for this module profile"):
     if PROFILE and (value in PROFILE):
@@ -196,6 +198,8 @@ class AvocadoTest(Test):
             elif self.params.get('module') == "rpm":
                 self.backend = RpmHelper()
                 self.moduleType = "rpm"
+        self.moduleProfile = PROFILE if PROFILE else "default"
+        LOGPARAMS.info("Module Type: %s; Profile: %s" % (self.moduleType, self.moduleProfile))
 
     def setUp(self, *args, **kwargs):
         return self.backend.setUp( *args, **kwargs)
