@@ -10,8 +10,13 @@ import time
 import urllib
 from avocado import Test
 from avocado import utils
+from avocado.core import exceptions
 
 MODULE = os.environ.get('MODULE')
+
+def skipTestIf(value, text="Test not intended for this module profile"):
+    if value:
+        raise exceptions.TestDecoratorSkip(text)
 
 class CommonFunctions():
     def loadconfig(self):

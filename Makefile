@@ -3,7 +3,7 @@ INSTALLPATH=/usr/share/$(NAME)
 PYTHONSITE=/usr/lib/python2.7/site-packages
 
 check: clean
-	./run-tests
+	./run-tests all
 
 .PHONY: clean
 

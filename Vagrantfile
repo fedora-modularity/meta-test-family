@@ -10,7 +10,7 @@ Vagrant.configure(2) do |config|
     config.vm.network "private_network", ip: "192.168.50.10"
     config.vm.network "forwarded_port", guest: 80, host: 8888
     config.vm.hostname = "moduletesting"
-    config.vm.post_up_message = "Results: http://localhost:8888/job-results/latest/html/results.html"
+    config.vm.post_up_message = "Results: http://localhost:8888/job-results"
 
     config.vm.provider "libvirt" do |libvirt|
         libvirt.memory = 1024
@@ -36,9 +36,12 @@ Vagrant.configure(2) do |config|
 
         cd /vagrant
         make install
-        make check
-        avocado -v
-        cp -r /root/avocado/* /var/www/html/
+        for foo in baseruntime memcached; do
+            ./run-tests $foo
+            mkdir /var/www/html/$foo
+            cp -r /root/avocado/job-results/latest/html/* /var/www/html/$foo
+            ln -sf /var/www/html/$foo/results.html /var/www/html/$foo/index.html
+        done
         chmod -R a+x /var/www/html/
         restorecon -r /var/www/html/
         systemctl start httpd
