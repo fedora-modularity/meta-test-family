@@ -24,6 +24,5 @@ module:
             - https://kojipkgs.stg.fedoraproject.org/repos/module-base-runtime-master-3/latest/x86_64/
 test:
     processrunnig:
-        # this is one simple test, it expect all 0 return codes of commands
         - 'ls  / | grep bin'
 
