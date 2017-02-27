@@ -15,6 +15,7 @@
  * __Avocado tests__
   * There is wrapper class what helps you to tests modules not focusing on module type
   * It uses avocado-framwork
+  * This test could be primarily used for more complex testing, not previous one
   * General test for modules: `./base/modulelint.py`
   * Example tests in `memcached` module
 
