@@ -37,6 +37,17 @@ class CommonFunctions():
             self.packages = self.config['packages']['rpms']
             self.moduleName = self.config['name']
 
+    def getModulemdYamlconfig(self,urllink=None):
+        if urllink:
+            ymlfile = urllib.urlopen(urllink)
+            cconfig = yaml.load(ymlfile)
+            return cconfig
+        else:
+            if not self.__modulemdConf:
+                ymlfile = urllib.urlopen(self.config['modulemd-url'])
+                self.__modulemdConf = yaml.load(ymlfile)
+            return self.__modulemdConf
+
 
 class ContainerHelper(CommonFunctions):
     """
@@ -225,11 +236,8 @@ class AvocadoTest(Test):
     def runLocal(self, command = "ls /", **kwargs):
         return utils.process.run("%s" % command, **kwargs)
 
-    def getModulemdYamlconfig(self):
-        if not self.backend.__modulemdConf:
-            with urllib.urlopen(self.getConfig()['modulemd-url']) as ymlfile:
-                self.backend.__modulemdConf = yaml.load(ymlfile)
-        return self.backend.__modulemdConf
+    def getModulemdYamlconfig(self, *args, **kwargs):
+        return self.backend.getModulemdYamlconfig( *args, **kwargs)
 
     def getActualProfile(self):
         self.start()
