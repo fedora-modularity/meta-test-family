@@ -1,6 +1,7 @@
 document: modularity-testing
 version: 1
 name: memcached
+modulemd-url: http://raw.githubusercontent.com/container-images/memcached/master/memcached.yaml
 service:
     port: 11211
 packages:
@@ -23,10 +24,12 @@ module:
             - http://download.englab.brq.redhat.com/pub/fedora/releases/25/Everything/x86_64/os/
             - https://phracek.fedorapeople.org/memcached-module-repo/
 test:
-    processrunnig:
-        - 'ls  /proc/*/exe -alh | grep memcached'
+    processrunning:
+        # this is one simple test, it expect all 0 return codes of command
+        'ls  /proc/*/exe -alh | grep memcached'
 testlocal:
     selfcheck:
+        # this is second simple test, it expect all 0 return codes of commands, it runs commands on host (not in module)
         - 'echo errr | nc localhost 11211'
         - 'echo set AAA 0 4 2 | nc localhost 11211'
         - 'echo get AAA | nc localhost 11211'
