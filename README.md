@@ -9,6 +9,9 @@
   * there is possible to write simple tests directly in yaml config file
   * Bash style testing
   * It has  to have solved dependencies inside each module type
+  * Now it just expect to end with `0` return code of command (like: `ls / |grep sbin` directry sbin exists in root dir)
+  * It can contain multiple lines
+  * It generates python covered bash tests
  * __Avocado tests__
   * There is wrapper class what helps you to tests modules not focusing on module type
   * It uses avocado-framwork
