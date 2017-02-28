@@ -5,7 +5,7 @@
   * Each module will need to have yaml config file
   * Config file should cover non generic part - part focused on general module testing
   * It cloud contain also simple test 
-  * [[how to write config | https://gitlab.cee.redhat.com/jscotka/modularity-testing/wikis/configfile]]
+  * __how to write config file__ https://gitlab.cee.redhat.com/jscotka/modularity-testing/wikis/configfile
  * __Self generated tests__
   * there is possible to write simple tests directly in yaml config file
   * Bash style testing
