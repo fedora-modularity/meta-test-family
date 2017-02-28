@@ -50,6 +50,7 @@ dnf -y instal docker python-pip
 ## How to write tests
  * __minimal path creation__
   * Use `git clone git@gitlab.cee.redhat.com:jscotka/modularity-testing.git` as framework and call `make install`
+   * If you do not have privileges to clone it, upload your public key to `https://gitlab.cee.redhat.com/profile/keys`
   * CREATE your config.yaml (see example https://gitlab.cee.redhat.com/jscotka/modularity-testing/blob/master/base/example-config.yaml)
   * If you have tests in config file call:  `/usr/share/moduleframework/generator.py`
   * Call command like:  `MODULE=docker avocado run /usr/share/moduleframework/modulelint.py ./*.py`
