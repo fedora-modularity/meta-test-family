@@ -18,6 +18,8 @@ install: clean
 	cp base/generator.py $(INSTALLPATH)/tools
 	cp base/general_multiplex.yaml $(INSTALLPATH)/tools
 	cp base/example-config.yaml $(INSTALLPATH)/tools
+	cp base/bashhelper.py $(INSTALLPATH)/tools
 	ln -sf $(INSTALLPATH) $(PYTHONSITE)/$(NAME)
+	ln -sf $(INSTALLPATH)/tools/bashhelper.py /usr/bin/moduleframework-cmd
 
 all: install check
