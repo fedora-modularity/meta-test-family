@@ -25,7 +25,7 @@ module:
             - https://phracek.fedorapeople.org/memcached-module-repo/
 test:
     processrunning:
-        'ls  /proc/*/exe -alh | grep memcached'
+        - 'ls  /proc/*/exe -alh | grep memcached'
 testhost:
     selfcheck:
         - 'echo errr | nc localhost 11211'
