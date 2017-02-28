@@ -233,7 +233,7 @@ class AvocadoTest(Test):
     def getConfigModule(self):
         return self.backend.info
 
-    def runLocal(self, command = "ls /", **kwargs):
+    def runHost(self, command = "ls /", **kwargs):
         return utils.process.run("%s" % command, **kwargs)
 
     def getModulemdYamlconfig(self, *args, **kwargs):

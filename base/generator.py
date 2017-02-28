@@ -10,9 +10,9 @@ class TestGenerator(CommonFunctions):
         if self.config.has_key('test'):
             for testname  in self.config['test']:
                 self.templateTest(testname, self.config['test'][testname])
-        if self.config.has_key('testlocal'):
-            for testname  in self.config['testlocal']:
-                self.templateTest(testname, self.config['testlocal'][testname], method="runLocal")
+        if self.config.has_key('testhost'):
+            for testname  in self.config['testhost']:
+                self.templateTest(testname, self.config['testhost'][testname], method="runHost")
 
     def templateClassBefore(self):
         self.output = """#!/usr/bin/python

@@ -20,7 +20,7 @@ class DockerLint(moduleframework.ContainerAvocadoTest):
 
     def testContainerIsRunning(self):
         self.start()
-        self.assertIn(self.backend.jmeno, self.runLocal("docker ps").stdout)
+        self.assertIn(self.backend.jmeno, self.runHost("docker ps").stdout)
 
     def testLabels(self):
         for key in self.getConfigModule()['labels']:
