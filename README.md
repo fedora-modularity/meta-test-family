@@ -21,10 +21,10 @@
   * Example tests in `memcached` module
  * __Simple bash tests__
   * There is helper what you can use for writing `bash` like tests
-  * library is [[ here | https://gitlab.cee.redhat.com/jscotka/modularity-testing/blob/master/base/bashhelper.py ]] and it is installed as `moduleframework-cmd` command in `/usr/bin`
+  * library is https://gitlab.cee.redhat.com/jscotka/modularity-testing/blob/master/base/bashhelper.py and it is installed as `moduleframework-cmd` command in `/usr/bin`
   * Test has to call setup and cleanup of module explicitly
   * These tests are dependent on return code of commans in test, so in case you have more tests subtest, just count return codes
-  * see example test for [[ memcached | https://gitlab.cee.redhat.com/jscotka/modularity-testing/blob/master/memcached/sanity2.sh]]
+  * see example test for https://gitlab.cee.redhat.com/jscotka/modularity-testing/blob/master/memcached/sanity2.sh
 
 ## Running using VAGRANT
  * install vagrant `dnf -y install vagrant`
