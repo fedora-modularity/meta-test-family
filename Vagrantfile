@@ -25,7 +25,7 @@ Vagrant.configure(2) do |config|
     config.vm.provision "shell", inline: <<-SHELL
         set -x
         dnf install -y python-pip make docker httpd git
-        pip install PyYAML
+        pip install PyYAML behave
         
         git clone --depth 1 https://github.com/avocado-framework/avocado.git
         cd avocado
