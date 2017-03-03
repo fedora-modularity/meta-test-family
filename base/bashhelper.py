@@ -34,14 +34,10 @@ if os.path.isfile(picklefile) and os.stat(picklefile).st_size > 100:
     if options.verbose:
         print "reading from pickled object", helper
     pkl_file.close()
-elif "rpm" == MODULE:
-    helper=moduleframework.RpmHelper()
+else:
+    helper=moduleframework.get_correct_backend()
     if options.verbose:
-        print "created new instance: rpm"
-elif "docker" == MODULE:
-    helper=moduleframework.ContainerHelper()
-    if options.verbose:
-        print "created new instance: docker"
+        print "created new instance for module"
 
 pkl_file = open(picklefile, 'wb')
 

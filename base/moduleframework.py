@@ -260,3 +260,13 @@ class RpmAvocadoTest(AvocadoTest):
     :avocado: disable
     """
     pass
+
+def get_correct_backend():
+    MODULE = os.environ.get('MODULE')
+    MODULE = MODULE if MODULE else "docker"
+    if MODULE == 'docker':
+        return ContainerHelper()
+    elif MODULE == 'rpm':
+        return RpmHelper()
+    else:
+        raise ValueError("Unsupported MODULE={0}".format(MODULE))
