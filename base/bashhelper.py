@@ -1,52 +1,47 @@
 #!/usr/bin/python
 
-import moduleframework
-import pickle
 import os
+import pickle
+import moduleframework
 from optparse import OptionParser
 
+picklefile = '/var/tmp/module-data.pkl'
 parser = OptionParser()
 parser.add_option("-v", "--verbose",
                   action="store_true", dest="verbose", default=False,
                   help="print debug info")
-
 parser.add_option("-p", "--print",
                   action="store_true", dest="printt", default=False,
                   help="print output of called method")
 (options, args) = parser.parse_args()
 
-helper = None
-picklefile = '/var/tmp/module-data.pkl'
-method = args[0] if len(args)>0 else "close"
+if len(args) == 0:
+    raise ValueError("Unable to call bash helper without function")
 
-if options.verbose:
-    print "called ", method, args[1:]
+def printIfVerbose(**args):
+    if options.verbose:
+        print **args
 
 if os.path.isfile(picklefile) and os.stat(picklefile).st_size > 100:
-    if options.verbose:
-        print "reading from pickfile", picklefile
+    printIfVerbose("reading from pickfile", picklefile)
     pkl_file = open(picklefile, 'rb')
-    if options.verbose:
-        print "descriptor ", pkl_file
     helper = pickle.load(pkl_file)
-    if options.verbose:
-        print "reading from pickled object", helper
+    printIfVerbose("reading from pickled object", helper)
     pkl_file.close()
 else:
-    helper=moduleframework.get_correct_backend()
-    if options.verbose:
-        print "created new instance for module"
+    helper = moduleframework.get_correct_backend()
+    printIfVerbose("created new instance for module")
 
 pkl_file = open(picklefile, 'wb')
 
 if "tearDown" != method:
     if options.printt:
-        if len(args)==1:
+        if len(args) == 1:
             print getattr(helper,method)()
         else:
             print getattr(helper,method)(" ".join(args[1:]))
     else:
-        if len(args)==1:
+        if len(args) == 1:
             getattr(helper,method)()
         else:
             getattr(helper,method)(" ".join(args[1:]))
