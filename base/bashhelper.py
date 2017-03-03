@@ -19,8 +19,6 @@ helper = None
 picklefile = '/var/tmp/module-data.pkl'
 method = args[0] if len(args)>0 else "close"
 
-MODULE = moduleframework.MODULE if moduleframework.MODULE else "docker"
-
 if options.verbose:
     print "called ", method, args[1:]
 
