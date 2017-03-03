@@ -11,6 +11,7 @@ echo "Test what run bash command inside module"
 moduleframework-cmd -v -p run ls / | grep sbin
 EC=$(($EC+$?))
 
+dnf -y install nc
 echo "Test what run bash command outside, host"
 echo errr | nc localhost 11211
 EC=$(($EC+$?))
