@@ -8,6 +8,9 @@ packages:
     rpms:
         - memcached
         - perl-Carp
+testdependecies:
+    rpms:
+        - nc
 module:
     docker:
         start: "docker run -it -e CACHE_SIZE=128 -p 11211:11211"

@@ -29,6 +29,15 @@ def skipTestIf(value, text="Test not intended for this module profile"):
 
 class CommonFunctions():
 
+    def runHost(self, command="ls /", **kwargs):
+        return utils.process.run("%s" % command, **kwargs)
+
+    def installTestDependencies(self, packages = None):
+        if not packages and 'testdependecies' in self.config and 'rpms' in self.config['testdependecies']:
+            packages = self.config['testdependecies']['rpms']
+        if packages:
+            self.runHost("dnf -y install " + " ".join(packages), ignore_status=True)
+
     def loadconfig(self):
         self.__modulemdConf = None
         xconfig = os.environ.get('CONFIG') if os.environ.get(
@@ -40,6 +49,7 @@ class CommonFunctions():
                 sys.exit(1)
             self.packages = self.config['packages']['rpms']
             self.moduleName = self.config['name']
+        self.installTestDependencies()
 
     def getModulemdYamlconfig(self, urllink=None):
         if urllink:
@@ -51,9 +61,6 @@ class CommonFunctions():
                 ymlfile = urllib.urlopen(self.config['modulemd-url'])
                 self.__modulemdConf = yaml.load(ymlfile)
             return self.__modulemdConf
-
-    def runHost(self, command="ls /", **kwargs):
-        return utils.process.run("%s" % command, **kwargs)
 
 class ContainerHelper(CommonFunctions):
     """
