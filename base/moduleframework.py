@@ -67,18 +67,18 @@ class ContainerHelper(CommonFunctions):
         self.jmeno = None
         self.docker_id = None
         self.icontainer = URL if URL else self.info['container']
-        self.prepare()
-        self.prepareContainer()
-        self.pullContainer()
+        self.__prepare()
+        self.__prepareContainer()
+        self.__pullContainer()
 
     def tearDown(self):
         self.stop()
 
-    def prepare(self):
+    def __prepare(self):
         if not os.path.isfile('/usr/bin/docker-current'):
             utils.process.run("dnf -y install docker")
 
-    def prepareContainer(self):
+    def __prepareContainer(self):
         if ".tar.gz" in self.icontainer:
             self.jmeno = "testcontainer"
             self.tarbased = True
@@ -103,7 +103,7 @@ class ContainerHelper(CommonFunctions):
             utils.process.run("systemctl restart docker")
             pass
 
-    def pullContainer(self):
+    def __pullContainer(self):
         if self.tarbased:
             utils.process.run(
                 "docker import %s %s" %
@@ -154,13 +154,13 @@ class RpmHelper(CommonFunctions):
             "/etc", "yum.repos.d", "%s.repo" %
             self.moduleName)
         self.info = self.config['module']['rpm']
-        self.prepare()
-        self.prepareSetup()
+        self.__prepare()
+        self.__prepareSetup()
 
     def tearDown(self):
         self.stop()
 
-    def prepare(self):
+    def __prepare(self):
         # if not os.path.exists(self.installroot):
         #    shutil.rmtree(self.installroot)
          #   os.makedirs(self.installroot)
@@ -179,7 +179,7 @@ gpgcheck=0
                 f.write(add)
             f.close()
 
-    def prepareSetup(self):
+    def __prepareSetup(self):
         whattoinstall = " ".join(self.packages) + " rpm"
         utils.process.run(
             "dnf -y --disablerepo=* --enablerepo=%s* install %s" %
