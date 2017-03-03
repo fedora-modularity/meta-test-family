@@ -1,6 +1,7 @@
 from behave import *
 import socket
 
+
 @given(u'connected to module')
 def step_impl(context):
     context.backend.start()
@@ -9,14 +10,17 @@ def step_impl(context):
     s.settimeout(4)
     context.socket = s
 
+
 @when(u"send data '{text}'")
 def step_impl(context, text):
     context.socket.sendall(text)
-    #context.socket.close()
+    # context.socket.close()
+
 
 @when(u"send '{query}'")
 def step_imp(context, query):
     context.socket.sendall(query.decode('string_escape'))
+
 
 @then(u"receive '{expected_reply}'")
 def step_impl(context, expected_reply):

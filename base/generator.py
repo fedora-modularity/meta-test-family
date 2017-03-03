@@ -2,17 +2,22 @@
 
 from moduleframework import CommonFunctions
 
+
 class TestGenerator(CommonFunctions):
+
     def __init__(self):
         self.loadconfig()
-        self.output=""
+        self.output = ""
         self.templateClassBefore()
-        if self.config.has_key('test'):
-            for testname  in self.config['test']:
+        if 'test' in self.config:
+            for testname in self.config['test']:
                 self.templateTest(testname, self.config['test'][testname])
-        if self.config.has_key('testhost'):
-            for testname  in self.config['testhost']:
-                self.templateTest(testname, self.config['testhost'][testname], method="runHost")
+        if 'testhost' in self.config:
+            for testname in self.config['testhost']:
+                self.templateTest(
+                    testname,
+                    self.config['testhost'][testname],
+                    method="runHost")
 
     def templateClassBefore(self):
         self.output = """#!/usr/bin/python
@@ -31,12 +36,13 @@ class GeneratedTestsConfig(moduleframework.AvocadoTest):
 """
 
     def templateTest(self, testname, testlines, method="run"):
-        self.output=self.output+"""
+        self.output = self.output + """
     def test_%s(self):
         self.start()
 """ % testname
         for line in testlines:
-            self.output = self.output + """        self.%s("%s")\n""" % (method, line)
+            self.output = self.output + \
+                """        self.%s("%s")\n""" % (method, line)
         print "Added test (runmethod: %s): %s" % (method, testname)
 
 if __name__ == '__main__':

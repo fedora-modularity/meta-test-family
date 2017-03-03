@@ -19,16 +19,20 @@ URL = os.environ.get('URL')
 
 LOGPARAMS = logging.getLogger('params')
 
+
 def skipTestIf(value, text="Test not intended for this module profile"):
     if PROFILE and (value in PROFILE):
         raise exceptions.TestDecoratorSkip(text)
     elif value:
         raise exceptions.TestDecoratorSkip(text)
 
+
 class CommonFunctions():
+
     def loadconfig(self):
         self.__modulemdConf = None
-        xconfig = os.environ.get('CONFIG') if os.environ.get('CONFIG') else "config.yaml"
+        xconfig = os.environ.get('CONFIG') if os.environ.get(
+            'CONFIG') else "config.yaml"
         with open(xconfig, 'r') as ymlfile:
             self.config = yaml.load(ymlfile)
             if self.config['document'] != 'modularity-testing':
@@ -37,7 +41,7 @@ class CommonFunctions():
             self.packages = self.config['packages']['rpms']
             self.moduleName = self.config['name']
 
-    def getModulemdYamlconfig(self,urllink=None):
+    def getModulemdYamlconfig(self, urllink=None):
         if urllink:
             ymlfile = urllib.urlopen(urllink)
             cconfig = yaml.load(ymlfile)
@@ -53,14 +57,15 @@ class ContainerHelper(CommonFunctions):
     """
     :avocado: disable
     """
+
     def setUp(self):
         self.loadconfig()
         self.info = self.config['module']['docker']
-        #brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/rhel7/cockpit-ws:122-5
+        # brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/rhel7/cockpit-ws:122-5
         #/mnt/redhat/brewroot/packages/cockpit-ws-docker/131/1/images/docker-image-sha256:71df4da82ff401d88e31604439b5ce67563e6bae7056f75f8f6dc715b64b4e02.x86_64.tar.gz
-        self.tarbased=None
-        self.jmeno=None
-        self.docker_id=None
+        self.tarbased = None
+        self.jmeno = None
+        self.docker_id = None
         self.icontainer = URL if URL else self.info['container']
         self.prepare()
         self.prepareContainer()
@@ -75,20 +80,22 @@ class ContainerHelper(CommonFunctions):
 
     def prepareContainer(self):
         if ".tar.gz" in self.icontainer:
-            self.jmeno="testcontainer"
-            self.tarbased=True
+            self.jmeno = "testcontainer"
+            self.tarbased = True
         elif "docker.io" in self.info['container']:
-        # Trusted source
+            # Trusted source
             self.tarbased = False
             self.jmeno = self.icontainer
         else:
-        # untrusted source
+            # untrusted source
             self.tarbased = False
             self.jmeno = self.icontainer
-            registry=re.search("([^/]*)", self.icontainer).groups()[0]
+            registry = re.search("([^/]*)", self.icontainer).groups()[0]
             if registry not in open('/etc/sysconfig/docker', 'rw').read():
                 with open("/etc/sysconfig/docker", "a") as myfile:
-                    myfile.write("INSECURE_REGISTRY='--insecure-registry $REGISTRY %s'" % registry)
+                    myfile.write(
+                        "INSECURE_REGISTRY='--insecure-registry $REGISTRY %s'" %
+                        registry)
         try:
             utils.process.run("systemctl status docker")
         except Exception as e:
@@ -98,17 +105,26 @@ class ContainerHelper(CommonFunctions):
 
     def pullContainer(self):
         if self.tarbased:
-            utils.process.run("docker import %s %s" % (self.icontainer, self.jmeno))
+            utils.process.run(
+                "docker import %s %s" %
+                (self.icontainer, self.jmeno))
         else:
             utils.process.run("docker pull %s" % self.icontainer)
-        self.containerInfo = json.loads(utils.process.run("docker inspect --format='{{json .Config}}'  %s" % self.jmeno ).stdout)
+        self.containerInfo = json.loads(
+            utils.process.run(
+                "docker inspect --format='{{json .Config}}'  %s" %
+                self.jmeno).stdout)
 
-    def start(self, args = "-it -d", command = "/bin/bash"):
+    def start(self, args="-it -d", command="/bin/bash"):
         if not self.docker_id:
-            if self.info.has_key('start') and self.info['start']:
-                self.docker_id = utils.process.run("%s -d %s" % (self.info['start'], self.jmeno)).stdout
+            if 'start' in self.info and self.info['start']:
+                self.docker_id = utils.process.run(
+                    "%s -d %s" %
+                    (self.info['start'], self.jmeno)).stdout
             else:
-                self.docker_id = utils.process.run("docker run %s %s %s" % (args, self.jmeno, command)).stdout
+                self.docker_id = utils.process.run(
+                    "docker run %s %s %s" %
+                    (args, self.jmeno, command)).stdout
 
     def stop(self):
         try:
@@ -119,20 +135,24 @@ class ContainerHelper(CommonFunctions):
             print "docker already removed"
             pass
 
-    def run(self, command = "ls /", **kwargs):
+    def run(self, command="ls /", **kwargs):
         self.start()
-        return utils.process.run("docker exec %s bash -c '%s'" % (self.docker_id, command), **kwargs)
+        return utils.process.run("docker exec %s bash -c '%s'" %
+                                 (self.docker_id, command), **kwargs)
 
 
 class RpmHelper(CommonFunctions):
     """
     :avocado: disable
     """
+
     def setUp(self):
         self.loadconfig()
         #self.installroot=os.path.join("/opt", self.moduleName)
-        #self.installroot="/"
-        self.yumrepo=os.path.join("/etc","yum.repos.d","%s.repo" % self.moduleName)
+        # self.installroot="/"
+        self.yumrepo = os.path.join(
+            "/etc", "yum.repos.d", "%s.repo" %
+            self.moduleName)
         self.info = self.config['module']['rpm']
         self.prepare()
         self.prepareSetup()
@@ -141,12 +161,12 @@ class RpmHelper(CommonFunctions):
         self.stop()
 
     def prepare(self):
-        #if not os.path.exists(self.installroot):
+        # if not os.path.exists(self.installroot):
         #    shutil.rmtree(self.installroot)
          #   os.makedirs(self.installroot)
         if not os.path.isfile(self.yumrepo):
-            counter=0
-            f=open(self.yumrepo, 'w')
+            counter = 0
+            f = open(self.yumrepo, 'w')
             for repo in self.info['repos']:
                 counter = counter + 1
                 add = """[%s%d]
@@ -161,28 +181,30 @@ gpgcheck=0
 
     def prepareSetup(self):
         whattoinstall = " ".join(self.packages) + " rpm"
-        utils.process.run("dnf -y --disablerepo=* --enablerepo=%s* install %s" % (self.moduleName, whattoinstall))
-            
-    def status(self, command = "/bin/true"):
-        if self.info.has_key('status') and self.info['status']:
+        utils.process.run(
+            "dnf -y --disablerepo=* --enablerepo=%s* install %s" %
+            (self.moduleName, whattoinstall))
+
+    def status(self, command="/bin/true"):
+        if 'status' in self.info and self.info['status']:
             utils.process.run(self.info['status'])
         else:
             utils.process.run("%s" % command)
-    
-    def start(self, command = "/bin/true"):
-        if self.info.has_key('start') and self.info['start']:
+
+    def start(self, command="/bin/true"):
+        if 'start' in self.info and self.info['start']:
             utils.process.run(self.info['start'])
         else:
             utils.process.run("%s" % command)
         time.sleep(2)
 
-    def stop(self, command = "/bin/true"):
-        if self.info.has_key('stop') and self.info['stop']:
+    def stop(self, command="/bin/true"):
+        if 'stop' in self.info and self.info['stop']:
             utils.process.run(self.info['stop'])
         else:
             utils.process.run("%s" % command)
 
-    def run(self, command = "ls /", **kwargs):
+    def run(self, command="ls /", **kwargs):
         return utils.process.run("bash -c '%s'" % command, **kwargs)
 
 
@@ -210,22 +232,24 @@ class AvocadoTest(Test):
                 self.backend = RpmHelper()
                 self.moduleType = "rpm"
         self.moduleProfile = PROFILE if PROFILE else "default"
-        LOGPARAMS.info("Module Type: %s; Profile: %s" % (self.moduleType, self.moduleProfile))
+        LOGPARAMS.info(
+            "Module Type: %s; Profile: %s" %
+            (self.moduleType, self.moduleProfile))
 
     def setUp(self, *args, **kwargs):
-        return self.backend.setUp( *args, **kwargs)
+        return self.backend.setUp(*args, **kwargs)
 
     def tearDown(self, *args, **kwargs):
-        return self.backend.tearDown( *args, **kwargs)
+        return self.backend.tearDown(*args, **kwargs)
 
     def start(self, *args, **kwargs):
-        return self.backend.start( *args, **kwargs)
+        return self.backend.start(*args, **kwargs)
 
     def stop(self, *args, **kwargs):
-        return self.backend.stop( *args, **kwargs)
+        return self.backend.stop(*args, **kwargs)
 
     def run(self, *args, **kwargs):
-        return self.backend.run( *args, **kwargs)
+        return self.backend.run(*args, **kwargs)
 
     def getConfig(self):
         return self.backend.config
@@ -233,11 +257,11 @@ class AvocadoTest(Test):
     def getConfigModule(self):
         return self.backend.info
 
-    def runHost(self, command = "ls /", **kwargs):
+    def runHost(self, command="ls /", **kwargs):
         return utils.process.run("%s" % command, **kwargs)
 
     def getModulemdYamlconfig(self, *args, **kwargs):
-        return self.backend.getModulemdYamlconfig( *args, **kwargs)
+        return self.backend.getModulemdYamlconfig(*args, **kwargs)
 
     def getActualProfile(self):
         self.start()
@@ -245,21 +269,26 @@ class AvocadoTest(Test):
         return allpackages
 
 # INTERFACE CLASSES FOR SPECIFIC MODULE TESTS
+
+
 class ContainerAvocadoTest(AvocadoTest):
     """
     :avocado: disable
     """
 
     def checkLabel(self, key, value):
-        if self.backend.containerInfo['Labels'].has_key(key) and (value in self.backend.containerInfo['Labels'][key]):
+        if key in self.backend.containerInfo['Labels'] and (
+                value in self.backend.containerInfo['Labels'][key]):
             return True
         return False
+
 
 class RpmAvocadoTest(AvocadoTest):
     """
     :avocado: disable
     """
     pass
+
 
 def get_correct_backend():
     MODULE = os.environ.get('MODULE')

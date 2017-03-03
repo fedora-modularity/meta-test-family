@@ -4,10 +4,12 @@ import socket
 from avocado import main
 import moduleframework
 
+
 class SanityCheck1(moduleframework.AvocadoTest):
     """
     :avocado: enable
     """
+
     def test1echo(self):
         self.start()
         self.assertIn("AHOJ", self.run("echo AHOJ").stdout)
@@ -23,5 +25,3 @@ class SanityCheck1(moduleframework.AvocadoTest):
 
 if __name__ == '__main__':
     main()
-    
-    
