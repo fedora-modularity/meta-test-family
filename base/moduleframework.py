@@ -52,6 +52,8 @@ class CommonFunctions():
                 self.__modulemdConf = yaml.load(ymlfile)
             return self.__modulemdConf
 
+    def runHost(self, command="ls /", **kwargs):
+        return utils.process.run("%s" % command, **kwargs)
 
 class ContainerHelper(CommonFunctions):
     """
@@ -134,6 +136,13 @@ class ContainerHelper(CommonFunctions):
             print e
             print "docker already removed"
             pass
+
+    def status(self):
+        try:
+            self.run("true")
+            return True
+        except Exception as e:
+            return False
 
     def run(self, command="ls /", **kwargs):
         self.start()
@@ -257,8 +266,8 @@ class AvocadoTest(Test):
     def getConfigModule(self):
         return self.backend.info
 
-    def runHost(self, command="ls /", **kwargs):
-        return utils.process.run("%s" % command, **kwargs)
+    def runHost(self, *args, **kwargs):
+        return self.backend.runHost(*args, **kwargs)
 
     def getModulemdYamlconfig(self, *args, **kwargs):
         return self.backend.getModulemdYamlconfig(*args, **kwargs)
