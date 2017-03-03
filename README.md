@@ -28,6 +28,10 @@
    * Test has to call setup and cleanup of module explicitly
    * These tests are dependent on return code of commans in test, so in case you have more tests subtest, just count return codes
    * see example test for https://gitlab.cee.redhat.com/jscotka/modularity-testing/blob/master/memcached/sanity2.sh
+ * __WIP: Behave tests__
+   * You can write tests for you module also in behave style
+   * it is first prototype
+   * see example in https://gitlab.cee.redhat.com/jscotka/modularity-testing/blob/master/memcached-behave
 
 ## Running using VAGRANT
  * install vagrant `dnf -y install vagrant`
