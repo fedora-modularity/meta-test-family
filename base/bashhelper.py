@@ -39,30 +39,22 @@ else:
 
 pkl_file = open(picklefile, 'wb')
 
-if "close" != method:
-    if method == "init":
-        helper.setUp()
-    elif method == "start":
-        helper.start()
-    elif method == "stop":
-        helper.stop()
-    else:
-        if options.printt:
-            if len(args)==1:
-                print getattr(helper,method)()
-            else:
-                print getattr(helper,method)(" ".join(args[1:]))
+if "tearDown" != method:
+    if options.printt:
+        if len(args)==1:
+            print getattr(helper,method)()
         else:
-            if len(args)==1:
-                getattr(helper,method)()
-            else:
-                getattr(helper,method)(" ".join(args[1:]))
+            print getattr(helper,method)(" ".join(args[1:]))
+    else:
+        if len(args)==1:
+            getattr(helper,method)()
+        else:
+            getattr(helper,method)(" ".join(args[1:]))
     pickle.dump(helper, pkl_file)
-
-pkl_file.close()
-
-if method == "close":
-    helper.stop()
+    pkl_file.close()
+else:
+    pkl_file.close()
+    helper.tearDown()
     os.remove(picklefile) if os.path.exists(picklefile) else None
 
 

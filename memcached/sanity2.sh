@@ -2,7 +2,7 @@
 set -x
 EC=0
 echo "Initialize module"
-moduleframework-cmd -v init
+moduleframework-cmd -v setUp
 moduleframework-cmd -v start
 
 echo "Start testing"
@@ -17,5 +17,5 @@ echo errr | nc localhost 11211
 EC=$(($EC+$?))
 
 echo "Destroy module"
-moduleframework-cmd -v close
+moduleframework-cmd -v tearDown
 exit $EC
