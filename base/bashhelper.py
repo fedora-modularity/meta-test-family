@@ -17,11 +17,11 @@ parser.add_option("-p", "--print",
 
 if len(args) == 0:
     raise ValueError("Unable to call bash helper without function")
+method = args[0]
 
-
-def printIfVerbose(**args):
+def printIfVerbose(*sargs):
     if options.verbose:
-        print **args
+        print sargs
 
 if os.path.isfile(picklefile) and os.stat(picklefile).st_size > 100:
     printIfVerbose("reading from pickfile", picklefile)
