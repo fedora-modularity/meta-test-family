@@ -64,3 +64,6 @@ dnf -y install docker python-pip
   * If you have tests in config file call:  `/usr/share/moduleframework/tools/generator.py`
   * Call command for running all python tests:  `MODULE=docker avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py`
  * __additional tests__ - see https://gitlab.cee.redhat.com/jscotka/modularity-testing/blob/master/memcached/sanity1.py as an example for you
+
+## License
+ Framework is released under the GPL, version 2 or later, see LICENSE file in project
