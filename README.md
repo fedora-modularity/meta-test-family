@@ -24,14 +24,14 @@
    
  * __Simple bash tests__
    * There is helper what you can use for writing `bash` like tests
-   * library is https://gitlab.cee.redhat.com/jscotka/modularity-testing/blob/master/base/bashhelper.py and it is installed as `moduleframework-cmd` command in `/usr/bin`
+   * library is https://pagure.io/modularity-testing-framework/blob/master/f/base/bashhelper.py and it is installed as `moduleframework-cmd` command in `/usr/bin`
    * Test has to call setup and cleanup of module explicitly
    * These tests are dependent on return code of commans in test, so in case you have more tests subtest, just count return codes
-   * see example test for https://gitlab.cee.redhat.com/jscotka/modularity-testing/blob/master/memcached/sanity2.sh
+   * see example test for https://pagure.io/modularity-testing-framework/blob/master/f/memcached/sanity2.sh
  * __WIP: Behave tests__
    * You can write tests for you module also in behave style
    * it is first prototype
-   * see example in https://gitlab.cee.redhat.com/jscotka/modularity-testing/blob/master/memcached-behave
+   * see example in https://pagure.io/modularity-testing-framework/blob/master/f/memcached-behave
 
 ## Running using VAGRANT
  * install vagrant `dnf -y install vagrant`
@@ -58,12 +58,11 @@ dnf -y install docker python-pip
 
 ## How to write tests
  * __minimal path creation__
-  * Use `git clone git@gitlab.cee.redhat.com:jscotka/modularity-testing.git` as framework and call `make install`
-    * If you do not have privileges to clone it, upload your public key to `https://gitlab.cee.redhat.com/profile/keys`
-  * CREATE your config.yaml (see example https://gitlab.cee.redhat.com/jscotka/modularity-testing/blob/master/base/example-config.yaml)
+  * Use `git clone ssh://git@pagure.io/modularity-testing-framework.git` as framework and call `make install`
+  * CREATE your config.yaml (see example https://pagure.io/modularity-testing-framework/blob/master/f/base/example-config.yaml)
   * If you have tests in config file call:  `/usr/share/moduleframework/tools/generator.py`
   * Call command for running all python tests:  `MODULE=docker avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py`
- * __additional tests__ - see https://gitlab.cee.redhat.com/jscotka/modularity-testing/blob/master/memcached/sanity1.py as an example for you
+ * __additional tests__ - see https://pagure.io/modularity-testing-framework/blob/master/f/memcached/sanity1.py as an example for you
 
 ## License
  Framework is released under the GPL, version 2 or later, see LICENSE file in project
