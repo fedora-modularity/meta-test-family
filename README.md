@@ -5,7 +5,7 @@
    * Each module will need to have yaml config file
    * Config file should cover non generic part - part focused on general module testing
    * It cloud contain also simple test 
-   * __how to write config file__ https://gitlab.cee.redhat.com/jscotka/modularity-testing/wikis/configfile
+   * __how to write config file__ https://pagure.io/modularity-testing-framework/blob/master/f/docs/howtowriteyamlconf.md
    
  * __Self generated tests__
    * there is possible to write simple tests directly in yaml config file
