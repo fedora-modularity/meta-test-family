@@ -1,0 +1,6 @@
+* v0.1
+ Oficially release first version. It contains several options how to write tests
+  * simple bash tests in config.yaml file
+  * instrumented avocado tests
+  * bash tests with supporting library
+  * behave style tests
