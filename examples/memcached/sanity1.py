@@ -3,7 +3,7 @@
 import socket
 from avocado import main
 from avocado.core import exceptions
-import moduleframework
+from base import moduleframework
 
 
 class SanityCheck1(moduleframework.AvocadoTest):

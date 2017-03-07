@@ -1,0 +1,9 @@
+include MANIFEST.in
+include Makefile
+include CHANGELOG
+include LICENSE
+include Vagrantfile
+include README.md
+recursive-include base *
+recursive-include docs *
+recursive-include examples *
