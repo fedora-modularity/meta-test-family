@@ -8,6 +8,8 @@ URL:            https://pagure.io/modularity-testing-framework
 Source0:        https://pagure.io/modularity-testing-framework/%{name}/%{version}.tar.gz
 BuildArch:      noarch
 
+BuildRequires:  python2-devel
+BuildRequires:  python-setuptools
 Requires:       avocado
 Requires:       python2-avocado
 Requires:       docker
@@ -26,6 +28,7 @@ rm -rf %{name}.egg-info
 
 %install
 %{__python2} setup.py install --skip-build --root %{buildroot}
+mkdir -p  %{buildroot}%{_bindir}
 install -d -m 755 %{buildroot}%{_datadir}/moduleframework
 mv %{buildroot}%{python2_sitelib}/docs %{buildroot}%{_datadir}/moduleframework
 mv %{buildroot}%{python2_sitelib}/examples %{buildroot}%{_datadir}/moduleframework
