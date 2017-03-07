@@ -37,10 +37,12 @@ Vagrant.configure(2) do |config|
         cd /vagrant
         make install
         for foo in baseruntime memcached; do
-            ./run-tests $foo
-            mkdir -p /var/www/html/job-results/$foo
-            cp -r /root/avocado/job-results/latest/* /var/www/html/job-results/$foo
-            ln -sf /var/www/html/job-results/$foo/html/results.html /var/www/html/job-results/$foo/html/index.html
+            for bar in docker rpm; do
+                ./run-tests $foo $bar
+                mkdir -p /var/www/html/job-results/$foo-$bar
+                cp -r /root/avocado/job-results/latest/* /var/www/html/job-results/$foo-$bar
+                ln -sf /var/www/html/job-results/$foo-$bar/html/results.html /var/www/html/job-results/$foo-$bar/html/index.html
+            done
         done
         chmod -R a+x /var/www/html/
         restorecon -r /var/www/html/

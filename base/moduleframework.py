@@ -13,19 +13,12 @@ from avocado import Test
 from avocado import utils
 from avocado.core import exceptions
 
-MODULE = os.environ.get('MODULE')
-PROFILE = os.environ.get('PROFILE')
-URL = os.environ.get('URL')
-
 LOGPARAMS = logging.getLogger('params')
 
 
 def skipTestIf(value, text="Test not intended for this module profile"):
-    if PROFILE and (value in PROFILE):
+    if value:
         raise exceptions.TestDecoratorSkip(text)
-    elif value:
-        raise exceptions.TestDecoratorSkip(text)
-
 
 class CommonFunctions():
 
@@ -70,12 +63,10 @@ class ContainerHelper(CommonFunctions):
     def setUp(self):
         self.loadconfig()
         self.info = self.config['module']['docker']
-        # brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/rhel7/cockpit-ws:122-5
-        #/mnt/redhat/brewroot/packages/cockpit-ws-docker/131/1/images/docker-image-sha256:71df4da82ff401d88e31604439b5ce67563e6bae7056f75f8f6dc715b64b4e02.x86_64.tar.gz
         self.tarbased = None
         self.jmeno = None
         self.docker_id = None
-        self.icontainer = URL if URL else self.info['container']
+        self.icontainer = get_correct_url() if get_correct_url()  else self.info['container']
         self.__prepare()
         self.__prepareContainer()
         self.__pullContainer()
@@ -229,31 +220,13 @@ class AvocadoTest(Test):
     """
     :avocado: disable
     """
-    backend = None
-
-    def __init__(self, *args, **kwargs):
-        Test.__init__(self, **kwargs)
-        if os.environ.get('MODULE'):
-            if os.environ.get('MODULE') == "docker":
-                self.backend = ContainerHelper()
-                self.moduleType = "docker"
-            elif os.environ.get('MODULE') == "rpm":
-                self.backend = RpmHelper()
-                self.moduleType = "rpm"
-        elif self.params.get('module'):
-            if self.params.get('module') == "docker":
-                self.backend = ContainerHelper()
-                self.moduleType = "docker"
-            elif self.params.get('module') == "rpm":
-                self.backend = RpmHelper()
-                self.moduleType = "rpm"
-        self.moduleProfile = PROFILE if PROFILE else "default"
+    def setUp(self):
+        (self.backend, self.moduleType) =  get_correct_backend()
+        self.moduleProfile = get_correct_profile()
         LOGPARAMS.info(
             "Module Type: %s; Profile: %s" %
             (self.moduleType, self.moduleProfile))
-
-    def setUp(self, *args, **kwargs):
-        return self.backend.setUp(*args, **kwargs)
+        self.backend.setUp()
 
     def tearDown(self, *args, **kwargs):
         return self.backend.tearDown(*args, **kwargs)
@@ -306,12 +279,18 @@ class RpmAvocadoTest(AvocadoTest):
     pass
 
 
-def get_correct_backend():
-    MODULE = os.environ.get('MODULE')
-    MODULE = MODULE if MODULE else "docker"
-    if MODULE == 'docker':
-        return ContainerHelper()
-    elif MODULE == 'rpm':
-        return RpmHelper()
+def get_correct_backend(amodule=os.environ.get('MODULE')):
+    if amodule == 'docker':
+        return ContainerHelper(), amodule
+    elif amodule == 'rpm':
+        return RpmHelper(), amodule
     else:
-        raise ValueError("Unsupported MODULE={0}".format(MODULE))
+        raise ValueError("Unsupported MODULE={0}".format(amodule))
+
+def get_correct_profile(amodule=os.environ.get('PROFILE')):
+    if not amodule:
+        amodule="default"
+    return amodule
+
+def get_correct_url(amodule=os.environ.get('URL')):
+    return amodule

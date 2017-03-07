@@ -1,43 +1,31 @@
 #!/bin/bash
 set -x
 SERVICES="memcached baseruntime"
+PTH="/usr/share/moduleframework/tools"
+
+function runnomux(){
+    SERVICE="$1"
+    TYPE="$2"
+    echo "> > > > SERVICE: $SERVICE"
+    echo "> > > >   $TYPE based testing"
+    (
+        cd examples/$SERVICE
+        $PTH/generator.py
+        MODULE=$TYPE avocado run `ls $PTH/modulelint.py ./*.py ./*.sh`
+    )
+}
 
 function runclassic(){
     TYPES="rpm docker"
-    for SERVICE in $TESTING; do
-        echo "> > > > SERVICE: $SERVICE"
+    for SERVICE in $SERVICES; do
         for TYPE in $TYPES; do
-        (
-            echo "> > > >   $TYPE based testing"
-            cd $SERVICE
-            /usr/share/moduleframework/generator.py
-            MODULE=$TYPE avocado run ./*.py /usr/share/moduleframework/modulelint.py
-        )
+            runnomux $SERVICE $TYPE
         done
     done
 }
 
-PTH="/usr/share/moduleframework/tools"
-
-function runservice(){
-    SERVICE=$1
-    (
-        echo "> > > > SERVICE: $SERVICE"
-        cd $SERVICE
-        $PTH/generator.py
-        avocado run -m $PTH/general_multiplex.yaml --  `ls $PTH/modulelint.py ./*.py ./*.sh`
-    )
-}
-
-function runmultiplexer(){
-    PTH="/usr/share/moduleframework/tools"
-    for SERVICE in $SERVICES; do
-        runservice $SERVICE
-    done
-}
-
-if [ "$1" = "all" ]; then
-    runmultiplexer
-elif [ -n "$1" ]; then
-    runservice "$1"
+if [ -n "$2" ]; then
+    runnomux "$1" "$2"
+else
+    runclassic
 fi
