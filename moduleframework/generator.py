@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from base.moduleframework import CommonFunctions
+from moduleframework.moduleframework import CommonFunctions
 
 
 class TestGenerator(CommonFunctions):
@@ -24,7 +24,7 @@ class TestGenerator(CommonFunctions):
 
 import socket
 from avocado import main
-from base import moduleframework
+from moduleframework import moduleframework
 
 if __name__ == '__main__':
     main()

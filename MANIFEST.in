@@ -4,6 +4,6 @@ include CHANGELOG
 include LICENSE
 include Vagrantfile
 include README.md
-recursive-include base *
+recursive-include moduleframework *
 recursive-include docs *
 recursive-include examples *

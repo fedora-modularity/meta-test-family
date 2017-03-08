@@ -21,25 +21,41 @@
 # Authors: Petr Hracek <phracek@redhat.com>
 #          Tomas Hozza <thozza@redhat.com>
 
-from base.version import VERSION
+import os
+from moduleframework.version import VERSION
 
 try:
-    from setuptools import setup
+    from setuptools import setup, find_packages
 except ImportError:
     from distutils.core import setup
 
+
+data_files = {}
+
+paths = ['docs', 'examples']
+for path in paths:
+    for root, dirs, files in os.walk(path):
+        data_files[root] = [os.path.join(root, f) for f in files]
 
 setup(
     name='modularity-testing-framework',
     version=VERSION,
     description='Framework for testing modules and containers.',
-    keywords='mocules,containers,testing,framework',
+    keywords='modules,containers,testing,framework',
     author='Jan Scotka',
     author_email='jscotka@redhat.com',
     url='https://pagure.io/modularity-testing-framework',
     license='GPLv2+',
-    packages=['base', 'examples', 'docs'],
+    packages=find_packages(exclude=['docs', 'examples']),
     include_package_data=True,
+    data_files=data_files.items(),
+    entry_points={
+        'console_scripts': [
+            'moduleframework-cmd = moduleframework.bashhelper:main',
+            'modulelint = moduleframework.modulelint:main',
+            'generator = moduleframework.generator:main',
+        ]
+    },
     setup_requires=[],
     classifiers=[
         'Development Status :: 4 - Beta',

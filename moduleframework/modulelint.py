@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import inspect
-import moduleframework
+from moduleframework import moduleframework
 from avocado import utils
 from avocado import main
 
