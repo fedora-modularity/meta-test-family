@@ -10,7 +10,7 @@ function runnomux(){
     echo "> > > >   $TYPE based testing"
     (
         cd examples/$SERVICE
-        $PTH/generator.py
+        python $PTH/generator.py
         MODULE=$TYPE avocado run `ls $PTH/modulelint.py ./*.py ./*.sh`
     )
 }

@@ -33,9 +33,10 @@ except ImportError:
 data_files = {}
 
 paths = ['docs', 'examples']
+
 for path in paths:
     for root, dirs, files in os.walk(path):
-        data_files[root] = [os.path.join(root, f) for f in files]
+        data_files[os.path.join('/usr/share/moduleframework', root)] = [os.path.join(root, f) for f in files]
 
 setup(
     name='modularity-testing-framework',

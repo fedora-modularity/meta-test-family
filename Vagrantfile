@@ -24,7 +24,7 @@ Vagrant.configure(2) do |config|
 
     config.vm.provision "shell", inline: <<-SHELL
         set -x
-        dnf install -y python-pip make docker httpd git
+        dnf install -y python-pip make docker httpd git python2-avocado
         pip install PyYAML behave
         
         git clone --depth 1 https://github.com/avocado-framework/avocado.git
@@ -35,7 +35,8 @@ Vagrant.configure(2) do |config|
         python setup.py install
 
         cd /vagrant
-        make install
+        dnf -y copr enable phracek/Modularity-testing-framework
+        dnf install -y modularity-testing-framework
         for foo in baseruntime memcached; do
             for bar in docker rpm; do
                 ./run-tests $foo $bar

@@ -3,7 +3,7 @@
 import os
 import pickle
 import inspect
-from moduleframework import moduleframework
+from moduleframework import module_framework
 from optparse import OptionParser
 
 
@@ -33,7 +33,7 @@ def main():
         printIfVerbose("reading from pickled object", helper)
         pkl_file.close()
     else:
-        (helper, moduletype) = moduleframework.get_correct_backend()
+        (helper, moduletype) = module_framework.get_correct_backend()
         printIfVerbose("created new instance for module")
 
     pkl_file = open(picklefile, 'wb')

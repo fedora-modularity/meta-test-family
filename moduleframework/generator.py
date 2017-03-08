@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from moduleframework.moduleframework import CommonFunctions
+from moduleframework.module_framework import CommonFunctions
 
 
 class TestGenerator(CommonFunctions):
@@ -24,12 +24,12 @@ class TestGenerator(CommonFunctions):
 
 import socket
 from avocado import main
-from moduleframework import moduleframework
+from moduleframework import module_framework
 
 if __name__ == '__main__':
     main()
 
-class GeneratedTestsConfig(moduleframework.AvocadoTest):
+class GeneratedTestsConfig(module_framework.AvocadoTest):
     \"\"\"
     :avocado: enable
     \"\"\"

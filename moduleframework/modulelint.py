@@ -1,12 +1,12 @@
 #!/usr/bin/python
 
 import inspect
-from moduleframework import moduleframework
+from moduleframework import module_framework
 from avocado import utils
 from avocado import main
 
 
-class DockerLint(moduleframework.ContainerAvocadoTest):
+class DockerLint(module_framework.ContainerAvocadoTest):
     """
     :avocado: enable
     """
@@ -32,7 +32,7 @@ class DockerLint(moduleframework.ContainerAvocadoTest):
             self.assertTrue(aaa)
 
 
-class ModuleLint(moduleframework.AvocadoTest):
+class ModuleLint(module_framework.AvocadoTest):
     """
     :avocado: enable
     """

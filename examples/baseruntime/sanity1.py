@@ -2,10 +2,10 @@
 
 import socket
 from avocado import main
-from moduleframework import moduleframework
+from moduleframework import module_framework
 
 
-class SanityCheck1(moduleframework.AvocadoTest):
+class SanityCheck1(module_framework.AvocadoTest):
     """
     :avocado: enable
     """
@@ -19,7 +19,7 @@ class SanityCheck1(moduleframework.AvocadoTest):
         self.assertIn("sbin", self.run("ls /").stdout)
 
     def test3GccSkipped(self):
-        moduleframework.skipTestIf("gcc" not in self.getActualProfile())
+        module_framework.skipTestIf("gcc" not in self.getActualProfile())
         self.start()
         self.run("gcc -v")
 

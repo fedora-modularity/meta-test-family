@@ -1,16 +1,16 @@
 #!/usr/bin/python
 from __future__ import print_function
 import glob
-from moduleframework import moduleframework
+from moduleframework import module_framework
 from avocado import utils
 
 
-class Module(moduleframework.CommonFunctions):
+class Module(module_framework.CommonFunctions):
 
     def __init__(self):
         self.loadconfig()
         self.yamlconfig = self.getModulemdYamlconfig()
-        self.profile = moduleframework.PROFILE if moduleframework.PROFILE else "default"
+        self.profile = module_framework.PROFILE if module_framework.PROFILE else "default"
         self.whattoinstall = self.yamlconfig['data']['profiles'][self.profile]
         self.rootdir = "/tmp/tmpmodule1"
         self.rpmsrepo = self.rootdir + "/rpms"
