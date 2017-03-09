@@ -1,14 +1,6 @@
 Name:           modularity-testing-framework
-<<<<<<< 666ec4aae76e06b97b3d7675f29ff1b180a6a50d
-Version:        0.1
-Release:        2%{?dist}
-||||||| merged common ancestors
-Version:        0.1
-Release:        1%{?dist}
-=======
 Version:        0.1.0
 Release:        2%{?dist}
->>>>>>>  Rename base to moduleframework
 Summary:        Framework for writing tests for modules and containers
 
 License:        GPLv2+
@@ -49,7 +41,7 @@ install -d -m 755 %{buildroot}%{_datadir}/moduleframework
 
 
 %changelog
-* Wed Mar 9 2017 Petr Hracek <phracek@redhat.com> - 0.1.0-2
+* Thu Mar 9 2017 Petr Hracek <phracek@redhat.com> - 0.1.0-2
 - Renaming package from base to moduleframework
 - Wrong dependency to avocado
 
