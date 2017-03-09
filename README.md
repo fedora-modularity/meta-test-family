@@ -28,6 +28,8 @@
    * Test has to call setup and cleanup of module explicitly
    * These tests are dependent on return code of commans in test, so in case you have more tests subtest, just count return codes
    * see example test for https://pagure.io/modularity-testing-framework/blob/master/f/examples/memcached/sanity2.sh
+
+
  * __WIP: Behave tests__
    * You can write tests for you module also in behave style
    * it is first prototype
@@ -47,21 +49,25 @@ dnf -y install docker python-pip
 
 ## Schedule Tests
 * Now it is expected to run this __under root__
-* Ensure you installed new version via `make install`
+* Install modularity-testing-framework from COPR repo like:
+  * ```dnf copr enable phracek/Modularity-testing-framework```
+  * install it by command: ```dnf install -y modularity-testing-framework```
   * It installs packages to python site-packages and to /usr/share/moduleframework
 * To include tests into your module, add to your Makefile section __check__
   * __check__ section runs script __run_tests.sh__ which
 * Your __run_tests.sh__ should contain:
-  * __Docker based module testing:__ ```MODULE=docker avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py```
-  * __Rpm based module testing:__ ```MODULE=rpm avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py```
+  * __Docker based module testing:__ ```MODULE=docker avocado run /usr/lib/python2.7/site-packages/moduleframework/modulelint.py ./*.py```
+  * __Rpm based module testing:__ ```MODULE=rpm avocado run /usr/lib/python2.7/site-packages/moduleframework/modulelint.py ./*.py```
   * `make check` -  runs tests in your module directory
 
 ## How to write tests
  * __minimal path creation__
-  * Use `git clone ssh://git@pagure.io/modularity-testing-framework.git` as framework and call `make install`
+  * Install modularity-testing-framework from COPR repo like:
+    * ```dnf copr enable phracek/Modularity-testing-framework```
+    * install it by command: ```dnf install -y modularity-testing-framework```
   * CREATE your config.yaml (see example https://pagure.io/modularity-testing-framework/blob/master/f/docs/example-config.yaml)
-  * If you have tests in config file call:  `/usr/share/moduleframework/tools/generator.py`
-  * Call command for running all python tests:  `MODULE=docker avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py`
+  * If you have tests in config file call:  `python /usr/lib/python2.7/site-packages/moduleframework/generator.py`
+  * Call command for running all python tests:  `MODULE=docker avocado run /usr/lib/python2.7/site-packages/moduleframework/modulelint.py ./*.py`
  * __additional tests__ - see https://pagure.io/modularity-testing-framework/blob/master/f/memcached/sanity1.py as an example for you
 
 ## License
