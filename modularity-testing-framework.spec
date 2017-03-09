@@ -41,11 +41,9 @@ install -d -m 755 %{buildroot}%{_datadir}/moduleframework
 %license LICENSE
 %doc CHANGELOG
 %{_bindir}/moduleframework-cmd
-%{python2_sitelib}/moduleframework
 %{_bindir}/modulelint
 %{_bindir}/generator
 %{python2_sitelib}/moduleframework
->>>>>>>  Rename base to moduleframework
 %{python2_sitelib}/modularity_testing_framework-%{version}-py?.?.egg-info
 %{_datadir}/moduleframework
 
