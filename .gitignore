@@ -90,3 +90,10 @@ ENV/
 
 # Idea project settings
 .idea/
+
+# Vagrant folder
+.vagrant/
+
+# Generated files by framework
+examples/baseruntime/generated.py
+examples/memcached/generated.py
