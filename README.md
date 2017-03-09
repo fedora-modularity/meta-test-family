@@ -56,9 +56,9 @@ dnf -y install docker python-pip
 * To include tests into your module, add to your Makefile section __check__
   * __check__ section runs script __run_tests.sh__ which
 * Your __run_tests.sh__ should contain:
-  * __Docker based module testing:__ ```MODULE=docker avocado run /usr/lib/python2.7/site-packages/moduleframework/modulelint.py ./*.py```
-  * __Rpm based module testing:__ ```MODULE=rpm avocado run /usr/lib/python2.7/site-packages/moduleframework/modulelint.py ./*.py```
-  * `make check` -  runs tests in your module directory
+    * __Docker based module testing:__ ```MODULE=docker avocado run /usr/lib/python2.7/site-packages/moduleframework/modulelint.py ./*.py```
+    * __Rpm based module testing:__ ```MODULE=rpm avocado run /usr/lib/python2.7/site-packages/moduleframework/modulelint.py ./*.py```
+    * `make check` -  runs tests in your module directory
 
 ## How to write tests
  * __minimal path creation__
