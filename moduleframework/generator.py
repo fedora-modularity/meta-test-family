@@ -45,8 +45,12 @@ class GeneratedTestsConfig(module_framework.AvocadoTest):
                 """        self.%s("%s")\n""" % (method, line)
         print "Added test (runmethod: %s): %s" % (method, testname)
 
-if __name__ == '__main__':
+
+def main():
     config = TestGenerator()
     configout = open('generated.py', 'w')
     configout.write(config.output)
     configout.close()
+
+if __name__ == '__main__':
+    main()
