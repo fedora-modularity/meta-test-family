@@ -12,7 +12,7 @@ clean:
 	rm -f MANIFEST
 	rm -rf build/html
 	rm -fv */generated.py
-	find . -\( -name "*.pyc" -o -name '*.pyo' -o -name "*~" -\) -delete
+	find . -\( -name 'generated.py' -o -name "*.pyc" -o -name '*.pyo' -o -name "*~" -\) -delete
 
 install: clean
 	@python setup.py install
