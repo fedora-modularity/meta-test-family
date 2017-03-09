@@ -49,10 +49,10 @@ dnf -y install docker python-pip
 
 ## Schedule Tests
 * Now it is expected to run this __under root__
-* Install modularity-testing-framework from COPR repo like:
-  * ```dnf copr enable phracek/Modularity-testing-framework```
-  * install it by command: ```dnf install -y modularity-testing-framework```
-  * It installs packages to python site-packages and to /usr/share/moduleframework
+ * Install modularity-testing-framework from COPR repo like:
+    * ```dnf copr enable phracek/Modularity-testing-framework```
+    * install it by command: ```dnf install -y modularity-testing-framework```
+    * It installs packages to python site-packages and to /usr/share/moduleframework
 * To include tests into your module, add to your Makefile section __check__
   * __check__ section runs script __run_tests.sh__ which
 * Your __run_tests.sh__ should contain:
