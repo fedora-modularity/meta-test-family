@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-import socket
 from avocado import main
 from moduleframework import module_framework
 
