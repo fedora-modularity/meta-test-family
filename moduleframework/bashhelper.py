@@ -3,7 +3,7 @@
 import os
 import pickle
 import inspect
-import moduleframework
+from moduleframework import moduleframework
 from optparse import OptionParser
 
 
