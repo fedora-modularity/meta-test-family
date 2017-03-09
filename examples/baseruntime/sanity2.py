@@ -8,9 +8,6 @@ class RpmValidation(module_framework.AvocadoTest):
     """
     :avocado: enable
     """
-class rpmvalidation(Test):
-    # Provide a list of acceptable file paths based on
-    # http://refspecs.linuxfoundation.org/FHS_3.0/fhs/index.html
     fhs_base_paths = [
         '/bin',
         '/boot',
@@ -55,7 +52,7 @@ class rpmvalidation(Test):
 
     def testPaths(self):
         self.start()
-        for directory in fhs_base_paths:
+        for directory in self.fhs_base_paths:
             self.run("test -d %s" % directory)
 
 if __name__ == '__main__':
