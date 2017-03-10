@@ -22,5 +22,10 @@ class SanityCheck1(module_framework.AvocadoTest):
         self.start()
         self.run("gcc -v")
 
+    def test4failedCommand(self):
+        self.start()
+        self.runCheckState("ls /abc",2)
+
+
 if __name__ == '__main__':
     main()
