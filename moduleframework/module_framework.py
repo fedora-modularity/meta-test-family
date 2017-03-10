@@ -246,6 +246,15 @@ class AvocadoTest(Test):
     def run(self, *args, **kwargs):
         return self.backend.run(*args, **kwargs)
 
+    def runCheckState(command = "ls /", expected_state=0, output_text = None, *args, **kwargs):
+        cmd = self.backend.run(command, ignore_status=True, *args, **kwargs)
+        output_text = command if not output_text
+        
+        if cmd.exit_status == expected_state:
+            self.log.info("command (RC=%d, expected=%d): %s" % (cmd.exit_status, expected_state, output_text))
+        else:
+            self.fail("command (RC=%d, expected=%d): %s" % (cmd.exit_status, expected_state, output_text))
+
     def getConfig(self):
         return self.backend.config
 
