@@ -15,7 +15,7 @@ module:
             description: "I dont know"
             io.k8s.description: "I dont know too"
         source: https://github.com/container-images/memcached.git
-        container: docker.io/fedora
+        container: docker.io/baseruntime/baseruntime
     rpm:
         start:
         stop:

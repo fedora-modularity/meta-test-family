@@ -79,9 +79,12 @@ class ContainerHelper(CommonFunctions):
             utils.process.run("dnf -y install docker")
 
     def __prepareContainer(self):
-        if ".tar.gz" in self.icontainer:
+        if ".tar" in self.icontainer:
             self.jmeno = "testcontainer"
             self.tarbased = True
+        if "docker=" in self.icontainer:
+            self.jmeno = self.icontainer[7:]
+            self.tarbased = False
         elif "docker.io" in self.info['container']:
             # Trusted source
             self.tarbased = False
@@ -109,7 +112,7 @@ class ContainerHelper(CommonFunctions):
                 "docker import %s %s" %
                 (self.icontainer, self.jmeno))
         else:
-            utils.process.run("docker pull %s" % self.icontainer)
+            utils.process.run("docker pull %s" % self.jmeno)
         self.containerInfo = json.loads(
             utils.process.run(
                 "docker inspect --format='{{json .Config}}'  %s" %
