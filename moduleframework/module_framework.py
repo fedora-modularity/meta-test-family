@@ -111,8 +111,11 @@ class ContainerHelper(CommonFunctions):
             utils.process.run(
                 "docker import %s %s" %
                 (self.icontainer, self.jmeno))
+        elif "docker=" in self.icontainer:
+            pass
         else:
             utils.process.run("docker pull %s" % self.jmeno)
+
         self.containerInfo = json.loads(
             utils.process.run(
                 "docker inspect --format='{{json .Config}}'  %s" %
