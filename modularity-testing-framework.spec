@@ -1,6 +1,6 @@
 Name:           modularity-testing-framework
-Version:        0.1.0
-Release:        2%{?dist}
+Version:        0.1.1
+Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
 License:        GPLv2+
@@ -41,6 +41,9 @@ install -d -m 755 %{buildroot}%{_datadir}/moduleframework
 
 
 %changelog
+* Mon Mar 13 2017 Petr Hracek <phracek@redhat.com> - 0.1.1-1
+- Release a new version 0.1.1
+
 * Thu Mar 9 2017 Petr Hracek <phracek@redhat.com> - 0.1.0-2
 - Renaming package from base to moduleframework
 - Wrong dependency to avocado
