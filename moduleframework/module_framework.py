@@ -150,8 +150,8 @@ class ContainerHelper(CommonFunctions):
 
     def run(self, command="ls /", **kwargs):
         self.start()
-        return utils.process.run("docker exec %s bash -c '%s'" %
-                                 (self.docker_id, command), **kwargs)
+        return utils.process.run('docker exec %s bash -c "%s"' %
+                                 (self.docker_id, command.replace('"', r'\"')), **kwargs)
 
 
 class RpmHelper(CommonFunctions):
@@ -218,8 +218,7 @@ gpgcheck=0
             utils.process.run("%s" % command)
 
     def run(self, command="ls /", **kwargs):
-        return utils.process.run("bash -c '%s'" % command, **kwargs)
-
+        return utils.process.run('bash -c "%s"' % command.replace('"', r'\"'), **kwargs)
 
 # INTERFACE CLASS FOR GENERAL TESTS OF MODULES
 class AvocadoTest(Test):
