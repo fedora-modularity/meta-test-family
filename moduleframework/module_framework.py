@@ -131,6 +131,7 @@ class ContainerHelper(CommonFunctions):
                 self.docker_id = utils.process.run(
                     "docker run %s %s %s" %
                     (args, self.jmeno, command)).stdout
+        self.docker_id = self.docker_id.strip()
 
     def stop(self):
         try:
@@ -152,6 +153,12 @@ class ContainerHelper(CommonFunctions):
         self.start()
         return utils.process.run('docker exec %s bash -c "%s"' %
                                  (self.docker_id, command.replace('"', r'\"')), **kwargs)
+
+    def copyTo(self, src, dest):
+        self.runHost("docker cp %s %s:%s" % (src, self.docker_id, dest))
+
+    def copyFrom(self, src, dest):
+        self.runHost("docker cp %s:%s %s" % (self.docker_id, src, dest))
 
 
 class RpmHelper(CommonFunctions):
@@ -220,6 +227,13 @@ gpgcheck=0
     def run(self, command="ls /", **kwargs):
         return utils.process.run('bash -c "%s"' % command.replace('"', r'\"'), **kwargs)
 
+    def copyTo(self, src, dest):
+        self.runHost("cp -r %s %s" % (src, dest))
+
+    def copyFrom(self, src, dest):
+        self.runHost("cp -r %s %s" % (src, dest))
+
+
 # INTERFACE CLASS FOR GENERAL TESTS OF MODULES
 class AvocadoTest(Test):
     """
@@ -270,9 +284,14 @@ class AvocadoTest(Test):
         allpackages = self.run(r'rpm -qa --qf="%{name}\n"').stdout.split('\n')
         return allpackages
 
+    def copyTo(self, *args, **kwargs):
+        return self.backend.copyTo(*args, **kwargs)
+
+    def copyFrom(self, *args, **kwargs):
+        return self.backend.copyFrom(*args, **kwargs)
+
+
 # INTERFACE CLASSES FOR SPECIFIC MODULE TESTS
-
-
 class ContainerAvocadoTest(AvocadoTest):
     """
     :avocado: disable
