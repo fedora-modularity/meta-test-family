@@ -32,12 +32,13 @@ class DockerLint(module_framework.ContainerAvocadoTest):
             self.assertTrue(aaa)
 
 
-class ModuleLint(module_framework.AvocadoTest):
+class ModuleLintSigning(module_framework.AvocadoTest):
     """
     :avocado: enable
+    :avocado: tags=WIP
     """
 
-    def testPackagesSign(self):
+    def test(self):
         RHKEY = "fd431d51"
         FEDKEY = "73bde98381b46521"
         KEY = FEDKEY
@@ -49,11 +50,17 @@ class ModuleLint(module_framework.AvocadoTest):
             if len(pinfo) == 3:
                 self.assertIn(KEY, pinfo[2])
 
-    def testPackagesRpms(self):
+class ModuleLintPackagesCheck(module_framework.AvocadoTest):
+    """
+    :avocado: enable
+    """
+
+    def test(self):
         self.start()
         allpackages = self.run(r'rpm -qa --qf="%{name}\n"').stdout.split('\n')
         for pkg in self.backend.packages:
             self.assertIn(pkg, allpackages)
+
 
 if __name__ == '__main__':
     main()
