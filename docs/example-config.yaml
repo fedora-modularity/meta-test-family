@@ -7,7 +7,7 @@ service:
 packages:
     rpms:
         - memcached
-        - perl-Car
+        - perl-Carp
 testdependecies:
     rpms:
         - nc
