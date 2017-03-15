@@ -1,5 +1,5 @@
 Name:           modularity-testing-framework
-Version:        0.1.2
+Version:        0.1.3
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -41,6 +41,9 @@ install -d -m 755 %{buildroot}%{_datadir}/moduleframework
 
 
 %changelog
+* Wed Mar 15 2017 Jan Scotka <jscotka@redhat.com> 0.1.3-1
+- new package built with tito
+
 * Wed Mar 15 2017 Petr Hracek <phracek@redhat.com> - 0.1.2-1
 - Release a new version 0.1.2
 
