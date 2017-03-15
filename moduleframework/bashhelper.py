@@ -57,5 +57,5 @@ def main():
         os.remove(picklefile) if os.path.exists(picklefile) else None
 
 
-if "__name__" == "__main__":
+if __name__ == "__main__":
     main()
