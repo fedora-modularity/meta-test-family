@@ -6,6 +6,6 @@ check-docker:
 check-rpm:
 	MODULE=rpm $(CMD)
 
-check: check-docker
+check: check-docker check-rpm
 
 all: check
