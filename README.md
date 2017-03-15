@@ -72,3 +72,6 @@ dnf -y install docker python-pip
 
 ## License
  Framework is released under the GPL, version 2 or later, see LICENSE file in project
+ 
+## Development
+ * automatically built packages (untested): https://copr.fedorainfracloud.org/coprs/jscotka/modularity-testing-framework/
