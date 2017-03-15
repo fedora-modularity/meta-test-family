@@ -66,7 +66,7 @@ dnf -y install docker python-pip
     * ```dnf copr enable phracek/Modularity-testing-framework```
     * install it by command: ```dnf install -y modularity-testing-framework```
   * CREATE your config.yaml (see example https://pagure.io/modularity-testing-framework/blob/master/f/docs/example-config.yaml)
-  * If you have tests in config file call:  `python /usr/lib/python2.7/site-packages/moduleframework/generator.py`
+  * If you have tests in config file call:  `/usr/bin/generator` or simply `generator`.
   * Call command for running all python tests:  `MODULE=docker avocado run /usr/lib/python2.7/site-packages/moduleframework/modulelint.py ./*.py`
  * __additional tests__ - see https://pagure.io/modularity-testing-framework/blob/master/f/memcached/sanity1.py as an example for you
 
