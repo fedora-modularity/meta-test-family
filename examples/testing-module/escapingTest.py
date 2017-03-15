@@ -17,4 +17,4 @@ class SanityCheckApostophes(module_framework.AvocadoTest):
 
     def test3(self):
         self.start()
-        self.run("""su - -c 'echo "echo under root"' """)
+        self.run("""bash -c 'echo "echo under bash"' """)

@@ -10,9 +10,8 @@ class CheckCopyFiles(module_framework.AvocadoTest):
 
     def testCopyThereAndBack(self):
         self.start()
-        self.runHost("touch a")
+        self.runHost("echo x > a", shell=True)
         self.copyTo("a", "/a.test")
         self.run("ls /a.test")
-        self.run("echo x > a.test")
         self.copyFrom("/a.test", "b")
         self.runHost("grep x b")

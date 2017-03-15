@@ -1,16 +1,18 @@
 #!/bin/bash
 set -x
+CMD=./moduleframework-cmd
 EC=0
 echo "Initialize module"
-moduleframework-cmd -v setUp
-moduleframework-cmd -v start
+$CMD -v setUp
+$CMD -v start
 
 echo "Start testing"
 
 echo "Test what run bash command inside module"
-moduleframework-cmd -v -p run ls / | grep sbin
+$CMD -v -p run echo ahoj
+$CMD -v -p run ls / | grep bin
 EC=$(($EC+$?))
 
 echo "Destroy module"
-moduleframework-cmd -v tearDown
+$CMD -v tearDown
 exit $EC
