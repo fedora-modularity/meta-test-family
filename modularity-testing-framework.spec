@@ -1,5 +1,5 @@
 Name:           modularity-testing-framework
-Version:        0.1.4
+Version:        0.1.5
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -41,6 +41,11 @@ install -d -m 755 %{buildroot}%{_datadir}/moduleframework
 
 
 %changelog
+* Thu Mar 16 2017 Jan Scotka <jscotka@redhat.com> 0.1.5-1
+- added possibility call bash stile in config.yaml (jscotka@redhat.com)
+- typo (jscotka@redhat.com)
+- added missing egg with ? in spec (jscotka@redhat.com)
+
 * Thu Mar 16 2017 Jan Scotka <jscotka@redhat.com> 0.1.4-1
 - removed egg-info (jscotka@redhat.com)
 - testing commit (jscotka@redhat.com)
