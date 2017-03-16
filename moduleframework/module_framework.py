@@ -130,7 +130,7 @@ class ContainerHelper(CommonFunctions):
             else:
                 self.docker_id = utils.process.run(
                     "docker run %s %s %s" %
-                    (args, self.jmeno, command)).stdout
+                    (args, self.jmeno, command), shell=True).stdout
         self.docker_id = self.docker_id.strip()
 
     def stop(self):
@@ -207,22 +207,22 @@ gpgcheck=0
 
     def status(self, command="/bin/true"):
         if 'status' in self.info and self.info['status']:
-            utils.process.run(self.info['status'])
+            utils.process.run(self.info['status'], shell=True)
         else:
-            utils.process.run("%s" % command)
+            utils.process.run("%s" % command, shell=True)
 
     def start(self, command="/bin/true"):
         if 'start' in self.info and self.info['start']:
-            utils.process.run(self.info['start'])
+            utils.process.run(self.info['start'], shell=True)
         else:
-            utils.process.run("%s" % command)
+            utils.process.run("%s" % command, shell=True)
         time.sleep(2)
 
     def stop(self, command="/bin/true"):
         if 'stop' in self.info and self.info['stop']:
-            utils.process.run(self.info['stop'])
+            utils.process.run(self.info['stop'], shell=True)
         else:
-            utils.process.run("%s" % command)
+            utils.process.run("%s" % command, shell=True)
 
     def run(self, command="ls /", **kwargs):
         return utils.process.run('bash -c "%s"' % command.replace('"', r'\"'), **kwargs)
