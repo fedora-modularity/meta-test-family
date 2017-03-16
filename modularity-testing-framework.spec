@@ -36,7 +36,6 @@ install -d -m 755 %{buildroot}%{_datadir}/moduleframework
 %{_bindir}/modulelint
 %{_bindir}/generator
 %{python2_sitelib}/moduleframework
-k-0.1.2-py
 %{python2_sitelib}/modularity_testing_framework-?.?.?-py?.?.egg-info
 %{_datadir}/moduleframework
 
