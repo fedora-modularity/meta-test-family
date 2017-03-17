@@ -1,4 +1,4 @@
-CMD=avocado run --filter-by-tags=-WIP *.py *.sh
+CMD=python -m avocado run --filter-by-tags=-WIP *.py *.sh
 
 check-docker:
 	MODULE=docker $(CMD)
@@ -6,6 +6,6 @@ check-docker:
 check-rpm:
 	MODULE=rpm $(CMD)
 
-check: check-docker check-rpm
+check: check-rpm
 
 all: check
