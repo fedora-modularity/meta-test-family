@@ -155,9 +155,11 @@ class ContainerHelper(CommonFunctions):
                                  (self.docker_id, command.replace('"', r'\"')), **kwargs)
 
     def copyTo(self, src, dest):
+        self.start()
         self.runHost("docker cp %s %s:%s" % (src, self.docker_id, dest))
 
     def copyFrom(self, src, dest):
+        self.start()
         self.runHost("docker cp %s:%s %s" % (self.docker_id, src, dest))
 
 
