@@ -126,7 +126,7 @@ class ContainerHelper(CommonFunctions):
             if 'start' in self.info and self.info['start']:
                 self.docker_id = utils.process.run(
                     "%s -d %s" %
-                    (self.info['start'], self.jmeno)).stdout
+                    (self.info['start'], self.jmeno), shell=True).stdout
             else:
                 self.docker_id = utils.process.run(
                     "docker run %s %s %s" %
