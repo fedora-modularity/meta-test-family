@@ -309,8 +309,8 @@ class RpmAvocadoTest(AvocadoTest):
 def get_correct_backend(amodule=os.environ.get('MODULE')):
     readconfig = CommonFunctions()
     readconfig.loadconfig()
-    if readconfig.config.has_key("defaultmodule") and readconfig.config["defaultmodule"] is not None and amodule == None:
-        amodule = readconfig.config["defaultmodule"]
+    if readconfig.config.has_key("default_module") and readconfig.config["default_module"] is not None and amodule == None:
+        amodule = readconfig.config["default_module"]
     if amodule == 'docker':
         return ContainerHelper(), amodule
     elif amodule == 'rpm':
