@@ -1,5 +1,5 @@
 Name:           modularity-testing-framework
-Version:        0.1.5
+Version:        0.1.6
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -41,6 +41,18 @@ install -d -m 755 %{buildroot}%{_datadir}/moduleframework
 
 
 %changelog
+* Mon Mar 20 2017 Jan Scotka <jscotka@redhat.com> 0.1.6-1
+- added underline bw words (jscotka@redhat.com)
+- added better config handling, and allow use defaultmodule parameter in config
+  yaml file (jscotka@redhat.com)
+- changed fedora path to public webs (psklenar@masox.brq.redhat.com)
+- init of haproxy test (psklenar@masox.brq.redhat.com)
+- added explicitly calling start for docker copy functions (jscotka@redhat.com)
+- small changes of tox (jscotka@redhat.com)
+- added tox file to project for CI (jscotka@redhat.com)
+- added tox.ini for CI and improved makefile inside tests for CI
+  (jscotka@redhat.com)
+
 * Thu Mar 16 2017 Jan Scotka <jscotka@redhat.com> 0.1.5-1
 - added possibility call bash stile in config.yaml (jscotka@redhat.com)
 - typo (jscotka@redhat.com)
