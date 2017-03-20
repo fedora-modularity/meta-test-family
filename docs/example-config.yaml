@@ -24,7 +24,7 @@ module:
         stop: systemctl stop memcached
         status: systemctl status memcached
         repos:
-            - http://download.englab.brq.redhat.com/pub/fedora/releases/25/Everything/x86_64/os/
+            - http://mirror.vutbr.cz/fedora/releases/25/Everything/x86_64/os/
             - https://phracek.fedorapeople.org/memcached-module-repo/
 test:
     processrunning:

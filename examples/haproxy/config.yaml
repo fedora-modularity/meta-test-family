@@ -23,7 +23,7 @@ module:
         stop: systemctl stop haproxy
         status: systemctl status haproxy
         repos:
-            - http://download.englab.brq.redhat.com/pub/fedora/releases/25/Everything/x86_64/os/
+            - http://mirror.vutbr.cz/fedora/releases/25/Everything/x86_64/os/
             - https://phracek.fedorapeople.org/haproxy-module-repo/
     test:
         processrunning:
