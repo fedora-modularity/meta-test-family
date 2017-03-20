@@ -33,15 +33,9 @@ class CommonFunctions():
 
     def loadconfig(self):
         self.__modulemdConf = None
-        xconfig = os.environ.get('CONFIG') if os.environ.get(
-            'CONFIG') else "config.yaml"
-        with open(xconfig, 'r') as ymlfile:
-            self.config = yaml.load(ymlfile)
-            if self.config['document'] != 'modularity-testing':
-                print "Bad config file"
-                sys.exit(1)
-            self.packages = self.config['packages']['rpms']
-            self.moduleName = self.config['name']
+        self.config = get_correct_config()
+        self.packages = self.config['packages']['rpms']
+        self.moduleName = self.config['name']
         self.installTestDependencies()
 
     def getModulemdYamlconfig(self, urllink=None):
@@ -312,8 +306,11 @@ class RpmAvocadoTest(AvocadoTest):
     """
     pass
 
-
 def get_correct_backend(amodule=os.environ.get('MODULE')):
+    readconfig = CommonFunctions()
+    readconfig.loadconfig()
+    if readconfig.config.has_key("defaultmodule") and readconfig.config["defaultmodule"] is not None and amodule == None:
+        amodule = readconfig.config["defaultmodule"]
     if amodule == 'docker':
         return ContainerHelper(), amodule
     elif amodule == 'rpm':
@@ -328,3 +325,14 @@ def get_correct_profile(amodule=os.environ.get('PROFILE')):
 
 def get_correct_url(amodule=os.environ.get('URL')):
     return amodule
+
+def get_correct_config(cfgfile=os.environ.get('CONFIG')):
+    if not cfgfile:
+        cfgfile="config.yaml"
+    if not os.path.exists(cfgfile):
+        raise ValueError("Config file (%s) does not exist or is inaccesible (you can also redefine own by CONFIG=path/to/configfile.yaml env variable)" % cfgfile)
+    with open(cfgfile, 'r') as ymlfile:
+        xcfg = yaml.load(ymlfile)
+        if xcfg['document'] != 'modularity-testing':
+            raise ValueError("Bad Config file, not yaml or does not contain proper document type" % cfgfile)
+    return xcfg

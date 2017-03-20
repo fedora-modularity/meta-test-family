@@ -11,6 +11,7 @@ packages:
 testdependecies:
     rpms:
         - nc
+defaultmodule: docker
 module:
     docker:
         start: "docker run -it -e CACHE_SIZE=128 -p 11211:11211"
