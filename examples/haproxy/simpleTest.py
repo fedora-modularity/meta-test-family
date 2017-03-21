@@ -24,9 +24,8 @@ class simpleTests(module_framework.AvocadoTest):
         self.runHost('docker rm http_name_8001')
 
     def testAssertIn(self):
-
-        self.runHost('sed s/127.0.0.1/%s/ my-haproxy.cfg > local-haproxy.cfg' % myip, shell=True)
+        self.runHost(('sed s/127.0.0.1/{}/ my-haproxy.cfg > local-haproxy.cfg').format(myip), shell = True)
         self.runHost('chcon -t etc_t local-haproxy.cfg')
         self.start()
-        self.assertIn('It works!',self.runHost('curl localhost:80').stdout)
+        self.assertIn('It works!',self.runHost('curl localhost:8077').stdout)
 

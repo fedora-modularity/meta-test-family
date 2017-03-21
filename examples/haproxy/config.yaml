@@ -12,7 +12,7 @@ testdependecies:
         - nc
 module:
     docker:
-        start: "docker run -it -p 80:80 -v $(pwd)/local-haproxy.cfg:/etc/haproxy/haproxy.cfg"
+        start: "docker run -it -p 8077:80 -v $(pwd)/local-haproxy.cfg:/etc/haproxy/haproxy.cfg"
         labels:
             description: "HAProxy is a TCP/HTTP reverse proxy which is particularly suited for high availability environments."
             io.k8s.description: "HAProxy is a TCP/HTTP reverse proxy which is particularly suited for high availability environments."
