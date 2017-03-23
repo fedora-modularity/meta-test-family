@@ -26,5 +26,5 @@ class simpleTests(module_framework.AvocadoTest):
     def testAssertIn(self):
         self.runHost(('sed s/127.0.0.1/{}/ my-haproxy.cfg > local-haproxy.cfg').format(myip), shell = True)
         self.start()
-        self.assertIn('It works!',self.runHost('curl localhost:8077').stdout)
+        self.assertIn('It works!',self.runHost('curl localhost:8077', shell = True).stdout)
 
