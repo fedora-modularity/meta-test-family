@@ -12,6 +12,8 @@ import logging
 from avocado import Test
 from avocado import utils
 from avocado.core import exceptions
+from avocado.utils import service
+
 
 LOGPARAMS = logging.getLogger('params')
 
@@ -93,12 +95,8 @@ class ContainerHelper(CommonFunctions):
                     myfile.write(
                         "INSECURE_REGISTRY='--insecure-registry $REGISTRY %s'" %
                         registry)
-        try:
-            utils.process.run("systemctl status docker")
-        except Exception as e:
-            print e
-            utils.process.run("systemctl restart docker")
-            pass
+        service_manager = service.ServiceManager()
+        service_manager.start('docker')
 
     def __pullContainer(self):
         if self.tarbased:
