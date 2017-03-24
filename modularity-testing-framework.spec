@@ -1,5 +1,5 @@
 Name:           modularity-testing-framework
-Version:        0.1.6
+Version:        0.1.7
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -41,6 +41,28 @@ install -d -m 755 %{buildroot}%{_datadir}/moduleframework
 
 
 %changelog
+* Fri Mar 24 2017 Jan Scotka <jscotka@redhat.com> 0.1.7-1
+- added symlink to testing module to minimal.yaml (jscotka@redhat.com)
+- removed source section form minimal config, actually is not anyhow used
+  (jscotka@redhat.com)
+- imporved docker handling, solved issues with missing labes in config
+  (jscotka@redhat.com)
+- repaired mistakes caused that MODULE=rpm did not worked (jscotka@redhat.com)
+- added setup and cleanup part to config file (before starting module, after
+  stopping) - is id done on host (jscotka@redhat.com)
+- config improvement, firt commit to be able to disccuss about this
+  (jscotka@redhat.com)
+- tox file removed to not cause misundertand of project (jscotka@redhat.com)
+- improved how it works diagram (jscotka@redhat.com)
+- replace try exept with avocado service module (psklenar@masox.brq.redhat.com)
+- added setup and test for rpm module for haproxy
+  (psklenar@masox.brq.redhat.com)
+- added example of simple avocado test (jscotka@redhat.com)
+- added :z for selinux (psklenar@masox.brq.redhat.com)
+- use port 8077 (psklenar@masox.brq.redhat.com)
+- Bump version (phracek@redhat.com)
+- repaired behave test (jscotka@redhat.com)
+
 * Mon Mar 20 2017 Jan Scotka <jscotka@redhat.com> 0.1.6-1
 - added underline bw words (jscotka@redhat.com)
 - added better config handling, and allow use defaultmodule parameter in config
