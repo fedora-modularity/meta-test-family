@@ -26,10 +26,13 @@ class DockerLint(module_framework.ContainerAvocadoTest):
         self.assertIn(self.backend.jmeno, self.runHost("docker ps").stdout)
 
     def testLabels(self):
+        llabels = self.getConfigModule().get('labels')
+        module_framework.skipTestIf( llabels == None or len(llabels) == 0, "No labels defined in config to check")
         for key in self.getConfigModule()['labels']:
             aaa = self.checkLabel(key, self.getConfigModule()['labels'][key])
             print ">>>>>> ", aaa, key
             self.assertTrue(aaa)
+
 
 
 class ModuleLintSigning(module_framework.AvocadoTest):

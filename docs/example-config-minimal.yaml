@@ -1,12 +1,10 @@
 document: modularity-testing
 version: 1
-name: vim
+name: bash
 source: https://github.com/container-images/memcached.git
 modulemd-url: http://raw.githubusercontent.com/container-images/memcached/master/memcached.yaml
 module:
     docker:
-        labels:
-            description: "any description"
         container: docker.io/phracek/memcached
     rpm:
         repo: https://phracek.fedorapeople.org/memcached-module-repo/

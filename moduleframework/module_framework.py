@@ -37,8 +37,8 @@ class CommonFunctions():
         self.__modulemdConf = None
         self.config = get_correct_config()
         self.moduleName = self.config['name']
-        self.packages = self.config['packages']['rpms'] if self.config.has_key('packages') and  self.config['packages'].has_key('rpms') and self.config['packages']['rpms'] else self.moduleName
-        self.source = self.config['source']
+        self.packages = self.config['packages']['rpms'] if self.config.has_key('packages') and  self.config['packages'].has_key('rpms') and self.config['packages']['rpms'] else [self.moduleName]
+        self.source = self.config.get('source') if self.config.get('source') else self.config['module']['rpm'].get('source')
         self.installTestDependencies()
 
     def getModulemdYamlconfig(self, urllink=None):
@@ -117,7 +117,7 @@ class ContainerHelper(CommonFunctions):
                 self.jmeno).stdout)
 
     def start(self, args="-it -d", command="/bin/bash"):
-        if not self.docker_id:
+        if not self.status():
             if 'start' in self.info and self.info['start']:
                 self.docker_id = utils.process.run(
                     "%s -d %s" %
@@ -129,19 +129,19 @@ class ContainerHelper(CommonFunctions):
         self.docker_id = self.docker_id.strip()
 
     def stop(self):
-        try:
-            utils.process.run("docker stop %s" % self.docker_id)
-            utils.process.run("docker rm %s" % self.docker_id)
-        except Exception as e:
-            print e
-            print "docker already removed"
-            pass
+        if self.status():
+            try:
+                utils.process.run("docker stop %s" % self.docker_id)
+                utils.process.run("docker rm %s" % self.docker_id)
+            except Exception as e:
+                print e
+                print "docker already removed"
+                pass
 
     def status(self):
-        try:
-            self.run("true")
+        if self.docker_id and self.docker_id[:12] in self.runHost("docker ps", shell = True).stdout:
             return True
-        except Exception as e:
+        else:
             return False
 
     def run(self, command="ls /", **kwargs):
