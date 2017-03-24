@@ -36,8 +36,9 @@ class CommonFunctions():
     def loadconfig(self):
         self.__modulemdConf = None
         self.config = get_correct_config()
-        self.packages = self.config['packages']['rpms']
         self.moduleName = self.config['name']
+        self.packages = self.config['packages']['rpms'] if self.config.has_key('packages') and  self.config['packages'].has_key('rpms') and self.config['packages']['rpms'] else self.moduleName
+        self.source = self.config['source']
         self.installTestDependencies()
 
     def getModulemdYamlconfig(self, urllink=None):
