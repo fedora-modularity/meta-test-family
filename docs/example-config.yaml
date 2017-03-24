@@ -1,6 +1,7 @@
 document: modularity-testing
 version: 1
 name: memcached
+source: https://github.com/container-images/memcached.git
 modulemd-url: http://raw.githubusercontent.com/container-images/memcached/master/memcached.yaml
 service:
     port: 11211
@@ -14,19 +15,22 @@ testdependecies:
 default_module: docker
 module:
     docker:
+        setup: echo Do magic with general config stored on host;
+               echo More magic
+        cleanup: echo Cleanup magic
         start: "docker run -it -e CACHE_SIZE=128 -p 11211:11211"
         labels:
             description: "memcached is a high-performance, distributed memory"
             io.k8s.description: "memcached is a high-performance, distributed memory"
-        source: https://github.com/container-images/memcached.git
         container: docker.io/phracek/memcached
     rpm:
+        setup: echo Do magic with general config stored on host;
+               echo More magic
+        cleanup: echo Cleanup magic
         start: systemctl start memcached
         stop: systemctl stop memcached
         status: systemctl status memcached
-        repos:
-            - http://mirror.vutbr.cz/fedora/releases/25/Everything/x86_64/os/
-            - https://phracek.fedorapeople.org/memcached-module-repo/
+        repos: https://phracek.fedorapeople.org/memcached-module-repo/
 test:
     processrunning:
         - 'ls  /proc/*/exe -alh | grep memcached'

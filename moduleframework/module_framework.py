@@ -67,9 +67,11 @@ class ContainerHelper(CommonFunctions):
         self.__prepare()
         self.__prepareContainer()
         self.__pullContainer()
+        self.__callSetupFromConfig()
 
     def tearDown(self):
         self.stop()
+        self.__callCleanupFromConfig()
 
     def __prepare(self):
         if not os.path.isfile('/usr/bin/docker-current'):
@@ -155,6 +157,13 @@ class ContainerHelper(CommonFunctions):
         self.start()
         self.runHost("docker cp %s:%s %s" % (self.docker_id, src, dest))
 
+    def __callSetupFromConfig(self):
+        if self.info.get("setup"):
+            self.runHost(self.info.get("setup"), shell = True)
+
+    def __callCleanupFromConfig(self):
+        if self.info.get("cleanup"):
+            self.runHost(self.info.get("cleanup"), shell = True)
 
 class RpmHelper(CommonFunctions):
     """
@@ -163,17 +172,19 @@ class RpmHelper(CommonFunctions):
 
     def setUp(self):
         self.loadconfig()
-        #self.installroot=os.path.join("/opt", self.moduleName)
-        # self.installroot="/"
         self.yumrepo = os.path.join(
             "/etc", "yum.repos.d", "%s.repo" %
             self.moduleName)
         self.info = self.config['module']['rpm']
+        self.__baseruntimerepo = "http://mirror.vutbr.cz/fedora/releases/25/Everything/x86_64/os/"
+        self.__whattoinstallrpm = " ".join(self.getModulemdYamlconfig['data']['profiles']['rpms'])
         self.__prepare()
         self.__prepareSetup()
+        self.__callSetupFromConfig()
 
     def tearDown(self):
         self.stop()
+        self.__callCleanupFromConfig()
 
     def __prepare(self):
         # if not os.path.exists(self.installroot):
@@ -182,7 +193,15 @@ class RpmHelper(CommonFunctions):
         if not os.path.isfile(self.yumrepo):
             counter = 0
             f = open(self.yumrepo, 'w')
-            for repo in self.info['repos']:
+            if get_correct_url():
+                repos = [get_correct_url(),self.__baseruntimerepo]
+            elif self.info.get('repo'):
+                repos = [self.info.get('repo'),self.__baseruntimerepo]
+            elif self.info.get('repos'):
+                repos = self.info.get('repos')
+            else:
+                raise ValueError ("no RPM given in file or via URL")
+            for repo in repos:
                 counter = counter + 1
                 add = """[%s%d]
 name=%s%d
@@ -195,10 +214,9 @@ gpgcheck=0
             f.close()
 
     def __prepareSetup(self):
-        whattoinstall = " ".join(self.packages) + " rpm"
         utils.process.run(
             "dnf -y --disablerepo=* --enablerepo=%s* install %s" %
-            (self.moduleName, whattoinstall))
+            (self.moduleName, self.__whattoinstallrpm))
 
     def status(self, command="/bin/true"):
         if 'status' in self.info and self.info['status']:
@@ -227,6 +245,15 @@ gpgcheck=0
 
     def copyFrom(self, src, dest):
         self.runHost("cp -r %s %s" % (src, dest))
+
+    def __callSetupFromConfig(self):
+        if self.info.get("setup"):
+            self.runHost(self.info.get("setup"), shell = True)
+
+    def __callCleanupFromConfig(self):
+        if self.info.get("cleanup"):
+            self.runHost(self.info.get("cleanup"), shell = True)
+
 
 
 # INTERFACE CLASS FOR GENERAL TESTS OF MODULES

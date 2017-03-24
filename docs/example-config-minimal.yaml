@@ -9,6 +9,5 @@ module:
             description: "any description"
         container: docker.io/phracek/memcached
     rpm:
-        repos:
-            - https://phracek.fedorapeople.org/memcached-module-repo/
+        repo: https://phracek.fedorapeople.org/memcached-module-repo/
 
