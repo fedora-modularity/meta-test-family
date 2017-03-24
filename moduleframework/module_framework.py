@@ -177,7 +177,7 @@ class RpmHelper(CommonFunctions):
             self.moduleName)
         self.info = self.config['module']['rpm']
         self.__baseruntimerepo = "http://mirror.vutbr.cz/fedora/releases/25/Everything/x86_64/os/"
-        self.__whattoinstallrpm = " ".join(self.getModulemdYamlconfig['data']['profiles']['rpms'])
+        self.__whattoinstallrpm = " ".join(self.getModulemdYamlconfig()['data']['profiles'][get_correct_profile()]['rpms'])
         self.__prepare()
         self.__prepareSetup()
         self.__callSetupFromConfig()
