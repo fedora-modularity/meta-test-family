@@ -1,7 +1,6 @@
 document: modularity-testing
 version: 1
 name: bash
-source: https://github.com/container-images/memcached.git
 modulemd-url: http://raw.githubusercontent.com/container-images/memcached/master/memcached.yaml
 module:
     docker:
