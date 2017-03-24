@@ -1,5 +1,5 @@
 Name:           modularity-testing-framework
-Version:        0.1.7
+Version:        0.1.8
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -41,6 +41,9 @@ install -d -m 755 %{buildroot}%{_datadir}/moduleframework
 
 
 %changelog
+* Fri Mar 24 2017 Jan Scotka <jscotka@redhat.com> 0.1.8-1
+- 
+
 * Fri Mar 24 2017 Jan Scotka <jscotka@redhat.com> 0.1.7-1
 - added symlink to testing module to minimal.yaml (jscotka@redhat.com)
 - removed source section form minimal config, actually is not anyhow used
