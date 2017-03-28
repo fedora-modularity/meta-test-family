@@ -176,7 +176,7 @@ class RpmHelper(CommonFunctions):
             "/etc", "yum.repos.d", "%s.repo" %
             self.moduleName)
         self.info = self.config['module']['rpm']
-        self.__baseruntimerepo = "http://mirror.vutbr.cz/fedora/releases/25/Everything/x86_64/os/"
+        self.__baseruntimerepo = get_latest_baseruntime_repo_url()
         self.__whattoinstallrpm = " ".join(self.getModulemdYamlconfig()['data']['profiles'][get_correct_profile()]['rpms'])
         self.__prepare()
         self.__prepareSetup()
@@ -370,3 +370,12 @@ def get_correct_modulemd(mdf=os.environ.get('MODULEMDURL')):
         return mdf
     else:
         return readconfig.config.get("modulemd-url")
+
+def get_latest_baseruntime_repo_url(fake=False):
+    if fake:
+        return "http://mirror.vutbr.cz/fedora/releases/25/Everything/x86_64/os/"
+    else:
+        link="https://kojipkgs.fedoraproject.org/repos/"
+        reponame=utils.process.run("curl --insecure %s | egrep -o module-base-runtime-master-[0-9]+ |sort |uniq |tail -1" % link, shell = True).stdout.strip()
+        together="%s%s/latest/x86_64" %(link, reponame)
+        return together
