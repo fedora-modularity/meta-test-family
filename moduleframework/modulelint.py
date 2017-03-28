@@ -15,7 +15,6 @@ class DockerLint(module_framework.ContainerAvocadoTest):
         super(self.__class__, self).setUp()
         if self.moduleType != "docker":
             self.skip("Docker specific test")
-        super(DockerLint, self).setUp()
 
     def testBasic(self):
         self.start()
@@ -40,6 +39,10 @@ class ModuleLintSigning(module_framework.AvocadoTest):
     :avocado: enable
     :avocado: tags=WIP
     """
+    def setUp(self):
+        super(self.__class__, self).setUp()
+        if self.moduleType != "docker":
+            self.skip("Docker specific test")
 
     def test(self):
         RHKEY = "fd431d51"

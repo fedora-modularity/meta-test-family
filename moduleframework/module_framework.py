@@ -48,7 +48,7 @@ class CommonFunctions():
             return cconfig
         else:
             if not self.__modulemdConf:
-                ymlfile = urllib.urlopen(self.config['modulemd-url'])
+                ymlfile = urllib.urlopen(get_correct_modulemd())
                 self.__modulemdConf = yaml.load(ymlfile)
             return self.__modulemdConf
 
@@ -362,3 +362,11 @@ def get_correct_config(cfgfile=os.environ.get('CONFIG')):
         if xcfg['document'] != 'modularity-testing':
             raise ValueError("Bad Config file, not yaml or does not contain proper document type" % cfgfile)
     return xcfg
+
+def get_correct_modulemd(mdf=os.environ.get('MODULEMDURL')):
+    readconfig = CommonFunctions()
+    readconfig.loadconfig()
+    if  mdf:
+        return mdf
+    else:
+        return readconfig.config.get("modulemd-url")

@@ -1,0 +1,39 @@
+data:
+  api:
+    rpms: [ed, mksh]
+  components:
+    rpms:
+      ed: {cache: 'http://pkgs.fedoraproject.org/repo/pkgs/ed', rationale: A build
+          dependency of mksh., ref: 294cc9c77141dd8232afc8200a01537284fa939f, repository: 'git://pkgs.fedoraproject.org/rpms/ed'}
+      mksh: {buildorder: 10, cache: 'http://pkgs.fedoraproject.org/repo/pkgs/mksh',
+        rationale: The main package of the module., ref: 94253f0c65228a5d48ce841f90c1ee12fba3a077,
+        repository: 'git://pkgs.fedoraproject.org/rpms/mksh'}
+      perl-Tangerine: {buildorder: 10, cache: 'http://pkgs.fedoraproject.org/repo/pkgs/perl-Tangerine',
+        rationale: The main package of the module., ref: 7cc39685bde0775054224d2bd9563c75a3c6d9d5,
+        repository: 'git://pkgs.fedoraproject.org/rpms/perl-Tangerine'}
+  dependencies:
+    buildrequires: {base-runtime: master}
+    requires: {base-runtime: master}
+  description: This module demonstrates how to write simple modulemd files And can
+    be used for testing the build and release pipeline.
+  filter: {}
+  license:
+    module: [MIT]
+  name: testmodule
+  profiles:
+    default:
+      rpms: [mksh]
+  references: {community: 'https://fedoraproject.org/wiki/Modularity', documentation: 'https://fedoraproject.org/wiki/Fedora_Packaging_Guidelines_for_Modules',
+    tracker: 'https://taiga.fedorainfracloud.org/project/modularity'}
+  stream: master
+  summary: A test module in all its beautiful beauty.
+  version: 20170327081800
+  xmd:
+    mbs:
+      buildrequires:
+        base-runtime: {ref: ca15a2fd1cf157bc3f53cea8c785a547c2ddbbbe, stream: master,
+          version: '20170324091613'}
+      commit: 1dafe00bb741bd6a0e0f4b5f0dca706e137cec24
+      scmurl: git://pkgs.fedoraproject.org/modules/testmodule?#1dafe00bb741bd6a0e0f4b5f0dca706e137cec24
+document: modulemd
+version: 1
