@@ -68,7 +68,7 @@ dnf -y install docker python-pip
   * CREATE your config.yaml (see example https://pagure.io/modularity-testing-framework/blob/master/f/docs/example-config.yaml)
   * If you have tests in config file call:  `/usr/bin/generator` or simply `generator`.
   * Call command for running all python tests:  `MODULE=docker avocado run /usr/lib/python2.7/site-packages/moduleframework/modulelint.py ./*.py`
- * __additional tests__ - see https://pagure.io/modularity-testing-framework/blob/master/f/memcached/sanity1.py as an example for you
+ * __additional tests__ - see tests in https://pagure.io/modularity-testing-framework/blob/master/f/examples/testing-module directory as an example for you
 
 ## License
  Framework is released under the GPL, version 2 or later, see LICENSE file in project
