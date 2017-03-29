@@ -1,6 +1,8 @@
 #!/bin/bash
 PARAMS=$@
-XUFILE="out.xunit"
+AVDIR=~/avocado
+mkdir -p $AVDIR
+XUFILE="$AVDIR/out.xunit"
 AVOCADOCMD="avocado run --xunit $XUFILE"
 
 function avocado_wrapper(){
