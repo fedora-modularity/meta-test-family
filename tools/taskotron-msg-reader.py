@@ -4,6 +4,8 @@ import yaml
 import sys
 import os
 
+from optparse import OptionParser
+
 ARCH="x86_64"
 
 class FedMsgParser():
@@ -29,6 +31,15 @@ class FedMsgParser():
         output.append("MODULE=rpm")
         return output
 
-stdinput = "".join(sys.stdin.readlines()).strip()
+parser = OptionParser()
+parser.add_option("-f", "--file", dest="filename",
+                  help="file with message to read instead of stdin",default=None)
+(options, args) = parser.parse_args()
+if options.filename:
+    flh = open(os.path.abspath(options.filename))
+    stdinput = "".join(flh.readlines()).strip()
+    flh.close()
+else:
+    stdinput = "".join(sys.stdin.readlines()).strip()
 a=FedMsgParser(stdinput)
 print " ".join(a.out)
