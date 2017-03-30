@@ -11,10 +11,6 @@ class DockerLint(module_framework.ContainerAvocadoTest):
     :avocado: enable
     """
 
-    def setUp(self):
-        super(self.__class__, self).setUp()
-        if self.moduleType != "docker":
-            self.skip("Docker specific test")
 
     def testBasic(self):
         self.start()
@@ -40,6 +36,7 @@ class ModuleLintSigning(module_framework.AvocadoTest):
     :avocado: tags=WIP
     """
     def setUp(self):
+        # it is not intended just for docker, but just docker packages are actually properly signed
         super(self.__class__, self).setUp()
         if self.moduleType != "docker":
             self.skip("Docker specific test")

@@ -318,6 +318,10 @@ class ContainerAvocadoTest(AvocadoTest):
     """
     :avocado: disable
     """
+    def setUp(self):
+        super(ContainerAvocadoTest, self).setUp()
+        if self.moduleType != "docker":
+            self.skip("Docker specific test")
 
     def checkLabel(self, key, value):
         if key in self.backend.containerInfo['Labels'] and (
@@ -330,7 +334,11 @@ class RpmAvocadoTest(AvocadoTest):
     """
     :avocado: disable
     """
-    pass
+    def setUp(self):
+        super(RpmAvocadoTest, self).setUp()
+        if self.moduleType != "rpm":
+            self.skip("Rpm specific test")
+
 
 def get_correct_backend(amodule=os.environ.get('MODULE')):
     readconfig = CommonFunctions()
