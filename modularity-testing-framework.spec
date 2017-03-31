@@ -1,5 +1,5 @@
 Name:           modularity-testing-framework
-Version:        0.2.0
+Version:        0.2.1
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -41,6 +41,23 @@ install -d -m 755 %{buildroot}%{_datadir}/moduleframework
 
 
 %changelog
+* Fri Mar 31 2017 Jan Scotka <jscotka@redhat.com> 0.2.1-1
+- moved checking ENV variable to functions to allow override them
+  (jscotka@redhat.com)
+- added possibility to pass file via parameter, not just via stdin, could be
+  cleaner solution (jscotka@redhat.com)
+- moved skipping of module to specific class (jscotka@redhat.com)
+- removed typo in README file (jscotka@redhat.com)
+- move xunit log to avocado directory (jscotka@redhat.com)
+- typo, redefinig avocado function, it is bad bad bad (jscotka@redhat.com)
+- changed to executable (jscotka@redhat.com)
+- added scripts to help with taskotron integration (jscotka@redhat.com)
+- added scripts to help with taskotron integration (jscotka@redhat.com)
+- added scripts to help with taskotron integration (jscotka@redhat.com)
+- added simple tests for ngnix (jscotka@redhat.com)
+- Typo in version (phracek@redhat.com)
+- Bump version (phracek@redhat.com)
+
 * Fri Mar 24 2017 Petr Hracek <phracek@redhat.com> - 0.2.0-1
 - New upstream version
 
