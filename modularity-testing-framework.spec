@@ -5,7 +5,7 @@ Summary:        Framework for writing tests for modules and containers
 
 License:        GPLv2+
 URL:            https://pagure.io/modularity-testing-framework
-Source0:        https://pagure.io/modularity-testing-framework/%{name}/%{version}.tar.gz
+Source0:        http://releases.pagure.org/%{name}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 BuildRequires:  python2-devel
