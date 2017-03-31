@@ -1,5 +1,5 @@
 Name:           modularity-testing-framework
-Version:        0.2.2
+Version:        0.2.3
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -41,6 +41,9 @@ install -d -m 755 %{buildroot}%{_datadir}/moduleframework
 
 
 %changelog
+* Fri Mar 31 2017 Jan Scotka <jscotka@redhat.com> 0.2.3-1
+- version increased (jscotka@redhat.com)
+
 * Fri Mar 31 2017 Jan Scotka <jscotka@redhat.com> 0.2.2-1
 - improved specfile Source0 (jscotka@redhat.com)
 - added licenses to files, permissions repaired (jscotka@redhat.com)
