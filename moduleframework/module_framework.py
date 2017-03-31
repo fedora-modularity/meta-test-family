@@ -23,6 +23,7 @@ def skipTestIf(value, text="Test not intended for this module profile"):
         raise exceptions.TestDecoratorSkip(text)
 
 class CommonFunctions():
+    config = None
 
     def runHost(self, command="ls /", **kwargs):
         return utils.process.run("%s" % command, **kwargs)
@@ -47,6 +48,8 @@ class CommonFunctions():
             cconfig = yaml.load(ymlfile)
             return cconfig
         else:
+            if self.config is None:
+                self.loadconfig()
             if not self.__modulemdConf:
                 ymlfile = urllib.urlopen(get_correct_modulemd())
                 self.__modulemdConf = yaml.load(ymlfile)
@@ -340,7 +343,8 @@ class RpmAvocadoTest(AvocadoTest):
             self.skip("Rpm specific test")
 
 
-def get_correct_backend(amodule=os.environ.get('MODULE')):
+def get_correct_backend():
+    amodule = os.environ.get('MODULE')
     readconfig = CommonFunctions()
     readconfig.loadconfig()
     if readconfig.config.has_key("default_module") and readconfig.config["default_module"] is not None and amodule == None:
@@ -352,15 +356,18 @@ def get_correct_backend(amodule=os.environ.get('MODULE')):
     else:
         raise ValueError("Unsupported MODULE={0}".format(amodule))
 
-def get_correct_profile(amodule=os.environ.get('PROFILE')):
+def get_correct_profile():
+    amodule = os.environ.get('PROFILE')
     if not amodule:
         amodule="default"
     return amodule
 
-def get_correct_url(amodule=os.environ.get('URL')):
+def get_correct_url():
+    amodule = os.environ.get('URL')
     return amodule
 
-def get_correct_config(cfgfile=os.environ.get('CONFIG')):
+def get_correct_config():
+    cfgfile = os.environ.get('CONFIG')
     if not cfgfile:
         cfgfile="config.yaml"
     if not os.path.exists(cfgfile):
@@ -371,7 +378,8 @@ def get_correct_config(cfgfile=os.environ.get('CONFIG')):
             raise ValueError("Bad Config file, not yaml or does not contain proper document type" % cfgfile)
     return xcfg
 
-def get_correct_modulemd(mdf=os.environ.get('MODULEMDURL')):
+def get_correct_modulemd():
+    mdf = os.environ.get('MODULEMDURL')
     readconfig = CommonFunctions()
     readconfig.loadconfig()
     if  mdf:
