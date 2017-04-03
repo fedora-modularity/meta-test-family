@@ -20,7 +20,6 @@
 #
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
-
 PARAMS=$@
 AVDIR=~/avocado
 mkdir -p $AVDIR
@@ -29,6 +28,7 @@ AVOCADOCMD="avocado run --xunit $XUFILE"
 
 function avocado_wrapper(){
     TESTS=`ls *.py *.sh`
+    echo "FOUND TESTS: $TESTS"
     eval $PARAMS
     $AVOCADOCMD $TESTS
 }
