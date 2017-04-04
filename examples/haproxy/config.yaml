@@ -19,7 +19,7 @@ module:
         source: https://github.com/container-images/haproxy
         container: docker.io/modularitycontainers/haproxy
     rpm:
-        start: sed -i 's/bind\*/bind :8077/' $(pwd)/local-haproxy.cfg;
+        start: sed -i 's/bind.*/bind :8077/' $(pwd)/local-haproxy.cfg;
               cp $(pwd)/local-haproxy.cfg /etc/haproxy/haproxy.cfg;
               semanage port -a -t http_port_t -p tcp 8001;
               semanage port -a -t http_port_t -p tcp 8000;
