@@ -32,5 +32,7 @@ function avocado_wrapper(){
     eval $PARAMS
     $AVOCADOCMD $TESTS
 }
+# workaround for missing html plugin by default installation (not necessary, but nice)
+sudo dnf install -y python2-avocado-plugins-output-html || true
 
 avocado_wrapper
