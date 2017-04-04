@@ -10,22 +10,25 @@ packages:
 testdependecies:
     rpms:
         - nc
+source: https://github.com/container-images/haproxy
 module:
     docker:
+        setup: cp -f my-haproxy.cfg local-haproxy.cfg
         start: "docker run -it -p 8077:80 -v $(pwd)/local-haproxy.cfg:/etc/haproxy/haproxy.cfg:Z"
         labels:
             description: "HAProxy is a TCP/HTTP reverse proxy which is particularly suited for high availability environments."
             io.k8s.description: "HAProxy is a TCP/HTTP reverse proxy which is particularly suited for high availability environments."
-        source: https://github.com/container-images/haproxy
         container: docker.io/modularitycontainers/haproxy
     rpm:
-        start: sed -i 's/bind.*/bind :8077/' $(pwd)/local-haproxy.cfg;
-              cp $(pwd)/local-haproxy.cfg /etc/haproxy/haproxy.cfg;
+        setup: cp -f my-haproxy.cfg local-haproxy.cfg;
+              sed s/127.0.0.1/$(hostname -i | egrep -o '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+')/ -i local-haproxy.cfg;
+              sed -i 's/bind.*/bind :8077/' local-haproxy.cfg;
+              cp local-haproxy.cfg /etc/haproxy/haproxy.cfg;
               semanage port -a -t http_port_t -p tcp 8001;
               semanage port -a -t http_port_t -p tcp 8000;
               semanage port -a -t http_port_t -p tcp 8077;
-              sleep 4;
-              systemctl start haproxy
+              sleep 4
+        start: systemctl start haproxy
         stop: systemctl stop haproxy
         status: systemctl status haproxy
         repos:
