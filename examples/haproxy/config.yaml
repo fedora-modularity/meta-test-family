@@ -14,7 +14,9 @@ source: https://github.com/container-images/haproxy
 module:
     docker:
         setup: cp -f my-haproxy.cfg local-haproxy.cfg;
-              sed s/127.0.0.1/$(hostname -i | egrep -o '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+')/ -i local-haproxy.cfg;
+              IPR=`ip r |grep default |cut -d ' ' -f 5`;
+              IPA=`ip a s dev $IPR |egrep -o 'inet [0-9.]+' |egrep -o [0-9.]+`;
+              sed s/127.0.0.1/$IPA/ -i local-haproxy.cfg;
         start: "docker run -it -p 8077:80 -v $(pwd)/local-haproxy.cfg:/etc/haproxy/haproxy.cfg:Z"
         labels:
             description: "HAProxy is a TCP/HTTP reverse proxy which is particularly suited for high availability environments."
@@ -22,7 +24,6 @@ module:
         container: docker.io/modularitycontainers/haproxy
     rpm:
         setup: cp -f my-haproxy.cfg local-haproxy.cfg;
-              sed s/127.0.0.1/$(hostname -i | egrep -o '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+')/ -i local-haproxy.cfg;
               sed -i 's/bind.*/bind :8077/' local-haproxy.cfg;
               cp local-haproxy.cfg /etc/haproxy/haproxy.cfg;
               semanage port -a -t http_port_t -p tcp 8001;
