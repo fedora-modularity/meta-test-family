@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.2.3
+Version:        0.2.5
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -48,6 +48,19 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{modulelint,module_fra
 
 
 %changelog
+* Wed Apr 05 2017 Petr "Stone" Hracek <phracek@redhat.com> 0.2.5-1
+- Fix Packaging Guidelines (phracek@redhat.com)
+- added memcached to dependencies (jscotka@redhat.com)
+- one bug causing that it is not testing proper things (jscotka@redhat.com)
+- sed typo (psklenar@redhat.com)
+- added small workaround for html plugin (jscotka@redhat.com)
+- added symlink to work with testmodule in upstream (jscotka@redhat.com)
+- introduced regression for shell tests (jscotka@redhat.com)
+- Bump version (phracek@redhat.com)
+
+* Wed Apr 05 2017 Petr Hracek <phracek@redhat.com> 0.2.4-1
+- version increased (phracek@redhat.com)
+
 * Fri Mar 31 2017 Jan Scotka <jscotka@redhat.com> 0.2.3-1
 - version increased (jscotka@redhat.com)
 
