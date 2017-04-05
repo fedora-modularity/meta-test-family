@@ -1,3 +1,5 @@
+%global framework_name moduleframework
+
 Name:           modularity-testing-framework
 Version:        0.2.3
 Release:        1%{?dist}
@@ -27,7 +29,12 @@ rm -rf %{name}.egg-info
 
 %install
 %{__python2} setup.py install --skip-build --root %{buildroot}
-install -d -m 755 %{buildroot}%{_datadir}/moduleframework
+install -d -m 755 %{buildroot}%{_datadir}/%{framework_name}
+chmod a+x %{buildroot}%{_datadir}/%{framework_name}/examples/{memcached,baseruntime}/generated.py
+chmod a+x %{buildroot}%{_datadir}/%{framework_name}/examples/memcached-behave/environment.py
+chmod a+x %{buildroot}%{_datadir}/%{framework_name}/examples/testing-module/PureAvocadoTest.py
+chmod a+x %{buildroot}%{_datadir}/%{framework_name}/examples/testing-module/%{framework_name}/{setup,module_framework}.py 
+chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{modulelint,module_framework,generator,bashhelper,setup}.py
 
 %files
 %license LICENSE
