@@ -20,6 +20,7 @@
 #
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
+set -x
 PARAMS=$@
 AVDIR=~/avocado
 mkdir -p $AVDIR
@@ -29,8 +30,7 @@ AVOCADOCMD="avocado run --xunit $XUFILE"
 function avocado_wrapper(){
     TESTS=`ls *.py *.sh`
     echo "FOUND TESTS: $TESTS"
-    eval $PARAMS
-    $AVOCADOCMD $TESTS
+    eval $PARAMS $AVOCADOCMD $TESTS
 }
 # workaround for missing html plugin by default installation (not necessary, but nice)
 sudo dnf install -y python2-avocado-plugins-output-html || true
