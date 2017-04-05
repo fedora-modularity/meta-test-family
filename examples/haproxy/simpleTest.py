@@ -31,6 +31,7 @@ class simpleTests(module_framework.AvocadoTest):
     """
     def setUp(self):
         super(self.__class__, self).setUp()
+        self.runHost('systemctl start docker', ignore_status=True)
         self.runHost('docker pull docker.io/httpd')
         self.runHost('docker run --name http_name_8000 -d -p 8000:80 docker.io/httpd')
         self.runHost('docker run --name http_name_8001 -d -p 8001:80 docker.io/httpd')

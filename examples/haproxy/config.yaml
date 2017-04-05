@@ -10,6 +10,7 @@ packages:
 testdependecies:
     rpms:
         - nc
+        - docker
 source: https://github.com/container-images/haproxy
 module:
     docker:
