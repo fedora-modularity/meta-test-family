@@ -12,6 +12,7 @@ packages:
 testdependecies:
     rpms:
         - nc
+        - memcached
 default_module: docker
 module:
     docker:
