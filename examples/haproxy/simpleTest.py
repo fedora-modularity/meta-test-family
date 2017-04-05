@@ -45,5 +45,5 @@ class simpleTests(module_framework.AvocadoTest):
 
     def testAssertIn(self):
         self.start()
-        self.assertIn('It works!',self.runHost('curl localhost:8077', shell = True).stdout)
+        self.assertIn('It works!',self.runHost('curl 127.0.0.1:8077', shell = True).stdout)
 
