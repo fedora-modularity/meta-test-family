@@ -21,13 +21,16 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 set -x
-MODULENAME=$1
-FEDMSGFILE=$2
-MTF_PATH=/usr/share/moduleframework
+export MODULENAME=$1
+export FEDMSGFILE=$2
+export MTF_PATH=/usr/share/moduleframework
 
 function getparams_int(){
     python $MTF_PATH/taskotron-msg-reader.py -f $FEDMSGFILE
 }
+
+export PARAMS="`getparams_int`"
+
 function inst_env(){
     dnf copr -y enable jscotka/modularity-testing-framework
     dnf install -y modularity-testing-framework
@@ -58,8 +61,8 @@ AVDIR=~/avocado
 mkdir -p $AVDIR
 XUFILE="$AVDIR/out.xunit"
 AVOCADOCMD="avocado run --xunit $XUFILE"
-#MODULE_LINT=/usr/lib/python2.7/site-packages/moduleframework/modulelint.py
-MODULE_LINT=/bin/true
+MODULE_LINT=$MTF_PATH/tools/modulelint.py
+
 
 function avocado_wrapper(){
     (
