@@ -32,7 +32,7 @@ except ImportError:
 
 data_files = {}
 
-paths = ['docs', 'examples']
+paths = ['docs', 'examples', 'tools']
 
 for path in paths:
     for root, dirs, files in os.walk(path):
