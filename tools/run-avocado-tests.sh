@@ -32,7 +32,9 @@ function avocado_wrapper(){
     echo "FOUND TESTS: $TESTS"
     eval $PARAMS $AVOCADOCMD $TESTS
 }
-# workaround for missing html plugin by default installation (not necessary, but nice)
-sudo dnf install -y python2-avocado-plugins-output-html || true
 
+# workaround for missing html plugin by default installation (not necessary, but nice)
+sudo dnf install -y fedpkg python2-avocado-plugins-output-html || true
+
+if `pwd`
 avocado_wrapper
