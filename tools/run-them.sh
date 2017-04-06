@@ -26,7 +26,7 @@ FEDMSGFILE=$2
 MTF_PATH=/usr/share/moduleframework
 
 function getparams_int(){
-    python modularity-testing-framework/tools/taskotron-msg-reader.py -f $FEDMSGFILE
+    python $MTF_PATH/taskotron-msg-reader.py -f $FEDMSGFILE
 }
 function inst_env(){
     dnf copr -y enable jscotka/modularity-testing-framework
