@@ -34,7 +34,6 @@ function avocado_wrapper(){
 }
 
 # workaround for missing html plugin by default installation (not necessary, but nice)
-sudo dnf install -y fedpkg python2-avocado-plugins-output-html || true
+sudo dnf install -y python2-avocado-plugins-output-html || true
 
-if `pwd`
 avocado_wrapper
