@@ -31,7 +31,7 @@ module:
         start: systemctl start memcached
         stop: systemctl stop memcached
         status: systemctl status memcached
-        repos: https://phracek.fedorapeople.org/memcached-module-repo/
+        repo: https://phracek.fedorapeople.org/memcached-module-repo/
 test:
     processrunning:
         - 'ls  /proc/*/exe -alh | grep memcached'
