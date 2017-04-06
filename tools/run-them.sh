@@ -44,7 +44,7 @@ function loaddistgittests(){
 }
 
 function loadexampletests(){
-    test -f $MTF_PATH/examples/$MODULENAME
+    test -e $MTF_PATH/examples/$MODULENAME
 }
 
 function distgit_wrapper_rpm(){
@@ -52,10 +52,6 @@ function distgit_wrapper_rpm(){
     eval $PARAMS make
 }
 
-function examples_wrapper_rpm(){
-    cd $MODULENAME
-    eval $PARAMS make
-}
 
 AVDIR=~/avocado
 mkdir -p $AVDIR
@@ -66,10 +62,9 @@ MODULE_LINT=$MTF_PATH/tools/modulelint.py
 
 function avocado_wrapper(){
     (
-    cd modularity-testing-framework/examples/$MODULENAME
-    TESTS="`ls *.py *.sh` $MODULE_LINT"
+    TESTS="`ls $MTF_PATH/examples/$MODULENAME/*.py $MTF_PATH/examples/$MODULENAME/*.sh` $MODULE_LINT"
     echo "AVOCADO FOUND TESTS: $TESTS"
-    eval $PARAMS $AVOCADOCMD $TESTS
+    eval $PARAMS CONFIG=$MTF_PATH/examples/$MODULENAME/config.yaml $AVOCADOCMD $TESTS
     )
 }
 
