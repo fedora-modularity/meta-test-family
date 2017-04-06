@@ -47,7 +47,7 @@ setup(
     author_email='jscotka@redhat.com',
     url='https://pagure.io/modularity-testing-framework',
     license='GPLv2+',
-    packages=find_packages(exclude=['docs', 'examples']),
+    packages=find_packages(exclude=['docs', 'examples', 'tools']),
     include_package_data=True,
     data_files=data_files.items(),
     entry_points={
