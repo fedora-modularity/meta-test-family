@@ -24,16 +24,21 @@ set -x
 export MODULENAME=$1
 export FEDMSGFILE=$2
 export MTF_PATH=/usr/share/moduleframework
+export MODULE_LINT=$MTF_PATH/tools/modulelint.py
+
+export AVDIR=~/avocado
+mkdir -p $AVDIR
+export XUFILE="$AVDIR/out.xunit"
+export AVOCADOCMD="avocado run --xunit $XUFILE"
+
 
 function getparams_int(){
-    python $MTF_PATH/taskotron-msg-reader.py -f $FEDMSGFILE
+    python $MTF_PATH/tools/taskotron-msg-reader.py -f $FEDMSGFILE
 }
 
 export PARAMS="`getparams_int`"
 
 function inst_env(){
-    dnf copr -y enable jscotka/modularity-testing-framework
-    dnf install -y modularity-testing-framework
     dnf install -y python-pip make docker httpd git python2-avocado fedpkg python2-avocado-plugins-output-html
     pip install PyYAML behave
 }
@@ -51,14 +56,6 @@ function distgit_wrapper_rpm(){
     cd $MODULENAME
     eval $PARAMS make
 }
-
-
-AVDIR=~/avocado
-mkdir -p $AVDIR
-XUFILE="$AVDIR/out.xunit"
-AVOCADOCMD="avocado run --xunit $XUFILE"
-MODULE_LINT=$MTF_PATH/tools/modulelint.py
-
 
 function avocado_wrapper(){
     (
