@@ -36,8 +36,6 @@ function getparams_int(){
     python $MTF_PATH/tools/taskotron-msg-reader.py -f $FEDMSGFILE
 }
 
-export PARAMS="`getparams_int`"
-
 function inst_env(){
     dnf install -y python-pip make docker httpd git python2-avocado fedpkg python2-avocado-plugins-output-html
     pip install PyYAML behave
@@ -73,7 +71,9 @@ function run_modulelint(){
 }
 
 inst_env
-export PARAMS=`getparams_int`
+
+export PARAMS="`getparams_int`"
+
 if loaddistgittests; then
     distgit_wrapper_rpm
 elif loadexampletests; then
