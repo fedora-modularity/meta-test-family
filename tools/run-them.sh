@@ -73,6 +73,7 @@ function run_modulelint(){
 inst_env
 
 export PARAMS="`getparams_int`"
+test "$MODULENAME" = "testmodule" && MODULENAME="testing-module"
 
 if loaddistgittests; then
     distgit_wrapper_rpm
