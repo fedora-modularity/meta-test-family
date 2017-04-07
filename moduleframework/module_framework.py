@@ -413,7 +413,7 @@ def get_latest_baseruntime_repo_url(fake=False):
     else:
         ARCH = "x86_64"
         PDCURL = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
-        PDC = "%s/?variant_name=%s&variant_version=%s&active=True" % (PDCURL, "baseruntime", "master")
+        PDC = "%s/?variant_name=%s&variant_version=%s&active=True" % (PDCURL, "base-runtime", "master")
         pdcdata = json.load(urllib.urlopen(PDC))["results"][-1]
         rpmrepo = "http://kojipkgs.fedoraproject.org/repos/%s/latest/%s" % (
             pdcdata["koji_tag"], ARCH)
