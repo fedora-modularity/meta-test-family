@@ -67,7 +67,7 @@ function run_modulelint(){
 
     TESTS="$MODULE_LINT"
     echo "RUN AT LEAST MODULE LINTER: $TESTS"
-    eval $PARAMS $AVOCADOCMD $TESTS
+    eval $PARAMS CONFIG=$MTF_PATH/docs/example-config-minimal.yaml $AVOCADOCMD $TESTS
 }
 
 inst_env
