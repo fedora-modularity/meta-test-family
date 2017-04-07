@@ -38,7 +38,6 @@ from avocado.utils import service
 
 LOGPARAMS = logging.getLogger('params')
 
-
 def skipTestIf(value, text="Test not intended for this module profile"):
     if value:
         raise exceptions.TestDecoratorSkip(text)
@@ -412,7 +411,10 @@ def get_latest_baseruntime_repo_url(fake=False):
     if fake:
         return "http://mirror.vutbr.cz/fedora/releases/25/Everything/x86_64/os/"
     else:
-        link="https://kojipkgs.fedoraproject.org/repos/"
-        reponame=utils.process.run("curl --insecure %s | egrep -o module-base-runtime-master-[0-9]+ |sort |uniq |tail -1" % link, shell = True).stdout.strip()
-        together="%s%s/latest/x86_64" %(link, reponame)
-        return together
+        ARCH = "x86_64"
+        PDCURL = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
+        PDC = "%s/?variant_name=%s&variant_version=%s&active=True" % (PDCURL, "baseruntime", "master")
+        pdcdata = json.load(urllib.urlopen(PDC))["results"][-1]
+        rpmrepo = "http://kojipkgs.fedoraproject.org/repos/%s/latest/%s" % (
+            pdcdata["koji_tag"], ARCH)
+        return rpmrepo

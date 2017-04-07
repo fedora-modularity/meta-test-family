@@ -24,10 +24,13 @@
 import yaml
 import sys
 import os
+import json
+import urllib
 
 from optparse import OptionParser
 
 ARCH="x86_64"
+PDCURL="https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
 
 class FedMsgParser():
     def __init__(self,yamlinp):
@@ -35,16 +38,21 @@ class FedMsgParser():
         raw = yaml.load(yamlinp)
         #"kojipkgs.fedoraproject.org/repos/module-" + module_name + "-" + module_stream + "/latest"
         self.topic=raw["topic"]
+        name=raw["msg"]["name"]
+        stream=raw["msg"]["stream"]
+        version = raw["msg"]["version"]
+        PDC="%s/?variant_name=%s&variant_version=%s&variant_release=%s&active=True" % (PDCURL,name, stream, version)
+        self.pdcdata = json.load(urllib.urlopen(PDC))["results"][0]
         if self.topic == "org.fedoraproject.prod.mbs.module.state.change":
-            self.out = self.modulechangemessage(raw["msg"])
+            self.out = self.modulechangemessage()
 
-    def modulechangemessage(self,msg):
-        self.rpmrepo = "http://kojipkgs.fedoraproject.org/repos/module-%s-%s-%s/latest/%s" % (
-            msg["name"], msg["stream"], msg["version"], ARCH )
+    def modulechangemessage(self):
+        self.rpmrepo = "http://kojipkgs.fedoraproject.org/repos/%s/latest/%s" % (
+            self.pdcdata["koji_tag"], ARCH )
 
         omodulefile = "module.yaml"
         mdfile = open(omodulefile,mode = "w")
-        mdfile.write(msg["modulemd"])
+        mdfile.write(self.pdcdata["modulemd"])
         mdfile.close()
         output = []
         output.append("URL=%s" % self.rpmrepo)
