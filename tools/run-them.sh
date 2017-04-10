@@ -21,6 +21,15 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 set -x
+SLEEP=10
+echo "sleep for $SLEEP minutes to ensure that repos are ready"
+for foo in $SLEEP; do
+    sleep 60
+    echo "$foo/$SLEEP minutes done"
+done
+
+
+
 export MODULENAME=$1
 export FEDMSGFILE=$2
 export MTF_PATH=/usr/share/moduleframework
