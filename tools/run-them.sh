@@ -21,7 +21,7 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 set -x
-SLEEP=10
+SLEEP=15
 echo "sleep for $SLEEP minutes to ensure that repos are ready"
 for foo in $SLEEP; do
     sleep 60
