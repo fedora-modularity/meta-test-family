@@ -200,7 +200,10 @@ class RpmHelper(CommonFunctions):
             self.moduleName)
         self.info = self.config['module']['rpm']
         self.__baseruntimerepo = get_latest_baseruntime_repo_url()
-        self.__whattoinstallrpm = " ".join(self.getModulemdYamlconfig()['data']['profiles'][get_correct_profile()]['rpms'])
+        if self.getModulemdYamlconfig()['data'].get('profiles'):
+            self.__whattoinstallrpm = " ".join(self.getModulemdYamlconfig()['data']['profiles'][get_correct_profile()]['rpms'])
+        else:
+            self.__whattoinstallrpm = " ".join(self.getModulemdYamlconfig()['data']['components']['rpms'])
         self.__prepare()
         self.__prepareSetup()
         self.__callSetupFromConfig()
