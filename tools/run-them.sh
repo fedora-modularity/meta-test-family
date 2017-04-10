@@ -51,7 +51,7 @@ function loadexampletests(){
 }
 
 function distgit_wrapper_rpm(){
-    cd $MODULENAME
+    cd $MODULENAME/tests
     eval $PARAMS make
 }
 
