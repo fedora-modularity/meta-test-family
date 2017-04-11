@@ -425,6 +425,19 @@ def get_correct_config():
             raise ValueError("Bad Config file, not yaml or does not contain proper document type" % cfgfile)
     return xcfg
 
+def get_compose_url():
+    compose = os.environ.get('COMPOSEURL')
+    readconfig = CommonFunctions()
+    readconfig.loadconfig()
+    if compose is None:
+        if readconfig.config.get("compose-url"):
+            compose = readconfig.config.get("compose-url")
+        elif readconfig.config['module']['rpm'].get("repo"):
+            compose = readconfig.config['module']['rpm'].get("repo")
+        else:
+            compose = readconfig.config['module']['rpm'].get("repos")[0]
+    return compose
+
 def get_correct_modulemd():
     mdf = os.environ.get('MODULEMDURL')
     readconfig = CommonFunctions()
@@ -434,8 +447,7 @@ def get_correct_modulemd():
     elif readconfig.config.get("modulemd-url"):
         return readconfig.config.get("modulemd-url")
     else:
-        compose = readconfig.config.get("compose-url")
-        a = ComposeParser(compose)
+        a = ComposeParser(get_compose_url())
         b = a.variableListForModule(readconfig.config.get("name"))
         return [x[12:] for x in b if 'MODULEMDURL=' in x][0]
 
