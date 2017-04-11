@@ -87,9 +87,26 @@ class ContainerHelper(CommonFunctions):
         self.jmeno = None
         self.docker_id = None
         self.icontainer = get_correct_url() if get_correct_url()  else self.info['container']
+        if ".tar" in self.icontainer:
+            self.jmeno = "testcontainer"
+            self.tarbased = True
+        if "docker=" in self.icontainer:
+            self.jmeno = self.icontainer[7:]
+            self.tarbased = False
+        elif "docker.io" in self.info['container']:
+            # Trusted source
+            self.tarbased = False
+            self.jmeno = self.icontainer
+        else:
+            # untrusted source
+            self.tarbased = False
+            self.jmeno = self.icontainer
 
     def getURL(self):
         return self.icontainer
+
+    def getDockerInstanceName(self):
+        return self.jmeno
 
     def setUp(self):
         self.__prepare()
@@ -106,20 +123,7 @@ class ContainerHelper(CommonFunctions):
             utils.process.run("dnf -y install docker")
 
     def __prepareContainer(self):
-        if ".tar" in self.icontainer:
-            self.jmeno = "testcontainer"
-            self.tarbased = True
-        if "docker=" in self.icontainer:
-            self.jmeno = self.icontainer[7:]
-            self.tarbased = False
-        elif "docker.io" in self.info['container']:
-            # Trusted source
-            self.tarbased = False
-            self.jmeno = self.icontainer
-        else:
-            # untrusted source
-            self.tarbased = False
-            self.jmeno = self.icontainer
+        if self.tarbased == False and self.jmeno == self.icontainer and "docker.io" not in self.info['container']:
             registry = re.search("([^/]*)", self.icontainer).groups()[0]
             if registry not in open('/etc/sysconfig/docker', 'rw').read():
                 with open("/etc/sysconfig/docker", "a") as myfile:
