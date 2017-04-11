@@ -60,7 +60,6 @@ class CommonFunctions():
         self.moduleName = self.config['name']
         self.packages = self.config['packages']['rpms'] if self.config.has_key('packages') and  self.config['packages'].has_key('rpms') and self.config['packages']['rpms'] else [self.moduleName]
         self.source = self.config.get('source') if self.config.get('source') else self.config['module']['rpm'].get('source')
-        self.installTestDependencies()
 
     def getModulemdYamlconfig(self, urllink=None):
         if urllink:
@@ -109,6 +108,7 @@ class ContainerHelper(CommonFunctions):
         return self.jmeno
 
     def setUp(self):
+        self.installTestDependencies()
         self.__prepare()
         self.__prepareContainer()
         self.__pullContainer()
@@ -226,6 +226,7 @@ class RpmHelper(CommonFunctions):
         return ";".join(self.repos)
 
     def setUp(self):
+        self.installTestDependencies()
         self.__prepare()
         self.__prepareSetup()
         self.__callSetupFromConfig()
