@@ -63,7 +63,6 @@ class ComposeParser():
             if foo['data']['name'] == name:
                 thismodule = foo
         if thismodule:
-            print foo['data']['name']
             mdo = file(MODULEFILE,mode="w")
             yaml.dump(foo,mdo)
             mdo.close()
