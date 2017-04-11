@@ -68,6 +68,7 @@ class ComposeParser():
             yaml.dump(foo,mdo)
             mdo.close()
             out.append("MODULENAME=%s" % foo['data']['name'])
+            out.append("MODULE=%s" % "rpm")
             out.append("URL=%s" % self.compose)
             out.append("MODULEMDURL=file://%s" % os.path.abspath(MODULEFILE))
             return out
