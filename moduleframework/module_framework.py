@@ -80,13 +80,18 @@ class ContainerHelper(CommonFunctions):
     :avocado: disable
     """
 
-    def setUp(self):
+    def __init__(self):
         self.loadconfig()
         self.info = self.config['module']['docker']
         self.tarbased = None
         self.jmeno = None
         self.docker_id = None
         self.icontainer = get_correct_url() if get_correct_url()  else self.info['container']
+
+    def getURL(self):
+        return self.icontainer
+
+    def setUp(self):
         self.__prepare()
         self.__prepareContainer()
         self.__pullContainer()
@@ -192,18 +197,31 @@ class RpmHelper(CommonFunctions):
     """
     :avocado: disable
     """
-
-    def setUp(self):
+    def __init__(self):
         self.loadconfig()
         self.yumrepo = os.path.join(
             "/etc", "yum.repos.d", "%s.repo" %
-            self.moduleName)
+                                   self.moduleName)
         self.info = self.config['module']['rpm']
         self.__baseruntimerepo = get_latest_baseruntime_repo_url()
         if self.getModulemdYamlconfig()['data'].get('profiles'):
-            self.__whattoinstallrpm = " ".join(self.getModulemdYamlconfig()['data']['profiles'][get_correct_profile()]['rpms'])
+            self.__whattoinstallrpm = " ".join(
+                self.getModulemdYamlconfig()['data']['profiles'][get_correct_profile()]['rpms'])
         else:
             self.__whattoinstallrpm = " ".join(self.getModulemdYamlconfig()['data']['components']['rpms'])
+        if get_correct_url():
+            self.repos = [get_correct_url(), self.__baseruntimerepo]
+        elif self.info.get('repo'):
+            self.repos = [self.info.get('repo'), self.__baseruntimerepo]
+        elif self.info.get('repos'):
+            self.repos = self.info.get('repos')
+        else:
+            raise ValueError("no RPM given in file or via URL")
+
+    def getURL(self):
+        return ";".join(self.repos)
+
+    def setUp(self):
         self.__prepare()
         self.__prepareSetup()
         self.__callSetupFromConfig()
@@ -219,15 +237,7 @@ class RpmHelper(CommonFunctions):
         if not os.path.isfile(self.yumrepo):
             counter = 0
             f = open(self.yumrepo, 'w')
-            if get_correct_url():
-                repos = [get_correct_url(),self.__baseruntimerepo]
-            elif self.info.get('repo'):
-                repos = [self.info.get('repo'),self.__baseruntimerepo]
-            elif self.info.get('repos'):
-                repos = self.info.get('repos')
-            else:
-                raise ValueError ("no RPM given in file or via URL")
-            for repo in repos:
+            for repo in self.repos:
                 counter = counter + 1
                 add = """[%s%d]
 name=%s%d
