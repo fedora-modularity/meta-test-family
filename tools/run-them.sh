@@ -31,7 +31,9 @@ done
 
 
 export MODULENAME=$1
-export FEDMSGFILE=$2
+export PARSEITEM=$2
+# compose fedmsg or None same as fedmsg
+export PARSEITEMTYPE=$3
 export MTF_PATH=/usr/share/moduleframework
 export MODULE_LINT=$MTF_PATH/tools/modulelint.py
 
@@ -42,7 +44,11 @@ export AVOCADOCMD="avocado run --xunit $XUFILE"
 
 
 function getparams_int(){
-    python $MTF_PATH/tools/taskotron-msg-reader.py -f $FEDMSGFILE
+    if [ "$PARSEITEMTYPE" = "" -o "$PARSEITEMTYPE" = "fedmsg" ]; then
+        python $MTF_PATH/tools/taskotron-msg-reader.py -f $PARSEITEM
+    elif [ "$PARSEITEMTYPE" = "compose" ]; then
+        python $MTF_PATH/tools/compose_info_parser.py -c $PARSEITEM -m $MODULENAME
+    fi
 }
 
 function inst_env(){
