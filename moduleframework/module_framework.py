@@ -257,7 +257,9 @@ gpgcheck=0
     def __prepareSetup(self):
         try:
             utils.process.run(
-                "dnf -y --disablerepo=* --enablerepo=%s* --allowerasing distro-sync %s" %
+                "dnf -y --disablerepo=* --enablerepo=%s* --allowerasing distro-sync" % self.moduleName, ignore_status=True)
+            utils.process.run(
+                "dnf -y --disablerepo=* --enablerepo=%s* --allowerasing install %s" %
                 (self.moduleName, self.__whattoinstallrpm))
         except Exception as e:
             raise Exception("ERROR: Unable to install packages %s from repositories \n%s\n original exeption:\n%s\n" %
