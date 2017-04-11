@@ -34,6 +34,7 @@ from avocado import Test
 from avocado import utils
 from avocado.core import exceptions
 from avocado.utils import service
+from compose_info import ComposeParser
 
 
 LOGPARAMS = logging.getLogger('params')
@@ -430,8 +431,14 @@ def get_correct_modulemd():
     readconfig.loadconfig()
     if  mdf:
         return mdf
-    else:
+    elif readconfig.config.get("modulemd-url"):
         return readconfig.config.get("modulemd-url")
+    else:
+        compose = readconfig.config.get("compose-url")
+        a = ComposeParser(compose)
+        b = a.variableListForModule(readconfig.config.get("name"))
+        return [x[12:] for x in b if 'MODULEMDURL=' in x][0]
+
 
 def get_latest_baseruntime_repo_url(fake=False):
     if fake:
