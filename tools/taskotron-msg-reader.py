@@ -26,6 +26,7 @@ import sys
 import os
 import json
 import urllib
+import re
 
 from optparse import OptionParser
 
@@ -33,22 +34,22 @@ ARCH="x86_64"
 PDCURL="https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
 
 class FedMsgParser():
-    def __init__(self,yamlinp):
+    def __init__(self,yamlinp, taskotron = False):
         self.out = []
-        raw = yaml.load(yamlinp)
-        #"kojipkgs.fedoraproject.org/repos/module-" + module_name + "-" + module_stream + "/latest"
-        self.topic=raw["topic"]
-        name=raw["msg"]["name"]
-        stream=raw["msg"]["stream"]
-        version = raw["msg"]["version"]
+        if taskotron:
+            name, stream, version = re.search("(.*)-(.*)-(.*)", yamlinp).groups()
+        else:
+            raw = yaml.load(yamlinp)
+            self.topic=raw["topic"]
+            name=raw["msg"]["name"]
+            stream=raw["msg"]["stream"]
+            version = raw["msg"]["version"]
         PDC="%s/?variant_name=%s&variant_version=%s&variant_release=%s&active=True" % (PDCURL,name, stream, version)
         self.pdcdata = json.load(urllib.urlopen(PDC))["results"][0]
-        if self.topic == "org.fedoraproject.prod.mbs.module.state.change":
-            self.out = self.modulechangemessage()
 
-    def modulechangemessage(self):
+    def generateParams(self):
         self.rpmrepo = "http://kojipkgs.fedoraproject.org/repos/%s/latest/%s" % (
-            self.pdcdata["koji_tag"], ARCH )
+            self.pdcdata["koji_tag"], ARCH)
 
         omodulefile = "module.yaml"
         mdfile = open(omodulefile,mode = "w")
@@ -62,13 +63,20 @@ class FedMsgParser():
 
 parser = OptionParser()
 parser.add_option("-f", "--file", dest="filename",
-                  help="file with message to read instead of stdin",default=None)
+                  help="file with message to read fedora message bus",default=None)
+parser.add_option("-r", "--release", dest="release",
+                  help="Use release in format name-stream-version as input",default=None)
+
 (options, args) = parser.parse_args()
 if options.filename:
     flh = open(os.path.abspath(options.filename))
     stdinput = "".join(flh.readlines()).strip()
     flh.close()
+    a = FedMsgParser(stdinput)
+    print " ".join(a.generateParams())
+elif options.release:
+    a = FedMsgParser(options.release,taskotron=True)
+    print " ".join(a.generateParams())
 else:
-    stdinput = "".join(sys.stdin.readlines()).strip()
-a=FedMsgParser(stdinput)
-print " ".join(a.out)
+    raise Exception(parser.print_help())
+
