@@ -1,80 +1,78 @@
 {
-  "source_name": "datanommer", 
-  "certificate": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUVWakNDQTcrZ0F3SUJBZ0lDQW1rd0RRWUpL\nb1pJaHZjTkFRRUZCUUF3Z2FBeEN6QUpCZ05WQkFZVEFsVlQKTVFzd0NRWURWUVFJRXdKT1F6RVFN\nQTRHQTFVRUJ4TUhVbUZzWldsbmFERVhNQlVHQTFVRUNoTU9SbVZrYjNKaApJRkJ5YjJwbFkzUXhE\nekFOQmdOVkJBc1RCbVpsWkcxelp6RVBNQTBHQTFVRUF4TUdabVZrYlhObk1ROHdEUVlEClZRUXBF\nd1ptWldSdGMyY3hKakFrQmdrcWhraUc5dzBCQ1FFV0YyRmtiV2x1UUdabFpHOXlZWEJ5YjJwbFkz\nUXUKYjNKbk1CNFhEVEUzTURFeE1ERTJOVGt3TUZvWERUSTNNREV3T0RFMk5Ua3dNRm93Z2VReEN6\nQUpCZ05WQkFZVApBbFZUTVFzd0NRWURWUVFJRXdKT1F6RVFNQTRHQTFVRUJ4TUhVbUZzWldsbmFE\nRVhNQlVHQTFVRUNoTU9SbVZrCmIzSmhJRkJ5YjJwbFkzUXhEekFOQmdOVkJBc1RCbVpsWkcxelp6\nRXhNQzhHQTFVRUF4TW9iV0p6TFcxaWN5MWkKWVdOclpXNWtNREV1Y0doNE1pNW1aV1J2Y21Gd2Nt\nOXFaV04wTG05eVp6RXhNQzhHQTFVRUtSTW9iV0p6TFcxaQpjeTFpWVdOclpXNWtNREV1Y0doNE1p\nNW1aV1J2Y21Gd2NtOXFaV04wTG05eVp6RW1NQ1FHQ1NxR1NJYjNEUUVKCkFSWVhZV1J0YVc1QVpt\nVmtiM0poY0hKdmFtVmpkQzV2Y21jd2daOHdEUVlKS29aSWh2Y05BUUVCQlFBRGdZMEEKTUlHSkFv\nR0JBTHJHc0YvZlZOV1VQQmhTeDgya3hWSGFmbDk4c1N2UU8yaW5sVm9UT0tmdnRpM0owZmNIY3BN\nTQpPVGlEVFo3OEdoblBWbzNST0JCaVJQa20zeHBTMUVJMFJSNVdXWTJkVDAwZ1JKbGV0SXJXUllF\nZGE3cVZJL0dsCm9rOGkrMnN1MkFaQ2E4TGl4N3RnaUVhb01wbEZydkZMU2hGWW5rK09DQXZIZHFm\nV2ZmQVJBZ01CQUFHamdnRlgKTUlJQlV6QUpCZ05WSFJNRUFqQUFNQzBHQ1dDR1NBR0crRUlCRFFR\nZ0ZoNUZZWE41TFZKVFFTQkhaVzVsY21GMApaV1FnUTJWeWRHbG1hV05oZEdVd0hRWURWUjBPQkJZ\nRUZLQTRqUWZUY09oRnU0alRVbUtkMXpGbnRRLzVNSUhWCkJnTlZIU01FZ2Mwd2djcUFGR3RBV3Zr\nU0NJbFo1MW5sQmZVQ0hRcE9meFFBb1lHbXBJR2pNSUdnTVFzd0NRWUQKVlFRR0V3SlZVekVMTUFr\nR0ExVUVDQk1DVGtNeEVEQU9CZ05WQkFjVEIxSmhiR1ZwWjJneEZ6QVZCZ05WQkFvVApEa1psWkc5\neVlTQlFjbTlxWldOME1ROHdEUVlEVlFRTEV3Wm1aV1J0YzJjeER6QU5CZ05WQkFNVEJtWmxaRzF6\nClp6RVBNQTBHQTFVRUtSTUdabVZrYlhObk1TWXdKQVlKS29aSWh2Y05BUWtCRmhkaFpHMXBia0Jt\nWldSdmNtRncKY205cVpXTjBMbTl5WjRJSkFPTlFIa2RQRng1Rk1CTUdBMVVkSlFRTU1Bb0dDQ3NH\nQVFVRkJ3TUNNQXNHQTFVZApEd1FFQXdJSGdEQU5CZ2txaGtpRzl3MEJBUVVGQUFPQmdRQ2wzVDY5\nRDVSVlFHUzR1cjJjbWd5K2ZwTy95SlJiCnNwN2xaU2t6KzR6dFR5cTZSa2NhNDRLckRuN24wVVpV\nSWdkdnlwSlJ6WUVRUlltY3MvRVowSlVBVUE4SXJuQ08KT3d1TWt5cDIxTGdQSU9pZGxFTjQycnFm\nTUU0S2ovWk9aRndtcnA1NjAvTUo2Nkc2N0V5ZzVIWFVLV3hzNitDeApKMjRqS3ZNN3UxeU9XQT09\nCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K\n", 
-  "i": 23, 
-  "timestamp": 1490603347.0, 
-  "msg_id": "2017-46acc428-3292-4a4e-b3d7-5ad4b4e41ad5", 
-  "topic": "org.fedoraproject.prod.mbs.module.state.change", 
-  "source_version": "0.6.5", 
-  "signature": "by/u/rsRnaDx2aVKaLspGqteQ8PciOGHnznm0BbXh7TrDEib/IBBuutYN8Ya0rWWg7AOzPEA7GMd\nB+qPqy6nbcxWdqnjcpXYj/54GpDWLiHXkQfJNv/0smpm63Z6Dqe5DF0p35BE1j3VoVZ4KiYJqlXE\n6mLugPtTp+DTAQZ2uhM=\n", 
-  "msg": {
-    "state_reason": "Some components failed to build.", 
-    "component_builds": [
-      2657, 
-      2656, 
-      2658, 
-      2659
-    ], 
-    "name": "testmodule", 
-    "stream": "master", 
-    "time_submitted": 1490602717.0, 
-    "tasks": {
-      "rpms": {
-        "ed": {
-          "state": 1, 
-          "nvr": "ed-1.14.1-2.module_b98abea8", 
-          "task_id": 18582394, 
-          "state_reason": "Reused component from previous module build"
-        }, 
-        "perl-Tangerine": {
-          "state": 3, 
-          "nvr": "perl-Tangerine-0.23-2.module_b1f0e5d9", 
-          "task_id": 18628400, 
-          "state_reason": "Failed to build artifact perl-Tangerine in Koji"
-        }, 
-        "module-build-macros": {
-          "state": 1, 
-          "nvr": "module-build-macros-0.1-1.module_b1f0e5d9", 
-          "task_id": 18628271, 
-          "state_reason": ""
-        }, 
-        "mksh": {
-          "state": 1, 
-          "nvr": "mksh-54-2.module_b98abea8", 
-          "task_id": 18582475, 
-          "state_reason": "Reused component from previous module build"
+  "msg" : {
+    "component_builds" : [ 5542, 5541, 5543 ],
+    "id" : 166,
+    "modulemd" : "data:\n  api:\n    rpms: [ed, mksh]\n  components:\n    rpms:\n      ed: {cache: 'http://pkgs.fedoraproject.org/repo/pkgs/ed', rationale: A build\n          dependency of mksh., ref: 294cc9c77141dd8232afc8200a01537284fa939f, repository: 'git://pkgs.fedoraproject.org/rpms/ed'}\n      mksh: {buildorder: 10, cache: 'http://pkgs.fedoraproject.org/repo/pkgs/mksh',\n        rationale: The main package of the module., ref: 94253f0c65228a5d48ce841f90c1ee12fba3a077,\n        repository: 'git://pkgs.fedoraproject.org/rpms/mksh'}\n  dependencies:\n    buildrequires: {base-runtime: master}\n    requires: {base-runtime: master}\n  description: This module demonstrates how to write simple modulemd files And can\n    be used for testing the build and release pipeline.\n  filter: {}\n  license:\n    module: [MIT]\n  name: testmodule\n  profiles:\n    default:\n      rpms: [mksh]\n  references: {community: 'https://fedoraproject.org/wiki/Modularity', documentation: 'https://fedoraproject.org/wiki/Fedora_Packaging_Guidelines_for_Modules',\n    tracker: 'https://taiga.fedorainfracloud.org/project/modularity'}\n  stream: master\n  summary: A test module in all its beautiful beauty\n  version: 20170410111210\n  xmd:\n    mbs:\n      buildrequires:\n        base-runtime: {ref: 464026abf9cbe10fac1d800972e3229ac4d01975, stream: master,\n          version: '20170404161234'}\n      commit: 0e19a7ff612a66129cb844722226fff1956d947b\n      scmurl: git://pkgs.fedoraproject.org/modules/testmodule?#0e19a7ff612a66129cb844722226fff1956d947b\ndocument: modulemd\nversion: 1\n",
+    "name" : "testmodule",
+    "owner" : "jscotka",
+    "scmurl" : "git://pkgs.fedoraproject.org/modules/testmodule?#0e19a7ff612a66129cb844722226fff1956d947b",
+    "state" : 3,
+    "state_name" : "done",
+    "state_reason" : null,
+    "state_trace" : [ {
+      "reason" : null,
+      "state" : 1,
+      "state_name" : "wait",
+      "time" : 1.491822766E9
+    }, {
+      "reason" : null,
+      "state" : 2,
+      "state_name" : "build",
+      "time" : 1.491822792E9
+    }, {
+      "reason" : null,
+      "state" : 2,
+      "state_name" : "build",
+      "time" : 1.491822792E9
+    }, {
+      "reason" : null,
+      "state" : 2,
+      "state_name" : "build",
+      "time" : 1.491823057E9
+    }, {
+      "reason" : null,
+      "state" : 2,
+      "state_name" : "build",
+      "time" : 1.491823104E9
+    }, {
+      "reason" : null,
+      "state" : 2,
+      "state_name" : "build",
+      "time" : 1.491823163E9
+    } ],
+    "state_url" : "http://localhost/module-build-service/1/module-builds/166",
+    "stream" : "master",
+    "tasks" : {
+      "rpms" : {
+        "ed" : {
+          "nvr" : "ed-1.14.1-2.module_bd6e0eb1",
+          "state" : 1,
+          "state_reason" : "Reused component from previous module build",
+          "task_id" : 18790602
+        },
+        "mksh" : {
+          "nvr" : "mksh-54-2.module_a4b724ca",
+          "state" : 1,
+          "state_reason" : "Reused component from previous module build",
+          "task_id" : 18831744
+        },
+        "module-build-macros" : {
+          "nvr" : "module-build-macros-0.1-1.module_8c2fe258",
+          "state" : 1,
+          "state_reason" : "",
+          "task_id" : 18903973
         }
       }
-    }, 
-    "state_url": "http://localhost/module-build-service/1/module-builds/76", 
-    "time_modified": 1490603347.0, 
-    "scmurl": "git://pkgs.fedoraproject.org/modules/testmodule?#1dafe00bb741bd6a0e0f4b5f0dca706e137cec24", 
-    "state": 4, 
-    "modulemd": "data:\n  api:\n    rpms: [ed, mksh]\n  components:\n    rpms:\n      ed: {cache: 'http://pkgs.fedoraproject.org/repo/pkgs/ed', rationale: A build\n          dependency of mksh., ref: 294cc9c77141dd8232afc8200a01537284fa939f, repository: 'git://pkgs.fedoraproject.org/rpms/ed'}\n      mksh: {buildorder: 10, cache: 'http://pkgs.fedoraproject.org/repo/pkgs/mksh',\n        rationale: The main package of the module., ref: 94253f0c65228a5d48ce841f90c1ee12fba3a077,\n        repository: 'git://pkgs.fedoraproject.org/rpms/mksh'}\n      perl-Tangerine: {buildorder: 10, cache: 'http://pkgs.fedoraproject.org/repo/pkgs/perl-Tangerine',\n        rationale: The main package of the module., ref: 7cc39685bde0775054224d2bd9563c75a3c6d9d5,\n        repository: 'git://pkgs.fedoraproject.org/rpms/perl-Tangerine'}\n  dependencies:\n    buildrequires: {base-runtime: master}\n    requires: {base-runtime: master}\n  description: This module demonstrates how to write simple modulemd files And can\n    be used for testing the build and release pipeline.\n  filter: {}\n  license:\n    module: [MIT]\n  name: testmodule\n  profiles:\n    default:\n      rpms: [mksh]\n  references: {community: 'https://fedoraproject.org/wiki/Modularity', documentation: 'https://fedoraproject.org/wiki/Fedora_Packaging_Guidelines_for_Modules',\n    tracker: 'https://taiga.fedorainfracloud.org/project/modularity'}\n  stream: master\n  summary: A test module in all its beautiful beauty.\n  version: 20170327081800\n  xmd:\n    mbs:\n      buildrequires:\n        base-runtime: {ref: ca15a2fd1cf157bc3f53cea8c785a547c2ddbbbe, stream: master,\n          version: '20170324091613'}\n      commit: 1dafe00bb741bd6a0e0f4b5f0dca706e137cec24\n      scmurl: git://pkgs.fedoraproject.org/modules/testmodule?#1dafe00bb741bd6a0e0f4b5f0dca706e137cec24\ndocument: modulemd\nversion: 1\n", 
-    "time_completed": 1490603347.0, 
-    "version": "20170327081800", 
-    "owner": "jkaluza", 
-    "state_trace": [
-      {
-        "reason": null, 
-        "time": 1490602719.0, 
-        "state": 1, 
-        "state_name": "wait"
-      }, 
-      {
-        "reason": null, 
-        "time": 1490602740.0, 
-        "state": 2, 
-        "state_name": "build"
-      }, 
-      {
-        "reason": null, 
-        "time": 1490602741.0, 
-        "state": 2, 
-        "state_name": "build"
-      }
-    ], 
-    "id": 76, 
-    "state_name": "failed"
-  }
+    },
+    "time_completed" : 1.491823195E9,
+    "time_modified" : 1.491823195E9,
+    "time_submitted" : 1.491822764E9,
+    "version" : "20170410111210"
+  },
+  "i" : 26,
+  "topic" : "org.fedoraproject.prod.mbs.module.state.change",
+  "msg_id" : "2017-46e9c611-627d-4026-b872-70ad6705be95",
+  "crypto" : "x509",
+  "timestamp" : 1491823195,
+  "username" : "fedmsg"
 }
