@@ -240,9 +240,15 @@ gpgcheck=0
             f.close()
 
     def __prepareSetup(self):
-        utils.process.run(
-            "dnf -y --disablerepo=* --enablerepo=%s* install %s" %
-            (self.moduleName, self.__whattoinstallrpm))
+        try:
+            utils.process.run(
+                "dnf -y --disablerepo=* --enablerepo=%s* --allowerasing distro-sync %s" %
+                (self.moduleName, self.__whattoinstallrpm))
+        except Exception as e:
+            raise Exception("ERROR: Unable to install packages %s from repositories \n%s\n original exeption:\n%s\n" %
+                            (self.__whattoinstallrpm,
+                            utils.process.run("cat %s" % self.yumrepo).stdout,
+                            e))
 
     def status(self, command="/bin/true"):
         if 'status' in self.info and self.info['status']:
