@@ -76,7 +76,7 @@ if options.filename:
     print " ".join(a.generateParams())
 elif options.release:
     a = FedMsgParser(options.release,taskotron=True)
-    print " ".join(a.out)
+    print " ".join(a.generateParams())
 else:
     raise Exception(parser.print_help())
 
