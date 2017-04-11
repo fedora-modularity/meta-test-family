@@ -48,6 +48,8 @@ function getparams_int(){
         python $MTF_PATH/tools/taskotron-msg-reader.py -f $PARSEITEM
     elif [ "$PARSEITEMTYPE" = "compose" ]; then
         python $MTF_PATH/tools/compose_info_parser.py -c $PARSEITEM -m $MODULENAME
+    elif [ "$PARSEITEMTYPE" = "taskotron" ]; then
+        python $MTF_PATH/tools/taskotron-msg-reader.py -r $PARSEITEM
     fi
 }
 
