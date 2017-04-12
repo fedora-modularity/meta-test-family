@@ -459,5 +459,4 @@ def get_latest_baseruntime_repo_url(fake=False):
     else:
         brt = pdc_data.PDCParser()
         brt.setLatestPDC("base-runtime")
-
-        return rpmrepo
+        return brt.generateRepoUrl()
