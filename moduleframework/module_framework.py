@@ -35,6 +35,7 @@ from avocado import utils
 from avocado.core import exceptions
 from avocado.utils import service
 from compose_info import ComposeParser
+import pdc_data
 
 
 LOGPARAMS = logging.getLogger('params')
@@ -456,10 +457,7 @@ def get_latest_baseruntime_repo_url(fake=False):
     if fake:
         return "http://mirror.vutbr.cz/fedora/releases/25/Everything/x86_64/os/"
     else:
-        ARCH = "x86_64"
-        PDCURL = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
-        PDC = "%s/?variant_name=%s&variant_version=%s&active=True" % (PDCURL, "base-runtime", "master")
-        pdcdata = json.load(urllib.urlopen(PDC))["results"][-1]
-        rpmrepo = "http://kojipkgs.fedoraproject.org/repos/%s/latest/%s" % (
-            pdcdata["koji_tag"], ARCH)
+        brt = pdc_data.PDCParser()
+        brt.setLatestPDC("base-runtime")
+
         return rpmrepo
