@@ -32,21 +32,27 @@ if __name__ == '__main__':
                       help="Use release in format name-stream-version as input",default=None)
     parser.add_option("-l", "--latest", dest="latest",
                       help="Use latest bits, build by MBS and stored in PDC")
+    parser.add_option("--localrepo", dest="localrepo", action="store_true", default=False,
+                      help="generate local repository based on koji tag from PDC")
 
     a = PDCParser()
     (options, args) = parser.parse_args()
+    if options.localrepo:
+        callfnc = "generateParamsLocalKojiPkgs"
+    else:
+        callfnc = "generateParams"
     if options.filename:
         flh = open(options.filename)
         stdinput = "".join(flh.readlines()).strip()
         flh.close()
         a.setViaFedMsg(stdinput)
-        print " ".join(a.generateParams())
+        print " ".join(getattr(a,callfnc)())
     elif options.release:
         a.setFullVersion(options.release)
-        print " ".join(a.generateParams())
+        print " ".join(getattr(a,callfnc)())
     elif options.latest:
         a.setLatestPDC(options.latest)
-        print " ".join(a.generateParams())
+        print " ".join(getattr(a,callfnc)())
     else:
         raise Exception(parser.print_help())
 

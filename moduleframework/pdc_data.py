@@ -26,6 +26,7 @@ import os
 import json
 import urllib
 import re
+from avocado import utils
 
 ARCH="x86_64"
 PDCURL="https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
@@ -68,6 +69,24 @@ class PDCParser():
     def generateParams(self):
         output = []
         output.append("URL=%s" % self.generateRepoUrl())
+        output.append("MODULEMDURL=%s" % self.generateModuleMDFile())
+        output.append("MODULE=rpm")
+        return output
+
+    def createLocalRepoFromKoji(self):
+        utils.process.run("dnf -y install createrepo koji", ignore_status=True)
+        dirname = "localrepository"
+        os.mkdir(dirname)
+        absdir = os.path.abspath(dirname)
+        for foo in utils.process.run("koji list-tagged --quiet %s" % self.pdcdata["koji_tag"]).stdout.split("\n"):
+            pkgbouid = foo.strip().split(" ")[0]
+            utils.process.run("cd %s; do koji download-build %s" % (absdir, pkgbouid), shell=True)
+        utils.process.run("cd %s; createrepo -v %s" % (absdir,absdir), shell=True)
+        return "file://%s" % dirname
+
+    def generateParamsLocalKojiPkgs(self):
+        output = []
+        output.append("URL=%s" % self.createLocalRepoFromKoji())
         output.append("MODULEMDURL=%s" % self.generateModuleMDFile())
         output.append("MODULE=rpm")
         return output
