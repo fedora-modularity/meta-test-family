@@ -80,7 +80,7 @@ class PDCParser():
         absdir = os.path.abspath(dirname)
         for foo in utils.process.run("koji list-tagged --quiet %s" % self.pdcdata["koji_tag"]).stdout.split("\n"):
             pkgbouid = foo.strip().split(" ")[0]
-            utils.process.run("cd %s; do koji download-build %s" % (absdir, pkgbouid), shell=True)
+            utils.process.run("cd %s; koji download-build %s" % (absdir, pkgbouid), shell=True)
         utils.process.run("cd %s; createrepo -v %s" % (absdir,absdir), shell=True)
         return "file://%s" % dirname
 
