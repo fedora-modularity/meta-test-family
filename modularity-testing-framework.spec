@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.2.5
+Version:        0.2.6
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -44,6 +44,71 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Tue Apr 11 2017 Petr "Stone" Hracek <phracek@redhat.com> 0.2.6-1
+- Bump version (phracek@redhat.com)
+- restructured compose info parser to be able to use them in framework
+  (baseruntime RFE) (jscotka@redhat.com)
+- restructured compose info parser to be able to use them in framework
+  (baseruntime RFE) (jscotka@redhat.com)
+- restructured compose info parser to be able to use them in framework
+  (baseruntime RFE) (jscotka@redhat.com)
+- added distro-sync + install command (jscotka@redhat.com)
+- install test dependencies inside setup instead of loadconfig function
+  (jscotka@redhat.com)
+- moved initialization of name to init of docker class (jscotka@redhat.com)
+- moved some part to init method of helper to be able use it also without
+  direct using in tests (jscotka@redhat.com)
+- typo in fedmsg parser (jscotka@redhat.com)
+- added special parameter for taskotron (jscotka@redhat.com)
+- imporved taskotron reader to be able use just name-stream-version
+  (jscotka@redhat.com)
+- bad example fedora message (jscotka@redhat.com)
+- moved baseruntime to location to be same as a module name
+  (jscotka@redhat.com)
+- removed printing of module (jscotka@redhat.com)
+- missing module type variable (jscotka@redhat.com)
+- imporved run_them script to be able use also compose as input
+  (jscotka@redhat.com)
+- imporved run_them script to be able use also compose as input
+  (jscotka@redhat.com)
+- added compose handling library for modules (jscotka@redhat.com)
+- added tool for parsing data from final compose (jscotka@redhat.com)
+- added timeout before testing (jscotka@redhat.com)
+- added timeout before testing (jscotka@redhat.com)
+- missing tests subdir (jscotka@redhat.com)
+- have to check also if link exists (jscotka@redhat.com)
+- if missing profiles, use components:rpms packages to install
+  (jscotka@redhat.com)
+- improved simple test of testing module (jscotka@redhat.com)
+- improved shell test to not fail (jscotka@redhat.com)
+- improved shell test to not fail (jscotka@redhat.com)
+- adapted PDC changes (jscotka@redhat.com)
+- adapted PDC changes (jscotka@redhat.com)
+- adapted PDC changes (jscotka@redhat.com)
+- added minimal config for module linter in case config does not exist
+  (jscotka@redhat.com)
+- testing commit (jscotka@redhat.com)
+- mistake in fedmsg reader path and removed installing itself
+  (jscotka@redhat.com)
+- repaired helper tool (jscotka@redhat.com)
+- Typo in setup. Missing tools directory (phracek@redhat.com)
+- repo repos typos (psklenar@redhat.com)
+- removed old code (jscotka@redhat.com)
+- removed old code (jscotka@redhat.com)
+- Add directory tools (phracek@redhat.com)
+- Remove obsolete file (phracek@redhat.com)
+- Packaging changes (phracek@redhat.com)
+- added another helper tool (jscotka@redhat.com)
+- added another helper tool (jscotka@redhat.com)
+- added calling avocado service manager instead of starting manually via
+  command (jscotka@redhat.com)
+- changed to 127.0.0.1 instead of localhost (jscotka@redhat.com)
+- changes of haproxy (jscotka@redhat.com)
+- more fixes of haproxy to be cleaner (jscotka@redhat.com)
+- added some tweaks of haproxy tests (jscotka@redhat.com)
+- added some tweaks of haproxy tests (jscotka@redhat.com)
+- Bump version with the same as tito (phracek@redhat.com)
+
 * Wed Apr 05 2017 Petr "Stone" Hracek <phracek@redhat.com> 0.2.5-1
 - Fix Packaging Guidelines (phracek@redhat.com)
 - added memcached to dependencies (jscotka@redhat.com)
