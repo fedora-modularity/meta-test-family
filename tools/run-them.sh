@@ -22,13 +22,14 @@
 #
 set -x
 SLEEP=15
-echo "sleep for $SLEEP minutes to ensure that repos are ready"
-for foo in $SLEEP; do
-    sleep 60
-    echo "$foo/$SLEEP minutes done"
-done
 
-
+function sleep_a_while(){
+    echo "sleep for $SLEEP minutes to ensure that repos are ready"
+    for foo in $SLEEP; do
+        sleep 60
+        echo "$foo/$SLEEP minutes done"
+    done
+}
 
 export MODULENAME=$1
 export PARSEITEM=$2
