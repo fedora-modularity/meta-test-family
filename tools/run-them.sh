@@ -45,11 +45,11 @@ export AVOCADOCMD="avocado run --xunit $XUFILE"
 
 function getparams_int(){
     if [ "$PARSEITEMTYPE" = "" -o "$PARSEITEMTYPE" = "fedmsg" ]; then
-        python $MTF_PATH/tools/taskotron-msg-reader.py -f $PARSEITEM
+        python $MTF_PATH/tools/taskotron-msg-reader.py -f $PARSEITEM --localrepo
     elif [ "$PARSEITEMTYPE" = "compose" ]; then
         python $MTF_PATH/tools/compose_info_parser.py -c $PARSEITEM -m $MODULENAME
     elif [ "$PARSEITEMTYPE" = "taskotron" ]; then
-        python $MTF_PATH/tools/taskotron-msg-reader.py -r $PARSEITEM
+        python $MTF_PATH/tools/taskotron-msg-reader.py -r $PARSEITEM --localrepo
     fi
 }
 
