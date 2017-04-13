@@ -20,12 +20,12 @@
 #
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
-set -x
+
 SLEEP=15
 
 function sleep_a_while(){
     echo "sleep for $SLEEP minutes to ensure that repos are ready"
-    for foo in $SLEEP; do
+    for foo in `seq $SLEEP`; do
         sleep 60
         echo "$foo/$SLEEP minutes done"
     done
@@ -42,14 +42,14 @@ export AVDIR=~/avocado
 mkdir -p $AVDIR
 export XUFILE="$AVDIR/out.xunit"
 export AVOCADOCMD="avocado run --xunit $XUFILE"
-
+export RESULTTOOLS=0
 
 function getparams_int(){
     if [ "$PARSEITEMTYPE" = "" -o "$PARSEITEMTYPE" = "fedmsg" ]; then
         python $MTF_PATH/tools/taskotron-msg-reader.py -f $PARSEITEM --localrepo
     elif [ "$PARSEITEMTYPE" = "compose" ]; then
         python $MTF_PATH/tools/compose_info_parser.py -c $PARSEITEM -m $MODULENAME
-    elif [ "$PARSEITEMTYPE" = "taskotron" ]; then
+    elif [ "$PARSEITEMTYPE" = "taskotron" -o "$PARSEITEMTYPE" = "pdc" ]; then
         python $MTF_PATH/tools/taskotron-msg-reader.py -r $PARSEITEM --localrepo
     fi
 }
@@ -88,9 +88,12 @@ function run_modulelint(){
     eval $PARAMS CONFIG=$MTF_PATH/docs/example-config-minimal.yaml $AVOCADOCMD $TESTS
 }
 
+set -x
 inst_env
+RESULTTOOLS=$(($RESULTTOOLS+$?))
 
 export PARAMS="`getparams_int`"
+RESULTTOOLS=$(($RESULTTOOLS+$?))
 test "$MODULENAME" = "testmodule" && MODULENAME="testing-module"
 
 if loaddistgittests; then
@@ -99,4 +102,13 @@ elif loadexampletests; then
     avocado_wrapper
 else
     run_modulelint
+fi
+TESTRESULT=$?
+
+if [ "$RESULTTOOLS" -ne 0 ]; then
+    exit 2
+elif [ "$TESTRESULT" -ne 0 ]; then
+    exit 125
+else
+    exit 0
 fi
