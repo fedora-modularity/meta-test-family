@@ -27,6 +27,7 @@ import json
 import urllib
 import re
 from avocado import utils
+import shutil
 
 ARCH="x86_64"
 PDCURL="https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
@@ -76,6 +77,8 @@ class PDCParser():
     def createLocalRepoFromKoji(self):
         utils.process.run("dnf -y install createrepo koji", ignore_status=True)
         dirname = "localrepository"
+        if os.path.exists(dirname):
+            shutil.rmtree(dirname)
         os.mkdir(dirname)
         absdir = os.path.abspath(dirname)
         for foo in utils.process.run("koji list-tagged --quiet %s" % self.pdcdata["koji_tag"]).stdout.split("\n"):
