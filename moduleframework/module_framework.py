@@ -326,6 +326,8 @@ class NspawnHelper(RpmHelper):
 
     def setUp(self):
         self.installTestDependencies()
+# TODO: workaround because systemd nspawn is now working well in F-25 (failing because of selinux)
+        self.runHost("setenforce 0")
         self.__prepare()
         self.__prepareSetup()
         self.__callSetupFromConfig()
