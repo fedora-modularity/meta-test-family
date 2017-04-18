@@ -60,7 +60,7 @@ class CommonFunctions(object):
         self.__modulemdConf = None
         self.config = get_correct_config()
         self.moduleName = self.config['name']
-        self.packages = self.config['packages']['rpms'] if self.config.has_key('packages') and  self.config['packages'].has_key('rpms') and self.config['packages']['rpms'] else [self.moduleName]
+        self.packages = self.config['packages'].get('rpms') if self.config.has_key('packages') and  self.config['packages'].has_key('rpms') and self.config['packages'].get('rpms') else None
         self.source = self.config.get('source') if self.config.get('source') else self.config['module']['rpm'].get('source')
 
     def getModulemdYamlconfig(self, urllink=None):
@@ -160,7 +160,11 @@ class ContainerHelper(CommonFunctions):
                 self.docker_id = self.runHost(
                     "docker run %s %s %s" %
                     (args, self.jmeno, command), shell=True).stdout
+            self.docker_id = self.docker_id.strip()
+            if self.packages:
+                self.run("microdnf -y install %s" % " ".join(self.packages))
         self.docker_id = self.docker_id.strip()
+
 
     def stop(self):
         if self.status():
@@ -210,7 +214,9 @@ class RpmHelper(CommonFunctions):
                                    self.moduleName)
         self.info = self.config['module']['rpm']
         self.baseruntimerepo = get_latest_baseruntime_repo_url()
-        if self.getModulemdYamlconfig()['data'].get('profiles'):
+        if self.packages:
+            self.whattoinstallrpm=" ".join(self.packages)
+        elif self.getModulemdYamlconfig()['data'].get('profiles'):
             self.whattoinstallrpm = " ".join(
                 self.getModulemdYamlconfig()['data']['profiles'][get_correct_profile()]['rpms'])
         else:
@@ -311,7 +317,7 @@ class NspawnHelper(RpmHelper):
     def __init__(self):
         super(NspawnHelper, self).__init__()
         self.chrootpath = os.path.abspath(os.path.join("/opt","chroot_%s" % self.moduleName))
-        self.__addionalpackages="systemd passwd"
+        self.__addionalpackages="systemd passwd microdnf"
 
     def setUp(self):
         self.installTestDependencies()
