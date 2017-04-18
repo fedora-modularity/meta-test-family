@@ -387,6 +387,8 @@ gpgcheck=0
         self.runHost("machinectl poweroff %s" % self.moduleName)
         self.nspawncont.stop()
         self.__callCleanupFromConfig()
+# TODO: workaround because systemd nspawn is now working well in F-25 (failing because of selinux)
+        self.runHost("setenforce 1")
 
     def __callSetupFromConfig(self):
         if self.info.get("setup"):
