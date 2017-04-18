@@ -162,7 +162,8 @@ class ContainerHelper(CommonFunctions):
                     (args, self.jmeno, command), shell=True).stdout
             self.docker_id = self.docker_id.strip()
             if self.packages:
-                self.run("microdnf -y install %s" % " ".join(self.packages))
+                self.run("dnf -y install %s" % " ".join(self.packages), ignore_status=True)
+                self.run("microdnf -y install %s" % " ".join(self.packages), ignore_status=True)
         self.docker_id = self.docker_id.strip()
 
 
@@ -221,6 +222,7 @@ class RpmHelper(CommonFunctions):
                 self.getModulemdYamlconfig()['data']['profiles'][get_correct_profile()]['rpms'])
         else:
             self.whattoinstallrpm = " ".join(self.getModulemdYamlconfig()['data']['components']['rpms'])
+
         if get_correct_url():
             self.repos = [get_correct_url(), self.baseruntimerepo]
         elif self.info.get('repo'):
@@ -265,10 +267,11 @@ gpgcheck=0
     def __prepareSetup(self):
         try:
             self.runHost(
-                "dnf -y --disablerepo=* --enablerepo=%s* --allowerasing distro-sync" % self.moduleName, ignore_status=True)
-            self.runHost(
                 "dnf -y --disablerepo=* --enablerepo=%s* --allowerasing install %s" %
                 (self.moduleName, self.whattoinstallrpm))
+            self.runHost(
+                "dnf -y --disablerepo=* --enablerepo=%s* --allowerasing distro-sync" % self.moduleName,
+                ignore_status=True)
         except Exception as e:
             raise Exception("ERROR: Unable to install packages %s from repositories \n%s\n original exeption:\n%s\n" %
                             (self.whattoinstallrpm,
@@ -317,7 +320,7 @@ class NspawnHelper(RpmHelper):
     def __init__(self):
         super(NspawnHelper, self).__init__()
         self.chrootpath = os.path.abspath(os.path.join("/opt","chroot_%s" % self.moduleName))
-        self.__addionalpackages="systemd passwd microdnf"
+        self.__addionalpackages="systemd passwd"
 
     def setUp(self):
         self.installTestDependencies()

@@ -23,7 +23,7 @@ testdependecies:
  * `name:` name of module
  * `modulemd-url:` link to modulemd file, now it is not used anyhow, just for installing packages for proper module
  * `service:` In case module is service like memcached, store there port number, can be then used in tests, to not hardcode port number *(Optional)*
- * `packages:` Which packages has to be installed, propabably there will be packages from __api__ specification
+ * `packages:` Which packages will be installed inside module (docker container, guest, any type of module)
  * `testdependecies:` Install dependecies on host, what are important for module testing, for example when you would like to use `nc`, you have to install it explicitly, it is not in cloud images.
 
 ## Module types specification
