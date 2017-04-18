@@ -44,7 +44,7 @@ def skipTestIf(value, text="Test not intended for this module profile"):
     if value:
         raise exceptions.TestDecoratorSkip(text)
 
-class CommonFunctions():
+class CommonFunctions(object):
     config = None
 
     def runHost(self, command="ls /", **kwargs):
@@ -122,7 +122,7 @@ class ContainerHelper(CommonFunctions):
 
     def __prepare(self):
         if not os.path.isfile('/usr/bin/docker-current'):
-            utils.process.run("dnf -y install docker")
+            self.runHost("dnf -y install docker")
 
     def __prepareContainer(self):
         if self.tarbased == False and self.jmeno == self.icontainer and "docker.io" not in self.info['container']:
@@ -137,27 +137,27 @@ class ContainerHelper(CommonFunctions):
 
     def __pullContainer(self):
         if self.tarbased:
-            utils.process.run(
+            self.runHost(
                 "docker import %s %s" %
                 (self.icontainer, self.jmeno))
         elif "docker=" in self.icontainer:
             pass
         else:
-            utils.process.run("docker pull %s" % self.jmeno)
+            self.runHost("docker pull %s" % self.jmeno)
 
         self.containerInfo = json.loads(
-            utils.process.run(
+            self.runHost(
                 "docker inspect --format='{{json .Config}}'  %s" %
                 self.jmeno).stdout)
 
     def start(self, args="-it -d", command="/bin/bash"):
         if not self.status():
             if 'start' in self.info and self.info['start']:
-                self.docker_id = utils.process.run(
+                self.docker_id = self.runHost(
                     "%s -d %s" %
                     (self.info['start'], self.jmeno), shell=True).stdout
             else:
-                self.docker_id = utils.process.run(
+                self.docker_id = self.runHost(
                     "docker run %s %s %s" %
                     (args, self.jmeno, command), shell=True).stdout
         self.docker_id = self.docker_id.strip()
@@ -165,8 +165,8 @@ class ContainerHelper(CommonFunctions):
     def stop(self):
         if self.status():
             try:
-                utils.process.run("docker stop %s" % self.docker_id)
-                utils.process.run("docker rm %s" % self.docker_id)
+                self.runHost("docker stop %s" % self.docker_id)
+                self.runHost("docker rm %s" % self.docker_id)
             except Exception as e:
                 print e
                 print "docker already removed"
@@ -180,7 +180,7 @@ class ContainerHelper(CommonFunctions):
 
     def run(self, command="ls /", **kwargs):
         self.start()
-        return utils.process.run('docker exec %s bash -c "%s"' %
+        return self.runHost('docker exec %s bash -c "%s"' %
                                  (self.docker_id, command.replace('"', r'\"')), **kwargs)
 
     def copyTo(self, src, dest):
@@ -209,16 +209,16 @@ class RpmHelper(CommonFunctions):
             "/etc", "yum.repos.d", "%s.repo" %
                                    self.moduleName)
         self.info = self.config['module']['rpm']
-        self.__baseruntimerepo = get_latest_baseruntime_repo_url()
+        self.baseruntimerepo = get_latest_baseruntime_repo_url()
         if self.getModulemdYamlconfig()['data'].get('profiles'):
-            self.__whattoinstallrpm = " ".join(
+            self.whattoinstallrpm = " ".join(
                 self.getModulemdYamlconfig()['data']['profiles'][get_correct_profile()]['rpms'])
         else:
-            self.__whattoinstallrpm = " ".join(self.getModulemdYamlconfig()['data']['components']['rpms'])
+            self.whattoinstallrpm = " ".join(self.getModulemdYamlconfig()['data']['components']['rpms'])
         if get_correct_url():
-            self.repos = [get_correct_url(), self.__baseruntimerepo]
+            self.repos = [get_correct_url(), self.baseruntimerepo]
         elif self.info.get('repo'):
-            self.repos = [self.info.get('repo'), self.__baseruntimerepo]
+            self.repos = [self.info.get('repo'), self.baseruntimerepo]
         elif self.info.get('repos'):
             self.repos = self.info.get('repos')
         else:
@@ -258,38 +258,38 @@ gpgcheck=0
 
     def __prepareSetup(self):
         try:
-            utils.process.run(
+            self.runHost(
                 "dnf -y --disablerepo=* --enablerepo=%s* --allowerasing distro-sync" % self.moduleName, ignore_status=True)
-            utils.process.run(
+            self.runHost(
                 "dnf -y --disablerepo=* --enablerepo=%s* --allowerasing install %s" %
-                (self.moduleName, self.__whattoinstallrpm))
+                (self.moduleName, self.whattoinstallrpm))
         except Exception as e:
             raise Exception("ERROR: Unable to install packages %s from repositories \n%s\n original exeption:\n%s\n" %
-                            (self.__whattoinstallrpm,
+                            (self.whattoinstallrpm,
                             utils.process.run("cat %s" % self.yumrepo).stdout,
                             e))
 
     def status(self, command="/bin/true"):
         if 'status' in self.info and self.info['status']:
-            utils.process.run(self.info['status'], shell=True)
+            self.runHost(self.info['status'], shell=True)
         else:
-            utils.process.run("%s" % command, shell=True)
+            self.runHost("%s" % command, shell=True)
 
     def start(self, command="/bin/true"):
         if 'start' in self.info and self.info['start']:
-            utils.process.run(self.info['start'], shell=True)
+            self.runHost(self.info['start'], shell=True)
         else:
-            utils.process.run("%s" % command, shell=True)
+            self.runHost("%s" % command, shell=True)
         time.sleep(2)
 
     def stop(self, command="/bin/true"):
         if 'stop' in self.info and self.info['stop']:
-            utils.process.run(self.info['stop'], shell=True)
+            self.runHost(self.info['stop'], shell=True)
         else:
-            utils.process.run("%s" % command, shell=True)
+            self.runHost("%s" % command, shell=True)
 
     def run(self, command="ls /", **kwargs):
-        return utils.process.run('bash -c "%s"' % command.replace('"', r'\"'), **kwargs)
+        return self.runHost('bash -c "%s"' % command.replace('"', r'\"'), **kwargs)
 
     def copyTo(self, src, dest):
         self.runHost("cp -r %s %s" % (src, dest))
@@ -305,6 +305,83 @@ gpgcheck=0
         if self.info.get("cleanup"):
             self.runHost(self.info.get("cleanup"), shell = True)
 
+
+class NspawnHelper(RpmHelper):
+
+    def __init__(self):
+        super(NspawnHelper, self).__init__()
+        self.chrootpath = os.path.abspath(os.path.join("/opt","chroot_%s" % self.moduleName))
+        self.__addionalpackages="systemd passwd"
+
+    def setUp(self):
+        self.installTestDependencies()
+        self.__prepare()
+        self.__prepareSetup()
+        self.__callSetupFromConfig()
+
+    def __prepare(self):
+        # if not os.path.exists(self.installroot):
+        #    shutil.rmtree(self.installroot)
+         #   os.makedirs(self.installroot)
+        if not os.path.isfile(self.yumrepo):
+            counter = 0
+            f = open(self.yumrepo, 'w')
+            for repo in self.repos:
+                counter = counter + 1
+                add = """[%s%d]
+name=%s%d
+baseurl=%s
+enabled=0
+gpgcheck=0
+
+""" % (self.moduleName, counter, self.moduleName, counter, repo)
+                f.write(add)
+            f.close()
+
+
+    def __prepareSetup(self):
+        if os.path.exists(self.chrootpath):
+            shutil.rmtree(self.chrootpath)
+        os.mkdir(self.chrootpath)
+        self.runHost("dnf -y install systemd-container")
+        try:
+            self.runHost(
+                "dnf --nogpgcheck install --installroot %s -y --disablerepo=* --enablerepo=%s* %s %s" %
+                (self.chrootpath, self.moduleName, self.whattoinstallrpm, self.__addionalpackages))
+        except Exception as e:
+            raise Exception("ERROR: Unable to install packages %s from repositories \n%s\n original exeption:\n%s\n" %
+                            (self.whattoinstallrpm,
+                            utils.process.run("cat %s" % self.yumrepo).stdout,
+                            e))
+        self.nspawncont = utils.process.SubProcess("systemd-nspawn --machine=%s -bD %s" % (self.moduleName, self.chrootpath))
+        self.nspawncont.start()
+        time.sleep(30)
+
+    def run(self, command="ls /", **kwargs):
+        return self.runHost('machinectl shell root@%s /bin/bash -c "%s"' % (self.moduleName, command.replace('"', r'\"')), **kwargs)
+
+    def selfcheck(self):
+        return self.run().stdout
+
+    def copyTo(self, src, dest):
+        self.runHost("cp -r %s %s/%s" % (src, self.chrootpath, dest))
+
+    def copyFrom(self, src, dest):
+        self.runHost("cp -r %s/%s %s" % (self.chrootpath, src, dest))
+
+    def tearDown(self):
+        self.stop()
+        self.runHost("machinectl poweroff %s" % self.moduleName)
+        self.nspawncont.stop()
+        self.__callCleanupFromConfig()
+
+    def __callSetupFromConfig(self):
+        if self.info.get("setup"):
+            self.runHost(self.info.get("setup"), shell = True)
+
+    def __callCleanupFromConfig(self):
+        if self.info.get("cleanup"):
+            self.runHost(self.info.get("cleanup"), shell = True)
 
 
 # INTERFACE CLASS FOR GENERAL TESTS OF MODULES
@@ -401,6 +478,8 @@ def get_correct_backend():
         return ContainerHelper(), amodule
     elif amodule == 'rpm':
         return RpmHelper(), amodule
+    elif amodule == 'nspawn':
+        return NspawnHelper(), amodule
     else:
         raise ValueError("Unsupported MODULE={0}".format(amodule))
 
