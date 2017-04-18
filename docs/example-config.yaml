@@ -2,7 +2,7 @@ document: modularity-testing
 version: 1
 name: memcached
 source: https://github.com/container-images/memcached.git
-modulemd-url: http://raw.githubusercontent.com/container-images/memcached/master/memcached.yaml
+modulemd-url: https://src.fedoraproject.org/cgit/modules/memcached.git/plain/memcached.yaml
 service:
     port: 11211
 packages:
