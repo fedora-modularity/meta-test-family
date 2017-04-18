@@ -7,12 +7,10 @@ service:
     port: 11211
 packages:
     rpms:
-        - memcached
-        - perl-Carp
+        - bash
 testdependecies:
     rpms:
         - nc
-        - memcached
 default_module: docker
 module:
     docker:
