@@ -92,5 +92,5 @@ class PDCParser():
         output = []
         output.append("URL=%s" % self.createLocalRepoFromKoji())
         output.append("MODULEMDURL=%s" % self.generateModuleMDFile())
-        output.append("MODULE=rpm")
+        output.append("MODULE=%s" % "nspawn")
         return output
