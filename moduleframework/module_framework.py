@@ -214,7 +214,9 @@ class RpmHelper(CommonFunctions):
             "/etc", "yum.repos.d", "%s.repo" %
                                    self.moduleName)
         self.info = self.config['module']['rpm']
-        self.baseruntimerepo = get_latest_baseruntime_repo_url()
+        self.alldrepos = []
+        for dep in self.getModulemdYamlconfig()["data"]["dependencies"].get("requires") if self.getModulemdYamlconfig()["data"].get("dependencies").keys() else []:
+            self.alldrepos.append(get_latest_repo_url(dep))
         if self.packages:
             self.whattoinstallrpm=" ".join(self.packages)
         elif self.getModulemdYamlconfig()['data'].get('profiles'):
@@ -224,9 +226,9 @@ class RpmHelper(CommonFunctions):
             self.whattoinstallrpm = " ".join(self.getModulemdYamlconfig()['data']['components']['rpms'])
 
         if get_correct_url():
-            self.repos = [get_correct_url(), self.baseruntimerepo]
+            self.repos = [get_correct_url()] + self.alldrepos
         elif self.info.get('repo'):
-            self.repos = [self.info.get('repo'), self.baseruntimerepo]
+            self.repos = [self.info.get('repo')] + self.alldrepos
         elif self.info.get('repos'):
             self.repos = self.info.get('repos')
         else:
@@ -541,10 +543,10 @@ def get_correct_modulemd():
         return [x[12:] for x in b if 'MODULEMDURL=' in x][0]
 
 
-def get_latest_baseruntime_repo_url(fake=False):
+def get_latest_repo_url(wmodule="base-runtime", fake=False):
     if fake:
         return "http://mirror.vutbr.cz/fedora/releases/25/Everything/x86_64/os/"
     else:
         brt = pdc_data.PDCParser()
-        brt.setLatestPDC("base-runtime")
+        brt.setLatestPDC(wmodule)
         return brt.generateRepoUrl()
