@@ -320,7 +320,7 @@ class NspawnHelper(RpmHelper):
     def __init__(self):
         super(NspawnHelper, self).__init__()
         self.chrootpath = os.path.abspath(os.path.join("/opt","chroot_%s" % self.moduleName))
-        self.__addionalpackages="systemd passwd"
+        self.__addionalpackages="systemd"
 
     def setUp(self):
         self.installTestDependencies()
@@ -355,7 +355,7 @@ gpgcheck=0
         self.runHost("dnf -y install systemd-container")
         try:
             self.runHost(
-                "dnf --nogpgcheck install --installroot %s -y --disablerepo=* --enablerepo=%s* %s %s" %
+                "dnf --nogpgcheck install --installroot %s -y --allowerasing --disablerepo=* --enablerepo=%s* %s %s" %
                 (self.chrootpath, self.moduleName, self.whattoinstallrpm, self.__addionalpackages))
         except Exception as e:
             raise Exception("ERROR: Unable to install packages %s from repositories \n%s\n original exeption:\n%s\n" %
