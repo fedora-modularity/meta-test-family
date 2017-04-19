@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.2.6
+Version:        0.2.7
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -44,6 +44,44 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Wed Apr 19 2017 Petr "Stone" Hracek <phracek@redhat.com> 0.2.7-1
+- Bump release (phracek@redhat.com)
+- typo (jscotka@redhat.com)
+- added srippint to rpm commans because it contains bad character
+  (jscotka@redhat.com)
+- added possibility to use python format variables inside config and then it is
+  translated by framework (jscotka@redhat.com)
+- iproved docker skip (jscotka@redhat.com)
+- removed process object. Unable to pickle, this commit does workaround what
+  should be removed in future (jscotka@redhat.com)
+- removed memcached specific things from test module (jscotka@redhat.com)
+- removed memcached dependencies (jscotka@redhat.com)
+- missing nspawn when using local reposiries (jscotka@redhat.com)
+- added also enabling selinux in teardown, to return system to previous state
+  (jscotka@redhat.com)
+- added setenforce 0, because nspawn is failing on F-25 (jscotka@redhat.com)
+- changes in testing module example, to actual koji link (jscotka@redhat.com)
+- added new link to modulemd file of memcached (jscotka@redhat.com)
+- added dependencies on another modules when installing (from PDC)
+  (jscotka@redhat.com)
+- removed passwd as dependency, not needed (jscotka@redhat.com)
+- removed microdnf dep, because it is not installed now in container images or
+  not in fedora25 (jscotka@redhat.com)
+- added microdnf dependency (jscotka@redhat.com)
+- added nspawn helper for rpm based module testing. (jscotka@redhat.com)
+- removed localrepository if exist (jscotka@redhat.com)
+- improved to properly return good RC for taskotron (jscotka@redhat.com)
+- added return stat handling for taskotron (jscotka@redhat.com)
+- removed sleep (jscotka@redhat.com)
+- more changes (jscotka@redhat.com)
+- there were typo in koji downloader (jscotka@redhat.com)
+- added possibility to create local repository (jscotka@redhat.com)
+- typo (jscotka@redhat.com)
+- added possibility to list latest bits from PDC and little bit removed
+  duplication of code (jscotka@redhat.com)
+- added possibility to list latest bits from PDC and little bit removed
+  duplication of code (jscotka@redhat.com)
+
 * Tue Apr 11 2017 Petr "Stone" Hracek <phracek@redhat.com> 0.2.6-1
 - Bump version (phracek@redhat.com)
 - restructured compose info parser to be able to use them in framework
