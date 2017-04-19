@@ -366,6 +366,11 @@ gpgcheck=0
     def __prepareSetup(self):
         if os.path.exists(self.chrootpath):
             shutil.rmtree(self.chrootpath, ignore_errors=True)
+        try:
+            self.runHost("machinectl poweroff %s" % self.moduleName)
+        except:
+            pass
+        time.sleep(10)
         os.mkdir(self.chrootpath)
         self.runHost("dnf -y install systemd-container")
         try:
@@ -379,7 +384,7 @@ gpgcheck=0
                             e))
         nspawncont = utils.process.SubProcess("systemd-nspawn --machine=%s -bD %s" % (self.moduleName, self.chrootpath))
         nspawncont.start()
-        time.sleep(30)
+        time.sleep(20)
 
     def run(self, command="ls /", **kwargs):
         return self.runHost('machinectl shell root@%s /bin/bash -c "%s; echo EEEXITCODE $?" &> stdout.log\
@@ -399,7 +404,7 @@ gpgcheck=0
         self.stop()
         self.runHost("machinectl poweroff %s" % self.moduleName)
         #self.nspawncont.stop()
-        time.sleep(30)
+        time.sleep(10)
         self.__callCleanupFromConfig()
 # TODO: workaround because systemd nspawn is now working well in F-25 (failing because of selinux)
         self.runHost("setenforce 1")
