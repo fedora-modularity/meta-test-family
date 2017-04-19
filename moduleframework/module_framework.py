@@ -365,7 +365,7 @@ gpgcheck=0
 
     def __prepareSetup(self):
         if os.path.exists(self.chrootpath):
-            shutil.rmtree(self.chrootpath)
+            shutil.rmtree(self.chrootpath, ignore_errors=True)
         os.mkdir(self.chrootpath)
         self.runHost("dnf -y install systemd-container")
         try:
@@ -382,7 +382,9 @@ gpgcheck=0
         time.sleep(30)
 
     def run(self, command="ls /", **kwargs):
-        return self.runHost('machinectl shell root@%s /bin/bash -c "%s"' % (self.moduleName, command.replace('"', r'\"')), **kwargs)
+        return self.runHost('machinectl shell root@%s /bin/bash -c "%s; echo EEEXITCODE $?" &> stdout.log\
+                            cat stdout.log | egrep -v EEEXITCODE | sed s/\r// >/dev/stdout;\
+                            exit `tail -1 stdout.log | egrep -o [0-9]+`' % (self.moduleName, command.replace('"', r'\"')), **kwargs)
 
     def selfcheck(self):
         return self.run().stdout
