@@ -40,6 +40,11 @@ import pdc_data
 
 LOGPARAMS = logging.getLogger('params')
 
+defroutedev = utils.process.run("ip r |grep default |cut -d ' ' -f 5 |head -1", shell=True).stdout.strip()
+hostipaddr = utils.process.run("ip a s dev {defroute} | egrep -o 'inet [0-9.]+' | egrep -o '[0-9.]+'".format(defroute=defroutedev), shell=True).stdout.strip()
+# translation table for config.yaml files syntax is {VARIABLE} in config file
+trans_dict = {"HOSTIPADDR":hostipaddr,"DEFROUTE":defroutedev, "ROOT":"/"}
+
 def skipTestIf(value, text="Test not intended for this module profile"):
     if value:
         raise exceptions.TestDecoratorSkip(text)
@@ -323,6 +328,7 @@ class NspawnHelper(RpmHelper):
         super(NspawnHelper, self).__init__()
         self.chrootpath = os.path.abspath(os.path.join("/opt","chroot_%s" % self.moduleName))
         self.__addionalpackages="systemd rpm"
+        defroutedev["ROOT"] = self.chrootpath
 
     def setUp(self):
         self.installTestDependencies()
@@ -521,7 +527,7 @@ def get_correct_config():
     if not os.path.exists(cfgfile):
         raise ValueError("Config file (%s) does not exist or is inaccesible (you can also redefine own by CONFIG=path/to/configfile.yaml env variable)" % cfgfile)
     with open(cfgfile, 'r') as ymlfile:
-        xcfg = yaml.load(ymlfile)
+        xcfg = yaml.load(ymlfile.read().format(**trans_dict))
         if xcfg['document'] != 'modularity-testing':
             raise ValueError("Bad Config file, not yaml or does not contain proper document type" % cfgfile)
     return xcfg
