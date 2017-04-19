@@ -75,7 +75,7 @@ class ModuleLintSigning(module_framework.AvocadoTest):
         self.start()
         allpackages = self.run(
             r'rpm -qa --qf="%{name}-%{version}-%{release} %{SIGPGP:pgpsig}\n"').stdout
-        for package in allpackages.split('\n'):
+        for package in [x.strip() for x in allpackages.split('\n')]:
             pinfo = package.split(', ')
             if len(pinfo) == 3:
                 self.assertIn(KEY, pinfo[2])
@@ -87,7 +87,7 @@ class ModuleLintPackagesCheck(module_framework.AvocadoTest):
 
     def test(self):
         self.start()
-        allpackages = self.run(r'rpm -qa --qf="%{name}\n"').stdout.split('\n')
+        allpackages = [x.strip() for x in self.run(r'rpm -qa --qf="%{name}\n"').stdout.split('\n')]
         for pkg in self.backend.packages:
             self.assertIn(pkg, allpackages)
 
