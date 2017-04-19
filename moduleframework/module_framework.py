@@ -322,7 +322,7 @@ class NspawnHelper(RpmHelper):
     def __init__(self):
         super(NspawnHelper, self).__init__()
         self.chrootpath = os.path.abspath(os.path.join("/opt","chroot_%s" % self.moduleName))
-        self.__addionalpackages="systemd"
+        self.__addionalpackages="systemd rpm"
 
     def setUp(self):
         self.installTestDependencies()
@@ -465,6 +465,11 @@ class ContainerAvocadoTest(AvocadoTest):
     def setUp(self):
         super(ContainerAvocadoTest, self).setUp()
         if self.moduleType != "docker":
+            try:
+                self.tearDown()
+            except Exception as e:
+                print e
+                pass
             self.skip("Docker specific test")
 
     def checkLabel(self, key, value):
