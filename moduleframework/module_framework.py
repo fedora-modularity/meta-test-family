@@ -366,8 +366,8 @@ gpgcheck=0
                             (self.whattoinstallrpm,
                             utils.process.run("cat %s" % self.yumrepo).stdout,
                             e))
-        self.nspawncont = utils.process.SubProcess("systemd-nspawn --machine=%s -bD %s" % (self.moduleName, self.chrootpath))
-        self.nspawncont.start()
+        nspawncont = utils.process.SubProcess("systemd-nspawn --machine=%s -bD %s" % (self.moduleName, self.chrootpath))
+        nspawncont.start()
         time.sleep(30)
 
     def run(self, command="ls /", **kwargs):
@@ -385,7 +385,8 @@ gpgcheck=0
     def tearDown(self):
         self.stop()
         self.runHost("machinectl poweroff %s" % self.moduleName)
-        self.nspawncont.stop()
+        #self.nspawncont.stop()
+        time.sleep(30)
         self.__callCleanupFromConfig()
 # TODO: workaround because systemd nspawn is now working well in F-25 (failing because of selinux)
         self.runHost("setenforce 1")
