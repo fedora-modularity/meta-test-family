@@ -43,7 +43,7 @@ LOGPARAMS = logging.getLogger('params')
 defroutedev = utils.process.run("ip r |grep default |cut -d ' ' -f 5 |head -1", shell=True).stdout.strip()
 hostipaddr = utils.process.run("ip a s dev {defroute} | egrep -o 'inet [0-9.]+' | egrep -o '[0-9.]+'".format(defroute=defroutedev), shell=True).stdout.strip()
 # translation table for config.yaml files syntax is {VARIABLE} in config file
-trans_dict = {"HOSTIPADDR":hostipaddr,"DEFROUTE":defroutedev, "ROOT":"/"}
+trans_dict = {"HOSTIPADDR" : hostipaddr, "DEFROUTE" : defroutedev, "ROOT":"/"}
 
 def skipTestIf(value, text="Test not intended for this module profile"):
     if value:
@@ -328,7 +328,7 @@ class NspawnHelper(RpmHelper):
         super(NspawnHelper, self).__init__()
         self.chrootpath = os.path.abspath(os.path.join("/opt","chroot_%s" % self.moduleName))
         self.__addionalpackages="systemd rpm"
-        defroutedev["ROOT"] = self.chrootpath
+        trans_dict["ROOT"] = self.chrootpath
 
     def setUp(self):
         self.installTestDependencies()
