@@ -220,7 +220,12 @@ class RpmHelper(CommonFunctions):
                                    self.moduleName)
         self.info = self.config['module']['rpm']
         self.alldrepos = []
-        for dep in self.getModulemdYamlconfig()["data"]["dependencies"].get("requires") if self.getModulemdYamlconfig()["data"].get("dependencies").keys() else []:
+        try:
+            repositories = self.getModulemdYamlconfig()["data"]["dependencies"]["requires"]
+        except:
+            repositories = []
+            pass
+        for dep in repositories:
             self.alldrepos.append(get_latest_repo_url(dep))
         if self.packages:
             self.whattoinstallrpm=" ".join(self.packages)
