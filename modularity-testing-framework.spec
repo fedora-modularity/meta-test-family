@@ -39,7 +39,7 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 %{_bindir}/modulelint
 %{_bindir}/generator
 %{python2_sitelib}/moduleframework
-%{python2_sitelib}/modularity_testing_framework-?.?.?-py?.?.egg-info
+%{python2_sitelib}/modularity_testing_framework-?.?.*-py?.?.egg-info
 %{_datadir}/moduleframework
 
 
