@@ -88,7 +88,7 @@ class ModuleLintPackagesCheck(module_framework.AvocadoTest):
     def test(self):
         self.start()
         allpackages = [x.strip() for x in self.run(r'rpm -qa --qf="%{name}\n"').stdout.split('\n')]
-        for pkg in self.backend.packages:
+        for pkg in self.backend.getPackageList():
             self.assertIn(pkg, allpackages)
 
 

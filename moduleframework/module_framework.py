@@ -65,8 +65,19 @@ class CommonFunctions(object):
         self.__modulemdConf = None
         self.config = get_correct_config()
         self.moduleName = self.config['name']
-        self.packages = self.config['packages'].get('rpms') if self.config.has_key('packages') and  self.config['packages'].has_key('rpms') and self.config['packages'].get('rpms') else None
         self.source = self.config.get('source') if self.config.get('source') else self.config['module']['rpm'].get('source')
+
+    def getPackageList(self):
+        out = []
+        if self.config.has_key('packages'):
+            packages_rpm = self.config['packages'].get('rpms') if self.config['packages'].get('rpms') else []
+            packages_profiles = []
+            for x in self.config['packages'].get('profiles') if self.config['packages'].get('profiles') else []:
+                packages_profiles = packages_profiles + self.getModulemdYamlconfig()['data']['profiles'][x]['rpms']
+            out = out + packages_rpm + packages_profiles
+        print "PCKGs to install inside module:", out
+        return out
+
 
     def getModulemdYamlconfig(self, urllink=None):
         if urllink:
@@ -166,9 +177,9 @@ class ContainerHelper(CommonFunctions):
                     "docker run %s %s %s" %
                     (args, self.jmeno, command), shell=True).stdout
             self.docker_id = self.docker_id.strip()
-            if self.packages:
-                self.run("dnf -y install %s" % " ".join(self.packages), ignore_status=True)
-                self.run("microdnf -y install %s" % " ".join(self.packages), ignore_status=True)
+            if self.getPackageList():
+                self.run("dnf -y install %s" % " ".join(self.getPackageList()), ignore_status=True)
+                self.run("microdnf -y install %s" % " ".join(self.getPackageList()), ignore_status=True)
         self.docker_id = self.docker_id.strip()
 
 
@@ -227,9 +238,9 @@ class RpmHelper(CommonFunctions):
             pass
         for dep in repositories:
             self.alldrepos.append(get_latest_repo_url(dep))
-        if self.packages:
-            self.whattoinstallrpm=" ".join(self.packages)
-        elif self.getModulemdYamlconfig()['data'].get('profiles'):
+        if self.getPackageList():
+            self.whattoinstallrpm=" ".join(self.getPackageList())
+        elif self.getModulemdYamlconfig()['data'].get('profiles') and self.getModulemdYamlconfig()['data']['profiles'].get(get_correct_profile()):
             self.whattoinstallrpm = " ".join(
                 self.getModulemdYamlconfig()['data']['profiles'][get_correct_profile()]['rpms'])
         else:
@@ -387,9 +398,16 @@ gpgcheck=0
         time.sleep(20)
 
     def run(self, command="ls /", **kwargs):
-        return self.runHost('machinectl shell root@%s /bin/bash -c "%s; echo EEEXITCODE $?" &> stdout.log\
-                            cat stdout.log | egrep -v EEEXITCODE | sed s/\r// >/dev/stdout;\
-                            exit `tail -1 stdout.log | egrep -o [0-9]+`' % (self.moduleName, command.replace('"', r'\"')), **kwargs)
+# TODO: workaround because machinedctl is unable to behave like ssh. It is bug
+# systemd-run should be used, but in F-25 it does not contain --wait option
+        comout = self.runHost('machinectl shell root@%s /bin/bash -c "%s; echo EXITCODE $?" '% (self.moduleName, command.replace('"', r'\"')), **kwargs)
+        stdout = [x.strip() for x in comout.stdout.split("\n")]
+        stderr = [x.strip() for x in comout.stderr.split("\n")]
+        comout.exit_status = int(stdout[-2].split(" ")[1])
+        comout.stdout = "\n".join(stdout[:-2])
+        comout.stderr = "\n".join(stderr)
+        self.runHost('bash -c "echo DO NOT CARE of this command, this is workaound for good exit status; exit %d"' % comout.exit_status, **kwargs)
+        return comout
 
     def selfcheck(self):
         return self.run().stdout
