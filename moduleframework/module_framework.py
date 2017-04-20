@@ -443,6 +443,16 @@ gpgcheck=0
                      "cat %s" %
                      self.yumrepo).stdout,
                     e))
+        # COPY yum repository inside NSPAW, to be able to do installations
+        shutil.copy(self.yumrepo, os.path.join(self.chrootpath,"etc","yum.repos.d"))
+        for repo in self.repos:
+            if "file:///" in repo:
+                src = repo[7:]
+                try:
+                    shutil.copytree(src,os.path.join(self.chrootpath,src))
+                except Exception as e:
+                    print e, "Unable to copy files from:", src, "to:", os.path.join(self.chrootpath,src)
+                    pass
         nspawncont = utils.process.SubProcess(
             "systemd-nspawn --machine=%s -bD %s" %
             (self.moduleName, self.chrootpath))
