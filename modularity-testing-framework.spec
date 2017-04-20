@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.2.7
+Version:        0.2.8
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -44,6 +44,19 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Thu Apr 20 2017 Jan Scotka <jscotka@redhat.com> 0.2.8-1
+- prepare for databases, add some common varibles what could be used for
+  testing inside code and in configs (jscotka@redhat.com)
+- called autopep8 to imporove style of code (jscotka@redhat.com)
+- added changes to nspawn  helper, to workaround issues with retun codes and
+  bad chars there (jscotka@redhat.com)
+- Update documentation (phracek@redhat.com)
+- removed upgrading avocado via pip, it cause fail (jscotka@redhat.com)
+- small improvements (jscotka@redhat.com)
+- after discussing with Bruno, there wwre wound issues in machinectl, so added
+  workaround (jscotka@redhat.com)
+- reworked part for fetching data.dependencies.requires (jscotka@redhat.com)
+
 * Wed Apr 19 2017 Petr "Stone" Hracek <phracek@redhat.com> 0.2.7-1
 - Bump release (phracek@redhat.com)
 - typo (jscotka@redhat.com)
