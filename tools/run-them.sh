@@ -110,8 +110,10 @@ TESTRESULT=$?
 
 if [ "$RESULTTOOLS" -ne 0 ]; then
     exit 2
-elif [ "$TESTRESULT" -ne 0 ]; then
+elif [ "$TESTRESULT" = "1" ]; then
     exit 125
+elif [ "$TESTRESULT" -gt 1 ]; then
+    exit $TESTRESULT
 else
     exit 0
 fi
