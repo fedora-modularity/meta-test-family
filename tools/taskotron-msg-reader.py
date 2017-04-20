@@ -26,14 +26,26 @@ from optparse import OptionParser
 
 if __name__ == '__main__':
     parser = OptionParser()
-    parser.add_option("-f", "--file", dest="filename",
-                      help="file with message to read fedora message bus",default=None)
-    parser.add_option("-r", "--release", dest="release",
-                      help="Use release in format name-stream-version as input",default=None)
+    parser.add_option(
+        "-f",
+        "--file",
+        dest="filename",
+        help="file with message to read fedora message bus",
+        default=None)
+    parser.add_option(
+        "-r",
+        "--release",
+        dest="release",
+        help="Use release in format name-stream-version as input",
+        default=None)
     parser.add_option("-l", "--latest", dest="latest",
                       help="Use latest bits, build by MBS and stored in PDC")
-    parser.add_option("--localrepo", dest="localrepo", action="store_true", default=False,
-                      help="generate local repository based on koji tag from PDC")
+    parser.add_option(
+        "--localrepo",
+        dest="localrepo",
+        action="store_true",
+        default=False,
+        help="generate local repository based on koji tag from PDC")
 
     a = PDCParser()
     (options, args) = parser.parse_args()
@@ -46,13 +58,12 @@ if __name__ == '__main__':
         stdinput = "".join(flh.readlines()).strip()
         flh.close()
         a.setViaFedMsg(stdinput)
-        print " ".join(getattr(a,callfnc)())
+        print " ".join(getattr(a, callfnc)())
     elif options.release:
         a.setFullVersion(options.release)
-        print " ".join(getattr(a,callfnc)())
+        print " ".join(getattr(a, callfnc)())
     elif options.latest:
         a.setLatestPDC(options.latest)
-        print " ".join(getattr(a,callfnc)())
+        print " ".join(getattr(a, callfnc)())
     else:
         raise Exception(parser.print_help())
-

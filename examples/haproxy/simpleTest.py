@@ -30,13 +30,16 @@ class simpleTests(module_framework.AvocadoTest):
     """
     :avocado: enable
     """
+
     def setUp(self):
         super(self.__class__, self).setUp()
         service_manager = service.ServiceManager()
         service_manager.start('docker')
         self.runHost('docker pull docker.io/httpd')
-        self.runHost('docker run --name http_name_8000 -d -p 8000:80 docker.io/httpd')
-        self.runHost('docker run --name http_name_8001 -d -p 8001:80 docker.io/httpd')
+        self.runHost(
+            'docker run --name http_name_8000 -d -p 8000:80 docker.io/httpd')
+        self.runHost(
+            'docker run --name http_name_8001 -d -p 8001:80 docker.io/httpd')
 
     def tearDown(self):
         super(self.__class__, self).tearDown()
@@ -47,5 +50,8 @@ class simpleTests(module_framework.AvocadoTest):
 
     def testAssertIn(self):
         self.start()
-        self.assertIn('It works!',self.runHost('curl 127.0.0.1:8077', shell = True).stdout)
-
+        self.assertIn(
+            'It works!',
+            self.runHost(
+                'curl 127.0.0.1:8077',
+                shell=True).stdout)

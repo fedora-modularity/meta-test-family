@@ -11,6 +11,7 @@ import tempfile
 from avocado import main
 from moduleframework import module_framework
 
+
 class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
     """
     :avocado: enable
@@ -21,7 +22,8 @@ class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
         self.compiler_resource_dir = os.path.abspath(".")
         self.compiler_test_dir = None
 
-    def _check_cmd_result(self, cmd, return_code, cmd_output, expect_pass=True):
+    def _check_cmd_result(self, cmd, return_code,
+                          cmd_output, expect_pass=True):
         """
         Check based on return code if command passed or failed as expected
         """
@@ -33,8 +35,9 @@ class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
             self.log.info("command '%s' failed as expected with output:\n%s" %
                           (cmd, cmd_output))
             return True
-        self.error("command '%s' returned unexpected exit status %d; output:\n%s" %
-                       (cmd, return_code, cmd_output))
+        self.error(
+            "command '%s' returned unexpected exit status %d; output:\n%s" %
+            (cmd, return_code, cmd_output))
         return False
 
     def testSmoke(self):
@@ -60,8 +63,11 @@ class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
         for cmd in smoke_fail:
             cmd_result = self.run("%s" % cmd, ignore_status=True)
             cmd_output = cmd_result.stdout + cmd_result.stderr
-            self._check_cmd_result(cmd, cmd_result.exit_status, cmd_output, expect_pass=False)
-
+            self._check_cmd_result(
+                cmd,
+                cmd_result.exit_status,
+                cmd_output,
+                expect_pass=False)
 
     def _get_all_installed_pkgs(self):
         try:
@@ -69,7 +75,7 @@ class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
         except:
             self.error("Could not get all installed packages")
         output_list = cmd_result.stdout.split("\n")
-        #remove empty string from the list
+        # remove empty string from the list
         return [item for item in output_list if item]
 
     def testRequiredPackages(self):
@@ -126,29 +132,31 @@ class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
 
         for pkg in installed_pkgs:
             if pkg not in expected_pkgs:
-                self.error("Did not expect to have package '%s' installed" % pkg)
+                self.error(
+                    "Did not expect to have package '%s' installed" %
+                    pkg)
 
     def testUserManipulation(self):
         """
         Check if can add, remove and modify user
         """
 
-        #We want to run multiple commands using same docker container
+        # We want to run multiple commands using same docker container
         new_user = "usertest"
         pass_cmds = []
-        #Create new user
+        # Create new user
         pass_cmds.append("adduser %s" % new_user)
-        #Make sure user is created
+        # Make sure user is created
         pass_cmds.append("cat /etc/passwd | grep %s" % new_user)
         pass_cmds.append("ls /home/%s" % new_user)
-        #set user password
+        # set user password
         pass_cmds.append("usermod --password testpassword %s" % new_user)
-        #Test new user functionality
+        # Test new user functionality
         pass_cmds.append('su - %s -c "touch ~/testfile.txt"' % new_user)
-        #Make sure the file was created by the correct user
+        # Make sure the file was created by the correct user
         pass_cmds.append("ls -allh /home/%s/testfile.txt | grep '%s %s'" %
                          (new_user, new_user, new_user))
-        #Remove user
+        # Remove user
         pass_cmds.append("userdel -r %s" % new_user)
         for cmd in pass_cmds:
             cmd_result = self.run("%s" % cmd, ignore_status=True)
@@ -156,14 +164,18 @@ class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
             self._check_cmd_result(cmd, cmd_result.exit_status, cmd_output)
 
         fail_cmds = []
-        #Make sure user is removed
+        # Make sure user is removed
         fail_cmds.append("ls /home/%s" % new_user)
         fail_cmds.append("cat /etc/passwd | grep usertest")
-        #relying on __del__ from BaseRuntimeRunCmd to remove container
+        # relying on __del__ from BaseRuntimeRunCmd to remove container
         for cmd in fail_cmds:
             cmd_result = self.run("%s" % cmd, ignore_status=True)
             cmd_output = cmd_result.stdout + cmd_result.stderr
-            self._check_cmd_result(cmd, cmd_result.exit_status, cmd_output, expect_pass=False)
+            self._check_cmd_result(
+                cmd,
+                cmd_result.exit_status,
+                cmd_output,
+                expect_pass=False)
 
     def testOsRelease(self):
         """
@@ -194,46 +206,43 @@ class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
         """
 
         lang_default = {
-            #cmd : cmd_output
-            "ls /invalid_path" : "ls: cannot access '/invalid_path': No such file or directory",
-            "cp invalid_file tmp" : "cp: cannot stat 'invalid_file': No such file or directory",
-            "date -u -d \"2017-03-31\"" : "Fri Mar 31 00:00:00 UTC 2017",
-            "touch file; yes | rm -i file" : "rm: remove regular empty file 'file'?",
-            "numfmt --grouping 1234567890.98" : "1234567890.98"
+            # cmd : cmd_output
+            "ls /invalid_path": "ls: cannot access '/invalid_path': No such file or directory",
+            "cp invalid_file tmp": "cp: cannot stat 'invalid_file': No such file or directory",
+            "date -u -d \"2017-03-31\"": "Fri Mar 31 00:00:00 UTC 2017",
+            "touch file; yes | rm -i file": "rm: remove regular empty file 'file'?",
+            "numfmt --grouping 1234567890.98": "1234567890.98"
         }
 
         lang_english = {
-            "LC_ALL=en_US ls /invalid_path" : "ls: cannot access '/invalid_path': No such file or directory",
-            "LC_ALL=en_US cp invalid_file tmp" : "cp: cannot stat 'invalid_file': No such file or directory",
-            "LC_ALL=en_US date -u -d \"2017-03-31\"" : "Fri Mar 31 00:00:00 UTC 2017",
-            "touch file; yes | LC_ALL=en_US rm -i file" : "rm: remove regular empty file 'file'?",
-            "LC_ALL=en_US numfmt --grouping 1234567890.98" : "1,234,567,890.98"
-        }
+            "LC_ALL=en_US ls /invalid_path": "ls: cannot access '/invalid_path': No such file or directory",
+            "LC_ALL=en_US cp invalid_file tmp": "cp: cannot stat 'invalid_file': No such file or directory",
+            "LC_ALL=en_US date -u -d \"2017-03-31\"": "Fri Mar 31 00:00:00 UTC 2017",
+            "touch file; yes | LC_ALL=en_US rm -i file": "rm: remove regular empty file 'file'?",
+            "LC_ALL=en_US numfmt --grouping 1234567890.98": "1,234,567,890.98"}
 
         lang_spanish = {
-            "LC_ALL=es_ES ls /invalid_path" : "ls: cannot access '/invalid_path': No existe el fichero o el directorio",
-            "LC_ALL=es_ES cp invalid_file tmp" : "cp: cannot stat 'invalid_file': No existe el fichero o el directorio",
-            "LC_ALL=es_ES date -u -d \"2017-03-31\"" : "vie mar 31 00:00:00 UTC 2017",
-            "touch file; yes | LC_ALL=es_ES rm -i file" : "rm: remove regular empty file 'file'?",
-            "LC_ALL=es_ES numfmt --grouping 1234567890,98" : "1.234.567.890,98"
-        }
+            "LC_ALL=es_ES ls /invalid_path": "ls: cannot access '/invalid_path': No existe el fichero o el directorio",
+            "LC_ALL=es_ES cp invalid_file tmp": "cp: cannot stat 'invalid_file': No existe el fichero o el directorio",
+            "LC_ALL=es_ES date -u -d \"2017-03-31\"": "vie mar 31 00:00:00 UTC 2017",
+            "touch file; yes | LC_ALL=es_ES rm -i file": "rm: remove regular empty file 'file'?",
+            "LC_ALL=es_ES numfmt --grouping 1234567890,98": "1.234.567.890,98"}
 
         langs = {}
         langs["default"] = {
-            "pkg" : "glibc-minimal-langpack",
-            "cmds" : lang_default
+            "pkg": "glibc-minimal-langpack",
+            "cmds": lang_default
         }
 
         langs["english"] = {
-            "pkg" : "glibc-langpack-en",
-            "cmds" : lang_english
+            "pkg": "glibc-langpack-en",
+            "cmds": lang_english
         }
 
         langs["spanish"] = {
-            "pkg" : "glibc-langpack-es",
-            "cmds" : lang_spanish
+            "pkg": "glibc-langpack-es",
+            "cmds": lang_spanish
         }
-
 
         for i18n in langs.keys():
             lang = langs[i18n]
@@ -255,7 +264,7 @@ class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
                 output = cmd_result.stdout
                 output += cmd_result.stderr
                 output = output.strip()
-                #search for pattern as Spanish might have special characters
+                # search for pattern as Spanish might have special characters
                 if not re.search(lang["cmds"][cmd], output):
                     self.error("'%s'expected output '%s', but got '%s'" %
                                (cmd, lang["cmds"][cmd], output))
@@ -265,7 +274,6 @@ class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
                     self.run("microdnf remove %s" % lang["pkg"])
                 except:
                     self.error("Could not remove %s" % lang["pkg"])
-
 
     def _prepare_compiler_test_directory(self):
 
@@ -319,11 +327,12 @@ class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
 
         self._prepare_compiler_test_directory()
 
-        #The test dir should be the same one used on hello.sh
+        # The test dir should be the same one used on hello.sh
         mod_compiler_test_dir = "/mnt"
 
-        #Make sure there is a container running
-        #TODO: Remove start() once https://pagure.io/modularity-testing-framework/issue/8 is fixed
+        # Make sure there is a container running
+        # TODO: Remove start() once
+        # https://pagure.io/modularity-testing-framework/issue/8 is fixed
         self.start()
 
         try:
@@ -337,8 +346,9 @@ class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
         test_stdout = cmd_result.stdout
         test_stderr = cmd_result.stderr
         if cmd_result.exit_status:
-            self.error("command '%s' returned exit status %d; output:\n%s\nstderr:\n%s" %
-                       (cmdline, cmd_result.exit_status, test_stdout, test_stderr))
+            self.error(
+                "command '%s' returned exit status %d; output:\n%s\nstderr:\n%s" %
+                (cmdline, cmd_result.exit_status, test_stdout, test_stderr))
 
         self.log.info("command '%s' succeeded with output:\n%s\nstderr:\n%s" %
                       (cmdline, test_stdout, test_stderr))
@@ -346,8 +356,9 @@ class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
         # make sure we get exactly what we expect on stdout
         # (all other output from commands in the script were sent to stderr)
         expected_stdout = 'Hello, world!\n'
-        self.log.info("checking that compiler test returned expected output: %s" %
-                      repr(expected_stdout))
+        self.log.info(
+            "checking that compiler test returned expected output: %s" %
+            repr(expected_stdout))
         if test_stdout != expected_stdout:
             self.error("compiler test did not return unexpected output: %s" %
                        repr(test_stdout))

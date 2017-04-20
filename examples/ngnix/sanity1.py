@@ -25,6 +25,7 @@ from moduleframework import module_framework
 import time
 import urllib
 
+
 class SanityCheck1(module_framework.AvocadoTest):
     """
     :avocado: enable

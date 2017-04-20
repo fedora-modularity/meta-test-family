@@ -61,7 +61,13 @@ def main():
     (options, args) = parser.parse_args()
 
     if len(args) == 0:
-        raise ValueError("Unable to call bash helper without function, there is possible to use: ", [ a[0] for a in inspect.getmembers(moduleframework.get_correct_backend(), predicate=inspect.ismethod) if '__' not in a[0] ])
+        raise ValueError(
+            "Unable to call bash helper without function, there is possible to use: ",
+            [a[0]
+             for a in inspect.getmembers(
+                moduleframework.get_correct_backend(),
+                predicate=inspect.ismethod)
+             if '__' not in a[0]])
     method = args[0]
 
     def printIfVerbose(*sargs):

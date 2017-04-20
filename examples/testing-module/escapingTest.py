@@ -23,6 +23,7 @@
 
 from moduleframework import module_framework
 
+
 class SanityCheckApostophes(module_framework.AvocadoTest):
     """
     :avocado: enable

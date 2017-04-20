@@ -45,7 +45,7 @@ class SanityCheck1(module_framework.AvocadoTest):
 
     def test4failedCommand(self):
         self.start()
-        self.runCheckState("ls /abc",2)
+        self.runCheckState("ls /abc", 2)
 
 
 if __name__ == '__main__':

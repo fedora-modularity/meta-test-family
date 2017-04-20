@@ -26,11 +26,22 @@ from optparse import OptionParser
 
 if __name__ == '__main__':
     parser = OptionParser()
-    parser.add_option("-c", "--compose", dest="compose", help="Compose repo URL")
-    parser.add_option("-l", "--list", action="store_true", default=False, dest="list", help="List Modules in compose")
-    parser.add_option("-m", "--module", dest="module", help="get env variable for module")
+    parser.add_option(
+        "-c",
+        "--compose",
+        dest="compose",
+        help="Compose repo URL")
+    parser.add_option(
+        "-l",
+        "--list",
+        action="store_true",
+        default=False,
+        dest="list",
+        help="List Modules in compose")
+    parser.add_option("-m", "--module", dest="module",
+                      help="get env variable for module")
     (options, args) = parser.parse_args()
-    #REPO=https://kojipkgs.stg.fedoraproject.org/compose/branched/jkaluza/latest-Boltron-26/compose/base-runtime/x86_64/os/
+    # REPO=https://kojipkgs.stg.fedoraproject.org/compose/branched/jkaluza/latest-Boltron-26/compose/base-runtime/x86_64/os/
     if options.compose:
         a = ComposeParser(options.compose)
         if options.list:
@@ -38,4 +49,3 @@ if __name__ == '__main__':
                 print foo
         if options.module:
             print " ".join(a.variableListForModule(options.module))
-

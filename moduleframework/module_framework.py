@@ -40,14 +40,20 @@ import pdc_data
 
 LOGPARAMS = logging.getLogger('params')
 
-defroutedev = utils.process.run("ip r |grep default |cut -d ' ' -f 5 |head -1", shell=True).stdout.strip()
-hostipaddr = utils.process.run("ip a s dev {defroute} | egrep -o 'inet [0-9.]+' | egrep -o '[0-9.]+'".format(defroute=defroutedev), shell=True).stdout.strip()
+defroutedev = utils.process.run(
+    "ip r |grep default |cut -d ' ' -f 5 |head -1",
+    shell=True).stdout.strip()
+hostipaddr = utils.process.run(
+    "ip a s dev {defroute} | egrep -o 'inet [0-9.]+' | egrep -o '[0-9.]+'".format(
+        defroute=defroutedev), shell=True).stdout.strip()
 # translation table for config.yaml files syntax is {VARIABLE} in config file
-trans_dict = {"HOSTIPADDR" : hostipaddr, "DEFROUTE" : defroutedev, "ROOT":"/"}
+trans_dict = {"HOSTIPADDR": hostipaddr, "DEFROUTE": defroutedev, "ROOT": "/"}
+
 
 def skipTestIf(value, text="Test not intended for this module profile"):
     if value:
         raise exceptions.TestDecoratorSkip(text)
+
 
 class CommonFunctions(object):
     config = None
@@ -55,29 +61,36 @@ class CommonFunctions(object):
     def runHost(self, command="ls /", **kwargs):
         return utils.process.run("%s" % command, **kwargs)
 
-    def installTestDependencies(self, packages = None):
-        if not packages and 'testdependecies' in self.config and 'rpms' in self.config['testdependecies']:
+    def installTestDependencies(self, packages=None):
+        if not packages and 'testdependecies' in self.config and 'rpms' in self.config[
+                'testdependecies']:
             packages = self.config['testdependecies']['rpms']
         if packages:
-            self.runHost("dnf -y install " + " ".join(packages), ignore_status=True)
+            self.runHost(
+                "dnf -y install " +
+                " ".join(packages),
+                ignore_status=True)
 
     def loadconfig(self):
         self.__modulemdConf = None
         self.config = get_correct_config()
         self.moduleName = self.config['name']
-        self.source = self.config.get('source') if self.config.get('source') else self.config['module']['rpm'].get('source')
+        self.source = self.config.get('source') if self.config.get(
+            'source') else self.config['module']['rpm'].get('source')
 
     def getPackageList(self):
         out = []
-        if self.config.has_key('packages'):
-            packages_rpm = self.config['packages'].get('rpms') if self.config['packages'].get('rpms') else []
+        if 'packages' in self.config:
+            packages_rpm = self.config['packages'].get('rpms') if self.config[
+                'packages'].get('rpms') else []
             packages_profiles = []
-            for x in self.config['packages'].get('profiles') if self.config['packages'].get('profiles') else []:
-                packages_profiles = packages_profiles + self.getModulemdYamlconfig()['data']['profiles'][x]['rpms']
+            for x in self.config['packages'].get('profiles') if self.config[
+                    'packages'].get('profiles') else []:
+                packages_profiles = packages_profiles + self.getModulemdYamlconfig()['data'][
+                    'profiles'][x]['rpms']
             out = out + packages_rpm + packages_profiles
         print "PCKGs to install inside module:", out
         return out
-
 
     def getModulemdYamlconfig(self, urllink=None):
         if urllink:
@@ -92,6 +105,7 @@ class CommonFunctions(object):
                 self.__modulemdConf = yaml.load(ymlfile)
             return self.__modulemdConf
 
+
 class ContainerHelper(CommonFunctions):
     """
     :avocado: disable
@@ -103,7 +117,8 @@ class ContainerHelper(CommonFunctions):
         self.tarbased = None
         self.jmeno = None
         self.docker_id = None
-        self.icontainer = get_correct_url() if get_correct_url()  else self.info['container']
+        self.icontainer = get_correct_url() if get_correct_url() else self.info[
+            'container']
         if ".tar" in self.icontainer:
             self.jmeno = "testcontainer"
             self.tarbased = True
@@ -141,7 +156,8 @@ class ContainerHelper(CommonFunctions):
             self.runHost("dnf -y install docker")
 
     def __prepareContainer(self):
-        if self.tarbased == False and self.jmeno == self.icontainer and "docker.io" not in self.info['container']:
+        if self.tarbased == False and self.jmeno == self.icontainer and "docker.io" not in self.info[
+                'container']:
             registry = re.search("([^/]*)", self.icontainer).groups()[0]
             if registry not in open('/etc/sysconfig/docker', 'rw').read():
                 with open("/etc/sysconfig/docker", "a") as myfile:
@@ -178,10 +194,17 @@ class ContainerHelper(CommonFunctions):
                     (args, self.jmeno, command), shell=True).stdout
             self.docker_id = self.docker_id.strip()
             if self.getPackageList():
-                self.run("dnf -y install %s" % " ".join(self.getPackageList()), ignore_status=True)
-                self.run("microdnf -y install %s" % " ".join(self.getPackageList()), ignore_status=True)
+                self.run(
+                    "dnf -y install %s" %
+                    " ".join(
+                        self.getPackageList()),
+                    ignore_status=True)
+                self.run(
+                    "microdnf -y install %s" %
+                    " ".join(
+                        self.getPackageList()),
+                    ignore_status=True)
         self.docker_id = self.docker_id.strip()
-
 
     def stop(self):
         if self.status():
@@ -194,15 +217,19 @@ class ContainerHelper(CommonFunctions):
                 pass
 
     def status(self):
-        if self.docker_id and self.docker_id[:12] in self.runHost("docker ps", shell = True).stdout:
+        if self.docker_id and self.docker_id[
+                : 12] in self.runHost(
+                "docker ps", shell=True).stdout:
             return True
         else:
             return False
 
     def run(self, command="ls /", **kwargs):
         self.start()
-        return self.runHost('docker exec %s bash -c "%s"' %
-                                 (self.docker_id, command.replace('"', r'\"')), **kwargs)
+        return self.runHost(
+            'docker exec %s bash -c "%s"' %
+            (self.docker_id, command.replace('"', r'\"')),
+            **kwargs)
 
     def copyTo(self, src, dest):
         self.start()
@@ -214,16 +241,18 @@ class ContainerHelper(CommonFunctions):
 
     def __callSetupFromConfig(self):
         if self.info.get("setup"):
-            self.runHost(self.info.get("setup"), shell = True)
+            self.runHost(self.info.get("setup"), shell=True)
 
     def __callCleanupFromConfig(self):
         if self.info.get("cleanup"):
-            self.runHost(self.info.get("cleanup"), shell = True)
+            self.runHost(self.info.get("cleanup"), shell=True)
+
 
 class RpmHelper(CommonFunctions):
     """
     :avocado: disable
     """
+
     def __init__(self):
         self.loadconfig()
         self.yumrepo = os.path.join(
@@ -232,19 +261,22 @@ class RpmHelper(CommonFunctions):
         self.info = self.config['module']['rpm']
         self.alldrepos = []
         try:
-            repositories = self.getModulemdYamlconfig()["data"]["dependencies"]["requires"]
+            repositories = self.getModulemdYamlconfig()["data"]["dependencies"][
+                "requires"]
         except:
             repositories = []
             pass
         for dep in repositories:
             self.alldrepos.append(get_latest_repo_url(dep))
         if self.getPackageList():
-            self.whattoinstallrpm=" ".join(self.getPackageList())
+            self.whattoinstallrpm = " ".join(self.getPackageList())
         elif self.getModulemdYamlconfig()['data'].get('profiles') and self.getModulemdYamlconfig()['data']['profiles'].get(get_correct_profile()):
             self.whattoinstallrpm = " ".join(
-                self.getModulemdYamlconfig()['data']['profiles'][get_correct_profile()]['rpms'])
+                self.getModulemdYamlconfig()['data']['profiles'][
+                    get_correct_profile()]['rpms'])
         else:
-            self.whattoinstallrpm = " ".join(self.getModulemdYamlconfig()['data']['components']['rpms'])
+            self.whattoinstallrpm = " ".join(
+                self.getModulemdYamlconfig()['data']['components']['rpms'])
 
         if get_correct_url():
             self.repos = [get_correct_url()] + self.alldrepos
@@ -293,13 +325,16 @@ gpgcheck=0
                 "dnf -y --disablerepo=* --enablerepo=%s* --allowerasing install %s" %
                 (self.moduleName, self.whattoinstallrpm))
             self.runHost(
-                "dnf -y --disablerepo=* --enablerepo=%s* --allowerasing distro-sync" % self.moduleName,
-                ignore_status=True)
+                "dnf -y --disablerepo=* --enablerepo=%s* --allowerasing distro-sync" %
+                self.moduleName, ignore_status=True)
         except Exception as e:
-            raise Exception("ERROR: Unable to install packages %s from repositories \n%s\n original exeption:\n%s\n" %
-                            (self.whattoinstallrpm,
-                            utils.process.run("cat %s" % self.yumrepo).stdout,
-                            e))
+            raise Exception(
+                "ERROR: Unable to install packages %s from repositories \n%s\n original exeption:\n%s\n" %
+                (self.whattoinstallrpm,
+                 utils.process.run(
+                     "cat %s" %
+                     self.yumrepo).stdout,
+                    e))
 
     def status(self, command="/bin/true"):
         if 'status' in self.info and self.info['status']:
@@ -321,7 +356,8 @@ gpgcheck=0
             self.runHost("%s" % command, shell=True)
 
     def run(self, command="ls /", **kwargs):
-        return self.runHost('bash -c "%s"' % command.replace('"', r'\"'), **kwargs)
+        return self.runHost('bash -c "%s"' %
+                            command.replace('"', r'\"'), **kwargs)
 
     def copyTo(self, src, dest):
         self.runHost("cp -r %s %s" % (src, dest))
@@ -331,24 +367,28 @@ gpgcheck=0
 
     def __callSetupFromConfig(self):
         if self.info.get("setup"):
-            self.runHost(self.info.get("setup"), shell = True)
+            self.runHost(self.info.get("setup"), shell=True)
 
     def __callCleanupFromConfig(self):
         if self.info.get("cleanup"):
-            self.runHost(self.info.get("cleanup"), shell = True)
+            self.runHost(self.info.get("cleanup"), shell=True)
 
 
 class NspawnHelper(RpmHelper):
 
     def __init__(self):
         super(NspawnHelper, self).__init__()
-        self.chrootpath = os.path.abspath(os.path.join("/opt","chroot_%s" % self.moduleName))
-        self.__addionalpackages="systemd rpm"
+        self.chrootpath = os.path.abspath(
+            os.path.join(
+                "/opt", "chroot_%s" %
+                self.moduleName))
+        self.__addionalpackages = "systemd rpm"
         trans_dict["ROOT"] = self.chrootpath
 
     def setUp(self):
         self.installTestDependencies()
-# TODO: workaround because systemd nspawn is now working well in F-25 (failing because of selinux)
+# TODO: workaround because systemd nspawn is now working well in F-25
+# (failing because of selinux)
         self.runHost("setenforce 0")
         self.__prepare()
         self.__prepareSetup()
@@ -373,7 +413,6 @@ gpgcheck=0
                 f.write(add)
             f.close()
 
-
     def __prepareSetup(self):
         if os.path.exists(self.chrootpath):
             shutil.rmtree(self.chrootpath, ignore_errors=True)
@@ -389,24 +428,35 @@ gpgcheck=0
                 "dnf --nogpgcheck install --installroot %s -y --allowerasing --disablerepo=* --enablerepo=%s* %s %s" %
                 (self.chrootpath, self.moduleName, self.whattoinstallrpm, self.__addionalpackages))
         except Exception as e:
-            raise Exception("ERROR: Unable to install packages %s from repositories \n%s\n original exeption:\n%s\n" %
-                            (self.whattoinstallrpm,
-                            utils.process.run("cat %s" % self.yumrepo).stdout,
-                            e))
-        nspawncont = utils.process.SubProcess("systemd-nspawn --machine=%s -bD %s" % (self.moduleName, self.chrootpath))
+            raise Exception(
+                "ERROR: Unable to install packages %s from repositories \n%s\n original exeption:\n%s\n" %
+                (self.whattoinstallrpm,
+                 utils.process.run(
+                     "cat %s" %
+                     self.yumrepo).stdout,
+                    e))
+        nspawncont = utils.process.SubProcess(
+            "systemd-nspawn --machine=%s -bD %s" %
+            (self.moduleName, self.chrootpath))
         nspawncont.start()
         time.sleep(20)
 
     def run(self, command="ls /", **kwargs):
-# TODO: workaround because machinedctl is unable to behave like ssh. It is bug
-# systemd-run should be used, but in F-25 it does not contain --wait option
-        comout = self.runHost('machinectl shell root@%s /bin/bash -c "%s; echo EXITCODE $?" '% (self.moduleName, command.replace('"', r'\"')), **kwargs)
+        # TODO: workaround because machinedctl is unable to behave like ssh. It is bug
+        # systemd-run should be used, but in F-25 it does not contain --wait
+        # option
+        comout = self.runHost(
+            'machinectl shell root@%s /bin/bash -c "%s; echo EXITCODE $?" ' %
+            (self.moduleName, command.replace('"', r'\"')),
+            **kwargs)
         stdout = [x.strip() for x in comout.stdout.split("\n")]
         stderr = [x.strip() for x in comout.stderr.split("\n")]
         comout.exit_status = int(stdout[-2].split(" ")[1])
         comout.stdout = "\n".join(stdout[:-2])
         comout.stderr = "\n".join(stderr)
-        self.runHost('bash -c "echo DO NOT CARE of this command, this is workaound for good exit status; exit %d"' % comout.exit_status, **kwargs)
+        self.runHost(
+            'bash -c "echo DO NOT CARE of this command, this is workaound for good exit status; exit %d"' %
+            comout.exit_status, **kwargs)
         return comout
 
     def selfcheck(self):
@@ -421,19 +471,20 @@ gpgcheck=0
     def tearDown(self):
         self.stop()
         self.runHost("machinectl poweroff %s" % self.moduleName)
-        #self.nspawncont.stop()
+        # self.nspawncont.stop()
         time.sleep(10)
         self.__callCleanupFromConfig()
-# TODO: workaround because systemd nspawn is now working well in F-25 (failing because of selinux)
+# TODO: workaround because systemd nspawn is now working well in F-25
+# (failing because of selinux)
         self.runHost("setenforce 1")
 
     def __callSetupFromConfig(self):
         if self.info.get("setup"):
-            self.runHost(self.info.get("setup"), shell = True)
+            self.runHost(self.info.get("setup"), shell=True)
 
     def __callCleanupFromConfig(self):
         if self.info.get("cleanup"):
-            self.runHost(self.info.get("cleanup"), shell = True)
+            self.runHost(self.info.get("cleanup"), shell=True)
 
 
 # INTERFACE CLASS FOR GENERAL TESTS OF MODULES
@@ -441,8 +492,9 @@ class AvocadoTest(Test):
     """
     :avocado: disable
     """
+
     def setUp(self):
-        (self.backend, self.moduleType) =  get_correct_backend()
+        (self.backend, self.moduleType) = get_correct_backend()
         self.moduleProfile = get_correct_profile()
         LOGPARAMS.info(
             "Module Type: %s; Profile: %s" %
@@ -461,13 +513,18 @@ class AvocadoTest(Test):
     def run(self, *args, **kwargs):
         return self.backend.run(*args, **kwargs)
 
-    def runCheckState(self, command = "ls /", expected_state=0, output_text = None, *args, **kwargs):
+    def runCheckState(self, command="ls /", expected_state=0,
+                      output_text=None, *args, **kwargs):
         cmd = self.run(command, ignore_status=True, *args, **kwargs)
         output_text = command if not output_text else output_text
         if cmd.exit_status == expected_state:
-            self.log.info("command (RC=%d, expected=%d): %s" % (cmd.exit_status, expected_state, output_text))
+            self.log.info(
+                "command (RC=%d, expected=%d): %s" %
+                (cmd.exit_status, expected_state, output_text))
         else:
-            self.fail("command (RC=%d, expected=%d): %s" % (cmd.exit_status, expected_state, output_text))
+            self.fail(
+                "command (RC=%d, expected=%d): %s" %
+                (cmd.exit_status, expected_state, output_text))
 
     def getConfig(self):
         return self.backend.config
@@ -498,6 +555,7 @@ class ContainerAvocadoTest(AvocadoTest):
     """
     :avocado: disable
     """
+
     def setUp(self):
         super(ContainerAvocadoTest, self).setUp()
         if self.moduleType != "docker":
@@ -519,6 +577,7 @@ class RpmAvocadoTest(AvocadoTest):
     """
     :avocado: disable
     """
+
     def setUp(self):
         super(RpmAvocadoTest, self).setUp()
         if self.moduleType != "rpm":
@@ -529,7 +588,8 @@ def get_correct_backend():
     amodule = os.environ.get('MODULE')
     readconfig = CommonFunctions()
     readconfig.loadconfig()
-    if readconfig.config.has_key("default_module") and readconfig.config["default_module"] is not None and amodule == None:
+    if "default_module" in readconfig.config and readconfig.config[
+            "default_module"] is not None and amodule is None:
         amodule = readconfig.config["default_module"]
     if amodule == 'docker':
         return ContainerHelper(), amodule
@@ -540,27 +600,35 @@ def get_correct_backend():
     else:
         raise ValueError("Unsupported MODULE={0}".format(amodule))
 
+
 def get_correct_profile():
     amodule = os.environ.get('PROFILE')
     if not amodule:
-        amodule="default"
+        amodule = "default"
     return amodule
+
 
 def get_correct_url():
     amodule = os.environ.get('URL')
     return amodule
 
+
 def get_correct_config():
     cfgfile = os.environ.get('CONFIG')
     if not cfgfile:
-        cfgfile="config.yaml"
+        cfgfile = "config.yaml"
     if not os.path.exists(cfgfile):
-        raise ValueError("Config file (%s) does not exist or is inaccesible (you can also redefine own by CONFIG=path/to/configfile.yaml env variable)" % cfgfile)
+        raise ValueError(
+            "Config file (%s) does not exist or is inaccesible (you can also redefine own by CONFIG=path/to/configfile.yaml env variable)" %
+            cfgfile)
     with open(cfgfile, 'r') as ymlfile:
         xcfg = yaml.load(ymlfile.read().format(**trans_dict))
         if xcfg['document'] != 'modularity-testing':
-            raise ValueError("Bad Config file, not yaml or does not contain proper document type" % cfgfile)
+            raise ValueError(
+                "Bad Config file, not yaml or does not contain proper document type" %
+                cfgfile)
     return xcfg
+
 
 def get_compose_url():
     compose = os.environ.get('COMPOSEURL')
@@ -575,11 +643,12 @@ def get_compose_url():
             compose = readconfig.config['module']['rpm'].get("repos")[0]
     return compose
 
+
 def get_correct_modulemd():
     mdf = os.environ.get('MODULEMDURL')
     readconfig = CommonFunctions()
     readconfig.loadconfig()
-    if  mdf:
+    if mdf:
         return mdf
     elif readconfig.config.get("modulemd-url"):
         return readconfig.config.get("modulemd-url")

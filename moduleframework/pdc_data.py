@@ -29,27 +29,30 @@ import re
 from avocado import utils
 import shutil
 
-ARCH="x86_64"
-PDCURL="https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
+ARCH = "x86_64"
+PDCURL = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
+
 
 class PDCParser():
 
     def __getDataFromPdc(self):
-        PDC="%s/?variant_name=%s&variant_version=%s&variant_release=%s&active=True" % (PDCURL,self.name, self.stream, self.version)
+        PDC = "%s/?variant_name=%s&variant_version=%s&variant_release=%s&active=True" % (
+            PDCURL, self.name, self.stream, self.version)
         self.pdcdata = json.load(urllib.urlopen(PDC))["results"][-1]
 
-    def setFullVersion(self,nvr):
-        self.name, self.stream, self.version = re.search("(.*)-(.*)-(.*)", nvr).groups()
+    def setFullVersion(self, nvr):
+        self.name, self.stream, self.version = re.search(
+            "(.*)-(.*)-(.*)", nvr).groups()
         self.__getDataFromPdc()
 
-    def setViaFedMsg(self,yamlinp):
+    def setViaFedMsg(self, yamlinp):
         raw = yaml.load(yamlinp)
-        self.name=raw["msg"]["name"]
-        self.stream=raw["msg"]["stream"]
+        self.name = raw["msg"]["name"]
+        self.stream = raw["msg"]["stream"]
         self.version = raw["msg"]["version"]
         self.__getDataFromPdc()
 
-    def setLatestPDC(self,name, stream="master", version=""):
+    def setLatestPDC(self, name, stream="master", version=""):
         self.name = name
         self.stream = stream
         self.version = version
@@ -62,7 +65,7 @@ class PDCParser():
 
     def generateModuleMDFile(self):
         omodulefile = "tempmodule.yaml"
-        mdfile = open(omodulefile,mode = "w")
+        mdfile = open(omodulefile, mode="w")
         mdfile.write(self.pdcdata["modulemd"])
         mdfile.close()
         return "file://%s" % os.path.abspath(omodulefile)
@@ -81,11 +84,16 @@ class PDCParser():
             shutil.rmtree(dirname)
         os.mkdir(dirname)
         absdir = os.path.abspath(dirname)
-        for foo in utils.process.run("koji list-tagged --quiet %s" % self.pdcdata["koji_tag"]).stdout.split("\n"):
+        for foo in utils.process.run(
+                "koji list-tagged --quiet %s" % self.pdcdata["koji_tag"]).stdout.split("\n"):
             pkgbouid = foo.strip().split(" ")[0]
-            if len(pkgbouid)>4:
-                utils.process.run("cd %s; koji download-build %s" % (absdir, pkgbouid), shell=True)
-        utils.process.run("cd %s; createrepo -v %s" % (absdir,absdir), shell=True)
+            if len(pkgbouid) > 4:
+                utils.process.run(
+                    "cd %s; koji download-build %s" %
+                    (absdir, pkgbouid), shell=True)
+        utils.process.run(
+            "cd %s; createrepo -v %s" %
+            (absdir, absdir), shell=True)
         return "file://%s" % absdir
 
     def generateParamsLocalKojiPkgs(self):

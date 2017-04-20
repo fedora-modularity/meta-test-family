@@ -28,42 +28,50 @@ import gzip
 import tempfile
 import os
 
-ARCH="x86_64"
-REPOMD="repodata/repomd.xml"
-MODULEFILE='tempmodule.yaml'
+ARCH = "x86_64"
+REPOMD = "repodata/repomd.xml"
+MODULEFILE = 'tempmodule.yaml'
+
 
 class ComposeParser():
-    def __init__(self,compose):
+
+    def __init__(self, compose):
         self.compose = compose
         xmlrepomd = compose + "/" + REPOMD
         e = xml.etree.ElementTree.parse(urllib.urlopen(xmlrepomd)).getroot()
-        modulelocaltion = e.findall(".//{http://linux.duke.edu/metadata/repo}data[@type='modules']/{http://linux.duke.edu/metadata/repo}location")[0]
+        modulelocaltion = e.findall(
+            ".//{http://linux.duke.edu/metadata/repo}data[@type='modules']/{http://linux.duke.edu/metadata/repo}location")[0]
         mdrawlocaltion = modulelocaltion.attrib["href"]
-        response = ''.join(urllib.urlopen(compose +  "/" + mdrawlocaltion).readlines())
-        tmpf=tempfile.mkstemp()
-        tmpfo=open(tmpf[1],mode='w+b')
+        response = ''.join(
+            urllib.urlopen(
+                compose +
+                "/" +
+                mdrawlocaltion).readlines())
+        tmpf = tempfile.mkstemp()
+        tmpfo = open(tmpf[1], mode='w+b')
         tmpfo.write(response)
         tmpfo.close()
         self.modules = yaml.load(''.join(gzip.open(tmpf[1]).readlines()))
         os.remove(tmpf[1])
 
     def getModuleList(self):
-        out=[]
+        out = []
         for foo in self.modules['modules']:
-            out.append({'name':foo['data']['name'],'stream':foo['data']['stream'],'version':foo['data']['version'],})
+            out.append({'name': foo['data']['name'], 'stream': foo['data'][
+                       'stream'], 'version': foo['data']['version'], })
         return out
 
-    def variableListForModule(self,name):
-        stream=None
-        version=None
-        thismodule=None
-        out=[]
-        for foo in  self.modules['modules']:
+    def variableListForModule(self, name):
+        stream = None
+        version = None
+        thismodule = None
+        out = []
+        for foo in self.modules['modules']:
             if foo['data']['name'] == name:
                 thismodule = foo
         if thismodule:
-            mdo = file(MODULEFILE,mode="w")
-            yaml.dump(foo,mdo)
+            mdo = file(MODULEFILE, mode="w")
+            yaml.dump(foo, mdo)
             mdo.close()
             out.append("MODULENAME=%s" % foo['data']['name'])
             out.append("MODULE=%s" % "nspawn")
