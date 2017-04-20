@@ -22,7 +22,6 @@
 #
 
 import os
-import sys
 import re
 import shutil
 import yaml
@@ -456,7 +455,7 @@ gpgcheck=0
         # option
         comout = self.runHost(
             'machinectl shell root@%s /bin/bash -c "%s; echo EXITCODE $?" ' %
-            (self.moduleName, command.replace('"', r'\"')),
+            (self.moduleName, re.sub(r"(exit\s+\d+)", r"echo \1 | bash" , command.replace('"', r'\"'))),
             **kwargs)
         stdout = [x.strip() for x in comout.stdout.split("\n")]
         stderr = [x.strip() for x in comout.stderr.split("\n")]
