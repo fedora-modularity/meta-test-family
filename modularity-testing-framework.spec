@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.2.13
+Version:        0.2.14
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -44,6 +44,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Thu Apr 20 2017 Jan Scotka <jscotka@redhat.com> 0.2.14-1
+- improved for taskotron usecase (jscotka@redhat.com)
+
 * Thu Apr 20 2017 Jan Scotka <jscotka@redhat.com> 0.2.13-1
 - added changes to support baseruntime exit commands inside code
   (jscotka@redhat.com)
