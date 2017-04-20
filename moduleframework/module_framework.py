@@ -46,8 +46,17 @@ defroutedev = utils.process.run(
 hostipaddr = utils.process.run(
     "ip a s dev {defroute} | egrep -o 'inet [0-9.]+' | egrep -o '[0-9.]+'".format(
         defroute=defroutedev), shell=True).stdout.strip()
+dusername = "test"
+dpassword = "test"
+ddatabase = "basic"
 # translation table for config.yaml files syntax is {VARIABLE} in config file
-trans_dict = {"HOSTIPADDR": hostipaddr, "DEFROUTE": defroutedev, "ROOT": "/"}
+trans_dict = {"HOSTIPADDR": hostipaddr,
+              "DEFROUTE": defroutedev,
+              "ROOT": "/",
+              "USER": dusername,
+              "PASSWORD": dpassword,
+              "DATABASENAME": ddatabase
+              }
 
 
 def skipTestIf(value, text="Test not intended for this module profile"):
