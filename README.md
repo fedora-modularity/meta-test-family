@@ -56,8 +56,8 @@ dnf -y install docker python-pip
 * To include tests into your module, add to your Makefile section __check__
   * __check__ section runs script __run_tests.sh__ which
 * Your __run_tests.sh__ should contain:
-    * __Docker based module testing:__ ```MODULE=docker avocado run /usr/lib/python2.7/site-packages/moduleframework/modulelint.py ./*.py```
-    * __Rpm based module testing:__ ```MODULE=rpm avocado run /usr/lib/python2.7/site-packages/moduleframework/modulelint.py ./*.py```
+    * __Docker based module testing:__ ```MODULE=docker avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py```
+    * __Rpm based module testing:__ ```MODULE=rpm avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py```
     * `make check` -  runs tests in your module directory
 
 ## How to write tests
@@ -67,7 +67,7 @@ dnf -y install docker python-pip
     * install it by command: ```dnf install -y modularity-testing-framework```
   * CREATE your config.yaml (see example https://pagure.io/modularity-testing-framework/blob/master/f/docs/example-config.yaml)
   * If you have tests in config file call:  `/usr/bin/generator` or simply `generator`.
-  * Call command for running all python tests:  `MODULE=docker avocado run /usr/lib/python2.7/site-packages/moduleframework/modulelint.py ./*.py`
+  * Call command for running all python tests:  `MODULE=docker avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py`
  * __additional tests__ - see tests in https://pagure.io/modularity-testing-framework/blob/master/f/examples/testing-module directory as an example for you
 
 ## License
