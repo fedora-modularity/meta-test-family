@@ -29,6 +29,15 @@ class microDNFTest(module_framework.AvocadoTest):
     """
     :avocado: enable
     """
+    def setUp(self):
+        super(self.__class__, self).setUp()
+        if self.moduleType != "nspawn":
+            try:
+                self.tearDown()
+            except Exception as e:
+                print e
+                pass
+            self.skip("NSPAWN specific test (there is microdnf now)")
 
     def testInstallMicroDNFEmpty(self):
         self.start()
