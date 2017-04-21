@@ -18,7 +18,7 @@ class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
 
     def setUp(self):
         super(self.__class__, self).setUp()
-        self.compiler_resource_dir = os.path.abspath(".")
+        self.compiler_resource_dir = os.path.abspath("resources/hello-world")
         self.compiler_test_dir = None
 
     def _check_cmd_result(self, cmd, return_code,

@@ -55,20 +55,7 @@ class RpmValidation(module_framework.AvocadoTest):
         '/usr/local',
         '/usr/sbin',
         '/usr/share',
-        '/usr/src',
-        '/var/account',
-        '/var/cache',
-        '/var/crash',
-        '/var/games',
-        '/var/lib',
-        '/var/lock',
-        '/var/log',
-        '/var/mail',
-        '/var/opt',
-        '/var/run',
-        '/var/spool',
-        '/var/tmp',
-        '/var/yp'
+        '/var/tmp'
     ]
 
     def testPaths(self):
