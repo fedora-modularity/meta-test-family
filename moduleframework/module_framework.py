@@ -277,7 +277,7 @@ class RpmHelper(CommonFunctions):
             repositories = []
             pass
         for dep in repositories:
-            self.alldrepos.append(get_latest_repo_url(dep))
+            self.alldrepos.append(get_latest_repo_url(dep,repositories[dep]))
         if self.getPackageList():
             self.whattoinstallrpm = " ".join(self.getPackageList())
         elif self.getModulemdYamlconfig()['data'].get('profiles') and self.getModulemdYamlconfig()['data']['profiles'].get(get_correct_profile()):
@@ -692,10 +692,10 @@ def get_correct_modulemd():
         return [x[12:] for x in b if 'MODULEMDURL=' in x][0]
 
 
-def get_latest_repo_url(wmodule="base-runtime", fake=False):
+def get_latest_repo_url(wmodule="base-runtime", wstream="master", fake=False):
     if fake:
         return "http://mirror.vutbr.cz/fedora/releases/25/Everything/x86_64/os/"
     else:
-        brt = pdc_data.PDCParser()
-        brt.setLatestPDC(wmodule)
-        return brt.generateRepoUrl()
+        localrepo = pdc_data.PDCParser()
+        localrepo.setLatestPDC(wmodule, wstream)
+        return localrepo.generateParamsLocalKojiPkgs()
