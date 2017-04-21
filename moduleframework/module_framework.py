@@ -480,7 +480,7 @@ gpgcheck=0
         # systemd-run should be used, but in F-25 it does not contain --wait
         # option
         comout = self.runHost(
-            'machinectl shell root@%s /bin/bash -c "%s; echo; echo EXITCODE $?" ' %
+            'machinectl shell root@%s /bin/bash -c "%s; RRC=$?; echo; echo EXITCODE $RRC" ' %
             (self.moduleName, re.sub(r"(exit\s+\d+)", r"echo \1 | bash" , command.replace('"', r'\"'))),
             **kwargs)
         stdout = [x.strip() for x in comout.stdout.split("\n")]
