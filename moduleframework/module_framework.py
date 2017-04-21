@@ -698,4 +698,4 @@ def get_latest_repo_url(wmodule="base-runtime", wstream="master", fake=False):
     else:
         localrepo = pdc_data.PDCParser()
         localrepo.setLatestPDC(wmodule, wstream)
-        return localrepo.generateParamsLocalKojiPkgs()
+        return localrepo.createLocalRepoFromKoji()
