@@ -70,6 +70,7 @@ libverto
 libxml2
 lua-libs
 lz4
+lz4-libs
 lzo
 microdnf
 mpfr
