@@ -496,10 +496,10 @@ gpgcheck=0
         return self.run().stdout
 
     def copyTo(self, src, dest):
-        self.runHost("cp -r %s %s/%s" % (src, self.chrootpath, dest))
+        self.runHost("machinectl copy-to %s %s %s" % (self.moduleName, src, dest))
 
     def copyFrom(self, src, dest):
-        self.runHost("cp -r %s/%s %s" % (self.chrootpath, src, dest))
+        self.runHost("machinectl copy-from %s %s %s" % (self.moduleName, src, dest))
 
     def tearDown(self):
         self.stop()

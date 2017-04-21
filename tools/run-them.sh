@@ -31,6 +31,12 @@ function sleep_a_while(){
     done
 }
 
+function fedpkg_alt(){
+    LFILE="alt_fedpkg.conf"
+    cat /etc/rpkg/fedpkg.conf |sed 's/anongiturl.*/anongiturl = https:\/\/src.fedoraproject.org\/git\/%(module)s/' > $LFILE
+    fedpkg --config $LFILE $@
+}
+
 export MODULENAME=$1
 export PARSEITEM=$2
 # compose fedmsg or None same as fedmsg
@@ -62,7 +68,7 @@ function inst_env(){
 }
 
 function loaddistgittests(){
-    fedpkg clone -a modules/$MODULENAME
+    fedpkg_alt clone --anonymous modules/$MODULENAME
     test -f $MODULENAME/tests/Makefile
 }
 
