@@ -30,6 +30,8 @@ import time
 import urllib
 import logging
 import glob
+import netifaces
+import socket
 from avocado import Test
 from avocado import utils
 from avocado.core import exceptions
@@ -38,20 +40,19 @@ from compose_info import ComposeParser
 import pdc_data
 
 
+
 LOGPARAMS = logging.getLogger('params')
 
-defroutedev = utils.process.run(
-    "ip r |grep default |cut -d ' ' -f 5 |head -1",
-    shell=True).stdout.strip()
-hostipaddr = utils.process.run(
-    "ip a s dev {defroute} | egrep -o 'inet [0-9.]+' | egrep -o '[0-9.]+'".format(
-        defroute=defroutedev), shell=True).stdout.strip()
+defroutedev = netifaces.gateways().get('default').values()[0][1] if netifaces.gateways().get('default') else "lo"
+hostipaddr = netifaces.ifaddresses(defroutedev)[2][0]['addr']
+hostname = socket.gethostname()
 dusername = "test"
 dpassword = "test"
 ddatabase = "basic"
 # translation table for config.yaml files syntax is {VARIABLE} in config file
 trans_dict = {"HOSTIPADDR": hostipaddr,
               "DEFROUTE": defroutedev,
+              "HOSTNAME": hostname,
               "ROOT": "/",
               "USER": dusername,
               "PASSWORD": dpassword,
