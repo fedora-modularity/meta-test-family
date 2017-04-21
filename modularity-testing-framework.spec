@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.2.16
+Version:        0.2.17
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -44,6 +44,12 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Fri Apr 21 2017 Jan Scotka <jscotka@redhat.com> 0.2.17-1
+- simplified run_them script and added better localrepo names, will then work
+  with more local repos for various modules (jscotka@redhat.com)
+- improved dnf handling inside, microdnf selftest is working well
+  (jscotka@redhat.com)
+
 * Thu Apr 20 2017 Jan Scotka <jscotka@redhat.com> 0.2.16-1
 - added copying of repositories inside NSPAWN, to have them enabled for using
   by tests (baseruntime) (jscotka@redhat.com)
