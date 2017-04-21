@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.2.23
+Version:        0.2.24
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -47,6 +47,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Fri Apr 21 2017 Jan Scotka <jscotka@redhat.com> 0.2.24-1
+- added dependency on python netifaces library (jscotka@redhat.com)
+
 * Fri Apr 21 2017 Jan Scotka <jscotka@redhat.com> 0.2.23-1
 - solved issue with missin ip command, removed and replaced by pythonish style
   (jscotka@redhat.com)
