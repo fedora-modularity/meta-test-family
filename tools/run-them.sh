@@ -93,10 +93,10 @@ function run_modulelint(){
 set -x
 inst_env
 RESULTTOOLS=$(($RESULTTOOLS+$?))
-getparams_int
+PARAMS="`getparams_int`"
 RESULTTOOLS=$(($RESULTTOOLS+$?))
+export PARAMS
 
-export PARAMS="`getparams_int`"
 test "$MODULENAME" = "testmodule" && MODULENAME="testing-module"
 
 if loaddistgittests; then

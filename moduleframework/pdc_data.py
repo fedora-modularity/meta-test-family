@@ -79,7 +79,7 @@ class PDCParser():
 
     def createLocalRepoFromKoji(self):
         utils.process.run("dnf -y install createrepo koji", ignore_status=True)
-        dirname = "localrepository"
+        dirname = "localrepo_%s_%s_%s" % (self.name, self.stream, self.version)
         if os.path.exists(dirname):
             shutil.rmtree(dirname)
         os.mkdir(dirname)
