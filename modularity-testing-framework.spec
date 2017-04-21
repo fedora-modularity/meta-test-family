@@ -13,8 +13,11 @@ BuildArch:      noarch
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
 Requires:       python2-avocado
+Requires:       python2-avocado-plugins-output-html
+Requires:       python-netifaces
 Requires:       docker
 Requires:       docker-distribution
+
 
 %description
 Framework for writing tests for modules and containers
