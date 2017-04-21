@@ -2,27 +2,13 @@ document: modularity-testing
 version: 1
 name: baseruntime
 modulemd-url: http://pkgs.fedoraproject.org/cgit/modules/base-runtime.git/plain/base-runtime.yaml
-service:
-    port:
 packages:
-    rpms:
-        - bash
-        - coreutils
+    profiles:
+        - baseimage
 default_module: docker
 module:
     docker:
-        start:
-        labels:
-            description: "I dont know"
-            io.k8s.description: "I dont know too"
-        source: http://pkgs.fedoraproject.org/cgit/modules/base-runtime.git
         container: docker=base-runtime-smoke
     rpm:
-        start:
-        stop:
-        status:
         repos:
             - https://kojipkgs.stg.fedoraproject.org/compose/branched/jkaluza/latest-Boltron-26/compose/base-runtime/x86_64/os/
-test:
-    processrunnig:
-- 'ls  / | grep bin'

@@ -29,6 +29,7 @@ import json
 import time
 import urllib
 import logging
+import glob
 from avocado import Test
 from avocado import utils
 from avocado.core import exceptions
@@ -444,7 +445,12 @@ gpgcheck=0
                      self.yumrepo).stdout,
                     e))
         # COPY yum repository inside NSPAW, to be able to do installations
-        shutil.copy(self.yumrepo, os.path.join(self.chrootpath,"etc","yum.repos.d"))
+        insiderepopath = os.path.join(self.chrootpath, self.yumrepo[1:])
+        try:
+            os.mkdir(os.path.dirname(insiderepopath))
+        except:
+            pass
+        shutil.copy(self.yumrepo, insiderepopath)
         for repo in self.repos:
             if "file:///" in repo:
                 src = repo[7:]
@@ -453,6 +459,15 @@ gpgcheck=0
                 except Exception as e:
                     print e, "Unable to copy files from:", src, "to:", os.path.join(self.chrootpath,src)
                     pass
+        pkipath = "/etc/pki/rpm-gpg"
+        pkipath_ch = os.path.join(self.chrootpath, pkipath[1:])
+        try:
+            os.makedirs(pkipath_ch)
+        except:
+            pass
+        for filename in glob.glob(os.path.join(pkipath, '*')):
+            shutil.copy(filename, pkipath_ch)
+
         nspawncont = utils.process.SubProcess(
             "systemd-nspawn --machine=%s -bD %s" %
             (self.moduleName, self.chrootpath))

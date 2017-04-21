@@ -30,6 +30,6 @@ class microDNFTest(module_framework.AvocadoTest):
     :avocado: enable
     """
 
-    def testMicroDNFbash(self):
+    def testInstallMicroDNFEmpty(self):
         self.start()
-        self.run("microdnf install microdnf", ignore_status=True)
+        self.assertIn("Transaction: (empty)",self.run("microdnf install microdnf", ignore_status=True).stdout)
