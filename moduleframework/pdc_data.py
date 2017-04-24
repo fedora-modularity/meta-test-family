@@ -89,9 +89,12 @@ class PDCParser():
                     "koji list-tagged --quiet %s" % self.pdcdata["koji_tag"]).stdout.split("\n"):
                 pkgbouid = foo.strip().split(" ")[0]
                 if len(pkgbouid) > 4:
-                    utils.process.run(
-                        "cd %s; koji download-build %s  -a %s -a noarch" %
-                        (absdir, pkgbouid, ARCH), shell=True)
+                    try:
+                        utils.process.run(
+                            "cd %s; koji download-build %s  -a %s -a noarch" %
+                            (absdir, pkgbouid, ARCH), shell=True)
+                    except:
+                        pass
             utils.process.run(
                 "cd %s; createrepo -v %s" %
                 (absdir, absdir), shell=True)
