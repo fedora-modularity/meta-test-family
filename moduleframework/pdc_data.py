@@ -96,7 +96,7 @@ class PDCParser():
                             "cd %s; koji download-build %s  -a %s -a noarch" %
                             (absdir, pkgbouid, ARCH), shell=True)
                     except:
-                        print print >> sys.stderr, 'UNABLE TO DOWNLOAD:', "cd %s; koji download-build %s  -a %s -a noarch" % (absdir, pkgbouid, ARCH)
+                        print >> sys.stderr, 'UNABLE TO DOWNLOAD:', "cd %s; koji download-build %s  -a %s -a noarch" % (absdir, pkgbouid, ARCH)
                         pass
             utils.process.run(
                 "cd %s; createrepo -v %s" %
