@@ -26,6 +26,7 @@ import os
 import json
 import urllib
 import re
+import sys
 from avocado import utils
 import shutil
 
@@ -89,11 +90,13 @@ class PDCParser():
                     "koji list-tagged --quiet %s" % self.pdcdata["koji_tag"]).stdout.split("\n"):
                 pkgbouid = foo.strip().split(" ")[0]
                 if len(pkgbouid) > 4:
+                    print >> sys.stderr, "DOWNLOADING:", foo
                     try:
                         utils.process.run(
                             "cd %s; koji download-build %s  -a %s -a noarch" %
                             (absdir, pkgbouid, ARCH), shell=True)
                     except:
+                        print print >> sys.stderr, 'UNABLE TO DOWNLOAD:', "cd %s; koji download-build %s  -a %s -a noarch" % (absdir, pkgbouid, ARCH)
                         pass
             utils.process.run(
                 "cd %s; createrepo -v %s" %
