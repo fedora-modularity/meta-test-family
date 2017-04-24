@@ -80,20 +80,21 @@ class PDCParser():
     def createLocalRepoFromKoji(self):
         utils.process.run("dnf -y install createrepo koji", ignore_status=True)
         dirname = "localrepo_%s_%s_%s" % (self.name, self.stream, self.version)
-        if os.path.exists(dirname):
-            shutil.rmtree(dirname)
-        os.mkdir(dirname)
         absdir = os.path.abspath(dirname)
-        for foo in utils.process.run(
-                "koji list-tagged --quiet %s" % self.pdcdata["koji_tag"]).stdout.split("\n"):
-            pkgbouid = foo.strip().split(" ")[0]
-            if len(pkgbouid) > 4:
-                utils.process.run(
-                    "cd %s; koji download-build %s" %
-                    (absdir, pkgbouid), shell=True)
-        utils.process.run(
-            "cd %s; createrepo -v %s" %
-            (absdir, absdir), shell=True)
+        if os.path.exists(absdir):
+            pass
+        else:
+            os.mkdir(absdir)
+            for foo in utils.process.run(
+                    "koji list-tagged --quiet %s" % self.pdcdata["koji_tag"]).stdout.split("\n"):
+                pkgbouid = foo.strip().split(" ")[0]
+                if len(pkgbouid) > 4:
+                    utils.process.run(
+                        "cd %s; koji download-build %s" %
+                        (absdir, pkgbouid), shell=True)
+            utils.process.run(
+                "cd %s; createrepo -v %s" %
+                (absdir, absdir), shell=True)
         return "file://%s" % absdir
 
     def generateParamsLocalKojiPkgs(self):
