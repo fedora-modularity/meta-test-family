@@ -83,9 +83,11 @@ function distgit_wrapper_rpm(){
 
 function avocado_wrapper(){
     (
-    TESTS="`ls $MTF_PATH/examples/$MODULENAME/*.py $MTF_PATH/examples/$MODULENAME/*.sh` $MODULE_LINT"
+    cp -rf $MTF_PATH/examples/$MODULENAME tests_$MODULENAME
+    cd tests_$MODULENAME
+    TESTS="`ls *.py *.sh` $MODULE_LINT"
     echo "AVOCADO FOUND TESTS: $TESTS"
-    eval $PARAMS CONFIG=$MTF_PATH/examples/$MODULENAME/config.yaml $AVOCADOCMD $TESTS
+    eval $PARAMS $AVOCADOCMD $TESTS
     )
 }
 
