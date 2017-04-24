@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.2.33
+Version:        0.2.34
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -47,6 +47,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Mon Apr 24 2017 Jan Scotka <jscotka@redhat.com> 0.2.34-1
+- small typo (jscotka@redhat.com)
+
 * Mon Apr 24 2017 Jan Scotka <jscotka@redhat.com> 0.2.33-1
 - added messages to stderr, to see progress. It causes troubles to taskotron if
   no output there (jscotka@redhat.com)
