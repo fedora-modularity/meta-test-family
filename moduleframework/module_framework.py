@@ -399,7 +399,7 @@ class NspawnHelper(RpmHelper):
         self.installTestDependencies()
 # TODO: workaround because systemd nspawn is now working well in F-25
 # (failing because of selinux)
-        self.runHost("setenforce 0")
+        self.runHost("setenforce 0", ignore_status=True)
         self.__prepare()
         self.__prepareSetup()
         self.__callSetupFromConfig()
@@ -452,6 +452,7 @@ gpgcheck=0
         except:
             pass
         shutil.copy(self.yumrepo, insiderepopath)
+        self.runHost("sed s/enabled=0/enabled=1/ -i %s" % insiderepopath, ignore_status=True)
         for repo in self.repos:
             if "file:///" in repo:
                 src = repo[7:]
@@ -510,7 +511,7 @@ gpgcheck=0
         self.__callCleanupFromConfig()
 # TODO: workaround because systemd nspawn is now working well in F-25
 # (failing because of selinux)
-        self.runHost("setenforce 1")
+        self.runHost("setenforce 1", ignore_status=True)
 
     def __callSetupFromConfig(self):
         if self.info.get("setup"):

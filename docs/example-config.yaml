@@ -30,12 +30,5 @@ module:
         stop: /bin/true
         status: /bin/true
         repo: https://kojipkgs.fedoraproject.org/repos/module-481d2dd61f4ae110/latest/x86_64/
-test:
-    processrunning:
-        - 'ls  /proc/*/exe -alh | grep memcached'
-testhost:
-    selfcheck:
-        - 'echo errr | nc localhost 11211'
-    selcheckError:
-        - 'echo errr | nc localhost 11211'
+
 

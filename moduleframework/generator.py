@@ -63,7 +63,7 @@ class GeneratedTestsConfig(module_framework.AvocadoTest):
 """ % testname
         for line in testlines:
             self.output = self.output + \
-                """        self.%s("%s")\n""" % (method, line)
+                """        self.%s("%s")\n""" % (method, line.replace('"', r'\"'))
         print "Added test (runmethod: %s): %s" % (method, testname)
 
 
