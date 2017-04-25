@@ -58,6 +58,8 @@ dnf -y install docker python-pip
 * Your __run_tests.sh__ should contain:
     * __Docker based module testing:__ ```MODULE=docker avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py```
     * __Rpm based module testing:__ ```MODULE=rpm avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py```
+    * You can skip disabling SELinux by setting environment variable `MTF_SKIP_DISABLING_SELINUX`:
+        * `MTF_SKIP_DISABLING_SELINUX=true avocado run ...`
     * `make check` -  runs tests in your module directory
 
 ## How to write tests
