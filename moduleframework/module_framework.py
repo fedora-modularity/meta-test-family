@@ -397,9 +397,10 @@ class NspawnHelper(RpmHelper):
 
     def setUp(self):
         self.installTestDependencies()
-# TODO: workaround because systemd nspawn is now working well in F-25
-# (failing because of selinux)
-        self.runHost("setenforce 0", ignore_status=True)
+        if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
+            # TODO: workaround because systemd nspawn is now working well in F-25
+            # (failing because of selinux)
+            self.runHost("setenforce 0", ignore_status=True)
         self.__prepare()
         self.__prepareSetup()
         self.__callSetupFromConfig()
@@ -509,9 +510,10 @@ gpgcheck=0
         # self.nspawncont.stop()
         time.sleep(10)
         self.__callCleanupFromConfig()
-# TODO: workaround because systemd nspawn is now working well in F-25
-# (failing because of selinux)
-        self.runHost("setenforce 1", ignore_status=True)
+        if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
+            # TODO: workaround because systemd nspawn is now working well in F-25
+            # (failing because of selinux)
+            self.runHost("setenforce 1", ignore_status=True)
 
     def __callSetupFromConfig(self):
         if self.info.get("setup"):
