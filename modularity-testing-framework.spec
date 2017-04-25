@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.2.37
+Version:        0.2.38
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -47,6 +47,10 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Tue Apr 25 2017 Jan Scotka <jscotka@redhat.com> 0.2.38-1
+- fixed selftest of paths,  this test is bad in case running inside CIs
+  (jscotka@redhat.com)
+
 * Tue Apr 25 2017 Jan Scotka <jscotka@redhat.com> 0.2.37-1
 - repaired selinux disablig, ignoring status in case you dont have selinux
   enable enabling repos inside module nspawn for dnf command
