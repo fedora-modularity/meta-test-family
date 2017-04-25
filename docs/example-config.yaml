@@ -1,8 +1,8 @@
 document: modularity-testing
 version: 1
 name: memcached
-source: https://github.com/container-images/memcached.git
 modulemd-url: https://src.fedoraproject.org/cgit/modules/memcached.git/plain/memcached.yaml
+compose-url: url_to_compose_
 service:
     port: 11211
 packages:

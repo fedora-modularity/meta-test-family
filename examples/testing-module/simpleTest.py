@@ -33,19 +33,6 @@ class simpleTests(module_framework.AvocadoTest):
     def testPath(self):
         print ">>>>>>>>>>>>>> ", module_framework.__file__
         print ">>>>>>>>>>>>>> ", __file__
-        if "/usr/share/moduleframework/" in os.path.dirname(__file__):
-            self.assertIn(
-                "/usr/share/moduleframework/",
-                os.path.dirname(__file__))
-            self.assertIn(
-                "/usr/lib/python2.7/site-packages/moduleframework",
-                os.path.dirname(
-                    module_framework.__file__))
-        else:
-            self.assertIn(
-                os.path.dirname(__file__),
-                os.path.dirname(
-                    module_framework.__file__))
 
     def testAssertIn(self):
         self.start()
