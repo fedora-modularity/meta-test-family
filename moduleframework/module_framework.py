@@ -311,23 +311,19 @@ class RpmHelper(CommonFunctions):
         self.__callCleanupFromConfig()
 
     def __prepare(self):
-        # if not os.path.exists(self.installroot):
-        #    shutil.rmtree(self.installroot)
-         #   os.makedirs(self.installroot)
-        if not os.path.isfile(self.yumrepo):
-            counter = 0
-            f = open(self.yumrepo, 'w')
-            for repo in self.repos:
-                counter = counter + 1
-                add = """[%s%d]
+        counter = 0
+        f = open(self.yumrepo, 'w')
+        for repo in self.repos:
+            counter = counter + 1
+            add = """[%s%d]
 name=%s%d
 baseurl=%s
-enabled=0
+enabled=1
 gpgcheck=0
 
 """ % (self.moduleName, counter, self.moduleName, counter, repo)
-                f.write(add)
-            f.close()
+            f.write(add)
+        f.close()
 
     def __prepareSetup(self):
         try:
@@ -357,7 +353,6 @@ gpgcheck=0
             self.runHost(self.info['start'], shell=True)
         else:
             self.runHost("%s" % command, shell=True)
-        time.sleep(2)
 
     def stop(self, command="/bin/true"):
         if 'stop' in self.info and self.info['stop']:
@@ -400,82 +395,83 @@ class NspawnHelper(RpmHelper):
         if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
             # TODO: workaround because systemd nspawn is now working well in F-25
             # (failing because of selinux)
-            self.runHost("setenforce 0", ignore_status=True)
-        self.__prepare()
+            self.__selinuxState = self.runHost("getenforce", ignore_status=True).stdout.strip()
+            self.runHost("setenforce Permissive", ignore_status=True)
         self.__prepareSetup()
         self.__callSetupFromConfig()
 
-    def __prepare(self):
-        # if not os.path.exists(self.installroot):
-        #    shutil.rmtree(self.installroot)
-         #   os.makedirs(self.installroot)
-        if not os.path.isfile(self.yumrepo):
+    def __prepareSetup(self):
+        if get_if_cleanup and os.path.exists(self.chrootpath):
+            shutil.rmtree(self.chrootpath, ignore_errors=True)
+            os.mkdir(self.chrootpath)
+        try:
+            self.runHost("machinectl poweroff %s" % self.moduleName)
+            time.sleep(10)
+        except:
+            pass
+        if not os.path.exists(os.path.join(self.chrootpath,"usr")):
+            self.runHost("dnf -y install systemd-container")
+            repos_to_use=""
             counter = 0
-            f = open(self.yumrepo, 'w')
+            for repo in self.repos:
+                counter = counter + 1
+                repos_to_use += " --repofrompath %s%d,%s" % (self.moduleName, counter, repo)
+            try:
+                self.runHost(
+                    "dnf --nogpgcheck install --installroot %s -y --allowerasing --disablerepo=* %s %s %s" %
+                    (self.chrootpath, repos_to_use, self.whattoinstallrpm, self.__addionalpackages))
+            except Exception as e:
+                raise Exception(
+                    "ERROR: Unable to install packages %s from repositories \n%s\n original exeption:\n%s\n" %
+                    (self.whattoinstallrpm,
+                     utils.process.run(
+                         "cat %s" %
+                         self.yumrepo).stdout,
+                        e))
+            # COPY yum repository inside NSPAW, to be able to do installations
+            insiderepopath = os.path.join(self.chrootpath, self.yumrepo[1:])
+            try:
+                os.mkdirs(os.path.dirname(insiderepopath))
+            except:
+                pass
+            counter = 0
+            f = open(insiderepopath, 'w')
             for repo in self.repos:
                 counter = counter + 1
                 add = """[%s%d]
 name=%s%d
 baseurl=%s
-enabled=0
+enabled=1
 gpgcheck=0
-
-""" % (self.moduleName, counter, self.moduleName, counter, repo)
+    
+    """ % (self.moduleName, counter, self.moduleName, counter, repo)
                 f.write(add)
             f.close()
 
-    def __prepareSetup(self):
-        if os.path.exists(self.chrootpath):
-            shutil.rmtree(self.chrootpath, ignore_errors=True)
-        try:
-            self.runHost("machinectl poweroff %s" % self.moduleName)
-        except:
-            pass
-        time.sleep(10)
-        os.mkdir(self.chrootpath)
-        self.runHost("dnf -y install systemd-container")
-        try:
-            self.runHost(
-                "dnf --nogpgcheck install --installroot %s -y --allowerasing --disablerepo=* --enablerepo=%s* %s %s" %
-                (self.chrootpath, self.moduleName, self.whattoinstallrpm, self.__addionalpackages))
-        except Exception as e:
-            raise Exception(
-                "ERROR: Unable to install packages %s from repositories \n%s\n original exeption:\n%s\n" %
-                (self.whattoinstallrpm,
-                 utils.process.run(
-                     "cat %s" %
-                     self.yumrepo).stdout,
-                    e))
-        # COPY yum repository inside NSPAW, to be able to do installations
-        insiderepopath = os.path.join(self.chrootpath, self.yumrepo[1:])
-        try:
-            os.mkdir(os.path.dirname(insiderepopath))
-        except:
-            pass
-        shutil.copy(self.yumrepo, insiderepopath)
-        self.runHost("sed s/enabled=0/enabled=1/ -i %s" % insiderepopath, ignore_status=True)
-        for repo in self.repos:
-            if "file:///" in repo:
-                src = repo[7:]
-                try:
-                    shutil.copytree(src,os.path.join(self.chrootpath,src))
-                except Exception as e:
-                    print e, "Unable to copy files from:", src, "to:", os.path.join(self.chrootpath,src)
-                    pass
-        pkipath = "/etc/pki/rpm-gpg"
-        pkipath_ch = os.path.join(self.chrootpath, pkipath[1:])
-        try:
-            os.makedirs(pkipath_ch)
-        except:
-            pass
-        for filename in glob.glob(os.path.join(pkipath, '*')):
-            shutil.copy(filename, pkipath_ch)
+    #        shutil.copy(self.yumrepo, insiderepopath)
+    #        self.runHost("sed s/enabled=0/enabled=1/ -i %s" % insiderepopath, ignore_status=True)
+            for repo in self.repos:
+                if "file:///" in repo:
+                    src = repo[7:]
+                    try:
+                        shutil.copytree(src,os.path.join(self.chrootpath,src))
+                    except Exception as e:
+                        print e, "Unable to copy files from:", src, "to:", os.path.join(self.chrootpath,src)
+                        pass
+            pkipath = "/etc/pki/rpm-gpg"
+            pkipath_ch = os.path.join(self.chrootpath, pkipath[1:])
+            try:
+                os.makedirs(pkipath_ch)
+            except:
+                pass
+            for filename in glob.glob(os.path.join(pkipath, '*')):
+                shutil.copy(filename, pkipath_ch)
 
-        nspawncont = utils.process.SubProcess(
-            "systemd-nspawn --machine=%s -bD %s" %
-            (self.moduleName, self.chrootpath))
+            nspawncont = utils.process.SubProcess(
+                "systemd-nspawn --machine=%s -bD %s" %
+                (self.moduleName, self.chrootpath))
         nspawncont.start()
-        time.sleep(20)
+        time.sleep(15)
 
     def run(self, command="ls /", **kwargs):
         # TODO: workaround because machinedctl is unable to behave like ssh. It is bug
@@ -513,7 +509,7 @@ gpgcheck=0
         if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
             # TODO: workaround because systemd nspawn is now working well in F-25
             # (failing because of selinux)
-            self.runHost("setenforce 1", ignore_status=True)
+            self.runHost("setenforce %s" % self.__selinuxState, ignore_status=True)
 
     def __callSetupFromConfig(self):
         if self.info.get("setup"):
@@ -701,4 +697,16 @@ def get_latest_repo_url(wmodule="base-runtime", wstream="master", fake=False):
     else:
         localrepo = pdc_data.PDCParser()
         localrepo.setLatestPDC(wmodule, wstream)
-        return localrepo.createLocalRepoFromKoji()
+        if get_if_remoterepos:
+            return localrepo.generateRepoUrl()
+        else:
+            return localrepo.createLocalRepoFromKoji()
+
+
+def get_if_cleanup():
+    cleanup = os.environ.get('MTF_DO_NOT_CLEANUP')
+    return not bool(cleanup)
+
+def get_if_remoterepos():
+    rreps = os.environ.get('MTF_REMOTE_REPOS')
+    return not bool(rreps)
