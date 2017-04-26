@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.2.39
+Version:        0.2.40
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -47,6 +47,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Wed Apr 26 2017 Jan Scotka <jscotka@redhat.com> 0.2.40-1
+- fixed (jscotka@redhat.com)
+
 * Wed Apr 26 2017 Jan Scotka <jscotka@redhat.com> 0.2.39-1
 - repaired more stuff, repaired nspawn repos handling (jscotka@redhat.com)
 - add a way to skip SELinux disabling (ttomecek@redhat.com)
