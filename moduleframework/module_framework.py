@@ -427,8 +427,9 @@ class NspawnHelper(RpmHelper):
             # COPY yum repository inside NSPAW, to be able to do installations
             insiderepopath = os.path.join(self.chrootpath, self.yumrepo[1:])
             try:
-                os.mkdirs(os.path.dirname(insiderepopath))
-            except:
+                os.makedirs(os.path.dirname(insiderepopath))
+            except Exception as e:
+                print e
                 pass
             counter = 0
             f = open(insiderepopath, 'w')
