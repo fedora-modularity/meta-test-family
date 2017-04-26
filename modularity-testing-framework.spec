@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.2.45
+Version:        0.2.46
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,11 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Wed Apr 26 2017 Jan Scotka <jscotka@redhat.com> 0.2.46-1
+- version increasion (jscotka@redhat.com)
+- removed active=true it seems that somewthing changed (jscotka@redhat.com)
+- remove docker-distribution package (phracek@redhat.com)
+
 * Wed Apr 26 2017 Jan Scotka <jscotka@redhat.com> 0.2.45-1
 - copytree needs nonexisting directory (jscotka@redhat.com)
 
