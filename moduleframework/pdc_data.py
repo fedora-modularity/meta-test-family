@@ -37,7 +37,7 @@ PDCURL = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
 class PDCParser():
 
     def __getDataFromPdc(self):
-        PDC = "%s/?variant_name=%s&variant_version=%s&variant_release=%s&active=True" % (
+        PDC = "%s/?variant_name=%s&variant_version=%s&variant_release=%s" % (
             PDCURL, self.name, self.stream, self.version)
         self.pdcdata = json.load(urllib.urlopen(PDC))["results"][-1]
 
