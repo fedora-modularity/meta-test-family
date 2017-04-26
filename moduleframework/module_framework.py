@@ -418,16 +418,12 @@ class NspawnHelper(RpmHelper):
                 repos_to_use += " --repofrompath %s%d,%s" % (self.moduleName, counter, repo)
             try:
                 self.runHost(
-                    "dnf --nogpgcheck install --installroot %s -y --allowerasing --disablerepo=* %s %s %s" %
-                    (self.chrootpath, repos_to_use, self.whattoinstallrpm, self.__addionalpackages))
+                    "dnf --nogpgcheck install --installroot %s -y --allowerasing --disablerepo=* --enablerepo=* %s %s %s" %
+                    (self.chrootpath, self.moduleName, repos_to_use, self.whattoinstallrpm, self.__addionalpackages))
             except Exception as e:
                 raise Exception(
-                    "ERROR: Unable to install packages %s from repositories \n%s\n original exeption:\n%s\n" %
-                    (self.whattoinstallrpm,
-                     utils.process.run(
-                         "cat %s" %
-                         self.yumrepo).stdout,
-                        e))
+                    "ERROR: Unable to install packages %s\n original exeption:\n%s\n" %
+                    (self.whattoinstallrpm,e))
             # COPY yum repository inside NSPAW, to be able to do installations
             insiderepopath = os.path.join(self.chrootpath, self.yumrepo[1:])
             try:
