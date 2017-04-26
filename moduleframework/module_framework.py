@@ -449,11 +449,17 @@ gpgcheck=0
     #        self.runHost("sed s/enabled=0/enabled=1/ -i %s" % insiderepopath, ignore_status=True)
             for repo in self.repos:
                 if "file:///" in repo:
-                    src = repo[7:]
+                    src = repo[8:]
+                    srcto = os.path.join(self.chrootpath,src)
                     try:
-                        shutil.copytree(src,os.path.join(self.chrootpath,src))
+                        os.makedirs(srcto)
                     except Exception as e:
-                        print e, "Unable to copy files from:", src, "to:", os.path.join(self.chrootpath,src)
+                        print e, "\nUnable to create DIR", srcto
+                        pass
+                    try:
+                        shutil.copytree(src, srcto)
+                    except Exception as e:
+                        print e, "\nUnable to copy files from:", src, "to:", srcto
                         pass
             pkipath = "/etc/pki/rpm-gpg"
             pkipath_ch = os.path.join(self.chrootpath, pkipath[1:])
