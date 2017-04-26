@@ -452,7 +452,7 @@ gpgcheck=0
                     src = repo[7:]
                     srcto = os.path.join(self.chrootpath,src[1:])
                     try:
-                        os.makedirs(srcto)
+                        os.makedirs(os.path.dirname(srcto))
                     except Exception as e:
                         print e, "\nUnable to create DIR", srcto
                         pass
