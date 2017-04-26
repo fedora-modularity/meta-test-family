@@ -449,8 +449,8 @@ gpgcheck=0
     #        self.runHost("sed s/enabled=0/enabled=1/ -i %s" % insiderepopath, ignore_status=True)
             for repo in self.repos:
                 if "file:///" in repo:
-                    src = repo[8:]
-                    srcto = os.path.join(self.chrootpath,src)
+                    src = repo[7:]
+                    srcto = os.path.join(self.chrootpath,src[1:])
                     try:
                         os.makedirs(srcto)
                     except Exception as e:
