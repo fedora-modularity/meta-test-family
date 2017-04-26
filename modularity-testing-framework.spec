@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.2.41
+Version:        0.2.42
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -47,6 +47,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Wed Apr 26 2017 Jan Scotka <jscotka@redhat.com> 0.2.42-1
+- dirs are mot created mkdirs function does not exist (jscotka@redhat.com)
+
 * Wed Apr 26 2017 Jan Scotka <jscotka@redhat.com> 0.2.41-1
 - small typo in code of installing packages (jscotka@redhat.com)
 
