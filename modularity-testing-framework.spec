@@ -16,7 +16,6 @@ Requires:       python2-avocado
 Requires:       python2-avocado-plugins-output-html
 Requires:       python-netifaces
 Requires:       docker
-Requires:       docker-distribution
 
 
 %description
