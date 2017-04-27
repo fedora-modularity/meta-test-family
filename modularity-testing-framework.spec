@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.3.1
+Version:        0.3.2
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,11 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Thu Apr 27 2017 Jan Scotka <jscotka@redhat.com> 0.3.2-1
+- added documentation README, and config files repaired few smalled things
+  called autopep8 (jscotka@redhat.com)
+- rewritten part of documentation (jscotka@redhat.com)
+
 * Thu Apr 27 2017 Jan Scotka <jscotka@redhat.com> 0.3.1-1
 - added verbosity, it will be cleaner if you see output somehow
   (jscotka@redhat.com)
