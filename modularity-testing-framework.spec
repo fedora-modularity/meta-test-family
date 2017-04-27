@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.2.46
+Version:        0.2.47
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Thu Apr 27 2017 Jan Scotka <jscotka@redhat.com> 0.2.47-1
+- solved issue with stdout and stderr for nspawn (jscotka@redhat.com)
+
 * Wed Apr 26 2017 Jan Scotka <jscotka@redhat.com> 0.2.46-1
 - version increasion (jscotka@redhat.com)
 - removed active=true it seems that somewthing changed (jscotka@redhat.com)
