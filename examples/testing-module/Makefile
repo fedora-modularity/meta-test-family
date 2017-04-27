@@ -16,6 +16,8 @@ check-minimal-config-rpm:
 check-behave-docker:
 	cd ../memcached-behave; MODULE=docker behave
 
-check: check-rpm
+check: check-rpm check-docker check-minimal-config-rpm
 
 all: check
+
+.PHONY: all

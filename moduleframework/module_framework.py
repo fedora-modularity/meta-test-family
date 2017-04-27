@@ -485,7 +485,7 @@ gpgcheck=0
             """machinectl shell root@{machine} /bin/bash -c "({comm})>{pin}/stdout 2>{pin}/stderr; echo $?>{pin}/retcode" """.format(machine=self.moduleName, comm=command.replace('"', r'\"'),pin=lpath),
             **kwargs)
         b=self.runHost(
-            'cat {chroot}{pin}/stdout; cat {chroot}{pin}/stderr > /dev/stderr; exit `cat {chroot}{pin}/retcode`'.format(chroot = self.chrootpath, pin = lpath), shell = True,verbose = False, **kwargs)
+            'cat {chroot}{pin}/stdout; cat {chroot}{pin}/stderr > /dev/stderr; exit `cat {chroot}{pin}/retcode`'.format(chroot = self.chrootpath, pin = lpath), shell = True, **kwargs)
         comout.stdout=b.stdout
         comout.stderr = b.stderr
         comout.exit_status = b.exit_status
