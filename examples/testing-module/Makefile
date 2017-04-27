@@ -1,4 +1,5 @@
 CMD=python -m avocado run --show-job-log --filter-by-tags=-WIP *.py *.sh
+export MTF_REMOTE_REPOS=yes
 
 check-docker:
 	MODULE=docker $(CMD)

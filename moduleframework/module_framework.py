@@ -480,18 +480,15 @@ gpgcheck=0
         # TODO: workaround because machinedctl is unable to behave like ssh. It is bug
         # systemd-run should be used, but in F-25 it does not contain --wait
         # option
+        lpath="/var/tmp"
         comout = self.runHost(
-            'machinectl shell root@%s /bin/bash -c "%s; RRC=$?; echo; echo EXITCODE $RRC" ' %
-            (self.moduleName, re.sub(r"(exit\s+\d+)", r"echo \1 | bash" , command.replace('"', r'\"'))),
+            """machinectl shell root@{machine} /bin/bash -c "({comm})>{pin}/stdout 2>{pin}/stderr; echo $?>{pin}/retcode" """.format(machine=self.moduleName, comm=command.replace('"', r'\"'),pin=lpath),
             **kwargs)
-        stdout = [x.strip() for x in comout.stdout.split("\n")]
-        stderr = [x.strip() for x in comout.stderr.split("\n")]
-        comout.exit_status = int(stdout[-2].split(" ")[1])
-        comout.stdout = "\n".join(stdout[:-2])
-        comout.stderr = "\n".join(stderr)
-        self.runHost(
-            'bash -c "echo DO NOT CARE of this command, this is workaound for good exit status; exit %d"' %
-            comout.exit_status, **kwargs)
+        b=self.runHost(
+            'cat {chroot}{pin}/stdout; cat {chroot}{pin}/stderr > /dev/stderr; exit `cat {chroot}{pin}/retcode`'.format(chroot = self.chrootpath, pin = lpath), shell = True,verbose = False, **kwargs)
+        comout.stdout=b.stdout
+        comout.stderr = b.stderr
+        comout.exit_status = b.exit_status
         return comout
 
     def selfcheck(self):

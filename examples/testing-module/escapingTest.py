@@ -29,14 +29,21 @@ class SanityCheckApostophes(module_framework.AvocadoTest):
     :avocado: enable
     """
 
-    def test1(self):
+    def testSimpleShell(self):
         self.start()
         self.run("ls /| grep bin")
 
-    def test2(self):
+    def testApostrophesInside(self):
         self.start()
         self.run("echo 'a'")
 
-    def test3(self):
+    def testMoreLevelApostrophes(self):
         self.start()
         self.run("""bash -c 'echo "echo under bash"' """)
+
+    def testStderr(self):
+        self.start()
+        x = self.run("echo a; echo b>/dev/stderr; exit 1",ignore_status=True)
+        self.assertEqual("a",x.stdout.strip())
+        self.assertEqual("b", x.stderr.strip())
+        self.assertEqual(1, x.exit_status)

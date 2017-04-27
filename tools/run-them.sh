@@ -105,6 +105,11 @@ PARAMS="`getparams_int`"
 RESULTTOOLS=$(($RESULTTOOLS+$?))
 export PARAMS
 
+if [ "$RESULTTOOLS" -ne 0 ]; then
+    echo "PREVIOUS TOOLS FAILED, STOP running Tests" > /dev/stderr
+    exit 2
+fi
+
 test "$MODULENAME" = "testmodule" && MODULENAME="testing-module"
 
 if loaddistgittests; then
