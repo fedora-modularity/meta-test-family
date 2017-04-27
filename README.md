@@ -14,6 +14,7 @@
      * Now it just expect to end with `0` return code of command (like: `ls / |grep sbin` directory sbin exists in root dir)
      * It can contain multiple lines
      * It generates python covered bash tests
+     * You has to call `generator` binary explicitly, it then create these pythonish tests with bash inside, *Unittest* doesn not allow to have dynamic tests.
 
  * __Avocado tests__
      * There is wrapper class what helps you to tests modules not focusing on module type
@@ -41,11 +42,28 @@
 
 ## Dependencies
  * base dependencies: ```docker python-pip```
- * python dependencies: avocado-framework yaml json
+ * python dependencies: ```avocado-framework yaml json behave```
 
 ```bash
 dnf -y install docker python-pip
+pip install avocado-framework yaml json behave
 ```
+
+## Enviromental variables
+ * variables allows you to overwrite some values inside `config.yaml`
+  * `CONFIG` file with MTF configuration default is `config.yaml`
+  * `MODULE` which module type to test (in case there is not set `default-module` in config, you **HAVE TO** set it)
+    * `=docker` - uses section *docker* inside config file and will use docker containerisation
+    * `=nspawn` - systemd nspawn, it is lightweight virtualization, it does something like **MOCK** but it is not just chroot, but has own systemd etc.
+    * `=rpm` - testing of local RPM packages directly on HOST (it could be **DESTRUCTIVE**)
+
+  * `URL` see example config. It overwrites value `module.docker.container` or `module.rpm.repo` to whatever you want. It has to be proper type what is set in `MODULE`
+  * `MODULEMDURL` overwrite location of moduleMD file
+  * `COMPOSEURL` overwrite location of compose repo location
+  * `PROFILE` overwrite *default* profile to whatever you want to install instead of that
+  * `MTF_SKIP_DISABLING_SELINUX` In nspawn type on fedora-25 we have to disable selinux, because it does not work well with selinux enabled, this option allows to not do that.
+  * `MTF_DO_NOT_CLEANUP` - Do not cleanup modules between tests, in case there is no interference in your tests you can use it, and it will be **fast**
+  * `MTF_REMOTE_REPOS` - It disables downloading of packages done by koji and creating local repo, it make tests **fast**. (There is issue that composes (repos) are sometimes bad in fedora, unable to use)
 
 ## Schedule Tests
 * Now it is expected to run this __under root__
@@ -57,9 +75,8 @@ dnf -y install docker python-pip
   * __check__ section runs script __run_tests.sh__ which
 * Your __run_tests.sh__ should contain:
     * __Docker based module testing:__ ```MODULE=docker avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py```
-    * __Rpm based module testing:__ ```MODULE=rpm avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py```
-    * You can skip disabling SELinux by setting environment variable `MTF_SKIP_DISABLING_SELINUX`:
-        * `MTF_SKIP_DISABLING_SELINUX=true avocado run ...`
+    * __Repo based module testing:__ ```MODULE=nspawn avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py```
+    * __Host Rpm based module testing:__ ```MODULE=rpm avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py```
     * `make check` -  runs tests in your module directory
 
 ## How to write tests
@@ -77,4 +94,9 @@ dnf -y install docker python-pip
 
 ## Development
  * automatically built packages (untested): https://copr.fedorainfracloud.org/coprs/jscotka/modularity-testing-framework/
- * aa
+
+## How it works
+ * Structure of MTF:
+  * https://pagure.io/modularity-testing-framework/blob/master/f/docs/howitworks.png
+ * Test types:
+  * https://pagure.io/modularity-testing-framework/blob/master/f/docs/TestTypes.png

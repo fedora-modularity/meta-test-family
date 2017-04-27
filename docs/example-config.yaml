@@ -1,27 +1,64 @@
+# identifier of document for modularity testing framework
+# MANDATORY
 document: modularity-testing
+# MANDATORY
 version: 1
+# name of module for testing (it should be same as moduleMD yaml file without extension)
+# MANDATORY
 name: memcached
+# link to default moduleMD file (usefull for local testing wihtout any repo)
+# env var: MODULEMDURL
+# MANDATORY (or compose-url)
 modulemd-url: https://src.fedoraproject.org/cgit/modules/memcached.git/plain/memcached.yaml
-compose-url: url_to_compose_
+# final compose done by pungi (contain also modulemd files for modules) can suppy also previous part
+# env var: COMPOSEURL
+compose-url: url_to_compose_in done in fedora
+# variables what could be used in test
 service:
     port: 11211
+# packages what to install inside module
+# this section can be ommited, and it will install all packages in "default" profile
+# or in case default profile does not exist, it install all packages in section components
 packages:
     rpms:
         - bash
+# also profile could be defined as set of packages
+    profiles:
+        - default
+# packages what will be installed on host machine (for example nc (netcat) for testing if module
+# provides service on port exported to host)
 testdependecies:
     rpms:
         - nc
+# default module type for testing if not set by env variable
+# env var: MODULE   (docker, nspawn, rpm)
 default_module: docker
+# various module types setup and configuration (nspawn = rpm)
+# MANDATORY
 module:
+# for docker container
+# MANDATORY
     docker:
+# run setup/cleanup commands on HOST, for example config manipulation, selinux boolean manipulation
+# there could be used also variables in python style like: {ROOT}, {HOSTNAME} see
+# trans_dict in  file https://pagure.io/modularity-testing-framework/blob/master/f/moduleframework/module_framework.py
         setup: echo Do magic with general config stored on host;
                echo More magic
         cleanup: echo Cleanup magic
+# how to start docker container (bind mounts, selinux relabeling, port mapping etc.)
+# there is (then there is added -d and docker container name, to run at background)
         start: "docker run -it -e CACHE_SIZE=128 -p 11211:11211"
+# labels what will be checked if are properly set in container
         labels:
             description: "memcached is a high-performance, distributed memory"
             io.k8s.description: "memcached is a high-performance, distributed memory"
+# link to default container location, there could be used docker.io registry,
+# tag(gz) archive local path, or docker=cotainer_name for image already imported image
+# env var: URL
+# MANDATORY
         container: docker.io/phracek/memcached
+# rpm section (nspawn) There is similar meaning like docker seciton, but for rpm(nspawn)
+# MANDATORY
     rpm:
         setup: echo Do magic with general config stored on host;
                echo More magic
@@ -29,6 +66,16 @@ module:
         start: /bin/true
         stop: /bin/true
         status: /bin/true
+# link to repo (additiona repos are added via dependencies in moduleMD file), in case you will
+# use "compose", this will be ignored
+# env var: URL
+# MANDATORY
         repo: https://kojipkgs.fedoraproject.org/repos/module-481d2dd61f4ae110/latest/x86_64/
-
+# if you will not use "compose" nor repo, you can use repos, which caused that just mentioned
+# repos will be used, not additional repos from moduleMD file
+# env var: URL
+# OBSOLOTE
+        repos:
+            - https://kojipkgs.fedoraproject.org/repos/module-481d2dd61f4ae110/latest/x86_64/
+            - https://kojipkgs.fedoraproject.org/repos/module-481d2dd61f4ae110/latest/x86_64/
 
