@@ -21,6 +21,12 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
+"""
+MODULE for reading data from compose. There are stored:
+  repos of module
+  module files
+"""
+
 import yaml
 import urllib
 import xml.etree.ElementTree
@@ -34,6 +40,9 @@ MODULEFILE = 'tempmodule.yaml'
 
 
 class ComposeParser():
+    """
+    Class for parsing compose. It expect string as constructor for parsing data
+    """
 
     def __init__(self, compose):
         self.compose = compose
@@ -55,6 +64,10 @@ class ComposeParser():
         os.remove(tmpf[1])
 
     def getModuleList(self):
+        """
+        Return list of all modules in compose
+        :return: list
+        """
         out = []
         for foo in self.modules['modules']:
             out.append({'name': foo['data']['name'], 'stream': foo['data'][
@@ -62,6 +75,12 @@ class ComposeParser():
         return out
 
     def variableListForModule(self, name):
+        """
+        Return list of parameteres for CI's based on compose.
+        Could be used for compose qualification.
+        :param name: name of module what is stored in compose (latest one)
+        :return: list
+        """
         stream = None
         version = None
         thismodule = None

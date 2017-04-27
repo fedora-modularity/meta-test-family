@@ -63,5 +63,6 @@ class RpmValidation(module_framework.AvocadoTest):
         for directory in self.fhs_base_paths:
             self.run("test -d %s" % directory)
 
+
 if __name__ == '__main__':
     main()

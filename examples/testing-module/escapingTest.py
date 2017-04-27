@@ -43,7 +43,7 @@ class SanityCheckApostophes(module_framework.AvocadoTest):
 
     def testStderr(self):
         self.start()
-        x = self.run("echo a; echo b>/dev/stderr; exit 1",ignore_status=True)
-        self.assertEqual("a",x.stdout.strip())
+        x = self.run("echo a; echo b>/dev/stderr; exit 1", ignore_status=True)
+        self.assertEqual("a", x.stdout.strip())
         self.assertEqual("b", x.stderr.strip())
         self.assertEqual(1, x.exit_status)

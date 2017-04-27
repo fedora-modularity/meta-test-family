@@ -62,6 +62,7 @@ class Module(module_framework.CommonFunctions):
             (self.rpmsinstalled, " ".join(localfiles)))
         print("file://%s" % self.rpmsrepo)
 
+
 m = Module()
 m.CreateLocalRepo()
 m.CreateContainer()

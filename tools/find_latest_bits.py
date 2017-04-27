@@ -65,6 +65,7 @@ class FedMsgParser():
         output.append("MODULE=rpm")
         return output
 
+
 parser = OptionParser()
 parser.add_option(
     "-f",

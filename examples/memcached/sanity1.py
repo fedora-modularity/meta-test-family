@@ -54,5 +54,6 @@ class SanityCheck1(module_framework.AvocadoTest):
         self.start()
         self.run("gcc -v")
 
+
 if __name__ == '__main__':
     main()

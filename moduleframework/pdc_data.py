@@ -21,6 +21,13 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
+"""
+Module for PDC (Product definition Handling)
+Construct repos
+Download and create local repos
+Construct parameters for automatization (CIs)
+"""
+
 import yaml
 import os
 import json
@@ -35,18 +42,37 @@ PDCURL = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
 
 
 class PDCParser():
+    """
+    Class for parsing PDC data via some setters line setFullVersion, setViaFedMsg, setLatestPDC
+    """
 
     def __getDataFromPdc(self):
+        """
+        Internal method, do not use it
+        :return: None
+        """
         PDC = "%s/?variant_name=%s&variant_version=%s&variant_release=%s" % (
             PDCURL, self.name, self.stream, self.version)
         self.pdcdata = json.load(urllib.urlopen(PDC))["results"][-1]
 
     def setFullVersion(self, nvr):
+        """
+        Set parameters of class via name-stream-version string
+        Taskotron uses this format
+        :param nvr:
+        :return: None
+        """
         self.name, self.stream, self.version = re.search(
             "(.*)-(.*)-(.*)", nvr).groups()
         self.__getDataFromPdc()
 
     def setViaFedMsg(self, yamlinp):
+        """
+        Sets parameters via RAW fedora message from message bus
+        used by internal CI
+        :param yamlinp: yaml input string
+        :return:
+        """
         raw = yaml.load(yamlinp)
         self.name = raw["msg"]["name"]
         self.stream = raw["msg"]["stream"]
@@ -54,17 +80,33 @@ class PDCParser():
         self.__getDataFromPdc()
 
     def setLatestPDC(self, name, stream="master", version=""):
+        """
+        Most flexible method how to set name stream version for search
+        :param name: name of module
+        :param stream: optional
+        :param version: optional
+        :return:
+        """
         self.name = name
         self.stream = stream
         self.version = version
         self.__getDataFromPdc()
 
     def generateRepoUrl(self):
+        """
+        Return string of generated repository located on fedora koji
+        :return: str
+        """
         rpmrepo = "http://kojipkgs.fedoraproject.org/repos/%s/latest/%s" % (
             self.pdcdata["koji_tag"], ARCH)
         return rpmrepo
 
     def generateModuleMDFile(self):
+        """
+        Store moduleMD file locally from PDC to tempmodule.yaml file
+        It should not be used ouside this library.
+        :return: str url of file
+        """
         omodulefile = "tempmodule.yaml"
         mdfile = open(omodulefile, mode="w")
         mdfile.write(self.pdcdata["modulemd"])
@@ -72,6 +114,11 @@ class PDCParser():
         return "file://%s" % os.path.abspath(omodulefile)
 
     def generateParams(self):
+        """
+        Return list of params what has to be set for automation like:
+        MODULE=nspawn MODULEMDURL=file:///...  URL=kojirepo
+        :return: list
+        """
         output = []
         output.append("URL=%s" % self.generateRepoUrl())
         output.append("MODULEMDURL=%s" % self.generateModuleMDFile())
@@ -79,6 +126,11 @@ class PDCParser():
         return output
 
     def createLocalRepoFromKoji(self):
+        """
+        Return string of generated repository located LOCALLY
+        It downloads all tagged packages and creates repo via createrepo
+        :return: str
+        """
         utils.process.run("dnf -y install createrepo koji", ignore_status=True)
         dirname = "localrepo_%s_%s_%s" % (self.name, self.stream, self.version)
         absdir = os.path.abspath(dirname)
@@ -95,8 +147,9 @@ class PDCParser():
                         utils.process.run(
                             "cd %s; koji download-build %s  -a %s -a noarch" %
                             (absdir, pkgbouid, ARCH), shell=True)
-                    except:
-                        print >> sys.stderr, 'UNABLE TO DOWNLOAD:', "cd %s; koji download-build %s  -a %s -a noarch" % (absdir, pkgbouid, ARCH)
+                    except BaseException:
+                        print >> sys.stderr, 'UNABLE TO DOWNLOAD:', "cd %s; koji download-build %s  -a %s -a noarch" % (
+                            absdir, pkgbouid, ARCH)
                         pass
             utils.process.run(
                 "cd %s; createrepo -v %s" %
@@ -104,6 +157,11 @@ class PDCParser():
         return "file://%s" % absdir
 
     def generateParamsLocalKojiPkgs(self):
+        """
+        Return list of params what has to be set for automation like (local repo):
+        MODULE=nspawn MODULEMDURL=file:///...  URL=file:///localrepo
+        :return: list
+        """
         output = []
         output.append("URL=%s" % self.createLocalRepoFromKoji())
         output.append("MODULEMDURL=%s" % self.generateModuleMDFile())

@@ -71,7 +71,7 @@ class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
     def _get_all_installed_pkgs(self):
         try:
             cmd_result = self.run("rpm -qa --qf='%{name}\n'")
-        except:
+        except BaseException:
             self.error("Could not get all installed packages")
         output_list = cmd_result.stdout.split("\n")
         # remove empty string from the list
@@ -119,7 +119,7 @@ class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
         try:
             with open(all_installed_pkgs_path) as f:
                 expected_pkgs = f.read().splitlines()
-        except:
+        except BaseException:
             self.error("Could not read the expected installed packages list")
 
         if not expected_pkgs:
@@ -185,18 +185,18 @@ class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
         dest_path = "/tmp/os_release.sh"
         try:
             self.copyTo(test_path, dest_path)
-        except:
+        except BaseException:
             self.error("Could not copy test file from %s to module %s" %
                        (test_path, dest_path))
 
         try:
             self.run(dest_path)
-        except:
+        except BaseException:
             self.error("%s failed" % dest_path)
 
         try:
             self.run("rm -f %s" % dest_path)
-        except:
+        except BaseException:
             self.error("Could not delete %s" % dest_path)
 
     def test_glibc_i18n(self):
@@ -255,7 +255,7 @@ class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
             if install_package:
                 try:
                     self.run("microdnf install %s" % lang["pkg"])
-                except:
+                except BaseException:
                     self.error("Could not install %s" % lang["pkg"])
 
             for cmd in lang["cmds"].keys():
@@ -271,7 +271,7 @@ class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
             if install_package:
                 try:
                     self.run("microdnf remove %s" % lang["pkg"])
-                except:
+                except BaseException:
                     self.error("Could not remove %s" % lang["pkg"])
 
     def _prepare_compiler_test_directory(self):
@@ -336,7 +336,7 @@ class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
 
         try:
             self.copyTo("%s/." % self.compiler_test_dir, mod_compiler_test_dir)
-        except:
+        except BaseException:
             self.error("Could not copy test files from %s to module %s" %
                        (self.compiler_test_dir, mod_compiler_test_dir))
 
@@ -369,6 +369,7 @@ class BaseRuntimeSmokeTest(module_framework.AvocadoTest):
         super(self.__class__, self).tearDown()
 
         self._cleanup_compiler_test_directory()
+
 
 if __name__ == "__main__":
     main()

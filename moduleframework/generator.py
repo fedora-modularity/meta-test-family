@@ -62,8 +62,8 @@ class GeneratedTestsConfig(module_framework.AvocadoTest):
         self.start()
 """ % testname
         for line in testlines:
-            self.output = self.output + \
-                """        self.%s("%s")\n""" % (method, line.replace('"', r'\"'))
+            self.output = self.output + """        self.%s("%s")\n""" % (
+                method, line.replace('"', r'\"'))
         print "Added test (runmethod: %s): %s" % (method, testname)
 
 
@@ -72,6 +72,7 @@ def main():
     configout = open('generated.py', 'w')
     configout.write(config.output)
     configout.close()
+
 
 if __name__ == '__main__':
     main()

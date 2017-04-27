@@ -31,7 +31,7 @@ def before_scenario(context, scenario):
 def after_scenario(context, scenario):
     try:
         context.socket.close()
-    except:
+    except BaseException:
         pass
     context.backend.tearDown()
 

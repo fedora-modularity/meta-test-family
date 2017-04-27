@@ -29,6 +29,7 @@ class microDNFTest(module_framework.AvocadoTest):
     """
     :avocado: enable
     """
+
     def setUp(self):
         super(self.__class__, self).setUp()
         if self.moduleType != "nspawn":
@@ -41,4 +42,8 @@ class microDNFTest(module_framework.AvocadoTest):
 
     def testInstallMicroDNFEmpty(self):
         self.start()
-        self.assertIn("Transaction: (empty)",self.run("microdnf install microdnf", ignore_status=True).stdout)
+        self.assertIn(
+            "Transaction: (empty)",
+            self.run(
+                "microdnf install microdnf",
+                ignore_status=True).stdout)
