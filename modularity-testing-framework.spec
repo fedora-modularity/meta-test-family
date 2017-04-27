@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.3.3
+Version:        0.3.4
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Thu Apr 27 2017 Jan Scotka <jscotka@redhat.com> 0.3.4-1
+- added value to Makefile of testing module (jscotka@redhat.com)
+
 * Thu Apr 27 2017 Jan Scotka <jscotka@redhat.com> 0.3.3-1
 - missing brackets for functions. causing bad output (jscotka@redhat.com)
 
