@@ -620,7 +620,7 @@ class NspawnHelper(RpmHelper):
         Internal method, do not use it anyhow
         :return: None
         """
-        if get_if_cleanup and os.path.exists(self.chrootpath):
+        if get_if_do_cleanup() and os.path.exists(self.chrootpath):
             shutil.rmtree(self.chrootpath, ignore_errors=True)
             os.mkdir(self.chrootpath)
         try:
@@ -1126,13 +1126,13 @@ def get_latest_repo_url(wmodule="base-runtime", wstream="master", fake=False):
     else:
         localrepo = pdc_data.PDCParser()
         localrepo.setLatestPDC(wmodule, wstream)
-        if get_if_remoterepos:
+        if get_if_remoterepos():
             return localrepo.generateRepoUrl()
         else:
             return localrepo.createLocalRepoFromKoji()
 
 
-def get_if_cleanup():
+def get_if_do_cleanup():
     """
     Returns boolean value in case variable is set.
      It is used internally in code
