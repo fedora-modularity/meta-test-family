@@ -662,7 +662,7 @@ baseurl=%s
 enabled=1
 gpgcheck=0
 
-    """ % (self.moduleName, counter, self.moduleName, counter, repo)
+""" % (self.moduleName, counter, self.moduleName, counter, repo)
                 f.write(add)
             f.close()
 
@@ -690,7 +690,7 @@ gpgcheck=0
                 pass
             for filename in glob.glob(os.path.join(pkipath, '*')):
                 shutil.copy(filename, pkipath_ch)
-
+            print "repo prepared for mocrodnf:",insiderepopath,"\n", open(insiderepopath, 'r').read()
         nspawncont = utils.process.SubProcess(
             "systemd-nspawn --machine=%s -bD %s" %
             (self.moduleName, self.chrootpath))
