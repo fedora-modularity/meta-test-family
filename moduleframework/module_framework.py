@@ -384,10 +384,15 @@ class RpmHelper(CommonFunctions):
         self.info = self.config['module']['rpm']
         self.alldrepos = []
         try:
-            repositories = self.getModulemdYamlconfig(
+            xxx = self.getModulemdYamlconfig(
             )["data"]["dependencies"]["requires"]
+            for x in xxx:
+                pdc = pdc_data.PDCParser()
+                pdc.setLatestPDC(x, xxx[x])
+                xxx.update(pdc.generateDepModules())
+            repositories = xxx
         except BaseException:
-            repositories = []
+            repositories = {}
             pass
         for dep in repositories:
             self.alldrepos.append(get_latest_repo_url(dep, repositories[dep]))

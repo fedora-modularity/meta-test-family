@@ -133,6 +133,20 @@ class PDCParser():
         output.append("MODULE=%s" % "nspawn")
         return output
 
+    def generateDepModules(self):
+        x = yaml.load(self.pdcdata["modulemd"])
+        out = {}
+        try:
+            deps = x["data"]["dependencies"]["requires"]
+            for dep in deps:
+                a = PDCParser()
+                a.setLatestPDC(dep, deps[dep])
+                out.update(a.generateDepModules())
+            out.update(deps)
+        except:
+            out = {}
+        return out
+
     def createLocalRepoFromKoji(self):
         """
         Return string of generated repository located LOCALLY
