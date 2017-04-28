@@ -121,21 +121,31 @@ class CommonFunctions(object):
         self.source = self.config.get('source') if self.config.get(
             'source') else self.config['module']['rpm'].get('source')
 
-    def getPackageList(self):
+    def getPackageList(self,profile=None):
         """
         Return list of packages what has to be installed inside module
+        :param profile: get list for intended profile instead of default method for searching
         :return: list of packages (rpms)
         """
         out = []
-        if 'packages' in self.config:
-            packages_rpm = self.config['packages'].get('rpms') if self.config[
-                'packages'].get('rpms') else []
-            packages_profiles = []
-            for x in self.config['packages'].get('profiles') if self.config[
-                    'packages'].get('profiles') else []:
-                packages_profiles = packages_profiles + \
-                    self.getModulemdYamlconfig()['data']['profiles'][x]['rpms']
-            out = out + packages_rpm + packages_profiles
+        if not profile:
+            if 'packages' in self.config:
+                packages_rpm = self.config['packages'].get('rpms') if self.config[
+                    'packages'].get('rpms') else []
+                packages_profiles = []
+                for x in self.config['packages'].get('profiles') if self.config[
+                        'packages'].get('profiles') else []:
+                    packages_profiles = packages_profiles + \
+                        self.getModulemdYamlconfig()['data']['profiles'][x]['rpms']
+                out += packages_rpm + packages_profiles
+
+            elif self.getModulemdYamlconfig()['data'].get('profiles') and self.getModulemdYamlconfig()['data']['profiles'].get(get_correct_profile()):
+                out += self.getModulemdYamlconfig()['data']['profiles'][get_correct_profile()]['rpms']
+            else:
+                # fallback solution when it is not known what to install
+                out.append("bash")
+        else:
+            out += self.getModulemdYamlconfig()['data']['profiles'][profile]['rpms']
         print "PCKGs to install inside module:", out
         return out
 
@@ -403,16 +413,7 @@ class RpmHelper(CommonFunctions):
             pass
         for dep in repositories:
             self.alldrepos.append(get_latest_repo_url(dep, repositories[dep]))
-        if self.getPackageList():
-            self.whattoinstallrpm = " ".join(self.getPackageList())
-        elif self.getModulemdYamlconfig()['data'].get('profiles') and self.getModulemdYamlconfig()['data']['profiles'].get(get_correct_profile()):
-            self.whattoinstallrpm = " ".join(
-                self.getModulemdYamlconfig()['data']['profiles'][
-                    get_correct_profile()]['rpms'])
-        else:
-            self.whattoinstallrpm = " ".join(
-                self.getModulemdYamlconfig()['data']['components']['rpms'])
-
+        self.whattoinstallrpm = " ".join(self.getPackageList())
         if get_correct_url():
             self.repos = [get_correct_url()] + self.alldrepos
         elif self.info.get('repo'):
@@ -690,9 +691,9 @@ gpgcheck=0
             for filename in glob.glob(os.path.join(pkipath, '*')):
                 shutil.copy(filename, pkipath_ch)
 
-            nspawncont = utils.process.SubProcess(
-                "systemd-nspawn --machine=%s -bD %s" %
-                (self.moduleName, self.chrootpath))
+        nspawncont = utils.process.SubProcess(
+            "systemd-nspawn --machine=%s -bD %s" %
+            (self.moduleName, self.chrootpath))
         nspawncont.start()
         time.sleep(15)
 
