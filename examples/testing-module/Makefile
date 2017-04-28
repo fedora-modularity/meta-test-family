@@ -1,4 +1,4 @@
-CMD=python -m avocado run --show-job-log --filter-by-tags=-WIP *.py *.sh
+CMD=python -m avocado run --filter-by-tags=-WIP *.py *.sh
 export MTF_REMOTE_REPOS=yes
 export MTF_DO_NOT_CLEANUP=yes
 

@@ -46,6 +46,12 @@ if __name__ == '__main__':
         action="store_true",
         default=False,
         help="generate local repository based on koji tag from PDC")
+    parser.add_option(
+        "--commit",
+        dest="commit",
+        action="store_true",
+        default=False,
+        help="print git commit hash of exact version of module")
 
     a = PDCParser()
     (options, args) = parser.parse_args()
@@ -58,12 +64,14 @@ if __name__ == '__main__':
         stdinput = "".join(flh.readlines()).strip()
         flh.close()
         a.setViaFedMsg(stdinput)
-        print " ".join(getattr(a, callfnc)())
     elif options.release:
         a.setFullVersion(options.release)
-        print " ".join(getattr(a, callfnc)())
     elif options.latest:
         a.setLatestPDC(options.latest)
-        print " ".join(getattr(a, callfnc)())
     else:
         raise Exception(parser.print_help())
+
+    if options.commit:
+        print a.generateGitHash()
+    else:
+        print " ".join(getattr(a, callfnc)())

@@ -51,12 +51,13 @@ export AVOCADOCMD="avocado run --xunit $XUFILE"
 export RESULTTOOLS=0
 
 function getparams_int(){
+    ADDIT="$1"
     if [ "$PARSEITEMTYPE" = "" -o "$PARSEITEMTYPE" = "fedmsg" ]; then
-        python $MTF_PATH/tools/taskotron-msg-reader.py -f $PARSEITEM --localrepo
-    elif [ "$PARSEITEMTYPE" = "compose" ]; then
-        python $MTF_PATH/tools/compose_info_parser.py -c $PARSEITEM -m $MODULENAME
+        python $MTF_PATH/tools/taskotron-msg-reader.py -f $PARSEITEM --localrepo $ADDIT
     elif [ "$PARSEITEMTYPE" = "taskotron" -o "$PARSEITEMTYPE" = "pdc" ]; then
-        python $MTF_PATH/tools/taskotron-msg-reader.py -r $PARSEITEM --localrepo
+        python $MTF_PATH/tools/taskotron-msg-reader.py -r $PARSEITEM --localrepo $ADDIT
+    elif [ -z $ADDIT -a "$PARSEITEMTYPE" = "compose" ]; then
+        python $MTF_PATH/tools/compose_info_parser.py -c $PARSEITEM -m $MODULENAME
     fi
 }
 
@@ -69,6 +70,10 @@ function inst_env(){
 
 function loaddistgittests(){
     fedpkg_alt clone --anonymous modules/$MODULENAME
+    (
+        cd $MODULENAME
+        git reset `getparams_int --commit`
+    )
     test -f $MODULENAME/tests/Makefile
 }
 

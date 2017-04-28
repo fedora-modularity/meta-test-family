@@ -98,6 +98,17 @@ class PDCParser():
             self.pdcdata["koji_tag"], ARCH)
         return rpmrepo
 
+    def generateGitHash(self):
+        """
+        Return string of generated commit hash fopr git, to switch to proper test version
+        :return: str
+        """
+        try:
+            return self.pdcdata["scmurl"].split("#")[1]
+        except BaseException:
+            return "master"
+
+
     def generateModuleMDFile(self):
         """
         Store moduleMD file locally from PDC to tempmodule.yaml file
