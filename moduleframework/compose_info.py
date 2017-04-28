@@ -33,10 +33,8 @@ import xml.etree.ElementTree
 import gzip
 import tempfile
 import os
+from common import *
 
-ARCH = "x86_64"
-REPOMD = "repodata/repomd.xml"
-MODULEFILE = 'tempmodule.yaml'
 
 
 class ComposeParser():

@@ -33,12 +33,9 @@ import os
 import json
 import urllib
 import re
-import sys
 from avocado import utils
-import shutil
+from common import *
 
-ARCH = "x86_64"
-PDCURL = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
 
 
 class PDCParser():
@@ -107,7 +104,7 @@ class PDCParser():
         It should not be used ouside this library.
         :return: str url of file
         """
-        omodulefile = "tempmodule.yaml"
+        omodulefile = MODULEFILE
         mdfile = open(omodulefile, mode="w")
         mdfile.write(self.pdcdata["modulemd"])
         mdfile.close()
@@ -142,14 +139,14 @@ class PDCParser():
                     "koji list-tagged --quiet %s" % self.pdcdata["koji_tag"]).stdout.split("\n"):
                 pkgbouid = foo.strip().split(" ")[0]
                 if len(pkgbouid) > 4:
-                    print >> sys.stderr, "DOWNLOADING:", foo
+                    print_info("DOWNLOADING: %s" % foo)
                     try:
                         utils.process.run(
                             "cd %s; koji download-build %s  -a %s -a noarch" %
                             (absdir, pkgbouid, ARCH), shell=True)
                     except BaseException:
-                        print >> sys.stderr, 'UNABLE TO DOWNLOAD:', "cd %s; koji download-build %s  -a %s -a noarch" % (
-                            absdir, pkgbouid, ARCH)
+                        print_info('UNABLE TO DOWNLOAD:', "cd %s; koji download-build %s  -a %s -a noarch" % (
+                            absdir, pkgbouid, ARCH))
                         pass
             utils.process.run(
                 "cd %s; createrepo -v %s" %

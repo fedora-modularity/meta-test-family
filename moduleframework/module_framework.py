@@ -35,36 +35,15 @@ import yaml
 import json
 import time
 import urllib
-import logging
 import glob
-import netifaces
-import socket
 from avocado import Test
 from avocado import utils
 from avocado.core import exceptions
 from avocado.utils import service
 from compose_info import ComposeParser
 import pdc_data
+from common import *
 
-
-LOGPARAMS = logging.getLogger('params')
-
-defroutedev = netifaces.gateways().get('default').values(
-)[0][1] if netifaces.gateways().get('default') else "lo"
-hostipaddr = netifaces.ifaddresses(defroutedev)[2][0]['addr']
-hostname = socket.gethostname()
-dusername = "test"
-dpassword = "test"
-ddatabase = "basic"
-# translation table for config.yaml files syntax is {VARIABLE} in config file
-trans_dict = {"HOSTIPADDR": hostipaddr,
-              "DEFROUTE": defroutedev,
-              "HOSTNAME": hostname,
-              "ROOT": "/",
-              "USER": dusername,
-              "PASSWORD": dpassword,
-              "DATABASENAME": ddatabase
-              }
 
 
 def skipTestIf(value, text="Test not intended for this module profile"):
@@ -146,7 +125,7 @@ class CommonFunctions(object):
                 out.append("bash")
         else:
             out += self.getModulemdYamlconfig()['data']['profiles'][profile]['rpms']
-        print "PCKGs to install inside module:", out
+        print_info("PCKGs to install inside module:", out)
         return out
 
     def getModulemdYamlconfig(self, urllink=None):
@@ -322,8 +301,7 @@ class ContainerHelper(CommonFunctions):
                 self.runHost("docker stop %s" % self.docker_id)
                 self.runHost("docker rm %s" % self.docker_id)
             except Exception as e:
-                print e
-                print "docker already removed"
+                print_info(e, "docker already removed")
                 pass
 
     def status(self):
@@ -650,7 +628,7 @@ class NspawnHelper(RpmHelper):
             try:
                 os.makedirs(os.path.dirname(insiderepopath))
             except Exception as e:
-                print e
+                print_info(e)
                 pass
             counter = 0
             f = open(insiderepopath, 'w')
@@ -675,12 +653,12 @@ gpgcheck=0
                     try:
                         os.makedirs(os.path.dirname(srcto))
                     except Exception as e:
-                        print e, "\nUnable to create DIR", srcto
+                        print_info(e, "Unable to create DIR", srcto)
                         pass
                     try:
                         shutil.copytree(src, srcto)
                     except Exception as e:
-                        print e, "\nUnable to copy files from:", src, "to:", srcto
+                        print_info(e, "Unable to copy files from:", src, "to:", srcto)
                         pass
             pkipath = "/etc/pki/rpm-gpg"
             pkipath_ch = os.path.join(self.chrootpath, pkipath[1:])
@@ -690,7 +668,7 @@ gpgcheck=0
                 pass
             for filename in glob.glob(os.path.join(pkipath, '*')):
                 shutil.copy(filename, pkipath_ch)
-            print "repo prepared for mocrodnf:",insiderepopath,"\n", open(insiderepopath, 'r').read()
+            print_info("repo prepared for mocrodnf:", insiderepopath, open(insiderepopath, 'r').read())
         nspawncont = utils.process.SubProcess(
             "systemd-nspawn --machine=%s -bD %s" %
             (self.moduleName, self.chrootpath))
@@ -819,7 +797,7 @@ class AvocadoTest(Test):
         """
         (self.backend, self.moduleType) = get_correct_backend()
         self.moduleProfile = get_correct_profile()
-        LOGPARAMS.info(
+        print_info(
             "Module Type: %s; Profile: %s" %
             (self.moduleType, self.moduleProfile))
         return self.backend.setUp()
@@ -962,7 +940,7 @@ class ContainerAvocadoTest(AvocadoTest):
             try:
                 self.tearDown()
             except Exception as e:
-                print e
+                print_info(e)
                 pass
             self.skip("Docker specific test")
 
