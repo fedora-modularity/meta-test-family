@@ -1128,4 +1128,4 @@ def get_if_remoterepos():
     :return: bool
     """
     rreps = os.environ.get('MTF_REMOTE_REPOS')
-    return not bool(rreps)
+    return bool(rreps)
