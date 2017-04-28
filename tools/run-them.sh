@@ -128,10 +128,10 @@ TESTRESULT=$?
 
 if [ "$RESULTTOOLS" -ne 0 ]; then
     exit 2
-elif [ "$TESTRESULT" = "1" ]; then
-    exit 125
-elif [ "$TESTRESULT" -gt 1 ]; then
-    exit $TESTRESULT
-else
+fi
+
+if [ "$TESTRESULT" -eq 0 ]; then
     exit 0
+else
+    exit 125
 fi
