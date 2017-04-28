@@ -609,7 +609,7 @@ class NspawnHelper(RpmHelper):
             os.mkdir(self.chrootpath)
         try:
             self.runHost("machinectl poweroff %s" % self.moduleName)
-            time.sleep(10)
+            time.sleep(20)
         except BaseException:
             pass
         if not os.path.exists(os.path.join(self.chrootpath, "usr")):
@@ -728,8 +728,8 @@ gpgcheck=0
         :return: None
         """
         self.runHost(
-            "cp %s %s/%s" %
-            (src, self.chrootpath, dest))
+            " machinectl copy-to  %s %s %s" %
+            (self.moduleName, src, dest))
 
     def copyFrom(self, src, dest):
         """
@@ -739,8 +739,8 @@ gpgcheck=0
         :return: None
         """
         self.runHost(
-            "cp %s/%s %s" %
-            (self.chrootpath, src, dest))
+            " machinectl copy-from  %s %s %s" %
+            (self.moduleName, src, dest))
 
     def tearDown(self):
         """
