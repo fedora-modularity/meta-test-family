@@ -43,6 +43,7 @@ from avocado.utils import service
 from compose_info import ComposeParser
 import pdc_data
 from common import *
+from timeoutlib import Retry
 
 
 
@@ -279,16 +280,22 @@ class ContainerHelper(CommonFunctions):
                     (args, self.jmeno, command), shell=True).stdout
             self.docker_id = self.docker_id.strip()
             if self.getPackageList():
-                self.run(
+                a = self.run(
                     "dnf -y install %s" %
                     " ".join(
                         self.getPackageList()),
-                    ignore_status=True)
-                self.run(
+                    ignore_status=True, verbose=False)
+                b = self.run(
                     "microdnf -y install %s" %
                     " ".join(
                         self.getPackageList()),
-                    ignore_status=True)
+                    ignore_status=True, verbose=False)
+                if a.exit_status == 0:
+                    print_info("Packages installed via dnf", a.stdout)
+                elif b.exit_status == 0:
+                    print_info("Packages installed via dnf", b.stdout)
+                else:
+                    print_info("Nothing installed (nor via DNF nor microDNF), but package list is not empty", self.getPackageList())
         self.docker_id = self.docker_id.strip()
 
     def stop(self):
@@ -301,7 +308,7 @@ class ContainerHelper(CommonFunctions):
                 self.runHost("docker stop %s" % self.docker_id)
                 self.runHost("docker rm %s" % self.docker_id)
             except Exception as e:
-                print_info(e, "docker already removed")
+                print_debug(e, "docker already removed")
                 pass
 
     def status(self):
@@ -470,7 +477,7 @@ gpgcheck=0
             raise Exception(
                 "ERROR: Unable to install packages %s from repositories \n%s\n original exeption:\n%s\n" %
                 (self.whattoinstallrpm,
-                 utils.process.run(
+                 self.runHost(
                      "cat %s" %
                      self.yumrepo).stdout,
                     e))
@@ -483,9 +490,10 @@ gpgcheck=0
         """
         try:
             if 'status' in self.info and self.info['status']:
-                self.runHost(self.info['status'], shell=True)
+                a = self.runHost(self.info['status'], shell=True, verbose=False)
             else:
-                self.runHost("%s" % command, shell=True)
+                a = self.runHost("%s" % command, shell=True, verbose=False)
+            print_debug("command:",a.command ,"stdout:",a.stdout, "stderr:", a.stderr)
             return True
         except BaseException:
             return False
@@ -608,8 +616,8 @@ class NspawnHelper(RpmHelper):
             shutil.rmtree(self.chrootpath, ignore_errors=True)
             os.mkdir(self.chrootpath)
         try:
-            self.runHost("machinectl poweroff %s" % self.moduleName)
-            time.sleep(20)
+            self.runHost("machinectl terminate %s" % self.moduleName)
+            time.sleep(5)
         except BaseException:
             pass
         if not os.path.exists(os.path.join(self.chrootpath, "usr")):
@@ -633,7 +641,7 @@ class NspawnHelper(RpmHelper):
             try:
                 os.makedirs(os.path.dirname(insiderepopath))
             except Exception as e:
-                print_info(e)
+                print_debug(e)
                 pass
             counter = 0
             f = open(insiderepopath, 'w')
@@ -658,12 +666,12 @@ gpgcheck=0
                     try:
                         os.makedirs(os.path.dirname(srcto))
                     except Exception as e:
-                        print_info(e, "Unable to create DIR", srcto)
+                        print_debug(e, "Unable to create DIR (already created)", srcto)
                         pass
                     try:
                         shutil.copytree(src, srcto)
                     except Exception as e:
-                        print_info(e, "Unable to copy files from:", src, "to:", srcto)
+                        print_debug(e, "Unable to copy files from:", src, "to:", srcto)
                         pass
             pkipath = "/etc/pki/rpm-gpg"
             pkipath_ch = os.path.join(self.chrootpath, pkipath[1:])
@@ -674,11 +682,14 @@ gpgcheck=0
             for filename in glob.glob(os.path.join(pkipath, '*')):
                 shutil.copy(filename, pkipath_ch)
             print_info("repo prepared for mocrodnf:", insiderepopath, open(insiderepopath, 'r').read())
-        nspawncont = utils.process.SubProcess(
-            "systemd-nspawn --machine=%s -bD %s" %
-            (self.moduleName, self.chrootpath))
-        nspawncont.start()
-        time.sleep(15)
+
+        @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, delay=15)
+        def tempfnc():
+            nspawncont = utils.process.SubProcess(
+                "systemd-nspawn --machine=%s -bD %s" %
+                (self.moduleName, self.chrootpath))
+            nspawncont.start()
+        tempfnc()
 
     def run(self, command="ls /", **kwargs):
         """
@@ -729,7 +740,7 @@ gpgcheck=0
         """
         self.runHost(
             " machinectl copy-to  %s %s %s" %
-            (self.moduleName, src, dest))
+            (self.moduleName, src, dest), timeout = DEFAULTPROCESSTIMEOUT)
 
     def copyFrom(self, src, dest):
         """
@@ -740,7 +751,7 @@ gpgcheck=0
         """
         self.runHost(
             " machinectl copy-from  %s %s %s" %
-            (self.moduleName, src, dest))
+            (self.moduleName, src, dest), timeout = DEFAULTPROCESSTIMEOUT)
 
     def tearDown(self):
         """
@@ -945,7 +956,7 @@ class ContainerAvocadoTest(AvocadoTest):
             try:
                 self.tearDown()
             except Exception as e:
-                print_info(e)
+                print_debug(e)
                 pass
             self.skip("Docker specific test")
 

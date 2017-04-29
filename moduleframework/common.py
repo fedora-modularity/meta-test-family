@@ -30,6 +30,7 @@ It provides some general functions
 import sys
 import netifaces
 import socket
+import os
 
 defroutedev = netifaces.gateways().get('default').values(
 )[0][1] if netifaces.gateways().get('default') else "lo"
@@ -52,7 +53,14 @@ ARCH = "x86_64"
 PDCURL = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
 REPOMD = "repodata/repomd.xml"
 MODULEFILE = 'tempmodule.yaml'
+# default value of process timeout in sec
+DEFAULTPROCESSTIMEOUT = 10*600
+DEFAULTRETRYCOUNT = 3
+# time in seconds
+DEFAULTRETRYTIMEOUT = 30
 
+def is_debug():
+    return bool(os.environ.get("DEBUG"))
 
 def print_info(*args):
     """
@@ -70,5 +78,5 @@ def print_debug(*args):
     :param args: object
     :return: None
     """
-    if os.environ.get("DEBUG"):
+    if is_debug():
         print_info(*args)

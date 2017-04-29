@@ -51,19 +51,21 @@ pip install avocado-framework yaml json behave
 
 ## Enviromental variables
  * variables allows you to overwrite some values inside `config.yaml`
+  * `DEBUG` Enable debugging output to test output
   * `CONFIG` file with MTF configuration default is `config.yaml`
   * `MODULE` which module type to test (in case there is not set `default-module` in config, you **HAVE TO** set it)
-    * `=docker` - uses section *docker* inside config file and will use docker containerisation
-    * `=nspawn` - systemd nspawn, it is lightweight virtualization, it does something like **MOCK** but it is not just chroot, but has own systemd etc.
-    * `=rpm` - testing of local RPM packages directly on HOST (it could be **DESTRUCTIVE**)
+    * `=docker` uses section *docker* inside config file and will use docker containerisation
+    * `=nspawn` systemd nspawn, it is lightweight virtualization, it does something like **MOCK** but it is not just chroot, but has own systemd etc.
+    * `=rpm` testing of local RPM packages directly on HOST (it could be **DESTRUCTIVE**)
 
   * `URL` see example config. It overwrites value `module.docker.container` or `module.rpm.repo` to whatever you want. It has to be proper type what is set in `MODULE`
   * `MODULEMDURL` overwrite location of moduleMD file
   * `COMPOSEURL` overwrite location of compose repo location
   * `PROFILE` overwrite *default* profile to whatever you want to install instead of that
   * `MTF_SKIP_DISABLING_SELINUX` In nspawn type on fedora-25 we have to disable selinux, because it does not work well with selinux enabled, this option allows to not do that.
-  * `MTF_DO_NOT_CLEANUP` - Do not cleanup modules between tests, in case there is no interference in your tests you can use it, and it will be **fast**
-  * `MTF_REMOTE_REPOS` - It disables downloading of packages done by koji and creating local repo, it make tests **fast**. (There is issue that composes (repos) are sometimes bad in fedora, unable to use)
+  * `MTF_DO_NOT_CLEANUP` Do not cleanup modules between tests, in case there is no interference in your tests you can use it, and it will be **fast**
+  * `MTF_REMOTE_REPOS` It disables downloading of packages done by koji and creating local repo, it make tests **fast**. (There is issue that composes (repos) are sometimes bad in fedora, unable to use)
+
 
 ## Schedule Tests
 * Now it is expected to run this __under root__

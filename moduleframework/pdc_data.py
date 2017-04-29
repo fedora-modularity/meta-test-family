@@ -161,21 +161,20 @@ class PDCParser():
         else:
             os.mkdir(absdir)
             for foo in utils.process.run(
-                    "koji list-tagged --quiet %s" % self.pdcdata["koji_tag"]).stdout.split("\n"):
+                    "koji list-tagged --quiet %s" % self.pdcdata["koji_tag"], verbose=is_debug()).stdout.split("\n"):
                 pkgbouid = foo.strip().split(" ")[0]
                 if len(pkgbouid) > 4:
                     print_info("DOWNLOADING: %s" % foo)
                     try:
-                        utils.process.run(
+                        a = utils.process.run(
                             "cd %s; koji download-build %s  -a %s -a noarch" %
-                            (absdir, pkgbouid, ARCH), shell=True)
+                            (absdir, pkgbouid, ARCH), shell=True, verbose=is_debug())
                     except BaseException:
-                        print_info('UNABLE TO DOWNLOAD:', "cd %s; koji download-build %s  -a %s -a noarch" % (
-                            absdir, pkgbouid, ARCH))
+                        print_info('UNABLE TO DOWNLOAD via command:', a.command)
                         pass
             utils.process.run(
                 "cd %s; createrepo -v %s" %
-                (absdir, absdir), shell=True)
+                (absdir, absdir), shell=True, verbose=is_debug())
         return "file://%s" % absdir
 
     def generateParamsLocalKojiPkgs(self):
