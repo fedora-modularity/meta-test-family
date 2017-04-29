@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.3.11
+Version:        0.3.12
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,10 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Sat Apr 29 2017 Jan Scotka <jscotka@redhat.com> 0.3.12-1
+- removed sleep caused big issue there, because it starts on background
+  (jscotka@redhat.com)
+
 * Sat Apr 29 2017 Jan Scotka <jscotka@redhat.com> 0.3.11-1
 - added timeout library from cockpit project, improved debug output handling in
   pdc_data lib, changes in documentation, added debug option
