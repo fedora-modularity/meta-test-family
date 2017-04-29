@@ -273,11 +273,11 @@ class ContainerHelper(CommonFunctions):
             if 'start' in self.info and self.info['start']:
                 self.docker_id = self.runHost(
                     "%s -d %s" %
-                    (self.info['start'], self.jmeno), shell=True).stdout
+                    (self.info['start'], self.jmeno), shell=True, ignore_bg_processes=True).stdout
             else:
                 self.docker_id = self.runHost(
                     "docker run %s %s %s" %
-                    (args, self.jmeno, command), shell=True).stdout
+                    (args, self.jmeno, command), shell=True, ignore_bg_processes=True).stdout
             self.docker_id = self.docker_id.strip()
             if self.getPackageList():
                 a = self.run(
@@ -362,7 +362,7 @@ class ContainerHelper(CommonFunctions):
         :return: None
         """
         if self.info.get("setup"):
-            self.runHost(self.info.get("setup"), shell=True)
+            self.runHost(self.info.get("setup"), shell=True, ignore_bg_processes=True)
 
     def __callCleanupFromConfig(self):
         """
@@ -370,7 +370,7 @@ class ContainerHelper(CommonFunctions):
         :return: None
         """
         if self.info.get("cleanup"):
-            self.runHost(self.info.get("cleanup"), shell=True)
+            self.runHost(self.info.get("cleanup"), shell=True, ignore_bg_processes=True)
 
 
 class RpmHelper(CommonFunctions):
@@ -490,9 +490,9 @@ gpgcheck=0
         """
         try:
             if 'status' in self.info and self.info['status']:
-                a = self.runHost(self.info['status'], shell=True, verbose=False)
+                a = self.runHost(self.info['status'], shell=True, verbose=False, ignore_bg_processes=True)
             else:
-                a = self.runHost("%s" % command, shell=True, verbose=False)
+                a = self.runHost("%s" % command, shell=True, verbose=False, ignore_bg_processes=True)
             print_debug("command:",a.command ,"stdout:",a.stdout, "stderr:", a.stderr)
             return True
         except BaseException:
@@ -506,9 +506,9 @@ gpgcheck=0
         :return: None
         """
         if 'start' in self.info and self.info['start']:
-            self.runHost(self.info['start'], shell=True)
+            self.runHost(self.info['start'], shell=True, ignore_bg_processes=True)
         else:
-            self.runHost("%s" % command, shell=True)
+            self.runHost("%s" % command, shell=True, ignore_bg_processes=True)
 
     def stop(self, command="/bin/true"):
         """
@@ -518,9 +518,9 @@ gpgcheck=0
         :return: None
         """
         if 'stop' in self.info and self.info['stop']:
-            self.runHost(self.info['stop'], shell=True)
+            self.runHost(self.info['stop'], shell=True, ignore_bg_processes=True)
         else:
-            self.runHost("%s" % command, shell=True)
+            self.runHost("%s" % command, shell=True, ignore_bg_processes=True)
 
     def run(self, command="ls /", **kwargs):
         """
@@ -556,7 +556,7 @@ gpgcheck=0
         :return: None
         """
         if self.info.get("setup"):
-            self.runHost(self.info.get("setup"), shell=True)
+            self.runHost(self.info.get("setup"), shell=True, ignore_bg_processes=True)
 
     def __callCleanupFromConfig(self):
         """
@@ -564,7 +564,7 @@ gpgcheck=0
         :return: None
         """
         if self.info.get("cleanup"):
-            self.runHost(self.info.get("cleanup"), shell=True)
+            self.runHost(self.info.get("cleanup"), shell=True, ignore_bg_processes=True)
 
 
 class NspawnHelper(RpmHelper):
@@ -740,7 +740,7 @@ gpgcheck=0
         """
         self.runHost(
             " machinectl copy-to  %s %s %s" %
-            (self.moduleName, src, dest), timeout = DEFAULTPROCESSTIMEOUT)
+            (self.moduleName, src, dest), timeout = DEFAULTPROCESSTIMEOUT, ignore_bg_processes=True)
 
     def copyFrom(self, src, dest):
         """
@@ -751,7 +751,7 @@ gpgcheck=0
         """
         self.runHost(
             " machinectl copy-from  %s %s %s" %
-            (self.moduleName, src, dest), timeout = DEFAULTPROCESSTIMEOUT)
+            (self.moduleName, src, dest), timeout = DEFAULTPROCESSTIMEOUT, ignore_bg_processes=True)
 
     def tearDown(self):
         """
@@ -777,7 +777,7 @@ gpgcheck=0
         :return: None
         """
         if self.info.get("setup"):
-            self.runHost(self.info.get("setup"), shell=True)
+            self.runHost(self.info.get("setup"), shell=True, ignore_bg_processes=True)
 
     def __callCleanupFromConfig(self):
         """
@@ -785,7 +785,7 @@ gpgcheck=0
         :return: None
         """
         if self.info.get("cleanup"):
-            self.runHost(self.info.get("cleanup"), shell=True)
+            self.runHost(self.info.get("cleanup"), shell=True, ignore_bg_processes=True)
 
 
 # INTERFACE CLASS FOR GENERAL TESTS OF MODULES
