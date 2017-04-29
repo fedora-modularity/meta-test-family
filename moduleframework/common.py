@@ -58,6 +58,7 @@ DEFAULTPROCESSTIMEOUT = 2*60
 DEFAULTRETRYCOUNT = 3
 # time in seconds
 DEFAULTRETRYTIMEOUT = 30
+DEFAULTNSPAWNTIMEOUT = 10
 
 def is_debug():
     return bool(os.environ.get("DEBUG"))

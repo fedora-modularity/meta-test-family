@@ -617,7 +617,7 @@ class NspawnHelper(RpmHelper):
             os.mkdir(self.chrootpath)
         try:
             self.runHost("machinectl terminate %s" % self.moduleName)
-            time.sleep(5)
+            time.sleep(2)
         except BaseException:
             pass
         if not os.path.exists(os.path.join(self.chrootpath, "usr")):
@@ -689,7 +689,7 @@ gpgcheck=0
                 "systemd-nspawn --machine=%s -bD %s" %
                 (self.moduleName, self.chrootpath))
             nspawncont.start()
-            time.sleep(20)
+            time.sleep(DEFAULTNSPAWNTIMEOUT)
         tempfnc()
 
     def run(self, command="ls /", **kwargs):
@@ -714,10 +714,9 @@ gpgcheck=0
                 pin=lpath),
             **kwargs)
         b = self.runHost(
-            'cat {chroot}{pin}/stdout; cat {chroot}{pin}/stderr > /dev/stderr; exit `cat {chroot}{pin}/retcode`'.format(
+            'bash -c "cat {chroot}{pin}/stdout; cat {chroot}{pin}/stderr > /dev/stderr; exit `cat {chroot}{pin}/retcode`"'.format(
                 chroot=self.chrootpath,
                 pin=lpath),
-            shell=True,
             **kwargs)
         comout.stdout = b.stdout
         comout.stderr = b.stderr
@@ -762,7 +761,7 @@ gpgcheck=0
         self.stop()
         self.runHost("machinectl poweroff %s" % self.moduleName)
         # self.nspawncont.stop()
-        time.sleep(10)
+        time.sleep(DEFAULTNSPAWNTIMEOUT)
         self.__callCleanupFromConfig()
         if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
             # TODO: workaround because systemd nspawn is now working well in F-25
