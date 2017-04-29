@@ -54,7 +54,7 @@ PDCURL = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
 REPOMD = "repodata/repomd.xml"
 MODULEFILE = 'tempmodule.yaml'
 # default value of process timeout in sec
-DEFAULTPROCESSTIMEOUT = 10*600
+DEFAULTPROCESSTIMEOUT = 2*60
 DEFAULTRETRYCOUNT = 3
 # time in seconds
 DEFAULTRETRYTIMEOUT = 30

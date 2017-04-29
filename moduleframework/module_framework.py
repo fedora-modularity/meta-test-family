@@ -683,12 +683,13 @@ gpgcheck=0
                 shutil.copy(filename, pkipath_ch)
             print_info("repo prepared for mocrodnf:", insiderepopath, open(insiderepopath, 'r').read())
 
-        @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, delay=15)
+        @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, delay=21)
         def tempfnc():
             nspawncont = utils.process.SubProcess(
                 "systemd-nspawn --machine=%s -bD %s" %
                 (self.moduleName, self.chrootpath))
             nspawncont.start()
+            time.sleep(20)
         tempfnc()
 
     def run(self, command="ls /", **kwargs):
