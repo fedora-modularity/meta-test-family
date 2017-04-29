@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.3.15
+Version:        0.3.16
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Sat Apr 29 2017 Jan Scotka <jscotka@redhat.com> 0.3.16-1
+- removed exceptions and added if expressions (jscotka@redhat.com)
+
 * Sat Apr 29 2017 Jan Scotka <jscotka@redhat.com> 0.3.15-1
 - allow in setup cleanup, start stop etc section to let processes at background
   (jscotka@redhat.com)
