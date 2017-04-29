@@ -136,14 +136,14 @@ class PDCParser():
     def generateDepModules(self):
         x = yaml.load(self.pdcdata["modulemd"])
         out = {}
-        try:
+        if x["data"].get("dependencies") and x["data"]["dependencies"].get("requires"):
             deps = x["data"]["dependencies"]["requires"]
             for dep in deps:
                 a = PDCParser()
                 a.setLatestPDC(dep, deps[dep])
                 out.update(a.generateDepModules())
             out.update(deps)
-        except:
+        else:
             out = {}
         return out
 

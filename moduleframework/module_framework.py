@@ -390,17 +390,18 @@ class RpmHelper(CommonFunctions):
                                    self.moduleName)
         self.info = self.config['module']['rpm']
         self.alldrepos = []
-        try:
-            xxx = self.getModulemdYamlconfig(
-            )["data"]["dependencies"]["requires"]
-            for x in xxx:
+        temprepositories={}
+        if self.getModulemdYamlconfig()["data"].get("dependencies") and self.getModulemdYamlconfig()["data"]["dependencies"].get("requires"):
+            temprepositories = self.getModulemdYamlconfig()["data"]["dependencies"]["requires"]
+        for x in temprepositories:
+            @Retry(attempts=DEFAULTRETRYCOUNT,timeout=DEFAULTRETRYTIMEOUT,delay=10)
+            def tempfunc():
                 pdc = pdc_data.PDCParser()
-                pdc.setLatestPDC(x, xxx[x])
-                xxx.update(pdc.generateDepModules())
-            repositories = xxx
-        except BaseException:
-            repositories = {}
-            pass
+                pdc.setLatestPDC(x, temprepositories[x])
+                temprepositories.update(pdc.generateDepModules())
+            tempfunc()
+        repositories = temprepositories
+
         for dep in repositories:
             self.alldrepos.append(get_latest_repo_url(dep, repositories[dep]))
         self.whattoinstallrpm = " ".join(self.getPackageList())
