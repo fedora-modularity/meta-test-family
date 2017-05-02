@@ -173,9 +173,9 @@ class PDCParser():
                             (absdir, pkgbouid, ARCH), shell=True, verbose=is_debug(),ignore_status=True)
                         if a.exit_status == 1:
                             if "packages available for" in a.stdout.strip():
-                                print_info('UNABLE TO DOWNLOAD package (intended for other architectures, GOOD):', a.cmd)
+                                print_info('UNABLE TO DOWNLOAD package (intended for other architectures, GOOD):', a.command)
                             else:
-                                raise BaseException('UNABLE TO DOWNLOAD package (KOJI issue, BAD):', a.cmd)
+                                raise BaseException('UNABLE TO DOWNLOAD package (KOJI issue, BAD):', a.command)
                     tmpfunc()
             utils.process.run(
                 "cd %s; createrepo -v %s" %
