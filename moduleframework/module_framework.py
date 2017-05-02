@@ -587,7 +587,7 @@ class NspawnHelper(RpmHelper):
             os.path.join(
                 "/opt", "chroot_%s" %
                 self.moduleName))
-        self.__addionalpackages = "systemd microdnf rpm"
+        self.__addionalpackages = " ".join(BASEPACKAGESET) + " ".join(BASEPACKAGESET_WORKAROUND)
         trans_dict["ROOT"] = self.chrootpath
 
     def setUp(self):

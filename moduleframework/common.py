@@ -59,6 +59,19 @@ DEFAULTRETRYCOUNT = 3
 # time in seconds
 DEFAULTRETRYTIMEOUT = 30
 DEFAULTNSPAWNTIMEOUT = 10
+# copied from http://pkgs.stg.fedoraproject.org/cgit/modules/base-runtime.git/tree/base-runtime.yaml baseimage profile
+BASEPACKAGESET=["bash",
+                "coreutils",
+                "filesystem",
+                "glibc-minimal-langpack",
+                "libcrypt",
+                "microdnf",
+                "rpm",
+                "shadow-utils",
+                "util-linux"
+                ]
+# nspawn container need to install also systemd to be able to boot
+BASEPACKAGESET_WORKAROUND=["systemd"]
 
 def is_debug():
     return bool(os.environ.get("DEBUG"))
