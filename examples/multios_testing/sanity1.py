@@ -36,7 +36,7 @@ class SanityCheck1(module_framework.AvocadoTest):
         PORT = 3333
         self.start()
         self.assertIn("AHOJ", self.run("echo AHOJ").stdout)
-        self.run(" nohup nc -l %d > %s 2>&1 & sleep 2" % (PORT, TFILE), shell=True, ignore_bg_processes=True)
+        self.run(" nohup nc -l %d > %s 2>&1 &" % (PORT, TFILE), shell=True, ignore_bg_processes=True)
         time.sleep(2)
         a = self.runHost("cat /etc/redhat-release").stdout.strip()
         self.runHost("cat /etc/redhat-release | nc localhost %d" % PORT, shell=True)
@@ -51,7 +51,7 @@ class SanityCheck1(module_framework.AvocadoTest):
         PORT = 4444
         self.start()
         self.assertIn("AHOJ", self.runHost("echo AHOJ").stdout)
-        self.runHost("nohup nc -l %d > %s 2>&1 & sleep 2" % (PORT, TFILE), shell=True, ignore_bg_processes=True)
+        self.runHost("nohup nc -l %d > %s 2>&1 &" % (PORT, TFILE), shell=True, ignore_bg_processes=True)
         time.sleep(2)
         a = self.run("cat /etc/redhat-release").stdout.strip()
         self.run("cat /etc/redhat-release | nc localhost %d" % PORT, shell=True)

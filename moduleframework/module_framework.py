@@ -707,7 +707,7 @@ gpgcheck=0
         """
         lpath = "/var/tmp"
         comout = self.runHost(
-            """machinectl shell root@{machine} /bin/bash -c "({comm})>{pin}/stdout 2>{pin}/stderr; echo $?>{pin}/retcode" """.format(
+            """machinectl shell root@{machine} /bin/bash -c "({comm})>{pin}/stdout 2>{pin}/stderr; echo $?>{pin}/retcode; sleep 2" """.format(
                 machine=self.moduleName,
                 comm=command.replace(
                     '"',
