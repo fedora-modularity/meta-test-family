@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.3.21
+Version:        0.3.22
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Tue May 02 2017 Jan Scotka <jscotka@redhat.com> 0.3.22-1
+- 
+
 * Tue May 02 2017 Jan Scotka <jscotka@redhat.com> 0.3.21-1
 - nspawn used inheride status/start/stop functions, it was bad, because it was
   on host not inside container (jscotka@redhat.com)
