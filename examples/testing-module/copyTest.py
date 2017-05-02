@@ -34,7 +34,6 @@ class CheckCopyFiles(module_framework.AvocadoTest):
         self.runHost("echo x > a", shell=True)
         self.copyTo("a", "/a.test")
         self.assertIn("x", self.run("cat /a.test").stdout)
-        self.run("echo y > /a.test", shell=True)
         self.copyFrom("/a.test", "b")
-        self.assertIn("y",self.runHost("cat b").stdout)
+        self.assertIn("x",self.runHost("cat b").stdout)
         self.runHost("rm a b")
