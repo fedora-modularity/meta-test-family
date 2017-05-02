@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.3.19
+Version:        0.3.20
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Tue May 02 2017 Jan Scotka <jscotka@redhat.com> 0.3.20-1
+- there is missing space (jscotka@redhat.com)
+
 * Tue May 02 2017 Jan Scotka <jscotka@redhat.com> 0.3.19-1
 - added more packages to io install based on baseruntime baseimage profile
   (jscotka@redhat.com)
