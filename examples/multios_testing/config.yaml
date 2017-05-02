@@ -19,3 +19,4 @@ module:
     rpm:
         repos:
             - http://ftp.fi.muni.cz/pub/linux/fedora/linux/development/26/Everything/x86_64/os/
+

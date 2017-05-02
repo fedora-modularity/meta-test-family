@@ -693,6 +693,46 @@ gpgcheck=0
             time.sleep(DEFAULTNSPAWNTIMEOUT)
         tempfnc()
 
+    def status(self, command="/bin/true"):
+        """
+        Return status of module
+        :param command: which command used for do that. it could be defined inside config
+        :return: bool
+        """
+        try:
+            if 'status' in self.info and self.info['status']:
+                a = self.run(self.info['status'], shell=True, verbose=False, ignore_bg_processes=True)
+            else:
+                a = self.run("%s" % command, shell=True, verbose=False, ignore_bg_processes=True)
+            print_debug("command:", a.command, "stdout:", a.stdout, "stderr:", a.stderr)
+            return True
+        except BaseException:
+            return False
+
+    def start(self, command="/bin/true"):
+        """
+        start the RPM based module (like systemctl start service)
+        :param args: Do not use it directly (It is defined in config.yaml)
+        :param command: Do not use it directly (It is defined in config.yaml)
+        :return: None
+        """
+        if 'start' in self.info and self.info['start']:
+            self.run(self.info['start'], shell=True, ignore_bg_processes=True)
+        else:
+            self.run("%s" % command, shell=True, ignore_bg_processes=True)
+
+    def stop(self, command="/bin/true"):
+        """
+        stop the RPM based module (like systemctl stop service)
+        :param args: Do not use it directly (It is defined in config.yaml)
+        :param command: Do not use it directly (It is defined in config.yaml)
+        :return: None
+        """
+        if 'stop' in self.info and self.info['stop']:
+            self.run(self.info['stop'], shell=True, ignore_bg_processes=True)
+        else:
+            self.run("%s" % command, shell=True, ignore_bg_processes=True)
+
     def run(self, command="ls /", **kwargs):
         """
         Run command inside nspawn module type. It uses machinectl shell command.
