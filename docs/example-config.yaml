@@ -22,6 +22,8 @@ service:
 packages:
     rpms:
         - bash
+        - microdnf
+        - rpm
 # also profile could be defined as set of packages
     profiles:
         - default

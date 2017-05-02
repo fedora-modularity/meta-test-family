@@ -35,6 +35,7 @@ import urllib
 import re
 from avocado import utils
 from common import *
+from timeoutlib import Retry
 
 
 
@@ -165,13 +166,17 @@ class PDCParser():
                 pkgbouid = foo.strip().split(" ")[0]
                 if len(pkgbouid) > 4:
                     print_info("DOWNLOADING: %s" % foo)
-                    try:
+                    @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, delay=10)
+                    def tmpfunc():
                         a = utils.process.run(
                             "cd %s; koji download-build %s  -a %s -a noarch" %
-                            (absdir, pkgbouid, ARCH), shell=True, verbose=is_debug())
-                    except BaseException:
-                        print_info('UNABLE TO DOWNLOAD via command:', a.command)
-                        pass
+                            (absdir, pkgbouid, ARCH), shell=True, verbose=is_debug(),ignore_status=True)
+                        if a.exit_status == 1:
+                            if "packages available for" in a.stdout.strip():
+                                print_info('UNABLE TO DOWNLOAD package (intended for other architectures, GOOD):', a.cmd)
+                            else:
+                                raise BaseException('UNABLE TO DOWNLOAD package (KOJI issue, BAD):', a.cmd)
+                    tmpfunc()
             utils.process.run(
                 "cd %s; createrepo -v %s" %
                 (absdir, absdir), shell=True, verbose=is_debug())
