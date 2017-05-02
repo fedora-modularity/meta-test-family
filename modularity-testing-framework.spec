@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.3.17
+Version:        0.3.18
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Tue May 02 2017 Jan Scotka <jscotka@redhat.com> 0.3.18-1
+- small typo, it is not cmd but command (jscotka@redhat.com)
+
 * Tue May 02 2017 Jan Scotka <jscotka@redhat.com> 0.3.17-1
 - version increased (jscotka@redhat.com)
 - added explicit wait after commands in nspawn (jscotka@redhat.com)
