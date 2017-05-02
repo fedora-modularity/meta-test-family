@@ -1,0 +1,21 @@
+document: modularity-testing
+version: 1
+name: nc
+modulemd-url: http://pkgs.fedoraproject.org/cgit/modules/base-runtime.git/plain/base-runtime.yaml
+packages:
+    rpms:
+        - nc
+        - fedora-release
+        - psmisc
+        - procps-ng
+testdependecies:
+    rpms:
+        - nc
+        - fedora-release
+        - psmisc
+        - procps-ng
+default_module: nspawn
+module:
+    rpm:
+        repos:
+            - http://ftp.fi.muni.cz/pub/linux/fedora/linux/development/26/Everything/x86_64/os/
