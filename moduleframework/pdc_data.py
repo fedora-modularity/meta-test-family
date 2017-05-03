@@ -49,7 +49,7 @@ class PDCParser():
         Internal method, do not use it
         :return: None
         """
-        PDC = "%s/?variant_name=%s&variant_version=%s&variant_release=%s" % (
+        PDC = "%s/?variant_name=%s&variant_version=%s&variant_release=%s&active=True" % (
             PDCURL, self.name, self.stream, self.version)
         self.pdcdata = json.load(urllib.urlopen(PDC))["results"][-1]
 

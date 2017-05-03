@@ -32,9 +32,10 @@ function sleep_a_while(){
 }
 
 function fedpkg_alt(){
-    LFILE="alt_fedpkg.conf"
-    cat /etc/rpkg/fedpkg.conf |sed 's/anongiturl.*/anongiturl = https:\/\/src.fedoraproject.org\/git\/%(module)s/' > $LFILE
-    fedpkg --config $LFILE $@
+    #LFILE="alt_fedpkg.conf"
+    #cat /etc/rpkg/fedpkg.conf |sed 's/anongiturl.*/anongiturl = https:\/\/src.fedoraproject.org\/git\/%(module)s/' > $LFILE
+    #fedpkg --config $LFILE $@
+    fedpkg $@
 }
 
 export MODULENAME=$1
