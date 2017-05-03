@@ -303,7 +303,8 @@ class ContainerHelper(CommonFunctions):
                     print_info("Packages installed via {GUESTPACKAGER}".format(**trans_dict), b.stdout)
                 else:
                     print_info("Nothing installed (nor via {HOSTPACKAGER} nor {GUESTPACKAGER}), but package list is not empty".format(**trans_dict), self.getPackageList())
-        self.docker_id = self.docker_id.strip()
+        if self.status() is False:
+            raise BaseException("Container %s (for module %s) is not running, probably DEAD immediately after start (ID: %s)" % (self.jmeno, self.moduleName, self.docker_id))
 
     def stop(self):
         """
