@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.3.24
+Version:        0.3.25
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,11 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Wed May 03 2017 Jan Scotka <jscotka@redhat.com> 0.3.25-1
+- version increased (jscotka@redhat.com)
+- removed hardcoded dnf and microdnf commands and added possibility to use null
+  moduleMD file (jscotka@redhat.com)
+
 * Wed May 03 2017 Jan Scotka <jscotka@redhat.com> 0.3.24-1
 - adde back filter active=true for PDC, it causes strange errors
   (jscotka@redhat.com)
