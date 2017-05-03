@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.3.23
+Version:        0.3.24
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,10 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Wed May 03 2017 Jan Scotka <jscotka@redhat.com> 0.3.24-1
+- adde back filter active=true for PDC, it causes strange errors
+  (jscotka@redhat.com)
+
 * Tue May 02 2017 Jan Scotka <jscotka@redhat.com> 0.3.23-1
 - bumped version (jscotka@redhat.com)
 - s (jscotka@redhat.com)
