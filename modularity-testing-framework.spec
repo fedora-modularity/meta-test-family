@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.3.26
+Version:        0.3.27
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Wed May 03 2017 Jan Scotka <jscotka@redhat.com> 0.3.27-1
+- bumperd version (jscotka@redhat.com)
+
 * Wed May 03 2017 Jan Scotka <jscotka@redhat.com> 0.3.26-1
 - added symlink to docs directory, to enable pydoc (jscotka@redhat.com)
 - Add documents for generation RTD (phracek@redhat.com)
