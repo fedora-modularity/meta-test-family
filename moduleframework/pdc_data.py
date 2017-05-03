@@ -154,7 +154,7 @@ class PDCParser():
         It downloads all tagged packages and creates repo via createrepo
         :return: str
         """
-        utils.process.run("dnf -y install createrepo koji", ignore_status=True)
+        utils.process.run("{HOSTPACKAGER} install createrepo koji".format(**trans_dict), ignore_status=True)
         dirname = "localrepo_%s_%s_%s" % (self.name, self.stream, self.version)
         absdir = os.path.abspath(dirname)
         if os.path.exists(absdir):

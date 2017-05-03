@@ -31,6 +31,8 @@ import sys
 import netifaces
 import socket
 import os
+from avocado.utils import process
+
 
 defroutedev = netifaces.gateways().get('default').values(
 )[0][1] if netifaces.gateways().get('default') else "lo"
@@ -39,6 +41,11 @@ hostname = socket.gethostname()
 dusername = "test"
 dpassword = "test"
 ddatabase = "basic"
+hostpackager = "yum -y"
+guestpackager = "microdnf"
+if process.run("dnf --version", ignore_status=True).exit_status == 0:
+    hostpackager = "dnf -y"
+
 # translation table for config.yaml files syntax is {VARIABLE} in config file
 trans_dict = {"HOSTIPADDR": hostipaddr,
               "DEFROUTE": defroutedev,
@@ -46,7 +53,9 @@ trans_dict = {"HOSTIPADDR": hostipaddr,
               "ROOT": "/",
               "USER": dusername,
               "PASSWORD": dpassword,
-              "DATABASENAME": ddatabase
+              "DATABASENAME": ddatabase,
+              "HOSTPACKAGER": hostpackager,
+              "GUESTPACKAGER": guestpackager
               }
 
 ARCH = "x86_64"
@@ -72,6 +81,7 @@ BASEPACKAGESET=["bash",
                 ]
 # nspawn container need to install also systemd to be able to boot
 BASEPACKAGESET_WORKAROUND=["systemd"]
+BASEPACKAGESET_WORKAROUND_NOMODULE=["systemd","yum"]
 
 def is_debug():
     return bool(os.environ.get("DEBUG"))

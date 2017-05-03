@@ -1,11 +1,12 @@
 document: modularity-testing
 version: 1
 name: nc
-modulemd-url: http://pkgs.fedoraproject.org/cgit/modules/base-runtime.git/plain/base-runtime.yaml
 packages:
     rpms:
         - nc
         - fedora-release
+        #- redhat-release
+        #- centos-release
         - psmisc
         - procps-ng
 testdependecies:
@@ -19,4 +20,5 @@ module:
     rpm:
         repos:
             - http://ftp.fi.muni.cz/pub/linux/fedora/linux/development/26/Everything/x86_64/os/
+            #- http://ftp.fi.muni.cz/pub/linux/centos/7/os/x86_64/
 

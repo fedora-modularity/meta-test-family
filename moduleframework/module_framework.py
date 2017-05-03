@@ -85,7 +85,7 @@ class CommonFunctions(object):
             packages = self.config['testdependecies']['rpms']
         if packages:
             self.runHost(
-                "dnf -y install " +
+                "{HOSTPACKAGER} install ".format(**trans_dict) +
                 " ".join(packages),
                 ignore_status=True)
 
@@ -140,6 +140,9 @@ class CommonFunctions(object):
             ymlfile = urllib.urlopen(urllink)
             cconfig = yaml.load(ymlfile)
             return cconfig
+        elif not get_if_module():
+            trans_dict["GUESTPACKAGER"] = "yum -y"
+            return {"data":{}}
         else:
             if self.config is None:
                 self.loadconfig()
@@ -225,7 +228,7 @@ class ContainerHelper(CommonFunctions):
         :return: None
         """
         if not os.path.isfile('/usr/bin/docker-current'):
-            self.runHost("dnf -y install docker")
+            self.runHost("{HOSTPACKAGER} install docker".format(**trans_dict))
 
     def __prepareContainer(self):
         """
@@ -281,21 +284,21 @@ class ContainerHelper(CommonFunctions):
             self.docker_id = self.docker_id.strip()
             if self.getPackageList():
                 a = self.run(
-                    "dnf -y install %s" %
-                    " ".join(
-                        self.getPackageList()),
+                    "%s install %s" %
+                    (trans_dict["HOSTPACKAGER"], " ".join(
+                        self.getPackageList())),
                     ignore_status=True, verbose=False)
                 b = self.run(
-                    "microdnf -y install %s" %
-                    " ".join(
-                        self.getPackageList()),
+                    "%s install %s" %
+                    (trans_dict["GUESTPACKAGER"]," ".join(
+                        self.getPackageList())),
                     ignore_status=True, verbose=False)
                 if a.exit_status == 0:
-                    print_info("Packages installed via dnf", a.stdout)
+                    print_info("Packages installed via {HOSTPACKAGER}".format(**trans_dict), a.stdout)
                 elif b.exit_status == 0:
-                    print_info("Packages installed via dnf", b.stdout)
+                    print_info("Packages installed via {GUESTPACKAGER}".format(**trans_dict), b.stdout)
                 else:
-                    print_info("Nothing installed (nor via DNF nor microDNF), but package list is not empty", self.getPackageList())
+                    print_info("Nothing installed (nor via {HOSTPACKAGER} nor {GUESTPACKAGER}), but package list is not empty".format(**trans_dict), self.getPackageList())
         self.docker_id = self.docker_id.strip()
 
     def stop(self):
@@ -469,11 +472,11 @@ gpgcheck=0
         """
         try:
             self.runHost(
-                "dnf -y --disablerepo=* --enablerepo=%s* --allowerasing install %s" %
-                (self.moduleName, self.whattoinstallrpm))
+                "%s --disablerepo=* --enablerepo=%s* --allowerasing install %s" %
+                (trans_dict["HOSTPACKAGER"],self.moduleName, self.whattoinstallrpm))
             self.runHost(
-                "dnf -y --disablerepo=* --enablerepo=%s* --allowerasing distro-sync" %
-                self.moduleName, ignore_status=True)
+                "%s --disablerepo=* --enablerepo=%s* --allowerasing distro-sync" %
+                (trans_dict["HOSTPACKAGER"], self.moduleName), ignore_status=True)
         except Exception as e:
             raise Exception(
                 "ERROR: Unable to install packages %s from repositories \n%s\n original exeption:\n%s\n" %
@@ -587,7 +590,10 @@ class NspawnHelper(RpmHelper):
             os.path.join(
                 "/opt", "chroot_%s" %
                 self.moduleName))
-        self.__addionalpackages = " ".join(BASEPACKAGESET) + " " + " ".join(BASEPACKAGESET_WORKAROUND)
+        if get_if_module():
+            self.__addionalpackages = " ".join(BASEPACKAGESET) + " " + " ".join(BASEPACKAGESET_WORKAROUND)
+        else:
+            self.__addionalpackages = " ".join(BASEPACKAGESET_WORKAROUND_NOMODULE)
         trans_dict["ROOT"] = self.chrootpath
 
     def setUp(self):
@@ -622,7 +628,7 @@ class NspawnHelper(RpmHelper):
         except BaseException:
             pass
         if not os.path.exists(os.path.join(self.chrootpath, "usr")):
-            self.runHost("dnf -y install systemd-container")
+            self.runHost("{HOSTPACKAGER} install systemd-container".format(**trans_dict))
             repos_to_use = ""
             counter = 0
             for repo in self.repos:
@@ -631,8 +637,8 @@ class NspawnHelper(RpmHelper):
                     self.moduleName, counter, repo)
             try:
                 self.runHost(
-                    "dnf --nogpgcheck install --installroot %s -y --allowerasing --disablerepo=* --enablerepo=%s* %s %s %s" %
-                    (self.chrootpath, self.moduleName, repos_to_use, self.whattoinstallrpm, self.__addionalpackages))
+                    "%s --nogpgcheck install --installroot %s --allowerasing --disablerepo=* --enablerepo=%s* %s %s %s" %
+                    (trans_dict["HOSTPACKAGER"], self.chrootpath, self.moduleName, repos_to_use, self.whattoinstallrpm, self.__addionalpackages))
             except Exception as e:
                 raise Exception(
                     "ERROR: Unable to install packages %s\n original exeption:\n%s\n" %
@@ -682,7 +688,7 @@ gpgcheck=0
                 pass
             for filename in glob.glob(os.path.join(pkipath, '*')):
                 shutil.copy(filename, pkipath_ch)
-            print_info("repo prepared for mocrodnf:", insiderepopath, open(insiderepopath, 'r').read())
+            print_info("repo prepared for microdnf:", insiderepopath, open(insiderepopath, 'r').read())
 
         @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, delay=21)
         def tempfnc():
@@ -1186,3 +1192,12 @@ def get_if_remoterepos():
     """
     rreps = os.environ.get('MTF_REMOTE_REPOS')
     return bool(rreps)
+
+def get_if_module():
+    """
+    Returns boolean value in case variable is set.
+    It is used internally in code
+    :return: bool
+    """
+    rreps = os.environ.get('MTF_DISABLE_MODULE')
+    return not bool(rreps)
