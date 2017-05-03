@@ -46,7 +46,6 @@ from common import *
 from timeoutlib import Retry
 
 
-
 def skipTestIf(value, text="Test not intended for this module profile"):
     """
     function what solves troubles that it is not possible to call SKIP inside code
@@ -96,10 +95,15 @@ class CommonFunctions(object):
         :return: None
         """
         self.__modulemdConf = None
-        self.config = get_correct_config()
-        self.moduleName = self.config['name']
-        self.source = self.config.get('source') if self.config.get(
-            'source') else self.config['module']['rpm'].get('source')
+        self.moduleName = None
+        self.source = None
+        try:
+            self.config = get_correct_config()
+            self.moduleName = self.config['name']
+            self.source = self.config.get('source') if self.config.get(
+                'source') else self.config['module']['rpm'].get('source')
+        except ValueError:
+            pass
 
     def getPackageList(self,profile=None):
         """
@@ -202,10 +206,10 @@ class ContainerHelper(CommonFunctions):
         """
         It is called by child class and it is same methof as Avocado/Unittest has. It prepares environment
         for docker testing
-         * start docker if not
-         * pull docker image
-         * setup environment from config
-         * run and store identification
+        * start docker if not
+        * pull docker image
+        * setup environment from config
+        * run and store identification
         :return: None
         """
         self.installTestDependencies()
@@ -429,8 +433,8 @@ class RpmHelper(CommonFunctions):
         """
         It is called by child class and it is same methof as Avocado/Unittest has. It prepares environment
         for RPM based testing
-         * installing dependencies from config
-         * setup environment from config
+        * installing dependencies from config
+        * setup environment from config
         :return: None
         """
         self.installTestDependencies()
@@ -600,8 +604,8 @@ class NspawnHelper(RpmHelper):
         """
         It is called by child class and it is same method as Avocado/Unittest has. It prepares environment
         for systemd nspawn based testing
-         * installing dependencies from config
-         * setup environment from config
+        * installing dependencies from config
+        * setup environment from config
         :return: None
         """
         self.installTestDependencies()
@@ -1192,6 +1196,7 @@ def get_if_remoterepos():
     """
     rreps = os.environ.get('MTF_REMOTE_REPOS')
     return bool(rreps)
+
 
 def get_if_module():
     """
