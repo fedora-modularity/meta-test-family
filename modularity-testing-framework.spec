@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.3.31
+Version:        0.3.32
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,10 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Thu May 04 2017 Jan Scotka <jscotka@redhat.com> 0.3.32-1
+- added possibility to add more machines if you want, and play with them
+  (jscotka@redhat.com)
+
 * Thu May 04 2017 Jan Scotka <jscotka@redhat.com> 0.3.31-1
 - after discussion with jkaluza added more retry (jscotka@redhat.com)
 
