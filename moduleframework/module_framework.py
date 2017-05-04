@@ -63,7 +63,13 @@ class CommonFunctions(object):
     """
     Basic class doing configuration reading and allow do commands on host machine
     """
-    config = None
+    def __init__(self):
+        self.config = None
+        self.__modulemdConf = None
+        self.moduleName = None
+        self.source = None
+        # general use case is to have forwarded services to host (so thats why it is same)
+        self.ipaddr = trans_dict["HOSTIPADDR"]
 
     def runHost(self, command="ls /", **kwargs):
         """
@@ -95,9 +101,6 @@ class CommonFunctions(object):
         __init__ method for our purposes)
         :return: None
         """
-        self.__modulemdConf = None
-        self.moduleName = None
-        self.source = None
         try:
             self.config = get_correct_config()
             self.moduleName = self.config['name']
@@ -156,6 +159,14 @@ class CommonFunctions(object):
                 self.__modulemdConf = yaml.load(ymlfile)
             return self.__modulemdConf
 
+    def getIPaddr(self):
+        """
+        Return ip addr string of guest machine
+        In many cases it should be same as host machine and port should be forwarded to host
+        :return: str
+        """
+        return self.ipaddr
+
 
 class ContainerHelper(CommonFunctions):
     """
@@ -167,6 +178,7 @@ class ContainerHelper(CommonFunctions):
         """
         set basic object variables
         """
+        super(ContainerHelper,self).__init__()
         self.loadconfig()
         self.info = self.config['module']['docker']
         self.tarbased = None
@@ -393,6 +405,7 @@ class RpmHelper(CommonFunctions):
         """
         Set basic variables for RPM based testing, based on modules.rpm section of config.yaml
         """
+        super(RpmHelper, self).__init__()
         self.loadconfig()
         self.yumrepo = os.path.join(
             "/etc", "yum.repos.d", "%s.repo" %
@@ -996,6 +1009,14 @@ class AvocadoTest(Test):
         :return: None
         """
         return self.backend.copyFrom(*args, **kwargs)
+
+    def getIPaddr(self, *args, **kwargs):
+        """
+        Return ip addr string of guest machine
+        In many cases it should be same as host machine and port should be forwarded to host
+        :return: str
+        """
+        return self.backend.getIPaddr(*args, **kwargs)
 
 
 # INTERFACE CLASSES FOR SPECIFIC MODULE TESTS
