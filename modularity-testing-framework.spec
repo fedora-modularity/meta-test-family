@@ -2,7 +2,7 @@
 
 Name:           modularity-testing-framework
 Version:        0.4.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
 License:        GPLv2+

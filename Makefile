@@ -11,10 +11,7 @@ check: clean
 
 clean:
 	@python setup.py clean
-	rm -f MANIFEST
-	rm -rf build/html
-	rm -fv */generated.py
-	find . -\( -name 'generated.py' -o -name "*.pyc" -o -name '*.pyo' -o -name "*~" -\) -delete
+	git clean -fd
 
 install: clean
 	@python setup.py install
