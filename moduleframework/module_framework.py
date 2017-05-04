@@ -609,7 +609,10 @@ class NspawnHelper(RpmHelper):
         super(NspawnHelper, self).__init__()
         time.time()
         actualtime = time.time()
-        self.jmeno = "%s_%r" % (self.moduleName, actualtime)
+        if get_if_do_cleanup():
+            self.jmeno = "%s_%r" % (self.moduleName, actualtime)
+        else:
+            self.jmeno = self.moduleName
         self.chrootpath = os.path.abspath(
             os.path.join(
                 "/opt", "chroot_%s" % self.jmeno))
@@ -638,6 +641,14 @@ class NspawnHelper(RpmHelper):
         self.__prepareSetup()
         self.__callSetupFromConfig()
 
+    @Retry(attempts=DEFAULTRETRYTIMEOUT, timeout=DEFAULTRETRYTIMEOUT, delay=1,inverse=True)
+    def __is_killed(self):
+        self.runHost("machinectl status %s" % self.jmeno, shell=True)
+
+    @Retry(attempts=DEFAULTRETRYTIMEOUT, timeout=DEFAULTRETRYTIMEOUT, delay=1)
+    def __is_booted(self):
+        self.runHost("machinectl status %s | grep logind" % self.jmeno, shell=True)
+
     def __prepareSetup(self):
         """
         Internal method, do not use it anyhow
@@ -648,7 +659,7 @@ class NspawnHelper(RpmHelper):
             os.mkdir(self.chrootpath)
         try:
             self.runHost("machinectl terminate %s" % self.jmeno)
-            time.sleep(2)
+            self.__is_killed()
         except BaseException:
             pass
         if not os.path.exists(os.path.join(self.chrootpath, "usr")):
@@ -720,7 +731,7 @@ gpgcheck=0
                 "systemd-nspawn --machine=%s -bD %s" %
                 (self.jmeno, self.chrootpath))
             nspawncont.start()
-            time.sleep(DEFAULTNSPAWNTIMEOUT)
+            self.__is_booted()
         tempfnc()
 
     def status(self, command="/bin/true"):
@@ -777,7 +788,7 @@ gpgcheck=0
         """
         lpath = "/var/tmp"
         comout = self.runHost(
-            """machinectl shell root@{machine} /bin/bash -c "({comm})>{pin}/stdout 2>{pin}/stderr; echo $?>{pin}/retcode; sleep 2" """.format(
+            """machinectl shell root@{machine} /bin/bash -c "({comm})>{pin}/stdout 2>{pin}/stderr; echo $?>{pin}/retcode; sleep 1" """.format(
                 machine=self.jmeno,
                 comm=command.replace(
                     '"',
@@ -832,7 +843,7 @@ gpgcheck=0
         self.stop()
         self.runHost("machinectl poweroff %s" % self.jmeno)
         # self.nspawncont.stop()
-        time.sleep(DEFAULTNSPAWNTIMEOUT)
+        self.__is_killed()
         self.__callCleanupFromConfig()
         if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
             # TODO: workaround because systemd nspawn is now working well in F-25
