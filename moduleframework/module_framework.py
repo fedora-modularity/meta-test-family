@@ -44,6 +44,7 @@ from compose_info import ComposeParser
 import pdc_data
 from common import *
 from timeoutlib import Retry
+import time
 
 
 def skipTestIf(value, text="Test not intended for this module profile"):
@@ -397,7 +398,7 @@ class RpmHelper(CommonFunctions):
             "/etc", "yum.repos.d", "%s.repo" %
                                    self.moduleName)
         self.info = self.config['module']['rpm']
-        self.alldrepos = []
+        alldrepos = []
         temprepositories={}
         if self.getModulemdYamlconfig()["data"].get("dependencies") and self.getModulemdYamlconfig()["data"]["dependencies"].get("requires"):
             temprepositories = self.getModulemdYamlconfig()["data"]["dependencies"]["requires"]
@@ -411,12 +412,12 @@ class RpmHelper(CommonFunctions):
         repositories = temprepositories
 
         for dep in repositories:
-            self.alldrepos.append(get_latest_repo_url(dep, repositories[dep]))
+            alldrepos.append(get_latest_repo_url(dep, repositories[dep]))
         self.whattoinstallrpm = " ".join(self.getPackageList())
         if get_correct_url():
-            self.repos = [get_correct_url()] + self.alldrepos
+            self.repos = [get_correct_url()] + alldrepos
         elif self.info.get('repo'):
-            self.repos = [self.info.get('repo')] + self.alldrepos
+            self.repos = [self.info.get('repo')] + alldrepos
         elif self.info.get('repos'):
             self.repos = self.info.get('repos')
         else:
@@ -591,10 +592,10 @@ class NspawnHelper(RpmHelper):
         relative change root path
         """
         super(NspawnHelper, self).__init__()
+        self.jmeno = "%s_%r" % (self.moduleName, time.time())
         self.chrootpath = os.path.abspath(
             os.path.join(
-                "/opt", "chroot_%s" %
-                self.moduleName))
+                "/opt", "chroot_%s" % self.jmeno))
         if get_if_module():
             self.__addionalpackages = " ".join(BASEPACKAGESET) + " " + " ".join(BASEPACKAGESET_WORKAROUND)
         else:
@@ -628,7 +629,7 @@ class NspawnHelper(RpmHelper):
             shutil.rmtree(self.chrootpath, ignore_errors=True)
             os.mkdir(self.chrootpath)
         try:
-            self.runHost("machinectl terminate %s" % self.moduleName)
+            self.runHost("machinectl terminate %s" % self.jmeno)
             time.sleep(2)
         except BaseException:
             pass
@@ -699,7 +700,7 @@ gpgcheck=0
         def tempfnc():
             nspawncont = utils.process.SubProcess(
                 "systemd-nspawn --machine=%s -bD %s" %
-                (self.moduleName, self.chrootpath))
+                (self.jmeno, self.chrootpath))
             nspawncont.start()
             time.sleep(DEFAULTNSPAWNTIMEOUT)
         tempfnc()
@@ -759,7 +760,7 @@ gpgcheck=0
         lpath = "/var/tmp"
         comout = self.runHost(
             """machinectl shell root@{machine} /bin/bash -c "({comm})>{pin}/stdout 2>{pin}/stderr; echo $?>{pin}/retcode; sleep 2" """.format(
-                machine=self.moduleName,
+                machine=self.jmeno,
                 comm=command.replace(
                     '"',
                     r'\"'),
@@ -792,7 +793,7 @@ gpgcheck=0
         """
         self.runHost(
             " machinectl copy-to  %s %s %s" %
-            (self.moduleName, src, dest), timeout = DEFAULTPROCESSTIMEOUT, ignore_bg_processes=True)
+            (self.jmeno, src, dest), timeout = DEFAULTPROCESSTIMEOUT, ignore_bg_processes=True)
 
     def copyFrom(self, src, dest):
         """
@@ -803,7 +804,7 @@ gpgcheck=0
         """
         self.runHost(
             " machinectl copy-from  %s %s %s" %
-            (self.moduleName, src, dest), timeout = DEFAULTPROCESSTIMEOUT, ignore_bg_processes=True)
+            (self.jmeno, src, dest), timeout = DEFAULTPROCESSTIMEOUT, ignore_bg_processes=True)
 
     def tearDown(self):
         """
@@ -811,7 +812,7 @@ gpgcheck=0
         :return: None
         """
         self.stop()
-        self.runHost("machinectl poweroff %s" % self.moduleName)
+        self.runHost("machinectl poweroff %s" % self.jmeno)
         # self.nspawncont.stop()
         time.sleep(DEFAULTNSPAWNTIMEOUT)
         self.__callCleanupFromConfig()
@@ -822,6 +823,9 @@ gpgcheck=0
                 "setenforce %s" %
                 self.__selinuxState,
                 ignore_status=True)
+        if get_if_do_cleanup() and os.path.exists(self.chrootpath):
+            shutil.rmtree(self.chrootpath, ignore_errors=True)
+
 
     def __callSetupFromConfig(self):
         """
