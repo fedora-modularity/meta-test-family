@@ -44,7 +44,7 @@ class PDCParser():
     Class for parsing PDC data via some setters line setFullVersion, setViaFedMsg, setLatestPDC
     """
 
-    @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, delay=20)
+    @Retry(attempts=20, timeout=DEFAULTRETRYTIMEOUT, delay=20)
     def __getDataFromPdc(self):
         """
         Internal method, do not use it
