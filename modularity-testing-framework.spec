@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.4.1
+Version:        0.4.2
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,10 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Thu May 04 2017 Jan Scotka <jscotka@redhat.com> 0.4.2-1
+- bumped version (jscotka@redhat.com)
+- added info for chroot path (jscotka@redhat.com)
+
 * Thu May 04 2017 Jan Scotka <jscotka@redhat.com> 0.4.1-1
 - small trouble inside multios test caused by using function get correct
   backend (jscotka@redhat.com)
