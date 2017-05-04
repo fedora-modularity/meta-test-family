@@ -605,10 +605,13 @@ class NspawnHelper(RpmHelper):
         relative change root path
         """
         super(NspawnHelper, self).__init__()
-        self.jmeno = "%s_%r" % (self.moduleName, time.time())
+        time.time()
+        actualtime = time.time()
+        self.jmeno = "%s_%r" % (self.moduleName, actualtime)
         self.chrootpath = os.path.abspath(
             os.path.join(
                 "/opt", "chroot_%s" % self.jmeno))
+        print_info("name of CHROOT directory:", self.chrootpath)
         if get_if_module():
             self.__addionalpackages = " ".join(BASEPACKAGESET) + " " + " ".join(BASEPACKAGESET_WORKAROUND)
         else:
