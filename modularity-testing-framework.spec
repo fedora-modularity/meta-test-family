@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.3.32
+Version:        0.4.0
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
