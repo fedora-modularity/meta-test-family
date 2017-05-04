@@ -44,6 +44,7 @@ class PDCParser():
     Class for parsing PDC data via some setters line setFullVersion, setViaFedMsg, setLatestPDC
     """
 
+    @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, delay=20)
     def __getDataFromPdc(self):
         """
         Internal method, do not use it
@@ -51,7 +52,11 @@ class PDCParser():
         """
         PDC = "%s/?variant_name=%s&variant_version=%s&variant_release=%s&active=True" % (
             PDCURL, self.name, self.stream, self.version)
-        self.pdcdata = json.load(urllib.urlopen(PDC))["results"][-1]
+        out=json.load(urllib.urlopen(PDC))["results"]
+        if out:
+            self.pdcdata = out[-1]
+        else:
+            raise BaseException("Unable to get data from PDC URL: %s" % PDC)
 
     def setFullVersion(self, nvr):
         """
