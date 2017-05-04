@@ -32,9 +32,9 @@ class SanityRealMultihost(module_framework.AvocadoTest):
     :avocado: enable
     """
     def setUp(self):
-        self.machineF25 = module_framework.get_correct_backend()
-        self.machineF26 = module_framework.get_correct_backend()
-        self.machineRawhide = module_framework.get_correct_backend()
+        self.machineF25 = module_framework.get_correct_backend()[0]
+        self.machineF26 = module_framework.get_correct_backend()[0]
+        self.machineRawhide = module_framework.get_correct_backend()[0]
         self.machineF25.repos = ["http://ftp.fi.muni.cz/pub/linux/fedora/linux/releases/25/Everything/x86_64/os/"]
         self.machineF26.repos = ["http://ftp.fi.muni.cz/pub/linux/fedora/linux/development/26/Everything/x86_64/os/"]
         self.machineRawhide.repos = ["http://ftp.fi.muni.cz/pub/linux/fedora/linux/development/rawhide/Everything/x86_64/os/"]
