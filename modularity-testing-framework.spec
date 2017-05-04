@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.3.29
+Version:        0.3.30
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,10 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Thu May 04 2017 Jan Scotka <jscotka@redhat.com> 0.3.30-1
+- added better debugging to Retry (allow to output also original exception)
+  (jscotka@redhat.com)
+
 * Thu May 04 2017 Jan Scotka <jscotka@redhat.com> 0.3.29-1
 - added possibility to retry PDC URL in case of no data (jscotka@redhat.com)
 
