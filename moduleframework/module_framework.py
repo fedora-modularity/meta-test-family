@@ -46,6 +46,7 @@ from common import *
 from timeoutlib import Retry
 import time
 
+PROFILE = None
 
 def skipTestIf(value, text="Test not intended for this module profile"):
     """
@@ -63,9 +64,12 @@ class CommonFunctions(object):
     """
     Basic class doing configuration reading and allow do commands on host machine
     """
+    config = None
+    modulemdConf = None
+
     def __init__(self):
         self.config = None
-        self.__modulemdConf = None
+        self.modulemdConf = None
         self.moduleName = None
         self.source = None
         # general use case is to have forwarded services to host (so thats why it is same)
@@ -154,10 +158,12 @@ class CommonFunctions(object):
         else:
             if self.config is None:
                 self.loadconfig()
-            if not self.__modulemdConf:
-                ymlfile = urllib.urlopen(get_correct_modulemd())
-                self.__modulemdConf = yaml.load(ymlfile)
-            return self.__modulemdConf
+            if not self.modulemdConf:
+                modulemd = get_correct_modulemd()
+                if modulemd:
+                    ymlfile = urllib.urlopen()
+                    self.modulemdConf = yaml.load(ymlfile)
+            return self.modulemdConf
 
     def getIPaddr(self):
         """
@@ -1201,14 +1207,17 @@ def get_correct_modulemd():
     mdf = os.environ.get('MODULEMDURL')
     readconfig = CommonFunctions()
     readconfig.loadconfig()
-    if mdf:
-        return mdf
-    elif readconfig.config.get("modulemd-url"):
-        return readconfig.config.get("modulemd-url")
-    else:
-        a = ComposeParser(get_compose_url())
-        b = a.variableListForModule(readconfig.config.get("name"))
-        return [x[12:] for x in b if 'MODULEMDURL=' in x][0]
+    try:
+        if mdf:
+            return mdf
+        elif readconfig.config.get("modulemd-url"):
+            return readconfig.config.get("modulemd-url")
+        else:
+            a = ComposeParser(get_compose_url())
+            b = a.variableListForModule(readconfig.config.get("name"))
+            return [x[12:] for x in b if 'MODULEMDURL=' in x][0]
+    except AttributeError:
+        return None
 
 
 def get_latest_repo_url(wmodule="base-runtime", wstream="master", fake=False):
