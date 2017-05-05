@@ -24,11 +24,11 @@ check-behave-docker:
 	@true
 
 check-multihost-testing:
-	cd ../multios_testing; DEBUG=yes MTF_DISABLE_MODULE=yes $(CMD) *.py
+	cd ../multios_testing; MTF_DO_NOT_CLEANUP= DEBUG=yes MTF_DISABLE_MODULE=yes $(CMD) *.py
 	@true
 
 check-run-them-pdc-baseruntime:
-	../../tools/run-them.sh base-runtime base-runtime-master-20170502071613 pdc
+	MTF_REMOTE_REPOS= MTF_DO_NOT_CLEANUP= ../../tools/run-them.sh base-runtime base-runtime-master-20170502071613 pdc
 	@true
 
 check-run-them-pdc-testmodule:
