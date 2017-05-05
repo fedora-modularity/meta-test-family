@@ -795,14 +795,27 @@ gpgcheck=0
                     r'\"'),
                 pin=lpath),
             **kwargs)
-        b = self.runHost(
-            'bash -c "cat {chroot}{pin}/stdout; cat {chroot}{pin}/stderr > /dev/stderr; exit `cat {chroot}{pin}/retcode`"'.format(
-                chroot=self.chrootpath,
-                pin=lpath),
-            **kwargs)
-        comout.stdout = b.stdout
-        comout.stderr = b.stderr
-        comout.exit_status = b.exit_status
+        try:
+            if not kwargs:
+                kwargs = {}
+            kwargs["verbose"]=False
+            should_ignore=kwargs.get("ignore_status")
+            kwargs["ignore_status"]=True
+            b = self.runHost(
+                'bash -c "cat {chroot}{pin}/stdout; cat {chroot}{pin}/stderr > /dev/stderr; exit `cat {chroot}{pin}/retcode`"'.format(
+                    chroot=self.chrootpath,
+                    pin=lpath),
+                **kwargs)
+        finally:
+            comout.stdout = b.stdout
+            comout.stderr = b.stderr
+            comout.exit_status = b.exit_status
+            comout.command = re.sub('\)[^)]*$','', re.sub('^[^(]*\(','',comout.command))
+            if should_ignore:
+                pass
+            else:
+                process.CmdError(comout.command, comout)
+
         return comout
 
     def selfcheck(self):
