@@ -61,14 +61,9 @@ class ModuleLintSigning(module_framework.AvocadoTest):
     def setUp(self):
         # it is not intended just for docker, but just docker packages are
         # actually properly signed
-        super(self.__class__, self).setUp()
         if self.moduleType != "docker":
-            try:
-                self.tearDown()
-            except Exception as e:
-                print e
-                pass
             self.skip("Docker specific test")
+        super(self.__class__, self).setUp()
 
     def test(self):
         RHKEY = "fd431d51"

@@ -887,6 +887,14 @@ class AvocadoTest(Test):
 
     :avocado: disable
     """
+    def __init__(self,*args, **kwargs):
+        super(AvocadoTest,self).setUp(*args, **kwargs)
+        (self.backend, self.moduleType) = get_correct_backend()
+        self.moduleProfile = get_correct_profile()
+        print_info(
+            "Module Type: %s; Profile: %s" %
+            (self.moduleType, self.moduleProfile))
+
 
     def setUp(self):
         """
@@ -896,11 +904,6 @@ class AvocadoTest(Test):
         When you redefine this method in your class, don't forget to call super(self.__class__,self).setUp()
         :return: None
         """
-        (self.backend, self.moduleType) = get_correct_backend()
-        self.moduleProfile = get_correct_profile()
-        print_info(
-            "Module Type: %s; Profile: %s" %
-            (self.moduleType, self.moduleProfile))
         return self.backend.setUp()
 
     def tearDown(self, *args, **kwargs):
@@ -1044,14 +1047,9 @@ class ContainerAvocadoTest(AvocadoTest):
     """
 
     def setUp(self):
-        super(ContainerAvocadoTest, self).setUp()
         if self.moduleType != "docker":
-            try:
-                self.tearDown()
-            except Exception as e:
-                print_debug(e)
-                pass
             self.skip("Docker specific test")
+        super(ContainerAvocadoTest, self).setUp()
 
     def checkLabel(self, key, value):
         """
@@ -1074,9 +1072,9 @@ class RpmAvocadoTest(AvocadoTest):
     """
 
     def setUp(self):
-        super(RpmAvocadoTest, self).setUp()
         if self.moduleType != "rpm":
             self.skip("Rpm specific test")
+        super(RpmAvocadoTest, self).setUp()
 
 
 class NspawnAvocadoTest(AvocadoTest):
@@ -1087,9 +1085,10 @@ class NspawnAvocadoTest(AvocadoTest):
     """
 
     def setUp(self):
-        super(NspawnAvocadoTest, self).setUp()
         if self.moduleType != "nspawn":
-            self.skip("NSPAWN specific test")
+            self.skip("Nspawn specific test")
+        super(NspawnAvocadoTest, self).setUp()
+
 
 
 def get_correct_backend():
