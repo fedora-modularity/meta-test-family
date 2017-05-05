@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.4.5
+Version:        0.4.6
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,18 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Fri May 05 2017 Jan Scotka <jscotka@redhat.com> 0.4.6-1
+- version increased (jscotka@redhat.com)
+- allow use more picle file in bash helper to support more machines
+  (jscotka@redhat.com)
+- removed workaround characters around command to have better output
+  (jscotka@redhat.com)
+- mistake in bash helper (jscotka@redhat.com)
+- imporved makefile for test module to check more possibilities
+  (jscotka@redhat.com)
+- small typo there (jscotka@redhat.com)
+- skip in setup phase should be faster (jscotka@redhat.com)
+
 * Thu May 04 2017 Jan Scotka <jscotka@redhat.com> 0.4.5-1
 - added better handling of running machines in nspawn (jscotka@redhat.com)
 
