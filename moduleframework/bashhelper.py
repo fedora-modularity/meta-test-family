@@ -58,7 +58,12 @@ def main():
     parser.add_option("-p", "--print",
                       action="store_true", dest="printt", default=False,
                       help="print output of called method")
+    parser.add_option("-f", "--file",
+                      action="store", dest="tempfile", default=picklefile,
+                      help="use another file for pickling objects (it is important when you need to setup more machines)")
     (options, args) = parser.parse_args()
+
+    picklefile = options.tempfile
 
     if len(args) == 0:
         raise ValueError(
@@ -101,8 +106,8 @@ def main():
         pkl_file.close()
     else:
         pkl_file.close()
-        helper.tearDown()
         os.remove(picklefile) if os.path.exists(picklefile) else None
+        helper.tearDown()
 
 
 if __name__ == "__main__":
