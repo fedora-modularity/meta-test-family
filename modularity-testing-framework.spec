@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.4.6
+Version:        0.4.7
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,11 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Fri May 05 2017 Jan Scotka <jscotka@redhat.com> 0.4.7-1
+- version increased (jscotka@redhat.com)
+- added straight usage of bashhelper python lib it is in same directory
+  (jscotka@redhat.com)
+
 * Fri May 05 2017 Jan Scotka <jscotka@redhat.com> 0.4.6-1
 - version increased (jscotka@redhat.com)
 - allow use more picle file in bash helper to support more machines
