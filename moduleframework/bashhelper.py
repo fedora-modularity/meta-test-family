@@ -65,7 +65,7 @@ def main():
             "Unable to call bash helper without function, there is possible to use: ",
             [a[0]
              for a in inspect.getmembers(
-                moduleframework.get_correct_backend(),
+                module_framework.get_correct_backend(),
                 predicate=inspect.ismethod)
              if '__' not in a[0]])
     method = args[0]
