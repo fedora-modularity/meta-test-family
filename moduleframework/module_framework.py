@@ -888,7 +888,7 @@ class AvocadoTest(Test):
     :avocado: disable
     """
     def __init__(self,*args, **kwargs):
-        super(AvocadoTest,self).setUp(*args, **kwargs)
+        super(AvocadoTest,self).__init__(*args, **kwargs)
         (self.backend, self.moduleType) = get_correct_backend()
         self.moduleProfile = get_correct_profile()
         print_info(
