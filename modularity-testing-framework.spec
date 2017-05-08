@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.4.7
+Version:        0.4.8
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,16 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Mon May 08 2017 Jan Scotka <jscotka@redhat.com> 0.4.8-1
+- bumped version (jscotka@redhat.com)
+- cleaner solution to set repos and what to install instead for rewriting class
+  values (jscotka@redhat.com)
+- solved issues with changing to use init of classes (there is 60s timeout in
+  avocado) (jscotka@redhat.com)
+- added debug options for shell command, there is some issue with running
+  nspawn on background, TODO: needs inspect (jscotka@redhat.com)
+- Several updates for documentation stuff. (phracek@redhat.com)
+
 * Fri May 05 2017 Jan Scotka <jscotka@redhat.com> 0.4.7-1
 - version increased (jscotka@redhat.com)
 - added straight usage of bashhelper python lib it is in same directory
