@@ -161,7 +161,7 @@ class CommonFunctions(object):
             if not self.modulemdConf:
                 modulemd = get_correct_modulemd()
                 if modulemd:
-                    ymlfile = urllib.urlopen()
+                    ymlfile = urllib.urlopen(modulemd)
                     self.modulemdConf = yaml.load(ymlfile)
             return self.modulemdConf
 
@@ -417,7 +417,6 @@ class RpmHelper(CommonFunctions):
             "/etc", "yum.repos.d", "%s.repo" %
                                    self.moduleName)
         self.info = self.config['module']['rpm']
-        alldrepos = []
         temprepositories = {}
         temprepositories_cycle = {}
         if self.getModulemdYamlconfig()["data"].get("dependencies") and self.getModulemdYamlconfig()["data"]["dependencies"].get("requires"):
@@ -430,19 +429,9 @@ class RpmHelper(CommonFunctions):
                 pdc.setLatestPDC(x, temprepositories_cycle[x])
                 temprepositories.update(pdc.generateDepModules())
             tempfunc()
-        repositories = temprepositories
-
-        for dep in repositories:
-            alldrepos.append(get_latest_repo_url(dep, repositories[dep]))
-        self.whattoinstallrpm = " ".join(self.getPackageList())
-        if get_correct_url():
-            self.repos = [get_correct_url()] + alldrepos
-        elif self.info.get('repo'):
-            self.repos = [self.info.get('repo')] + alldrepos
-        elif self.info.get('repos'):
-            self.repos = self.info.get('repos')
-        else:
-            raise ValueError("no RPM given in file or via URL")
+        self.moduledeps = temprepositories
+        self.repos = []
+        self.whattoinstallrpm=""
 
     def getURL(self):
         """
@@ -460,10 +449,27 @@ class RpmHelper(CommonFunctions):
         * setup environment from config
         :return: None
         """
+        self.setRepositoriesAndWhatToInstall()
         self.installTestDependencies()
         self.__prepare()
         self.__prepareSetup()
         self.__callSetupFromConfig()
+
+    def setRepositoriesAndWhatToInstall(self):
+        alldrepos = []
+        if not self.repos:
+            for dep in self.moduledeps:
+                alldrepos.append(get_latest_repo_url(dep, self.moduledeps[dep]))
+            if get_correct_url():
+                self.repos = [get_correct_url()] + alldrepos
+            elif self.info.get('repo'):
+                self.repos = [self.info.get('repo')] + alldrepos
+            elif self.info.get('repos'):
+                self.repos = self.info.get('repos')
+            else:
+                raise ValueError("no RPM given in file or via URL")
+        if not self.whattoinstallrpm:
+            self.whattoinstallrpm = " ".join(self.getPackageList())
 
     def tearDown(self):
         """
@@ -623,10 +629,6 @@ class NspawnHelper(RpmHelper):
             os.path.join(
                 "/opt", "chroot_%s" % self.jmeno))
         print_info("name of CHROOT directory:", self.chrootpath)
-        if get_if_module():
-            self.__addionalpackages = " ".join(BASEPACKAGESET) + " " + " ".join(BASEPACKAGESET_WORKAROUND)
-        else:
-            self.__addionalpackages = " ".join(BASEPACKAGESET_WORKAROUND_NOMODULE)
         trans_dict["ROOT"] = self.chrootpath
 
     def setUp(self):
@@ -637,13 +639,20 @@ class NspawnHelper(RpmHelper):
         * setup environment from config
         :return: None
         """
-        self.installTestDependencies()
+
         if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
             # TODO: workaround because systemd nspawn is now working well in F-25
             # (failing because of selinux)
             self.__selinuxState = self.runHost(
                 "getenforce", ignore_status=True).stdout.strip()
             self.runHost("setenforce Permissive", ignore_status=True)
+        self.setRepositoriesAndWhatToInstall()
+        if get_if_module():
+            addionalpackages = BASEPACKAGESET + BASEPACKAGESET_WORKAROUND
+        else:
+            addionalpackages = BASEPACKAGESET_WORKAROUND_NOMODULE
+        self.whattoinstallrpm = " ".join(set(self.whattoinstallrpm.split() + addionalpackages))
+        self.installTestDependencies()
         self.__prepareSetup()
         self.__callSetupFromConfig()
 
@@ -678,8 +687,8 @@ class NspawnHelper(RpmHelper):
                     self.moduleName, counter, repo)
             try:
                 self.runHost(
-                    "%s --nogpgcheck install --installroot %s --allowerasing --disablerepo=* --enablerepo=%s* %s %s %s" %
-                    (trans_dict["HOSTPACKAGER"], self.chrootpath, self.moduleName, repos_to_use, self.whattoinstallrpm, self.__addionalpackages))
+                    "%s --nogpgcheck install --installroot %s --allowerasing --disablerepo=* --enablerepo=%s* %s %s" %
+                    (trans_dict["HOSTPACKAGER"], self.chrootpath, self.moduleName, repos_to_use, self.whattoinstallrpm))
             except Exception as e:
                 raise Exception(
                     "ERROR: Unable to install packages %s\n original exeption:\n%s\n" %
