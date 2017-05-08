@@ -455,21 +455,38 @@ class RpmHelper(CommonFunctions):
         self.__prepareSetup()
         self.__callSetupFromConfig()
 
-    def setRepositoriesAndWhatToInstall(self):
+    def setRepositoriesAndWhatToInstall(self, repos=[], whattooinstall=[]):
+        """
+        set repositories and packages what to install inside module
+        It can override base usage of this framework to general purpose testing
+        :param repos: list of repositories
+        :param whattooinstall: list of packages to install inside
+        :return: None
+        """
         alldrepos = []
-        if not self.repos:
-            for dep in self.moduledeps:
-                alldrepos.append(get_latest_repo_url(dep, self.moduledeps[dep]))
-            if get_correct_url():
-                self.repos = [get_correct_url()] + alldrepos
-            elif self.info.get('repo'):
-                self.repos = [self.info.get('repo')] + alldrepos
-            elif self.info.get('repos'):
-                self.repos = self.info.get('repos')
-            else:
-                raise ValueError("no RPM given in file or via URL")
-        if not self.whattoinstallrpm:
-            self.whattoinstallrpm = " ".join(self.getPackageList())
+        if repos:
+            self.repos=repos
+        else:
+            if not self.repos:
+                for dep in self.moduledeps:
+                    alldrepos.append(get_latest_repo_url(dep, self.moduledeps[dep]))
+                if get_correct_url():
+                    self.repos = [get_correct_url()] + alldrepos
+                elif self.info.get('repo'):
+                    self.repos = [self.info.get('repo')] + alldrepos
+                elif self.info.get('repos'):
+                    self.repos = self.info.get('repos')
+                else:
+                    raise ValueError("no RPM given in file or via URL")
+        if whattooinstall:
+            self.whattoinstallrpm = " ".join(set(whattooinstall))
+        else:
+            if not self.whattoinstallrpm:
+                if get_if_module():
+                    addionalpackages = BASEPACKAGESET + BASEPACKAGESET_WORKAROUND
+                else:
+                    addionalpackages = BASEPACKAGESET_WORKAROUND_NOMODULE
+                self.whattoinstallrpm = " ".join(set(self.getPackageList() + addionalpackages))
 
     def tearDown(self):
         """
@@ -647,11 +664,6 @@ class NspawnHelper(RpmHelper):
                 "getenforce", ignore_status=True).stdout.strip()
             self.runHost("setenforce Permissive", ignore_status=True)
         self.setRepositoriesAndWhatToInstall()
-        if get_if_module():
-            addionalpackages = BASEPACKAGESET + BASEPACKAGESET_WORKAROUND
-        else:
-            addionalpackages = BASEPACKAGESET_WORKAROUND_NOMODULE
-        self.whattoinstallrpm = " ".join(set(self.whattoinstallrpm.split() + addionalpackages))
         self.installTestDependencies()
         self.__prepareSetup()
         self.__callSetupFromConfig()
