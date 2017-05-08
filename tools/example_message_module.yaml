@@ -1,11 +1,11 @@
 {
   "msg" : {
-    "component_builds" : [ 5542, 5541, 5543 ],
-    "id" : 166,
-    "modulemd" : "data:\n  api:\n    rpms: [ed, mksh]\n  components:\n    rpms:\n      ed: {cache: 'http://pkgs.fedoraproject.org/repo/pkgs/ed', rationale: A build\n          dependency of mksh., ref: 294cc9c77141dd8232afc8200a01537284fa939f, repository: 'git://pkgs.fedoraproject.org/rpms/ed'}\n      mksh: {buildorder: 10, cache: 'http://pkgs.fedoraproject.org/repo/pkgs/mksh',\n        rationale: The main package of the module., ref: 94253f0c65228a5d48ce841f90c1ee12fba3a077,\n        repository: 'git://pkgs.fedoraproject.org/rpms/mksh'}\n  dependencies:\n    buildrequires: {base-runtime: master}\n    requires: {base-runtime: master}\n  description: This module demonstrates how to write simple modulemd files And can\n    be used for testing the build and release pipeline.\n  filter: {}\n  license:\n    module: [MIT]\n  name: testmodule\n  profiles:\n    default:\n      rpms: [mksh]\n  references: {community: 'https://fedoraproject.org/wiki/Modularity', documentation: 'https://fedoraproject.org/wiki/Fedora_Packaging_Guidelines_for_Modules',\n    tracker: 'https://taiga.fedorainfracloud.org/project/modularity'}\n  stream: master\n  summary: A test module in all its beautiful beauty\n  version: 20170410111210\n  xmd:\n    mbs:\n      buildrequires:\n        base-runtime: {ref: 464026abf9cbe10fac1d800972e3229ac4d01975, stream: master,\n          version: '20170404161234'}\n      commit: 0e19a7ff612a66129cb844722226fff1956d947b\n      scmurl: git://pkgs.fedoraproject.org/modules/testmodule?#0e19a7ff612a66129cb844722226fff1956d947b\ndocument: modulemd\nversion: 1\n",
+    "component_builds" : [ 5515, 5516, 5517 ],
+    "id" : 157,
+    "modulemd" : "data:\n  api:\n    rpms: [ed, mksh]\n  components:\n    rpms:\n      ed: {cache: 'http://pkgs.fedoraproject.org/repo/pkgs/ed', rationale: A build\n          dependency of mksh., ref: 294cc9c77141dd8232afc8200a01537284fa939f, repository: 'git://pkgs.fedoraproject.org/rpms/ed'}\n      mksh: {buildorder: 10, cache: 'http://pkgs.fedoraproject.org/repo/pkgs/mksh',\n        rationale: The main package of the module., ref: 94253f0c65228a5d48ce841f90c1ee12fba3a077,\n        repository: 'git://pkgs.fedoraproject.org/rpms/mksh'}\n  dependencies:\n    buildrequires: {base-runtime: master}\n    requires: {base-runtime: master}\n  description: This module demonstrates how to write simple modulemd files And can\n    be used for testing the build and release pipeline.\n  filter: {}\n  license:\n    module: [MIT]\n  name: testmodule\n  profiles:\n    default:\n      rpms: [mksh]\n  references: {community: 'https://fedoraproject.org/wiki/Modularity', documentation: 'https://fedoraproject.org/wiki/Fedora_Packaging_Guidelines_for_Modules',\n    tracker: 'https://taiga.fedorainfracloud.org/project/modularity'}\n  stream: master\n  summary: A test module in all its beautiful beauty\n  version: 20170407121558\n  xmd:\n    mbs:\n      buildrequires:\n        base-runtime: {ref: 464026abf9cbe10fac1d800972e3229ac4d01975, stream: master,\n          version: '20170404161234'}\n      commit: daf91237e6cc666a82f8466e92a8a51c465edfb0\n      scmurl: git://pkgs.fedoraproject.org/modules/testmodule?#daf91237e6cc666a82f8466e92a8a51c465edfb0\ndocument: modulemd\nversion: 1\n",
     "name" : "testmodule",
     "owner" : "jscotka",
-    "scmurl" : "git://pkgs.fedoraproject.org/modules/testmodule?#0e19a7ff612a66129cb844722226fff1956d947b",
+    "scmurl" : "git://pkgs.fedoraproject.org/modules/testmodule?#daf91237e6cc666a82f8466e92a8a51c465edfb0",
     "state" : 3,
     "state_name" : "done",
     "state_reason" : null,
@@ -13,34 +13,19 @@
       "reason" : null,
       "state" : 1,
       "state_name" : "wait",
-      "time" : 1.491822766E9
+      "time" : 1.491567372E9
     }, {
       "reason" : null,
       "state" : 2,
       "state_name" : "build",
-      "time" : 1.491822792E9
+      "time" : 1.491567387E9
     }, {
       "reason" : null,
       "state" : 2,
       "state_name" : "build",
-      "time" : 1.491822792E9
-    }, {
-      "reason" : null,
-      "state" : 2,
-      "state_name" : "build",
-      "time" : 1.491823057E9
-    }, {
-      "reason" : null,
-      "state" : 2,
-      "state_name" : "build",
-      "time" : 1.491823104E9
-    }, {
-      "reason" : null,
-      "state" : 2,
-      "state_name" : "build",
-      "time" : 1.491823163E9
+      "time" : 1.491567387E9
     } ],
-    "state_url" : "http://localhost/module-build-service/1/module-builds/166",
+    "state_url" : "http://localhost/module-build-service/1/module-builds/157",
     "stream" : "master",
     "tasks" : {
       "rpms" : {
@@ -57,22 +42,22 @@
           "task_id" : 18831744
         },
         "module-build-macros" : {
-          "nvr" : "module-build-macros-0.1-1.module_8c2fe258",
+          "nvr" : "module-build-macros-0.1-1.module_da0b9d8e",
           "state" : 1,
           "state_reason" : "",
-          "task_id" : 18903973
+          "task_id" : 18835447
         }
       }
     },
-    "time_completed" : 1.491823195E9,
-    "time_modified" : 1.491823195E9,
-    "time_submitted" : 1.491822764E9,
-    "version" : "20170410111210"
+    "time_completed" : 1.493909455E9,
+    "time_modified" : 1.493909455E9,
+    "time_submitted" : 1.49156737E9,
+    "version" : "20170407121558"
   },
-  "i" : 26,
+  "i" : 29,
   "topic" : "org.fedoraproject.prod.mbs.module.state.change",
-  "msg_id" : "2017-46e9c611-627d-4026-b872-70ad6705be95",
+  "msg_id" : "2017-bb707ade-4588-432a-bfcd-80c875b3da99",
   "crypto" : "x509",
-  "timestamp" : 1491823195,
+  "timestamp" : 1493909455,
   "username" : "fedmsg"
 }
