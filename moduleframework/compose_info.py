@@ -36,8 +36,7 @@ import os
 from common import *
 
 
-
-class ComposeParser():
+class ComposeParser(object):
     """
     Class for parsing compose. It expect string as constructor for parsing data
     """
