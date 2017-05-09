@@ -668,13 +668,24 @@ class NspawnHelper(RpmHelper):
         self.__prepareSetup()
         self.__callSetupFromConfig()
 
-    @Retry(attempts=DEFAULTRETRYTIMEOUT, timeout=DEFAULTRETRYTIMEOUT, delay=5,inverse=True)
     def __is_killed(self):
-        print_debug(self.runHost("machinectl status %s" % self.jmeno, shell=True, verbose=is_debug()))
+        for foo in range(DEFAULTRETRYTIMEOUT):
+            time.sleep(1)
+            out = self.runHost("machinectl status %s" % self.jmeno, verbose=is_debug(), ignore_status=True)
+            if out.exit_status != 0:
+                print_debug("NSPAWN machine % stopped" % self.jmeno)
+                return True
+        raise BaseException("Unable to stop machine %s within %d" % (self.jmeno,DEFAULTRETRYTIMEOUT))
 
-    @Retry(attempts=DEFAULTRETRYTIMEOUT, timeout=DEFAULTRETRYTIMEOUT, delay=5)
     def __is_booted(self):
-        print_debug(self.runHost("machinectl status %s | grep logind" % self.jmeno, shell=True, verbose=is_debug()))
+        for foo in range(DEFAULTRETRYTIMEOUT):
+            time.sleep(1)
+            out = self.runHost("machinectl status %s" % self.jmeno, verbose=is_debug(), ignore_status=True)
+            if "logind" in out.stdout:
+                time.sleep(2)
+                print_debug("NSPAWN machine % booted" % self.jmeno)
+                return True
+        raise BaseException("Unable to start machine %s within %d" % (self.jmeno,DEFAULTRETRYTIMEOUT))
 
     def __prepareSetup(self):
         """
