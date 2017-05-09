@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.4.11
+Version:        0.4.12
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,12 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Tue May 09 2017 Jan Scotka <jscotka@redhat.com> 0.4.12-1
+- solved issue with shell tests (jscotka@redhat.com)
+- added longer timeout for retry, try to solve issue with shell tests
+  (jscotka@redhat.com)
+- try to remove outside retry (jscotka@redhat.com)
+
 * Mon May 08 2017 Jan Scotka <jscotka@redhat.com> 0.4.11-1
 - bumped version (jscotka@redhat.com)
 - disables sh test (jscotka@redhat.com)
