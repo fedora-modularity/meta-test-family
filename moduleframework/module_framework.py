@@ -668,11 +668,11 @@ class NspawnHelper(RpmHelper):
         self.__prepareSetup()
         self.__callSetupFromConfig()
 
-    @Retry(attempts=DEFAULTRETRYTIMEOUT, timeout=DEFAULTRETRYTIMEOUT, delay=1,inverse=True)
+    @Retry(attempts=DEFAULTRETRYTIMEOUT, timeout=DEFAULTRETRYTIMEOUT, delay=3,inverse=True)
     def __is_killed(self):
         print_debug(self.runHost("machinectl status %s" % self.jmeno, shell=True, verbose=is_debug()))
 
-    @Retry(attempts=DEFAULTRETRYTIMEOUT, timeout=DEFAULTRETRYTIMEOUT, delay=1)
+    @Retry(attempts=DEFAULTRETRYTIMEOUT, timeout=DEFAULTRETRYTIMEOUT, delay=3)
     def __is_booted(self):
         print_debug(self.runHost("machinectl status %s | grep logind" % self.jmeno, shell=True, verbose=is_debug()))
 
@@ -752,15 +752,15 @@ gpgcheck=0
                 shutil.copy(filename, pkipath_ch)
             print_info("repo prepared for microdnf:", insiderepopath, open(insiderepopath, 'r').read())
 
-#        @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, delay=21)
-#        def tempfnc():
-        print_debug("starting container via command:", "systemd-nspawn --machine=%s -bD %s" % (self.jmeno, self.chrootpath))
-        nspawncont = utils.process.SubProcess(
-            "systemd-nspawn --machine=%s -bD %s" %
-            (self.jmeno, self.chrootpath))
-        nspawncont.start()
-        self.__is_booted()
-#        tempfnc()
+        @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, delay=21)
+        def tempfnc():
+            print_debug("starting container via command:", "systemd-nspawn --machine=%s -bD %s" % (self.jmeno, self.chrootpath))
+            nspawncont = utils.process.SubProcess(
+                "systemd-nspawn --machine=%s -bD %s" %
+                (self.jmeno, self.chrootpath))
+            nspawncont.start()
+            self.__is_booted()
+        tempfnc()
         print_info("machine: %s started" % self.jmeno)
 
     def status(self, command="/bin/true"):
