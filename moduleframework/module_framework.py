@@ -67,7 +67,7 @@ class CommonFunctions(object):
     config = None
     modulemdConf = None
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.config = None
         self.modulemdConf = None
         self.moduleName = None
