@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.4.13
+Version:        0.4.14
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,10 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Tue May 09 2017 Jan Scotka <jscotka@redhat.com> 0.4.14-1
+- external setup and teardown moved to begin or end of module init/clean
+  (jscotka@redhat.com)
+
 * Tue May 09 2017 Jan Scotka <jscotka@redhat.com> 0.4.13-1
 - added args and kwargs to init because baseruntime uses that -> it caused
   troubles when inherited with __init__method (jscotka@redhat.com)
