@@ -668,11 +668,11 @@ class NspawnHelper(RpmHelper):
         self.__prepareSetup()
         self.__callSetupFromConfig()
 
-    @Retry(attempts=DEFAULTRETRYTIMEOUT, timeout=DEFAULTRETRYTIMEOUT, delay=3,inverse=True)
+    @Retry(attempts=DEFAULTRETRYTIMEOUT, timeout=DEFAULTRETRYTIMEOUT, delay=5,inverse=True)
     def __is_killed(self):
         print_debug(self.runHost("machinectl status %s" % self.jmeno, shell=True, verbose=is_debug()))
 
-    @Retry(attempts=DEFAULTRETRYTIMEOUT, timeout=DEFAULTRETRYTIMEOUT, delay=3)
+    @Retry(attempts=DEFAULTRETRYTIMEOUT, timeout=DEFAULTRETRYTIMEOUT, delay=5)
     def __is_booted(self):
         print_debug(self.runHost("machinectl status %s | grep logind" % self.jmeno, shell=True, verbose=is_debug()))
 
