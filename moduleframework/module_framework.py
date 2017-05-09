@@ -232,10 +232,10 @@ class ContainerHelper(CommonFunctions):
         :return: None
         """
         self.installTestDependencies()
+        self.__callSetupFromConfig()
         self.__prepare()
         self.__prepareContainer()
         self.__pullContainer()
-        self.__callSetupFromConfig()
 
     def tearDown(self):
         """
@@ -451,9 +451,9 @@ class RpmHelper(CommonFunctions):
         """
         self.setRepositoriesAndWhatToInstall()
         self.installTestDependencies()
+        self.__callSetupFromConfig()
         self.__prepare()
         self.__prepareSetup()
-        self.__callSetupFromConfig()
 
     def setRepositoriesAndWhatToInstall(self, repos=[], whattooinstall=[]):
         """
@@ -665,8 +665,8 @@ class NspawnHelper(RpmHelper):
             self.runHost("setenforce Permissive", ignore_status=True)
         self.setRepositoriesAndWhatToInstall()
         self.installTestDependencies()
-        self.__prepareSetup()
         self.__callSetupFromConfig()
+        self.__prepareSetup()
 
     def __is_killed(self):
         for foo in range(DEFAULTRETRYTIMEOUT):
@@ -897,7 +897,6 @@ gpgcheck=0
         self.runHost("machinectl poweroff %s" % self.jmeno)
         # self.nspawncont.stop()
         self.__is_killed()
-        self.__callCleanupFromConfig()
         if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
             # TODO: workaround because systemd nspawn is now working well in F-25
             # (failing because of selinux)
@@ -907,6 +906,7 @@ gpgcheck=0
                 ignore_status=True)
         if get_if_do_cleanup() and os.path.exists(self.chrootpath):
             shutil.rmtree(self.chrootpath, ignore_errors=True)
+        self.__callCleanupFromConfig()
 
 
     def __callSetupFromConfig(self):
