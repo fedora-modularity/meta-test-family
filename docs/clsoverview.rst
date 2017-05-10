@@ -9,4 +9,3 @@ Module overview
    generator
    module_framework
    pdc_data
-   setup
