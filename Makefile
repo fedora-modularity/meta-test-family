@@ -12,6 +12,7 @@ check: clean
 clean:
 	@python setup.py clean
 	git clean -fd
+	rm -rf build/html
 
 install: clean
 	@python setup.py install
