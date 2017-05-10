@@ -1,10 +1,10 @@
-Welcome to rebase-helper's documentation!
-=========================================
+Welcome to modularity-testing-framework's documentation!
+========================================================
 
 Contents:
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 4
 
    overview
    clsoverview

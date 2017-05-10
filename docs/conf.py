@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# rebasehelper documentation build configuration file, created by
+# modularity-testing-framework documentation build configuration file, created by
 # sphinx-quickstart on Tue Apr 21 13:42:00 2015.
 #
 # This file is execfile()d with the current directory set to its

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# This tool helps you to rebase package to the latest version
 # Copyright (C) 2013-2014 Red Hat, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -18,8 +17,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# Authors: Petr Hracek <phracek@redhat.com>
-#          Tomas Hozza <thozza@redhat.com>
+# Authors: Jan Scotka <jscotka@redhat.com>
+#          Petr Hracek <phracek@redhat.com>
 
 import os
 from moduleframework.version import VERSION
