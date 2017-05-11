@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.4.16
+Version:        0.4.17
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,11 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Thu May 11 2017 Jan Scotka <jscotka@redhat.com> 0.4.17-1
+- improved makefiles and vagrant (jscotka@redhat.com)
+- added new lines to doc strings (jscotka@redhat.com)
+- added blank line to doc scrings (jscotka@redhat.com)
+
 * Thu May 11 2017 Jan Scotka <jscotka@redhat.com> 0.4.16-1
 - repaired one mistake caused by removing avocado from common library
   (jscotka@redhat.com)
