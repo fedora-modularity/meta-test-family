@@ -87,6 +87,7 @@ def is_debug():
 def print_info(*args):
     """
     Print data to selected output in case you are not in testing class, there is self.log
+
     :param args: object
     :return: None
     """
@@ -97,6 +98,7 @@ def print_debug(*args):
     """
     Print data to selected output in case you are not in testing class, there is self.log
     In case DEBUG variable is set
+
     :param args: object
     :return: None
     """

@@ -63,6 +63,7 @@ class ComposeParser(object):
     def getModuleList(self):
         """
         Return list of all modules in compose
+
         :return: list
         """
         out = []
@@ -75,6 +76,7 @@ class ComposeParser(object):
         """
         Return list of parameteres for CI's based on compose.
         Could be used for compose qualification.
+
         :param name: name of module what is stored in compose (latest one)
         :return: list
         """

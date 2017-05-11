@@ -48,6 +48,7 @@ class PDCParser():
     def __getDataFromPdc(self):
         """
         Internal method, do not use it
+
         :return: None
         """
         PDC = "%s/?variant_name=%s&variant_version=%s&variant_release=%s&active=True" % (
@@ -62,6 +63,7 @@ class PDCParser():
         """
         Set parameters of class via name-stream-version string
         Taskotron uses this format
+
         :param nvr:
         :return: None
         """
@@ -73,6 +75,7 @@ class PDCParser():
         """
         Sets parameters via RAW fedora message from message bus
         used by internal CI
+
         :param yamlinp: yaml input string
         :return:
         """
@@ -85,6 +88,7 @@ class PDCParser():
     def setLatestPDC(self, name, stream="master", version=""):
         """
         Most flexible method how to set name stream version for search
+
         :param name: name of module
         :param stream: optional
         :param version: optional
@@ -98,6 +102,7 @@ class PDCParser():
     def generateRepoUrl(self):
         """
         Return string of generated repository located on fedora koji
+
         :return: str
         """
         rpmrepo = "http://kojipkgs.fedoraproject.org/repos/%s/latest/%s" % (
@@ -107,6 +112,7 @@ class PDCParser():
     def generateGitHash(self):
         """
         Return string of generated commit hash fopr git, to switch to proper test version
+
         :return: str
         """
         try:
@@ -119,6 +125,7 @@ class PDCParser():
         """
         Store moduleMD file locally from PDC to tempmodule.yaml file
         It should not be used ouside this library.
+
         :return: str url of file
         """
         omodulefile = MODULEFILE
@@ -131,6 +138,7 @@ class PDCParser():
         """
         Return list of params what has to be set for automation like:
         MODULE=nspawn MODULEMDURL=file:///...  URL=kojirepo
+
         :return: list
         """
         output = []
@@ -157,6 +165,7 @@ class PDCParser():
         """
         Return string of generated repository located LOCALLY
         It downloads all tagged packages and creates repo via createrepo
+
         :return: str
         """
         utils.process.run("{HOSTPACKAGER} install createrepo koji".format(**trans_dict), ignore_status=True)
@@ -191,6 +200,7 @@ class PDCParser():
         """
         Return list of params what has to be set for automation like (local repo):
         MODULE=nspawn MODULEMDURL=file:///...  URL=file:///localrepo
+
         :return: list
         """
         output = []
