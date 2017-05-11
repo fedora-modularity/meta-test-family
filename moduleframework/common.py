@@ -31,8 +31,6 @@ import sys
 import netifaces
 import socket
 import os
-from avocado.utils import process
-
 
 defroutedev = netifaces.gateways().get('default').values(
 )[0][1] if netifaces.gateways().get('default') else "lo"
@@ -43,7 +41,7 @@ dpassword = "test"
 ddatabase = "basic"
 hostpackager = "yum -y"
 guestpackager = "microdnf"
-if process.run("dnf --version", ignore_status=True).exit_status == 0:
+if os.path.exists('/usr/bin/dnf'):
     hostpackager = "dnf -y"
 
 # translation table for config.yaml files syntax is {VARIABLE} in config file
