@@ -92,5 +92,6 @@ setup(
         'Operating System :: POSIX :: Linux',
         'Programming Language :: Python',
         'Topic :: Software Development',
-    ]
+    ],
+    install_requires=['avocado-framework', 'netifaces']
 )
