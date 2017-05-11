@@ -42,27 +42,10 @@ Vagrant.configure(2) do |config|
 
     config.vm.provision "shell", inline: <<-SHELL
         set -x
-        dnf install -y python-pip make docker httpd git python2-avocado
-        pip install PyYAML behave
-        
-        git clone --depth 1 https://github.com/avocado-framework/avocado.git
-        cd avocado
-        make install
-
-        cd optional_plugins/html
-        python setup.py install
-
+        dnf install -y python-pip make docker httpd git python2-avocado python2-avocado-plugins-output-html
         cd /vagrant
-        dnf -y copr enable phracek/Modularity-testing-framework
-        dnf install -y modularity-testing-framework
-        for foo in baseruntime memcached; do
-            for bar in docker rpm; do
-                ./run-tests $foo $bar
-                mkdir -p /var/www/html/job-results/$foo-$bar
-                cp -r /root/avocado/job-results/latest/* /var/www/html/job-results/$foo-$bar
-                ln -sf /var/www/html/job-results/$foo-$bar/html/results.html /var/www/html/job-results/$foo-$bar/html/index.html
-            done
-        done
+        make all
+        cp -r /root/avocado /var/www/html/
         chmod -R a+x /var/www/html/
         restorecon -r /var/www/html/
         systemctl start httpd

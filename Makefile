@@ -4,8 +4,8 @@ PYTHONSITE=/usr/lib/python2.7/site-packages
 
 all: install check
 
-check: clean
-	./run-tests
+check:
+	cd examples/testing-module; make
 
 .PHONY: clean
 
@@ -34,5 +34,5 @@ help:
 	@echo " clean                   remove python bytecode and temp files"
 	@echo " install                 install program on current system"
 	@echo " source                  create source tarball"
-	@echo " test                    run tests/run_tests.py"
+	@echo " check                   run examples/testing_module check target in Makefile"
 	@echo " html                    create HTML documentation"

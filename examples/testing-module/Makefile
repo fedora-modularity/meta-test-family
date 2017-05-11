@@ -41,7 +41,7 @@ check-run-them-fedmsg-testmodule:
 
 
 
-check: check-rpm check-docker check-minimal-config-rpm
+check: check-docker check-minimal-config-rpm check-run-them-pdc-testmodule
 
 all: check
 

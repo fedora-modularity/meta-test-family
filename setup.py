@@ -93,5 +93,9 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
-    install_requires=['avocado-framework', 'netifaces']
+    install_requires=['avocado-framework',
+                      'netifaces',
+                      'behave',
+                      'PyYAML'
+                      ]
 )
