@@ -1,7 +1,7 @@
 # Modularity prototype testing
 
 # Latest Documentation
-  __http://modularity-testing-framework.readthedocs.io__
+  http://modularity-testing-framework.readthedocs.io
 
 ## General Structure
  * __YAML Config file__
