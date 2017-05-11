@@ -21,6 +21,7 @@
 #          Petr Hracek <phracek@redhat.com>
 
 import os
+import sys
 from moduleframework.version import VERSION
 
 try:
@@ -28,6 +29,26 @@ try:
 except ImportError:
     from distutils.core import setup
 
+# copy from https://github.com/avocado-framework/avocado/blob/master/setup.py
+VIRTUAL_ENV = hasattr(sys, 'real_prefix')
+
+def get_dir(system_path=None, virtual_path=None):
+    """
+    Retrieve VIRTUAL_ENV friendly path
+    :param system_path: Relative system path
+    :param virtual_path: Overrides system_path for virtual_env only
+    :return: VIRTUAL_ENV friendly path
+    """
+    if virtual_path is None:
+        virtual_path = system_path
+    if VIRTUAL_ENV:
+        if virtual_path is None:
+            virtual_path = []
+        return os.path.join(*virtual_path)
+    else:
+        if system_path is None:
+            system_path = []
+    return os.path.join(*(['/'] + system_path))
 
 data_files = {}
 
@@ -36,9 +57,9 @@ paths = ['docs', 'examples', 'tools']
 for path in paths:
     for root, dirs, files in os.walk(path):
         data_files[
-            os.path.join(
-                '/usr/share/moduleframework',
-                root)] = [
+            get_dir(
+                ['usr','share','moduleframework',
+                root])] = [
             os.path.join(
                 root,
                 f) for f in files]
