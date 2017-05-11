@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.4.15
+Version:        0.4.16
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,13 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Thu May 11 2017 Jan Scotka <jscotka@redhat.com> 0.4.16-1
+- repaired one mistake caused by removing avocado from common library
+  (jscotka@redhat.com)
+- repaired one mistake caused by removing avocado from common library
+  (jscotka@redhat.com)
+- added link to read the docs documentation (jscotka@redhat.com)
+
 * Thu May 11 2017 Jan Scotka <jscotka@redhat.com> 0.4.15-1
 - added link to read the docs documentation (jscotka@redhat.com)
 - removed dnf search via dnf command, beter to ask path directly
