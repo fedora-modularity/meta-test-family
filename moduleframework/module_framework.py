@@ -850,13 +850,13 @@ gpgcheck=0
             comout.stdout = b.stdout
             comout.stderr = b.stderr
             comout.exit_status = b.exit_status
-            comout.command = re.sub('\)[^)]*$','', re.sub('^[^(]*\(','',comout.command))
-            if should_ignore:
-                pass
+            removesworkaround = re.search('[^(]*\((.*)\)[^)]*',comout.command)
+            if removesworkaround:
+                comout.command = removesworkaround.group(1)
+            if comout.exit_status == 0 or should_ignore:
+                return comout
             else:
-                process.CmdError(comout.command, comout)
-
-        return comout
+                utils.process.CmdError(comout.command, comout)
 
     def selfcheck(self):
         """
