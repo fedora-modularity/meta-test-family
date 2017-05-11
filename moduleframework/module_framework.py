@@ -52,6 +52,7 @@ def skipTestIf(value, text="Test not intended for this module profile"):
     """
     function what solves troubles that it is not possible to call SKIP inside code
     You can use avocado decorators, it is preferred way.
+
     :param value: Boolean what is used for decision in case of True
     :param text: Error text what to raise
     :return: None
@@ -78,6 +79,7 @@ class CommonFunctions(object):
     def runHost(self, command="ls /", **kwargs):
         """
         Run commands on host
+
         :param command: command to exectute
         :param kwargs: (avocado utils.process.run) params like: shell, ignore_status, verbose
         :return: avocado.utils.process.run
@@ -87,6 +89,7 @@ class CommonFunctions(object):
     def installTestDependencies(self, packages=None):
         """
         Which packages install to host system to satisfy environment
+
         :param packages: List of packages, if not set, it will install rpms from config.yaml
         :return: None
         """
@@ -103,6 +106,7 @@ class CommonFunctions(object):
         """
         Load configuration from config.yaml file (it is better to call this explicitly, than in
         __init__ method for our purposes)
+
         :return: None
         """
         try:
@@ -116,6 +120,7 @@ class CommonFunctions(object):
     def getPackageList(self,profile=None):
         """
         Return list of packages what has to be installed inside module
+
         :param profile: get list for intended profile instead of default method for searching
         :return: list of packages (rpms)
         """
@@ -145,6 +150,7 @@ class CommonFunctions(object):
         """
         Return moduleMD file yaml object.
         It can be used also for loading another yaml file via url parameter
+
         :param urllink: load this url instead of default one defined in config, or redefined by vaiable CONFIG
         :return: dict
         """
@@ -169,6 +175,7 @@ class CommonFunctions(object):
         """
         Return ip addr string of guest machine
         In many cases it should be same as host machine and port should be forwarded to host
+
         :return: str
         """
         return self.ipaddr
@@ -177,6 +184,7 @@ class CommonFunctions(object):
 class ContainerHelper(CommonFunctions):
     """
     Basic Helper class for Docker container module type
+
     :avocado: disable
     """
 
@@ -210,6 +218,7 @@ class ContainerHelper(CommonFunctions):
     def getURL(self):
         """
         It returns actual URL link string to container, It is same as URL
+
         :return: str
         """
         return self.icontainer
@@ -229,6 +238,7 @@ class ContainerHelper(CommonFunctions):
         * pull docker image
         * setup environment from config
         * run and store identification
+
         :return: None
         """
         self.installTestDependencies()
@@ -240,6 +250,7 @@ class ContainerHelper(CommonFunctions):
     def tearDown(self):
         """
         Cleanup environment and call also cleanup from config
+
         :return: None
         """
         self.stop()
@@ -248,6 +259,7 @@ class ContainerHelper(CommonFunctions):
     def __prepare(self):
         """
         Internal method, do not use it anyhow
+
         :return: None
         """
         if not os.path.isfile('/usr/bin/docker-current'):
@@ -256,6 +268,7 @@ class ContainerHelper(CommonFunctions):
     def __prepareContainer(self):
         """
         Internal method, do not use it anyhow
+
         :return: None
         """
         if self.tarbased == False and self.jmeno == self.icontainer and "docker.io" not in self.info[
@@ -272,6 +285,7 @@ class ContainerHelper(CommonFunctions):
     def __pullContainer(self):
         """
         Internal method, do not use it anyhow
+
         :return: None
         """
         if self.tarbased:
@@ -291,6 +305,7 @@ class ContainerHelper(CommonFunctions):
     def start(self, args="-it -d", command="/bin/bash"):
         """
         start the docker container
+
         :param args: Do not use it directly (It is defined in config.yaml)
         :param command: Do not use it directly (It is defined in config.yaml)
         :return: None
@@ -328,6 +343,7 @@ class ContainerHelper(CommonFunctions):
     def stop(self):
         """
         Stop the docker container
+
         :return: None
         """
         if self.status():
@@ -341,6 +357,7 @@ class ContainerHelper(CommonFunctions):
     def status(self):
         """
         get status if container is running
+
         :return: bool
         """
         if self.docker_id and self.docker_id[
@@ -353,6 +370,7 @@ class ContainerHelper(CommonFunctions):
     def run(self, command="ls /", **kwargs):
         """
         Run command inside module, all params what allows avocado are passed inside shell,ignore_status, etc.
+
         :param command: str
         :param kwargs: dict
         :return: avocado.utils.process.run
@@ -366,6 +384,7 @@ class ContainerHelper(CommonFunctions):
     def copyTo(self, src, dest):
         """
         Copy file to module
+
         :param src: str path to source file
         :param dest: str path to file inside module
         :return: None
@@ -376,6 +395,7 @@ class ContainerHelper(CommonFunctions):
     def copyFrom(self, src, dest):
         """
         Copy file from module
+
         :param src: str path of file inside module
         :param dest: str path of destination file
         :return: None
@@ -386,6 +406,7 @@ class ContainerHelper(CommonFunctions):
     def __callSetupFromConfig(self):
         """
         Internal method, do not use it anyhow
+
         :return: None
         """
         if self.info.get("setup"):
@@ -394,6 +415,7 @@ class ContainerHelper(CommonFunctions):
     def __callCleanupFromConfig(self):
         """
         Internal method, do not use it anyhow
+
         :return: None
         """
         if self.info.get("cleanup"):
@@ -404,6 +426,7 @@ class RpmHelper(CommonFunctions):
     """
     Class for testing "modules" on local machine (host) directly. It could be used for scheduling tests for
     system packages
+
     :avocado: disable
     """
 
@@ -437,7 +460,8 @@ class RpmHelper(CommonFunctions):
         """
         Return semicolon separated string of repositories what will be used, could be simialr to URL param,
          it contains also dependent repositories from PDC
-        :return:
+
+        :return: str
         """
         return ";".join(self.repos)
 
@@ -447,6 +471,7 @@ class RpmHelper(CommonFunctions):
         for RPM based testing
         * installing dependencies from config
         * setup environment from config
+
         :return: None
         """
         self.setRepositoriesAndWhatToInstall()
@@ -459,6 +484,7 @@ class RpmHelper(CommonFunctions):
         """
         set repositories and packages what to install inside module
         It can override base usage of this framework to general purpose testing
+
         :param repos: list of repositories
         :param whattooinstall: list of packages to install inside
         :return: None
@@ -491,6 +517,7 @@ class RpmHelper(CommonFunctions):
     def tearDown(self):
         """
         cleanup enviroment and call cleanup from config
+
         :return: None
         """
         self.stop()
@@ -499,6 +526,7 @@ class RpmHelper(CommonFunctions):
     def __prepare(self):
         """
         Internal method, do not use it anyhow
+
         :return: None
         """
         counter = 0
@@ -518,6 +546,7 @@ gpgcheck=0
     def __prepareSetup(self):
         """
         Internal method, do not use it anyhow
+
         :return: None
         """
         try:
@@ -539,6 +568,7 @@ gpgcheck=0
     def status(self, command="/bin/true"):
         """
         Return status of module
+
         :param command: which command used for do that. it could be defined inside config
         :return: bool
         """
@@ -555,6 +585,7 @@ gpgcheck=0
     def start(self, command="/bin/true"):
         """
         start the RPM based module (like systemctl start service)
+
         :param args: Do not use it directly (It is defined in config.yaml)
         :param command: Do not use it directly (It is defined in config.yaml)
         :return: None
@@ -567,6 +598,7 @@ gpgcheck=0
     def stop(self, command="/bin/true"):
         """
         stop the RPM based module (like systemctl stop service)
+
         :param args: Do not use it directly (It is defined in config.yaml)
         :param command: Do not use it directly (It is defined in config.yaml)
         :return: None
@@ -579,6 +611,7 @@ gpgcheck=0
     def run(self, command="ls /", **kwargs):
         """
         Run command inside module, for RPM based it is same as runHost
+
         :param command: str of command to execute
         :param kwargs: dict from avocado.utils.process.run
         :return: avocado.utils.process.run
@@ -589,6 +622,7 @@ gpgcheck=0
     def copyTo(self, src, dest):
         """
         Copy file from one location (host) to another one to (module)
+
         :param src: str
         :param dest: str
         :return: None
@@ -598,6 +632,7 @@ gpgcheck=0
     def copyFrom(self, src, dest):
         """
         Copy file from one location (module) to another one to (host)
+
         :param src: str
         :param dest: str
         :return: None
@@ -607,6 +642,7 @@ gpgcheck=0
     def __callSetupFromConfig(self):
         """
         Internal method, do not use it anyhow
+
         :return: None
         """
         if self.info.get("setup"):
@@ -615,6 +651,7 @@ gpgcheck=0
     def __callCleanupFromConfig(self):
         """
         Internal method, do not use it anyhow
+
         :return: None
         """
         if self.info.get("cleanup"):
@@ -654,6 +691,7 @@ class NspawnHelper(RpmHelper):
         for systemd nspawn based testing
         * installing dependencies from config
         * setup environment from config
+
         :return: None
         """
 
@@ -690,6 +728,7 @@ class NspawnHelper(RpmHelper):
     def __prepareSetup(self):
         """
         Internal method, do not use it anyhow
+
         :return: None
         """
         if get_if_do_cleanup() and os.path.exists(self.chrootpath):
@@ -777,6 +816,7 @@ gpgcheck=0
     def status(self, command="/bin/true"):
         """
         Return status of module
+
         :param command: which command used for do that. it could be defined inside config
         :return: bool
         """
@@ -793,6 +833,7 @@ gpgcheck=0
     def start(self, command="/bin/true"):
         """
         start the RPM based module (like systemctl start service)
+
         :param args: Do not use it directly (It is defined in config.yaml)
         :param command: Do not use it directly (It is defined in config.yaml)
         :return: None
@@ -805,6 +846,7 @@ gpgcheck=0
     def stop(self, command="/bin/true"):
         """
         stop the RPM based module (like systemctl stop service)
+
         :param args: Do not use it directly (It is defined in config.yaml)
         :param command: Do not use it directly (It is defined in config.yaml)
         :return: None
@@ -862,6 +904,7 @@ gpgcheck=0
         """
         Test if default command will pass, it is more important for nspawn, because it happens that
         it does not returns anything
+
         :return: avocado.utils.process.run
         """
         return self.run().stdout
@@ -869,6 +912,7 @@ gpgcheck=0
     def copyTo(self, src, dest):
         """
         Copy file to module from host
+
         :param src: source file on host
         :param dest: destination file on module
         :return: None
@@ -880,6 +924,7 @@ gpgcheck=0
     def copyFrom(self, src, dest):
         """
         Copy file from module to host
+
         :param src: source file on module
         :param dest: destination file on host
         :return: None
@@ -891,6 +936,7 @@ gpgcheck=0
     def tearDown(self):
         """
         cleanup environment after test is finished and call cleanup section in config file
+
         :return: None
         """
         self.stop()
@@ -912,6 +958,7 @@ gpgcheck=0
     def __callSetupFromConfig(self):
         """
         Internal method, do not use it anyhow
+
         :return: None
         """
         if self.info.get("setup"):
@@ -920,6 +967,7 @@ gpgcheck=0
     def __callCleanupFromConfig(self):
         """
         Internal method, do not use it anyhow
+
         :return: None
         """
         if self.info.get("cleanup"):
@@ -955,6 +1003,7 @@ class AvocadoTest(Test):
         It is called when instance of test is created.
 
         When you redefine this method in your class, don't forget to call super(self.__class__,self).setUp()
+
         :return: None
         """
         return self.backend.setUp()
@@ -965,6 +1014,7 @@ class AvocadoTest(Test):
         It is called when instance of test is finished.
 
         When you redefine this method in your class, don't forget to call super(self.__class__,self).tearDown()
+
         :return: None
         """
         return self.backend.tearDown(*args, **kwargs)
@@ -973,6 +1023,7 @@ class AvocadoTest(Test):
         """
         Start the module, it uses start action from config file for selected module or it calls default start
         in case start action is not defined in config file
+
         :param args: Do not use it directly (It is defined in config.yaml)
         :param kwargs: Do not use it directly (It is defined in config.yaml)
         :return: None
@@ -984,6 +1035,7 @@ class AvocadoTest(Test):
         Stop the module, it uses stop action from config file for selected module or it calls default stop
         in case stop action is not defined in config file (for some module type, stop action does not have sense,
         like docker, stop is done via docker stop dockerID)
+
         :param args: Do not use it directly (It is defined in config.yaml)
         :param kwargs: Do not use it directly (It is defined in config.yaml)
         :return: None
@@ -993,6 +1045,7 @@ class AvocadoTest(Test):
     def run(self, *args, **kwargs):
         """
         Run command inside module, parametr command and others are passed to proper module Helper
+
         :param args: command
         :param kwargs: shell, ignore_status, verbose
         :return: object avocado.utils.process.run
@@ -1003,6 +1056,7 @@ class AvocadoTest(Test):
                       output_text=None, *args, **kwargs):
         """
         derived from self.run method but allows to add also to pass expected return code.
+
         :param command: str Command to run
         :param expected_state: int expected value of return code of command or last command in case of shell
         :param output_text: str Description of commands, what it does (in case of empty, command is default)
@@ -1024,6 +1078,7 @@ class AvocadoTest(Test):
     def getConfig(self):
         """
         Return dict object of loaded config file
+
         :return: dict
         """
         return self.backend.config
@@ -1031,6 +1086,7 @@ class AvocadoTest(Test):
     def getConfigModule(self):
         """
         Return just part specific for this module type (module section in config file)
+
         :return: dict
         """
         return self.backend.info
@@ -1039,6 +1095,7 @@ class AvocadoTest(Test):
         """
         Run command on host (local machine). all parameters are passed inside. the most important is command
         what contains command to run
+
         :param args: pass thru
         :param kwargs: pass thru
         :return: object of avocado.utils.process.run
@@ -1048,6 +1105,7 @@ class AvocadoTest(Test):
     def getModulemdYamlconfig(self, *args, **kwargs):
         """
         Return dict of actual moduleMD file
+
         :param args: pass thru
         :param kwargs: pass thru
         :return: dict
@@ -1058,6 +1116,7 @@ class AvocadoTest(Test):
         """
         Return actual profile set profile via env variable PROFILE, could be used for filtering tests with skipIf method
         Actually it returns list of packages, because profiles are not defined well
+
         :return: str
         """
         self.start()
@@ -1067,6 +1126,7 @@ class AvocadoTest(Test):
     def copyTo(self, *args, **kwargs):
         """
         Copy file from host machine to module
+
         :param src: source file from host
         :param dest: destination file inside module
         :return: None
@@ -1076,6 +1136,7 @@ class AvocadoTest(Test):
     def copyFrom(self, *args, **kwargs):
         """
         Copy file from module to host machine
+
         :param src: source file from host
         :param dest: destination file inside module
         :return: None
@@ -1086,6 +1147,7 @@ class AvocadoTest(Test):
         """
         Return ip addr string of guest machine
         In many cases it should be same as host machine and port should be forwarded to host
+
         :return: str
         """
         return self.backend.getIPaddr(*args, **kwargs)
@@ -1096,6 +1158,7 @@ class ContainerAvocadoTest(AvocadoTest):
     """
     Class for writing tests specific just for DOCKER
     derived from AvocadoTest class.
+
     :avocado: disable
     """
 
@@ -1107,6 +1170,7 @@ class ContainerAvocadoTest(AvocadoTest):
     def checkLabel(self, key, value):
         """
         check label of docker image, expect key value (could be read from config file)
+
         :param key: str
         :param value: str
         :return: bool
@@ -1121,6 +1185,7 @@ class RpmAvocadoTest(AvocadoTest):
     """
     Class for writing tests specific just for LOCAL (system) RPM testing
     derived from AvocadoTest class.
+
     :avocado: disable
     """
 
@@ -1134,6 +1199,7 @@ class NspawnAvocadoTest(AvocadoTest):
     """
     Class for writing tests specific just for RPM module testing inside NSPAWN env
     derived from AvocadoTest class.
+
     :avocado: disable
     """
 
@@ -1148,6 +1214,7 @@ def get_correct_backend():
     """
     Return proper module type, set by config by default_module section, or defined via
     env variable "MODULE"
+
     :return: tuple (specific module object, str)
     """
     amodule = os.environ.get('MODULE')
@@ -1169,6 +1236,7 @@ def get_correct_backend():
 def get_correct_profile():
     """
     Return profile name string
+
     :return: str
     """
     amodule = os.environ.get('PROFILE')
@@ -1183,6 +1251,7 @@ def get_correct_url():
     env variable "URL"
 
     It redefines location of testing subject
+
     :return:
     """
     amodule = os.environ.get('URL')
@@ -1194,6 +1263,7 @@ def get_correct_config():
     Return proper config what should be used
     default location is ./config.yaml, could be refedined via
     env variable CONFIG
+
     :return: str
     """
     cfgfile = os.environ.get('CONFIG')
@@ -1216,6 +1286,7 @@ def get_compose_url():
     """
     Return Compose Url if set in config or via
     env variable COMPOSEURL
+
     :return: str
     """
     compose = os.environ.get('COMPOSEURL')
@@ -1236,6 +1307,7 @@ def get_correct_modulemd():
     Return dict of moduleMD file for module, It is read from config, from module-url section,
     if not defined it reads modulemd file from compose-url in case of set, or there is used
     env variable MODULEMDURL (eventually COMPOSEURL) for that
+
     :return: dict
     """
     mdf = os.environ.get('MODULEMDURL')
@@ -1259,6 +1331,7 @@ def get_latest_repo_url(wmodule="base-runtime", wstream="master", fake=False):
     Return URL location of rpm repository.
     It reads data from PDC and construct url locator.
     It is used to solve repos for dependent modules (eg. memcached is dependent on perl and baseruntime)
+
     :param wmodule: module name
     :param wstream: module stream
     :param fake:
@@ -1279,6 +1352,7 @@ def get_if_do_cleanup():
     """
     Returns boolean value in case variable is set.
      It is used internally in code
+
     :return: bool
     """
     cleanup = os.environ.get('MTF_DO_NOT_CLEANUP')
@@ -1289,6 +1363,7 @@ def get_if_remoterepos():
     """
     Returns boolean value in case variable is set.
     It is used internally in code
+
     :return: bool
     """
     rreps = os.environ.get('MTF_REMOTE_REPOS')
@@ -1299,6 +1374,7 @@ def get_if_module():
     """
     Returns boolean value in case variable is set.
     It is used internally in code
+
     :return: bool
     """
     rreps = os.environ.get('MTF_DISABLE_MODULE')
