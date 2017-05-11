@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.4.14
+Version:        0.4.15
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -46,6 +46,16 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 
 %changelog
+* Thu May 11 2017 Jan Scotka <jscotka@redhat.com> 0.4.15-1
+- added link to read the docs documentation (jscotka@redhat.com)
+- removed dnf search via dnf command, beter to ask path directly
+  (jscotka@redhat.com)
+- added dependencies to setup.py file (jscotka@redhat.com)
+- try to be more prepared for virt-env (jscotka@redhat.com)
+- delete html folder in make clean (phracek@redhat.com)
+- Several documentation updates (phracek@redhat.com)
+- Remove obsolete documentation (phracek@redhat.com)
+
 * Tue May 09 2017 Jan Scotka <jscotka@redhat.com> 0.4.14-1
 - external setup and teardown moved to begin or end of module init/clean
   (jscotka@redhat.com)
