@@ -1,5 +1,8 @@
 # Modularity prototype testing
 
+# Latest Documentation
+  __http://modularity-testing-framework.readthedocs.io__
+
 ## General Structure
  * __YAML Config file__
      * Each module will need to have yaml config file
