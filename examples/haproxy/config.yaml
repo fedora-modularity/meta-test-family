@@ -7,7 +7,7 @@ service:
 packages:
     rpms:
         - haproxy
-testdependecies:
+testdependencies:
     rpms:
         - nc
         - docker

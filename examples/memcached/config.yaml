@@ -8,7 +8,7 @@ packages:
     rpms:
         - memcached
         - perl-Carp
-testdependecies:
+testdependencies:
     rpms:
         - nc
 module:

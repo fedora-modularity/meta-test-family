@@ -29,7 +29,7 @@ packages:
         - default
 # packages what will be installed on host machine (for example nc (netcat) for testing if module
 # provides service on port exported to host)
-testdependecies:
+testdependencies:
     rpms:
         - nc
 # default module type for testing if not set by env variable

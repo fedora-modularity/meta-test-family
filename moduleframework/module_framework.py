@@ -45,6 +45,7 @@ import pdc_data
 from common import *
 from timeoutlib import Retry
 import time
+import warnings
 
 PROFILE = None
 
@@ -93,9 +94,21 @@ class CommonFunctions(object):
         :param packages: List of packages, if not set, it will install rpms from config.yaml
         :return: None
         """
-        if not packages and 'testdependecies' in self.config and 'rpms' in self.config[
-                'testdependecies']:
-            packages = self.config['testdependecies']['rpms']
+        if not packages:
+            typo = 'testdependecies' in self.config
+            if typo:
+                warnings.warn("'testdependecies' is a typo, please fix",
+                              DeprecationWarning)
+
+            # try section without typo first
+            packages = self.config.get('testdependencies', {}).get('rpms')
+            if packages:
+                if typo:
+                    warnings.warn("preferring section without typo")
+            else:
+                # fall back to mistyped test dependency section
+                packages = self.config.get('testdependecies', {}).get('rpms')
+
         if packages:
             self.runHost(
                 "{HOSTPACKAGER} install ".format(**trans_dict) +

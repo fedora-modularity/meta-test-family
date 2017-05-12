@@ -9,7 +9,7 @@ packages:
         #- centos-release
         - psmisc
         - procps-ng
-testdependecies:
+testdependencies:
     rpms:
         - nc
         - fedora-release

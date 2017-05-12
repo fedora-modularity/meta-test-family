@@ -17,7 +17,7 @@ packages:
     rpms:
         - memcached
         - perl-Carp
-testdependecies:
+testdependencies:
     rpms:
         - nc
 ```
@@ -26,7 +26,7 @@ testdependecies:
  * `compose-url:` final compose build (done by pungi) it contains repositories + moduleMD infromations for tooling
  * `service:` In case module is service like memcached, store there port number, can be then used in tests, to not hardcode port number *(Optional)*
  * `packages:` Which packages will be installed inside module (docker container, guest, any type of module)
- * `testdependecies:` Install dependencies on host, what are important for module testing, for example when you would like to use `nc`, you have to install it explicitly, it is not in cloud images.
+ * `testdependencies:` Install dependencies on host, what are important for module testing, for example when you would like to use `nc`, you have to install it explicitly, it is not in cloud images.
 
 ## Module types specification
 It contains specification for each type of module, now for __rpm__ and __docker__ based modules
