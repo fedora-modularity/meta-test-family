@@ -11,27 +11,26 @@ Source0:        http://releases.pagure.org/%{name}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 BuildRequires:  python2-devel
-BuildRequires:  python-setuptools
+BuildRequires:  python2-setuptools
 Requires:       python2-avocado
 Requires:       python2-avocado-plugins-output-html
 Requires:       python-netifaces
 Requires:       docker
 
-
 %description
-Framework for writing tests for modules and containers
+%{summary}.
 
 %prep
-%setup -q -n %{name}-%{version}
+%autosetup
 # Remove bundled egg-info
 rm -rf %{name}.egg-info
 
 %build
-%{__python2} setup.py build
+%py2_build
 
 %install
-%{__python2} setup.py install --skip-build --root %{buildroot}
-install -d -m 755 %{buildroot}%{_datadir}/%{framework_name}
+%py2_install
+install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
 chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,generator,bashhelper,setup}.py
 
 %files
@@ -40,10 +39,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 %{_bindir}/moduleframework-cmd
 %{_bindir}/modulelint
 %{_bindir}/generator
-%{python2_sitelib}/moduleframework
-%{python2_sitelib}/modularity_testing_framework-?.?.*-py?.?.egg-info
-%{_datadir}/moduleframework
-
+%{python2_sitelib}/moduleframework/
+%{python2_sitelib}/modularity_testing_framework-*.egg-info/
+%{_datadir}/moduleframework/
 
 %changelog
 * Fri May 12 2017 Jan Scotka <jscotka@redhat.com> 0.4.21-1
