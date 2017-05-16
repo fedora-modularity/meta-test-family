@@ -1,5 +1,5 @@
 CMD=python -m avocado run --filter-by-tags=-WIP
-TESTS=$(shell ls *.py *.sh)
+TESTS=$(shell ls *.py *.sh modulelint/*.py)
 export MTF_REMOTE_REPOS=yes
 export MTF_DO_NOT_CLEANUP=yes
 

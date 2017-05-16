@@ -5,7 +5,6 @@ modulemd-url: https://src.fedoraproject.org/cgit/modules/memcached.git/plain/mem
 packages:
     rpms:
         - bash
-        - microdnf
         - rpm
 module:
     docker:

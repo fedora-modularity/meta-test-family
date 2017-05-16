@@ -55,7 +55,7 @@ data_files = {}
 paths = ['docs', 'examples', 'tools']
 
 for path in paths:
-    for root, dirs, files in os.walk(path):
+    for root, dirs, files in os.walk(path, followlinks=True):
         data_files[
             get_dir(
                 ['usr','share','moduleframework',

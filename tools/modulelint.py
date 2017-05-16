@@ -22,10 +22,7 @@
 #
 
 
-import inspect
 from moduleframework import module_framework
-from avocado import utils
-from avocado import main
 
 
 class DockerLint(module_framework.ContainerAvocadoTest):
@@ -90,7 +87,3 @@ class ModuleLintPackagesCheck(module_framework.AvocadoTest):
             for x in self.run(r'rpm -qa --qf="%{name}\n"').stdout.split('\n')]
         for pkg in self.backend.getPackageList():
             self.assertIn(pkg, allpackages)
-
-
-if __name__ == '__main__':
-    main()
