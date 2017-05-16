@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.4.22
+Version:        0.4.23
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -44,6 +44,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 %{_datadir}/moduleframework/
 
 %changelog
+* Tue May 16 2017 Jan Scotka <jscotka@redhat.com> 0.4.23-1
+- do not remove base packages (jscotka@redhat.com)
+
 * Tue May 16 2017 Jan Scotka <jscotka@redhat.com> 0.4.22-1
 - modulelint tests in subdirectory and some improvements (jscotka@redhat.com)
 - packaging: trivial fixes (ignatenkobrain@fedoraproject.org)
