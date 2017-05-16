@@ -41,8 +41,12 @@ class ComposeTest(module_framework.NspawnAvocadoTest):
         """
         self.log.info("Checking availability of component and installation and remove them")
         for profile in self.getModulemdYamlconfig()["data"].get("profiles"):
-            actualpackagelist = " ".join(self.getModulemdYamlconfig()["data"]["profiles"].get(profile))
+            actualpackagelist = " ".join(
+                set(self.getModulemdYamlconfig()["data"]["profiles"].get(profile))
+                -set(common.BASEPACKAGESET+common.BASEPACKAGESET_WORKAROUND)
+            )
             packager = common.trans_dict["GUESTPACKAGER"]
-            self.run("%s install %s" % (packager, actualpackagelist))
-            self.run("rpm -q %s" % actualpackagelist)
-            self.run("%s remove %s" % (packager, actualpackagelist))
+            if actualpackagelist:
+                self.run("%s install %s" % (packager, actualpackagelist))
+                self.run("rpm -q %s" % actualpackagelist)
+                self.run("%s remove %s" % (packager, actualpackagelist))
