@@ -43,7 +43,8 @@ export PARSEITEM=$2
 # compose fedmsg or None same as fedmsg
 export PARSEITEMTYPE=$3
 export MTF_PATH=/usr/share/moduleframework
-export MODULE_LINT=$MTF_PATH/tools/modulelint.py
+export MODULE_LINT="$MTF_PATH/tools/modulelint/*.py"
+export MODULE_TESTS="*.py *.sh"
 
 export AVDIR=~/avocado
 mkdir -p $AVDIR
@@ -91,7 +92,7 @@ function avocado_wrapper(){
     (
     cp -rf $MTF_PATH/examples/$MODULENAME tests_$MODULENAME
     cd tests_$MODULENAME
-    TESTS="`ls *.py *.sh` $MODULE_LINT"
+    TESTS="`ls $MODULE_TESTS $MODULE_LINT`"
     echo "AVOCADO FOUND TESTS: $TESTS"
     eval $PARAMS $AVOCADOCMD $TESTS
     )
@@ -99,7 +100,7 @@ function avocado_wrapper(){
 
 function run_modulelint(){
 
-    TESTS="$MODULE_LINT"
+    TESTS="`ls $MODULE_LINT`"
     echo "RUN AT LEAST MODULE LINTER: $TESTS"
     eval $PARAMS CONFIG=$MTF_PATH/docs/example-config-minimal.yaml $AVOCADOCMD $TESTS
 }
