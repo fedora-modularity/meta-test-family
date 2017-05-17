@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.4.23
+Version:        0.4.24
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -44,6 +44,10 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 %{_datadir}/moduleframework/
 
 %changelog
+* Wed May 17 2017 Jan Scotka <jscotka@redhat.com> 0.4.24-1
+- added new version of module lint, it is now directory, so that repaired in
+  common tests (jscotka@redhat.com)
+
 * Tue May 16 2017 Jan Scotka <jscotka@redhat.com> 0.4.23-1
 - do not remove base packages (jscotka@redhat.com)
 
