@@ -51,7 +51,7 @@ class DockerLint(module_framework.ContainerAvocadoTest):
 
 class ModuleLintSigning(module_framework.AvocadoTest):
     """
-    :avocado: enable
+    :avocado: disable
     :avocado: tags=WIP
     """
 
