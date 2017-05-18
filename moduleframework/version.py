@@ -3,10 +3,10 @@
 import os
 
 SPECFILEPATH = os.path.abspath(
+    # Path to SPECFILE
     os.path.join(
-        os.path.dirname(
-            os.path.dirname(__file__)
-        ),
+        os.path.dirname(__file__),
+        "..",
         "modularity-testing-framework.spec"
     ))
 

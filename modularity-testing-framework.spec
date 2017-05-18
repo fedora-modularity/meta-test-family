@@ -2,7 +2,7 @@
 
 Name:           modularity-testing-framework
 Version:        0.4.25
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
 License:        GPLv2+
@@ -44,6 +44,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 %{_datadir}/moduleframework/
 
 %changelog
+* Thu May 18 2017 Petr Hracek <phracek@redhat.com> - 0.4.25-2
+- Calulcate correct path to SPEC file
+
 * Thu May 18 2017 Jan Scotka <jscotka@redhat.com> 0.4.25-1
 - 
 
