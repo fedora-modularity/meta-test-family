@@ -44,6 +44,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 %{_datadir}/moduleframework/
 
 %changelog
+* Thu May 18 2017 Petr "Stone" Hracek <phracek@redhat.com> 0.4.25-2
+- Calculate correct path to SPEC file (phracek@redhat.com)
+
 * Thu May 18 2017 Petr Hracek <phracek@redhat.com> - 0.4.25-2
 - Calulcate correct path to SPEC file
 
