@@ -8,3 +8,4 @@ recursive-include moduleframework *
 recursive-include docs *
 recursive-include examples *
 recursive-include tools *
+recursive-include distro *
