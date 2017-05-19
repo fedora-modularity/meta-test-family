@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.4.26
+Version:        0.4.27
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -44,6 +44,10 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 %{_datadir}/moduleframework/
 
 %changelog
+* Fri May 19 2017 Jan Scotka <jscotka@redhat.com> 0.4.27-1
+- disabled test for package signing (jscotka@redhat.com)
+- Moving SPEC to specific distro directory (phracek@redhat.com)
+
 * Thu May 18 2017 Petr Hracek <phracek@redhat.com> - 0.4.26-1
 - Calulcate correct path to SPEC file
 
