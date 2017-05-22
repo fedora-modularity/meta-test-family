@@ -79,13 +79,26 @@ Schedule Tests
     - **dnf copr enable phracek/Modularity-testing-framework**
     - install it by command: **dnf install -y modularity-testing-framework**
     - It installs packages to python site-packages and to /usr/share/moduleframework
-- To include tests into your module, add to your Makefile section **check**
-- **check** section runs script **run_tests.sh** which
-- Your **run_tests.sh** should contain:
-    - **Docker based module testing:** `MODULE=docker avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py`
-    - **Repo based module testing:** `MODULE=nspawn avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py`
-    - **Host Rpm based module testing:** `MODULE=rpm avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py`
-    - `make check` -  runs tests in your module directory
+- To include tests into your module, add to your Makefile section **test**
+- **test** section runs another Makefile in directory **tests**
+- Your **Makefile** should contain:
+    - **Docker based module testing:** `cd tests; MODULE=docker make all`
+    - **Repo based module testing:** `MODULE=nspawn make all `
+    - **Host Rpm based module testing:** `MODULE=rpm make all`
+
+- Makefile in tests directory looks like:
+
+    $ cat tests/Makefile
+    MODULE_LINT=/usr/share/moduleframework/tools/modulelint.py
+    CMD=python -m avocado run --filter-by-tags=-WIP $(MODULE_LINT) *.py
+
+    #
+    all: $(CMD)
+
+    - **Makefile in MTF** `https://pagure.io/modularity-testing-framework/blob/master/f/examples/testing-module/Makefile`
+
+- `make check` -  runs tests in your module directory
+
 
 How to write tests
 ------------------
