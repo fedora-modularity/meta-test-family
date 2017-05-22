@@ -82,10 +82,10 @@ Schedule Tests
 - To include tests into your module, add to your Makefile section **check**
 - **check** section runs script **run_tests.sh** which
 - Your **run_tests.sh** should contain:
-  - **Docker based module testing:** *MODULE=docker avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py*
-  - **Repo based module testing:** *MODULE=nspawn avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py*
-  - **Host Rpm based module testing:** *MODULE=rpm avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py*
-  - `make check` -  runs tests in your module directory
+    - **Docker based module testing:** `MODULE=docker avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py`
+    - **Repo based module testing:** `MODULE=nspawn avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py`
+    - **Host Rpm based module testing:** `MODULE=rpm avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py`
+    - `make check` -  runs tests in your module directory
 
 How to write tests
 ------------------
