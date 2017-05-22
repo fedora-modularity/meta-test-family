@@ -82,4 +82,4 @@ testhost:
   * next level like __processrunning__ is test name what will be visible on output of avocado run, then all lines will be run as commands for this test
  * `testhost:` it is similar to *test*,  just difference is that it runs commands on host machine so that there could be more dependencies than just are in module. I', not sure if this part is useful, will see after discussion *(Optional)*
   * other specification is same as `test`
- * you have to call `generator` binary to generate python files from that (because unittests does not allow to have dynamically created tests)
+ * you have to call `mtf-generator` binary to generate python files from that (because unittests does not allow to have dynamically created tests)

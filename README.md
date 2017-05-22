@@ -17,7 +17,7 @@
      * Now it just expect to end with `0` return code of command (like: `ls / |grep sbin` directory sbin exists in root dir)
      * It can contain multiple lines
      * It generates python covered bash tests
-     * You has to call `generator` binary explicitly, it then create these pythonish tests with bash inside, *Unittest* doesn not allow to have dynamic tests.
+     * You has to call `mtf-generator` binary explicitly, it then create these pythonish tests with bash inside, *Unittest* doesn not allow to have dynamic tests.
 
  * __Avocado tests__
      * There is wrapper class what helps you to tests modules not focusing on module type
@@ -90,7 +90,7 @@ pip install avocado-framework yaml json behave
     * ```dnf copr enable phracek/Modularity-testing-framework```
     * install it by command: ```dnf install -y modularity-testing-framework```
   * CREATE your config.yaml (see example https://pagure.io/modularity-testing-framework/blob/master/f/docs/example-config.yaml)
-  * If you have tests in config file call:  `/usr/bin/generator` or simply `generator`.
+  * If you have tests in config file call:  `/usr/bin/mtf-generator` or simply `mtf-generator`.
   * Call command for running all python tests:  `MODULE=docker avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py`
  * __additional tests__ - see tests in https://pagure.io/modularity-testing-framework/blob/master/f/examples/testing-module directory as an example for you
 
