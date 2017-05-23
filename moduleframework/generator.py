@@ -21,6 +21,8 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
+from __future__ import print_function
+
 from moduleframework.module_framework import CommonFunctions
 
 
@@ -63,7 +65,7 @@ class GeneratedTestsConfig(module_framework.AvocadoTest):
 """ % testname
         for line in testlines:
             self.output = self.output + '        self.%s(""" %s """,  shell=True)\n' % (method, line)
-        print "Added test (runmethod: %s): %s" % (method, testname)
+        print("Added test (runmethod: %s): %s" % (method, testname))
 
 
 def main():
@@ -71,6 +73,13 @@ def main():
     configout = open('generated.py', 'w')
     configout.write(config.output)
     configout.close()
+
+
+def deprecated_main():
+    import sys
+    print("The 'generator' name is deprecated and will go away eventually, "
+          "please use\n'mtf-generator' instead!", file=sys.stderr)
+    main()
 
 
 if __name__ == '__main__':

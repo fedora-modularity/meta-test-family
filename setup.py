@@ -80,7 +80,8 @@ setup(
         'console_scripts': [
             'moduleframework-cmd = moduleframework.bashhelper:main',
             'modulelint = moduleframework.modulelint:main',
-            'generator = moduleframework.generator:main',
+            'mtf-generator = moduleframework.generator:main',
+            'generator = moduleframework.generator:deprecated_main',
         ]
     },
     setup_requires=[],
