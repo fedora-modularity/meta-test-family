@@ -7,7 +7,9 @@ Contents:
    :maxdepth: 4
 
    overview
+   how_to_schedule
    workflow_integration
+   levels
    clsoverview
 
 Indices and tables
