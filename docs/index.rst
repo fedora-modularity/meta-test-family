@@ -7,6 +7,7 @@ Contents:
    :maxdepth: 4
 
    overview
+   workflow_integration
    clsoverview
 
 Indices and tables
