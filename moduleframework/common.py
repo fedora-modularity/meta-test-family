@@ -94,7 +94,12 @@ def print_info(*args):
     for arg in args:
         out = arg
         if isinstance(arg, basestring):
-            out = arg.format(**trans_dict)
+            try:
+                out = arg.format(**trans_dict)
+            except KeyError:
+                raise BaseException(
+                    "String is formatted by using trans_dict, if you want to use brackets { } in your code please use {{ or }}, possible values in trans_dict are:",
+                    trans_dict)
         print >> sys.stderr, out
 
 def print_debug(*args):

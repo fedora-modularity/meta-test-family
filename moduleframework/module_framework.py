@@ -85,7 +85,11 @@ class CommonFunctions(object):
         :param kwargs: (avocado utils.process.run) params like: shell, ignore_status, verbose
         :return: avocado.utils.process.run
         """
-        return utils.process.run("%s" % command.format(**trans_dict), **kwargs)
+        try:
+            formattedcommand = command.format(**trans_dict)
+        except KeyError:
+            raise BaseException("Command is formatted by using trans_dict, if you want to use brackets { } in your code please use {{ or }}, possible values in trans_dict are:", trans_dict)
+        return utils.process.run("%s" % formattedcommand, **kwargs)
 
     def installTestDependencies(self, packages=None):
         """
