@@ -316,7 +316,7 @@ class ContainerHelper(CommonFunctions):
 
         self.containerInfo = json.loads(
             self.runHost(
-                "docker inspect --format='{{json .Config}}'  %s" %
+                "docker inspect %s" %
                 self.jmeno).stdout)
 
     def start(self, args="-it -d", command="/bin/bash"):
