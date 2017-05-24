@@ -68,7 +68,7 @@ class ModuleLintSigning(module_framework.AvocadoTest):
         KEY = FEDKEY
         self.start()
         allpackages = self.run(
-            r'rpm -qa --qf="%{name}-%{version}-%{release} %{SIGPGP:pgpsig}\n"').stdout
+            r'rpm -qa --qf="%{{name}}-%{{version}}-%{{release}} %{{SIGPGP:pgpsig}}\n"').stdout
         for package in [x.strip() for x in allpackages.split('\n')]:
             pinfo = package.split(', ')
             if len(pinfo) == 3:
@@ -84,6 +84,6 @@ class ModuleLintPackagesCheck(module_framework.AvocadoTest):
         self.start()
         allpackages = [
             x.strip()
-            for x in self.run(r'rpm -qa --qf="%{name}\n"').stdout.split('\n')]
+            for x in self.run(r'rpm -qa --qf="%{{name}}\n"').stdout.split('\n')]
         for pkg in self.backend.getPackageList():
             self.assertIn(pkg, allpackages)
