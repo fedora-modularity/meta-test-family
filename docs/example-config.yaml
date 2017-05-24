@@ -1,4 +1,7 @@
 # identifier of document for modularity testing framework
+# COPY of https://pagure.io/modularity-testing-framework/blob/master/f/docs/example-config.yaml
+# if your module does not provide any service, you can use minimal version:
+# https://pagure.io/modularity-testing-framework/blob/master/f/docs/example-config-minimal.yaml
 # MANDATORY
 document: modularity-testing
 # MANDATORY

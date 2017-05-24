@@ -92,7 +92,10 @@ def print_info(*args):
     :return: None
     """
     for arg in args:
-        print >> sys.stderr, arg
+        out = arg
+        if isinstance(arg, basestring):
+            out = arg.format(**trans_dict)
+        print >> sys.stderr, out
 
 def print_debug(*args):
     """

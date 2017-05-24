@@ -85,7 +85,7 @@ class CommonFunctions(object):
         :param kwargs: (avocado utils.process.run) params like: shell, ignore_status, verbose
         :return: avocado.utils.process.run
         """
-        return utils.process.run("%s" % command, **kwargs)
+        return utils.process.run("%s" % command.format(**trans_dict), **kwargs)
 
     def installTestDependencies(self, packages=None):
         """
@@ -111,7 +111,7 @@ class CommonFunctions(object):
 
         if packages:
             self.runHost(
-                "{HOSTPACKAGER} install ".format(**trans_dict) +
+                "{HOSTPACKAGER} install " +
                 " ".join(packages),
                 ignore_status=True)
 
@@ -276,7 +276,7 @@ class ContainerHelper(CommonFunctions):
         :return: None
         """
         if not os.path.isfile('/usr/bin/docker-current'):
-            self.runHost("{HOSTPACKAGER} install docker".format(**trans_dict))
+            self.runHost("{HOSTPACKAGER} install docker")
 
     def __prepareContainer(self):
         """
@@ -345,11 +345,11 @@ class ContainerHelper(CommonFunctions):
                         self.getPackageList())),
                     ignore_status=True, verbose=False)
                 if a.exit_status == 0:
-                    print_info("Packages installed via {HOSTPACKAGER}".format(**trans_dict), a.stdout)
+                    print_info("Packages installed via {HOSTPACKAGER}", a.stdout)
                 elif b.exit_status == 0:
-                    print_info("Packages installed via {GUESTPACKAGER}".format(**trans_dict), b.stdout)
+                    print_info("Packages installed via {GUESTPACKAGER}", b.stdout)
                 else:
-                    print_info("Nothing installed (nor via {HOSTPACKAGER} nor {GUESTPACKAGER}), but package list is not empty".format(**trans_dict), self.getPackageList())
+                    print_info("Nothing installed (nor via {HOSTPACKAGER} nor {GUESTPACKAGER}), but package list is not empty", self.getPackageList())
         if self.status() is False:
             raise BaseException("Container %s (for module %s) is not running, probably DEAD immediately after start (ID: %s)" % (self.jmeno, self.moduleName, self.docker_id))
 
@@ -753,7 +753,7 @@ class NspawnHelper(RpmHelper):
         except BaseException:
             pass
         if not os.path.exists(os.path.join(self.chrootpath, "usr")):
-            self.runHost("{HOSTPACKAGER} install systemd-container".format(**trans_dict))
+            self.runHost("{HOSTPACKAGER} install systemd-container")
             repos_to_use = ""
             counter = 0
             for repo in self.repos:
@@ -1287,7 +1287,7 @@ def get_correct_config():
             "Config file (%s) does not exist or is inaccesible (you can also redefine own by CONFIG=path/to/configfile.yaml env variable)" %
             cfgfile)
     with open(cfgfile, 'r') as ymlfile:
-        xcfg = yaml.load(ymlfile.read().format(**trans_dict))
+        xcfg = yaml.load(ymlfile.read())
         if xcfg['document'] != 'modularity-testing':
             raise ValueError(
                 "Bad Config file, not yaml or does not contain proper document type" %
