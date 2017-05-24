@@ -1137,7 +1137,7 @@ class AvocadoTest(Test):
         :return: str
         """
         self.start()
-        allpackages = self.run(r'rpm -qa --qf="%{name}\n"').stdout.split('\n')
+        allpackages = self.run(r'rpm -qa --qf="%{{name}}\n"').stdout.split('\n')
         return allpackages
 
     def copyTo(self, *args, **kwargs):
