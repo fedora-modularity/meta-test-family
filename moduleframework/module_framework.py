@@ -720,8 +720,8 @@ class NspawnHelper(RpmHelper):
             self.runHost("setenforce Permissive", ignore_status=True)
         self.setRepositoriesAndWhatToInstall()
         self.installTestDependencies()
-        self.__callSetupFromConfig()
         self.__prepareSetup()
+        self.__callSetupFromConfig()
 
     def __is_killed(self):
         for foo in range(DEFAULTRETRYTIMEOUT):
