@@ -1,7 +1,8 @@
 Modularity-testing-framework
 ============================
 
-**Recent documentation on http://modularity-testing-framework.readthedocs.io**
+Recent documentation on:
+    http://modularity-testing-framework.readthedocs.io
 
 Modularity prototype testing
 ----------------------------
@@ -11,7 +12,7 @@ Modularity prototype testing
         - Each module will need to have yaml config file
         - Config file should cover non generic part - part focused on general module testing
         - It could contain also simple test
-        - **how to write config file** `https://pagure.io/modularity-testing-framework/blob/master/f/docs/howtowriteyamlconf.md`
+        - **how to write config file** https://pagure.io/modularity-testing-framework/blob/master/f/docs/howtowriteyamlconf.md
 
     - **Self generated tests**
         - there is possible to write simple tests directly in yaml config file
@@ -31,16 +32,16 @@ Modularity prototype testing
 
     - **Simple bash tests**
         - There is helper what you can use for writing *bash* like tests
-        - library is `https://pagure.io/modularity-testing-framework/blob/master/f/moduleframework/bashhelper.py` and it is installed as *moduleframework-cmd* command in */usr/bin*
+        - library is https://pagure.io/modularity-testing-framework/blob/master/f/moduleframework/bashhelper.py and it is installed as *moduleframework-cmd* command in */usr/bin*
         - Test has to call setup and cleanup of module explicitly
         - These tests are dependent on return code of commands in test, so in case you have more tests subtest, just count return codes
-        - see example test for `https://pagure.io/modularity-testing-framework/blob/master/f/examples/memcached/sanity2.sh`
+        - see example test for https://pagure.io/modularity-testing-framework/blob/master/f/examples/memcached/sanity2.sh
 
 
     - **WIP: Behave tests**
         - You can write tests for you module also in behave style
         - it is first prototype
-        - see example in `https://pagure.io/modularity-testing-framework/blob/master/f/examples/memcached-behave`
+        - see example in https://pagure.io/modularity-testing-framework/blob/master/f/examples/memcached-behave
 
 Running using VAGRANT
 ---------------------
@@ -111,7 +112,7 @@ Schedule Tests
     #
     all: $(CMD)
 
-    - **Makefile in MTF** `https://pagure.io/modularity-testing-framework/blob/master/f/examples/testing-module/Makefile`
+    - **Makefile in MTF** https://pagure.io/modularity-testing-framework/blob/master/f/examples/testing-module/Makefile
 
 - `make check` -  runs tests in your module directory
 
@@ -122,10 +123,10 @@ How to write tests
 - Install modularity-testing-framework from COPR repo like:
    - *dnf copr enable phracek/Modularity-testing-framework*
    - install it by command: *dnf install -y modularity-testing-framework*
-- CREATE your config.yaml (see example `https://pagure.io/modularity-testing-framework/blob/master/f/docs/example-config.yaml`)
+- CREATE your config.yaml (see example https://pagure.io/modularity-testing-framework/blob/master/f/docs/example-config.yaml)
 - If you have tests in config file call:  */usr/bin/mtf-generator* or simply *mtf-generator*.
 - Call command for running all python tests:  **MODULE=docker avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py**
-- **additional tests** - see tests in `https://pagure.io/modularity-testing-framework/blob/master/f/examples/testing-module` directory as an example for you
+- **additional tests** - see tests in https://pagure.io/modularity-testing-framework/blob/master/f/examples/testing-module directory as an example for you
 
 License
 -------
@@ -155,6 +156,6 @@ Unable to debug avocado output errors
 How it works
 ------------
 - Structure of MTF:
-  - `https://pagure.io/modularity-testing-framework/blob/master/f/docs/howitworks.png`
+  - https://pagure.io/modularity-testing-framework/blob/master/f/docs/howitworks.png
 - Test types:
-  - `https://pagure.io/modularity-testing-framework/blob/master/f/docs/TestTypes.png`
+  - https://pagure.io/modularity-testing-framework/blob/master/f/docs/TestTypes.png
