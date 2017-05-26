@@ -1006,12 +1006,15 @@ class AvocadoTest(Test):
     :avocado: disable
     """
     def __init__(self,*args, **kwargs):
-        super(AvocadoTest,self).__init__(*args, **kwargs)
-        (self.backend, self.moduleType) = get_correct_backend()
-        self.moduleProfile = get_correct_profile()
-        print_info(
-            "Module Type: %s; Profile: %s" %
-            (self.moduleType, self.moduleProfile))
+        @Retry(attempts=1,timeout=55)
+        def tmpfunc():
+            super(AvocadoTest,self).__init__(*args, **kwargs)
+            (self.backend, self.moduleType) = get_correct_backend()
+            self.moduleProfile = get_correct_profile()
+            print_info(
+                "Module Type: %s; Profile: %s" %
+                (self.moduleType, self.moduleProfile))
+        tmpfunc()
 
 
     def setUp(self):
