@@ -136,13 +136,13 @@ Framework is released under the GPL, version 2 or later, see LICENSE file in pro
 Debugging & How To
 ------------------
 
-First test take so long time
+First test takes so long time
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 It is normal, because first test downloads all packages from koji and creates localrepo.
 It is workaround because of missing composes for modules (on demand done by pungi)
 - If you would like to make it faster use env variables:
-    - *MTF_REMOTE_REPOS=yes*
-    - in case it is still slow for you, use *MTF_DO_NOT_CLEANUP=yes* it disable test cleaup (between tests) could cause side effects
+    - *MTF_REMOTE_REPOS=yes* - It heps in case there are repos in koji https://kojipkgs.fedoraproject.org/repos/ (they are there just temporary, deleted after 2 weeks and probably it will not be created in near future anyhow)
+    - *MTF_DO_NOT_CLEANUP=yes* - in case it is still slow for you, it disable test cleaup (between tests) could cause side effects
 
 Unable to debug avocado output errors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
