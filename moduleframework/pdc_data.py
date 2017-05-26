@@ -106,7 +106,7 @@ class PDCParser():
         :return: str
         """
         rpmrepo = "http://kojipkgs.fedoraproject.org/repos/%s/latest/%s" % (
-            self.pdcdata["koji_tag"], ARCH)
+            self.pdcdata["koji_tag"] + "-build", ARCH)
         return rpmrepo
 
     def generateGitHash(self):
