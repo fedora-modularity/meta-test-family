@@ -1,6 +1,8 @@
 Modularity-testing-framework
 ============================
 
+**Recent documentation on http://modularity-testing-framework.readthedocs.io**
+
 Modularity prototype testing
 ----------------------------
 
@@ -45,17 +47,30 @@ Running using VAGRANT
 - install vagrant *dnf -y install vagrant*
 - just run *vagrant up*
 
-Dependencies
+Installation
 ------------
 - base dependencies: **docker python-pip**
 - python dependencies: **avocado-framework yaml json behave**
 
-  dnf -y install docker python-pip
-  pip install avocado-framework yaml json behave
+Stable version
+~~~~~~~~~~~~~~
+- It is built as package for fedora (>26)
+- stable COPR repo
+    - https://copr.fedorainfracloud.org/coprs/phracek/Modularity-testing-framework/
+    - `dnf copr enable phracek/Modularity-testing-framework`
+    - `dnf install -y modularity-testing-framework`
+
+Development version
+~~~~~~~~~~~~~~
+- Automatically built packages
+    - https://copr.fedorainfracloud.org/coprs/jscotka/modularity-testing-framework/
+
+
 
 Enviromental variables
 ----------------------
 - variables allows you to overwrite some values inside *config.yaml*
+- *AVOCADO_LOG_DEBUG=yes* enables avocado debug output - in case you find some strange hard to debug issues
 - *DEBUG* Enable debugging output to test output
 - *CONFIG* file with MTF configuration default is *config.yaml*
 - *MODULE* which module type to test (in case there is not set *default-module* in config, you **HAVE TO** set it)
@@ -70,6 +85,7 @@ Enviromental variables
 - *MTF_SKIP_DISABLING_SELINUX* In nspawn type on fedora-25 we have to disable selinux, because it does not work well with selinux enabled, this option allows to not do that.
 - *MTF_DO_NOT_CLEANUP* Do not cleanup modules between tests, in case there is no interference in your tests you can use it, and it will be **fast**
 - *MTF_REMOTE_REPOS* It disables downloading of packages done by koji and creating local repo, it make tests **fast**. (There is issue that composes (repos) are sometimes bad in fedora, unable to use)
+
 
 
 Schedule Tests
@@ -115,9 +131,26 @@ License
 -------
 Framework is released under the GPL, version 2 or later, see LICENSE file in project
 
-Development
------------
-- automatically built packages (untested): `https://copr.fedorainfracloud.org/coprs/jscotka/modularity-testing-framework/`
+
+Debugging & How To
+------------------
+
+First test take so long time
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+It is normal, because first test downloads all packages from koji and creates localrepo.
+It is workaround because of missing composes for modules (on demand done by pungi)
+- If you would like to make it faster use env variables:
+    - *MTF_REMOTE_REPOS=yes*
+    - in case it is still slow for you, use *MTF_DO_NOT_CLEANUP=yes* it disable test cleaup (between tests) could cause side effects
+
+Unable to debug avocado output errors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- If you see error like: *Avocado crashed: TestError: Process died before it pushed early test_status.*
+    - add env variables:
+        - *AVOCADO_LOG_DEBUG=yes*
+        - *DEBUG=yes*
+    - **This is preferred variant for submitting issues to pagure**
+
 
 How it works
 ------------
