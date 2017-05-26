@@ -35,7 +35,6 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 
 %files
 %license LICENSE
-%doc CHANGELOG
 %{_bindir}/moduleframework-cmd
 %{_bindir}/modulelint
 %{_bindir}/mtf-generator

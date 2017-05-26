@@ -1,6 +1,5 @@
 include MANIFEST.in
 include Makefile
-include CHANGELOG
 include LICENSE
 include Vagrantfile
 include README.md
