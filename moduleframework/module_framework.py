@@ -459,6 +459,7 @@ class RpmHelper(CommonFunctions):
         self.info = self.config['module']['rpm']
         self.repos = []
         self.whattoinstallrpm=""
+        self.bootstrappackages=[]
 
     def setModuleDependencies(self):
         temprepositories = {}
@@ -526,8 +527,8 @@ class RpmHelper(CommonFunctions):
             self.whattoinstallrpm = " ".join(set(whattooinstall))
         else:
             if not self.whattoinstallrpm:
-                addionalpackages = pdc_data.getBasePackageSet(modulesDict=self.moduledeps, isModule=get_if_module(), isContainer=False)
-                self.whattoinstallrpm = " ".join(set(self.getPackageList() + addionalpackages))
+                self.bootstrappackages = pdc_data.getBasePackageSet(modulesDict=self.moduledeps, isModule=get_if_module(), isContainer=False)
+                self.whattoinstallrpm = " ".join(set(self.getPackageList() + self.bootstrappackages))
 
     def tearDown(self):
         """

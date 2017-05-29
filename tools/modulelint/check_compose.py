@@ -26,6 +26,7 @@
 
 from moduleframework import module_framework
 from moduleframework import common
+from moduleframework import pdc_data
 
 
 class ComposeTest(module_framework.NspawnAvocadoTest):
@@ -43,7 +44,7 @@ class ComposeTest(module_framework.NspawnAvocadoTest):
         for profile in self.getModulemdYamlconfig()["data"].get("profiles"):
             actualpackagelist = " ".join(
                 set(self.getModulemdYamlconfig()["data"]["profiles"].get(profile))
-                -set(common.BASEPACKAGESET+common.BASEPACKAGESET_WORKAROUND)
+                -set(self.bootstrappackages)
             )
             packager = common.trans_dict["GUESTPACKAGER"]
             if actualpackagelist:

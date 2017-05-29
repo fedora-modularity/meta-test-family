@@ -52,7 +52,7 @@ config={"module":{
 
 class ModuleLintSigning(module_framework.AvocadoTest):
     """
-    :avocado: enable
+    :avocado: disable
     :avocado: tags=WIP
     """
 
