@@ -40,9 +40,9 @@ class DockerLint(module_framework.ContainerAvocadoTest):
 
     def testLabels(self):
         llabels = self.getConfigModule().get('labels')
-        module_framework.skipTestIf(
-            llabels is None or len(llabels) == 0,
-            "No labels defined in config to check")
+        if llabels is None or len(llabels) == 0:
+            print "No labels defined in config to check"
+            self.cancel()
         for key in self.getConfigModule()['labels']:
             aaa = self.checkLabel(key, self.getConfigModule()['labels'][key])
             print ">>>>>> ", aaa, key
