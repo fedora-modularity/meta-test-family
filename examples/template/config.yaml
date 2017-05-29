@@ -1,0 +1,26 @@
+document: modularity-testing
+version: 1
+name: Module name
+modulemd-url: URL to Raw format of YAML file
+service:
+    port: Specify port if needed
+packages:
+    rpms:
+        - Specify packages which are needed
+testdependencies:
+    rpms:
+        - nc
+module:
+    docker:
+        start: Command for starting container image
+        labels:
+            description:
+            io.k8s.description:
+        source: path to git repo
+        container: URL to docker.io.
+    rpm:
+        start: systemctl start <service name>
+        stop: systemctl stop <service name>
+        status: systemctl status <service name>
+        repo: Path to module-build repo from koji
+
