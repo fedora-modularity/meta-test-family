@@ -29,7 +29,6 @@ Construct parameters for automatization (CIs)
 """
 
 import yaml
-import os
 import json
 import urllib
 import re
@@ -44,7 +43,7 @@ class PDCParser():
     Class for parsing PDC data via some setters line setFullVersion, setViaFedMsg, setLatestPDC
     """
 
-    @Retry(attempts=20, timeout=DEFAULTRETRYTIMEOUT, delay=20)
+    @Retry(attempts=20, timeout=30, delay=20)
     def __getDataFromPdc(self):
         """
         Internal method, do not use it
@@ -53,6 +52,7 @@ class PDCParser():
         """
         PDC = "%s/?variant_name=%s&variant_version=%s&variant_release=%s&active=True" % (
             PDCURL, self.name, self.stream, self.version)
+        print_debug("attemt to contact PDC with:", PDC)
         out=json.load(urllib.urlopen(PDC))["results"]
         if out:
             self.pdcdata = out[-1]

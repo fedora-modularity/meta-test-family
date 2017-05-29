@@ -462,19 +462,14 @@ class RpmHelper(CommonFunctions):
 
     def setModuleDependencies(self):
         temprepositories = {}
-        temprepositories_cycle = {}
         if self.getModulemdYamlconfig()["data"].get("dependencies") and self.getModulemdYamlconfig()["data"][
             "dependencies"].get("requires"):
             temprepositories = self.getModulemdYamlconfig()["data"]["dependencies"]["requires"]
         temprepositories_cycle = dict(temprepositories)
         for x in temprepositories_cycle:
-            @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, delay=10)
-            def tempfunc():
-                pdc = pdc_data.PDCParser()
-                pdc.setLatestPDC(x, temprepositories_cycle[x])
-                temprepositories.update(pdc.generateDepModules())
-
-            tempfunc()
+            pdc = pdc_data.PDCParser()
+            pdc.setLatestPDC(x, temprepositories_cycle[x])
+            temprepositories.update(pdc.generateDepModules())
         self.moduledeps = temprepositories
         print_info("Detected module dependencies:", self.moduledeps)
 
