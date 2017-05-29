@@ -37,13 +37,53 @@ from common import *
 from timeoutlib import Retry
 
 
+def getBasePackageSet(modulesDict = None, isModule=True, isContainer=False):
+    """
+    Get list of base packages (for bootstrapping of various module types)
+    It is used internally, you should not use it in case you don't know where to use it.
+    
+    :param modulesDict: dictionary of dependent modules
+    :param isModule: bool is module
+    :param isContainer: bool is contaner?
+    :return: list of packages to install 
+    """
+    # nspawn container need to install also systemd to be able to boot
+    BASEPACKAGESET_WORKAROUND = ["systemd"]
+    BASEPACKAGESET_WORKAROUND_NOMODULE = ["systemd", "yum"]
+    if modulesDict.has_key("base-runtime"):
+        pdc = PDCParser()
+        pdc.setLatestPDC("base-runtime", modulesDict["base-runtime"])
+        basepackageset = pdc.getmoduleMD()['data']['profiles']['container']['rpms']
+    if isModule:
+        # copied from http://pkgs.stg.fedoraproject.org/cgit/modules/base-runtime.git/tree/base-runtime.yaml baseimage profile
+        basepackageset = ["bash",
+                          "coreutils",
+                          "filesystem",
+                          "glibc-minimal-langpack",
+                          "libcrypt",
+                          "microdnf",
+                          "rpm",
+                          "shadow-utils",
+                          "util-linux"
+                          ]
+        if isContainer:
+            return basepackageset
+        else:
+            return basepackageset + BASEPACKAGESET_WORKAROUND
+    else:
+        basepackageset = ""
+        if isContainer:
+            return basepackageset
+        else:
+            return basepackageset + BASEPACKAGESET_WORKAROUND_NOMODULE
+
 
 class PDCParser():
     """
     Class for parsing PDC data via some setters line setFullVersion, setViaFedMsg, setLatestPDC
     """
 
-    @Retry(attempts=20, timeout=30, delay=20)
+    @Retry(attempts=DEFAULTRETRYCOUNT*5, timeout=DEFAULTRETRYTIMEOUT, delay=20)
     def __getDataFromPdc(self):
         """
         Internal method, do not use it

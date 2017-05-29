@@ -526,7 +526,7 @@ class RpmHelper(CommonFunctions):
             self.whattoinstallrpm = " ".join(set(whattooinstall))
         else:
             if not self.whattoinstallrpm:
-                addionalpackages = getBasePackageSet(modulesDict=self.moduledeps, isModule=get_if_module(), isContainer=False)
+                addionalpackages = pdc_data.getBasePackageSet(modulesDict=self.moduledeps, isModule=get_if_module(), isContainer=False)
                 self.whattoinstallrpm = " ".join(set(self.getPackageList() + addionalpackages))
 
     def tearDown(self):
