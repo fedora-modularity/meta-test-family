@@ -1,6 +1,6 @@
 CMD=python -m avocado run --filter-by-tags=-WIP
 TESTS=$(shell ls *.py *.sh modulelint/*.py)
-export MTF_REMOTE_REPOS=
+export MTF_REMOTE_REPOS=yes
 export MTF_DO_NOT_CLEANUP=yes
 export DEBUG=yes
 
@@ -29,15 +29,15 @@ check-multihost-testing:
 	@true
 
 check-run-them-pdc-baseruntime:
-	MTF_DO_NOT_CLEANUP= ../../tools/run-them.sh base-runtime base-runtime-f26-20170504201340 pdc
+	MTF_REMOTE_REPOS= MTF_DO_NOT_CLEANUP= ../../tools/run-them.sh base-runtime base-runtime-f26-20170504201340 pdc
 	@true
 
 check-run-them-pdc-testmodule:
-	../../tools/run-them.sh testmodule testmodule-master-20170413142055 pdc
+	MTF_REMOTE_REPOS= ../../tools/run-them.sh testmodule testmodule-master-20170413142055 pdc
 	@true
 
 check-run-them-fedmsg-testmodule:
-	../../tools/run-them.sh testmodule ../../tools/example_message_module.yaml fedmsg
+	MTF_REMOTE_REPOS= ../../tools/run-them.sh testmodule ../../tools/example_message_module.yaml fedmsg
 	@true
 
 
