@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.4.38
+Version:        0.4.39
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -44,6 +44,11 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 %{_datadir}/moduleframework/
 
 %changelog
+* Mon May 29 2017 Jan Scotka <jscotka@redhat.com> 0.4.39-1
+- adapted to new avocado self.cancel() instead of using internal exception for skipping tests on the fly
+- imporved links to composes in testing module. No modules builds in koji.
+
+
 * Fri May 26 2017 Jan Scotka <jscotka@redhat.com> 0.4.38-1
 - 
 
