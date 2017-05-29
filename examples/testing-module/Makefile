@@ -32,7 +32,7 @@ check-run-them-pdc-baseruntime:
 	@true
 
 check-run-them-pdc-testmodule:
-	../../tools/run-them.sh testmodule testmodule-master-20170407121558 pdc
+	../../tools/run-them.sh testmodule testmodule-master-20170413142055 pdc
 	@true
 
 check-run-them-fedmsg-testmodule:

@@ -31,6 +31,7 @@ import sys
 import netifaces
 import socket
 import os
+import pdc_data
 
 defroutedev = netifaces.gateways().get('default').values(
 )[0][1] if netifaces.gateways().get('default') else "lo"
@@ -66,20 +67,38 @@ DEFAULTRETRYCOUNT = 3
 # time in seconds
 DEFAULTRETRYTIMEOUT = 30
 DEFAULTNSPAWNTIMEOUT = 10
-# copied from http://pkgs.stg.fedoraproject.org/cgit/modules/base-runtime.git/tree/base-runtime.yaml baseimage profile
-BASEPACKAGESET=["bash",
-                "coreutils",
-                "filesystem",
-                "glibc-minimal-langpack",
-                "libcrypt",
-                "microdnf",
-                "rpm",
-                "shadow-utils",
-                "util-linux"
-                ]
-# nspawn container need to install also systemd to be able to boot
-BASEPACKAGESET_WORKAROUND=["systemd"]
-BASEPACKAGESET_WORKAROUND_NOMODULE=["systemd","yum"]
+
+def getBasePackageSet(modulesDict = None, isModule=True, isContainer=False):
+    # nspawn container need to install also systemd to be able to boot
+    BASEPACKAGESET_WORKAROUND = ["systemd"]
+    BASEPACKAGESET_WORKAROUND_NOMODULE = ["systemd", "yum"]
+    if modulesDict.has_key("base-runtime"):
+        pdc = pdc_data.PDCParser()
+        pdc.setLatestPDC("base-runtime", modulesDict["base-runtime"])
+        basepackageset = pdc.getmoduleMD()['data']['profiles']['container']['rpms']
+    if isModule:
+        # copied from http://pkgs.stg.fedoraproject.org/cgit/modules/base-runtime.git/tree/base-runtime.yaml baseimage profile
+        basepackageset = ["bash",
+                          "coreutils",
+                          "filesystem",
+                          "glibc-minimal-langpack",
+                          "libcrypt",
+                          "microdnf",
+                          "rpm",
+                          "shadow-utils",
+                          "util-linux"
+                          ]
+        if isContainer:
+            return basepackageset
+        else:
+            return basepackageset + BASEPACKAGESET_WORKAROUND
+    else:
+        basepackageset = ""
+        if isContainer:
+            return basepackageset
+        else:
+            return basepackageset + BASEPACKAGESET_WORKAROUND_NOMODULE
+
 
 def is_debug():
     return bool(os.environ.get("DEBUG"))

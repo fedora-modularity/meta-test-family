@@ -120,6 +120,8 @@ class PDCParser():
         except BaseException:
             return "master"
 
+    def getmoduleMD(self):
+        return json.load(self.pdcdata["modulemd"])
 
     def generateModuleMDFile(self):
         """
@@ -130,7 +132,7 @@ class PDCParser():
         """
         omodulefile = MODULEFILE
         mdfile = open(omodulefile, mode="w")
-        mdfile.write(self.pdcdata["modulemd"])
+        mdfile.write(json.dumps(self.getmoduleMD()))
         mdfile.close()
         return "file://%s" % os.path.abspath(omodulefile)
 

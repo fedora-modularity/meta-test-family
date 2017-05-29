@@ -457,21 +457,26 @@ class RpmHelper(CommonFunctions):
             "/etc", "yum.repos.d", "%s.repo" %
                                    self.moduleName)
         self.info = self.config['module']['rpm']
+        self.repos = []
+        self.whattoinstallrpm=""
+
+    def setModuleDependencies(self):
         temprepositories = {}
         temprepositories_cycle = {}
-        if self.getModulemdYamlconfig()["data"].get("dependencies") and self.getModulemdYamlconfig()["data"]["dependencies"].get("requires"):
+        if self.getModulemdYamlconfig()["data"].get("dependencies") and self.getModulemdYamlconfig()["data"][
+            "dependencies"].get("requires"):
             temprepositories = self.getModulemdYamlconfig()["data"]["dependencies"]["requires"]
         temprepositories_cycle = dict(temprepositories)
         for x in temprepositories_cycle:
-            @Retry(attempts=DEFAULTRETRYCOUNT,timeout=DEFAULTRETRYTIMEOUT,delay=10)
+            @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, delay=10)
             def tempfunc():
                 pdc = pdc_data.PDCParser()
                 pdc.setLatestPDC(x, temprepositories_cycle[x])
                 temprepositories.update(pdc.generateDepModules())
+
             tempfunc()
         self.moduledeps = temprepositories
-        self.repos = []
-        self.whattoinstallrpm=""
+        print_info("Detected module dependencies:", self.moduledeps)
 
     def getURL(self):
         """
@@ -491,6 +496,7 @@ class RpmHelper(CommonFunctions):
 
         :return: None
         """
+        self.setModuleDependencies()
         self.setRepositoriesAndWhatToInstall()
         self.installTestDependencies()
         self.__callSetupFromConfig()
@@ -525,10 +531,7 @@ class RpmHelper(CommonFunctions):
             self.whattoinstallrpm = " ".join(set(whattooinstall))
         else:
             if not self.whattoinstallrpm:
-                if get_if_module():
-                    addionalpackages = BASEPACKAGESET + BASEPACKAGESET_WORKAROUND
-                else:
-                    addionalpackages = BASEPACKAGESET_WORKAROUND_NOMODULE
+                addionalpackages = getBasePackageSet(modulesDict=self.moduledeps, isModule=get_if_module(), isContainer=False)
                 self.whattoinstallrpm = " ".join(set(self.getPackageList() + addionalpackages))
 
     def tearDown(self):
@@ -718,6 +721,7 @@ class NspawnHelper(RpmHelper):
             self.__selinuxState = self.runHost(
                 "getenforce", ignore_status=True).stdout.strip()
             self.runHost("setenforce Permissive", ignore_status=True)
+        self.setModuleDependencies()
         self.setRepositoriesAndWhatToInstall()
         self.installTestDependencies()
         self.__prepareSetup()

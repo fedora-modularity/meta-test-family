@@ -1,63 +1,269 @@
 {
   "msg" : {
-    "component_builds" : [ 5515, 5516, 5517 ],
-    "id" : 157,
-    "modulemd" : "data:\n  api:\n    rpms: [ed, mksh]\n  components:\n    rpms:\n      ed: {cache: 'http://pkgs.fedoraproject.org/repo/pkgs/ed', rationale: A build\n          dependency of mksh., ref: 294cc9c77141dd8232afc8200a01537284fa939f, repository: 'git://pkgs.fedoraproject.org/rpms/ed'}\n      mksh: {buildorder: 10, cache: 'http://pkgs.fedoraproject.org/repo/pkgs/mksh',\n        rationale: The main package of the module., ref: 94253f0c65228a5d48ce841f90c1ee12fba3a077,\n        repository: 'git://pkgs.fedoraproject.org/rpms/mksh'}\n  dependencies:\n    buildrequires: {base-runtime: master}\n    requires: {base-runtime: master}\n  description: This module demonstrates how to write simple modulemd files And can\n    be used for testing the build and release pipeline.\n  filter: {}\n  license:\n    module: [MIT]\n  name: testmodule\n  profiles:\n    default:\n      rpms: [mksh]\n  references: {community: 'https://fedoraproject.org/wiki/Modularity', documentation: 'https://fedoraproject.org/wiki/Fedora_Packaging_Guidelines_for_Modules',\n    tracker: 'https://taiga.fedorainfracloud.org/project/modularity'}\n  stream: master\n  summary: A test module in all its beautiful beauty\n  version: 20170407121558\n  xmd:\n    mbs:\n      buildrequires:\n        base-runtime: {ref: 464026abf9cbe10fac1d800972e3229ac4d01975, stream: master,\n          version: '20170404161234'}\n      commit: daf91237e6cc666a82f8466e92a8a51c465edfb0\n      scmurl: git://pkgs.fedoraproject.org/modules/testmodule?#daf91237e6cc666a82f8466e92a8a51c465edfb0\ndocument: modulemd\nversion: 1\n",
+    "component_builds" : [ 24425, 7112, 7113 ],
+    "id" : 190,
+    "koji_tag" : "module-d8b6e7bcad8dfa3f",
+    "modulemd" : "data:\n  api:\n    rpms: [ed, mksh]\n  components:\n    rpms:\n      ed: {cache: 'http://pkgs.fedoraproject.org/repo/pkgs/ed', rationale: A build\n          dependency of mksh., ref: master, repository: 'git://pkgs.fedoraproject.org/rpms/ed'}\n      mksh: {buildorder: 10, cache: 'http://pkgs.fedoraproject.org/repo/pkgs/mksh',\n        rationale: The main package of the module., ref: master, repository: 'git://pkgs.fedoraproject.org/rpms/mksh'}\n  dependencies:\n    buildrequires: {base-runtime: master}\n    requires: {base-runtime: master}\n  description: This module demonstrates how to write simple modulemd files And can\n    be used for testing the build and release pipeline.\n  license:\n    module: [MIT]\n  name: testmodule\n  profiles:\n    default:\n      rpms: [mksh]\n  references: {community: 'https://fedoraproject.org/wiki/Modularity', documentation: 'https://fedoraproject.org/wiki/Fedora_Packaging_Guidelines_for_Modules',\n    tracker: 'https://taiga.fedorainfracloud.org/project/modularity'}\n  stream: master\n  summary: A test module in all its beautiful beauty\n  version: 20170413142055\n  xmd:\n    mbs:\n      buildrequires:\n        base-runtime: {ref: 485e976ddee354347b142f58219f7f6790056668, stream: master,\n          version: '20170523113302'}\n      commit: 463de28c424bb97fcc03a6a2bc59df1f37114af7\n      rpms:\n        ed: {ref: 294cc9c77141dd8232afc8200a01537284fa939f}\n        mksh: {ref: 3fc4d1a2b8d5083078247a27cee584cc88e71917}\n      scmurl: git://pkgs.fedoraproject.org/modules/testmodule.git?#463de28c424bb97fcc03a6a2bc59df1f37114af7\ndocument: modulemd\nversion: 1\n",
     "name" : "testmodule",
-    "owner" : "jscotka",
-    "scmurl" : "git://pkgs.fedoraproject.org/modules/testmodule?#daf91237e6cc666a82f8466e92a8a51c465edfb0",
+    "owner" : "qwan",
+    "scmurl" : "git://pkgs.fedoraproject.org/modules/testmodule.git?#463de28c424bb97fcc03a6a2bc59df1f37114af7",
     "state" : 3,
     "state_name" : "done",
-    "state_reason" : null,
+    "state_reason" : "Resubmitted by qwan",
     "state_trace" : [ {
       "reason" : null,
       "state" : 1,
       "state_name" : "wait",
-      "time" : 1.491567372E9
+      "time" : "2017-04-13T14:23:38Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-04-13T14:23:51Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-04-13T14:23:51Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-04-13T14:23:55Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-04-13T14:23:56Z"
+    }, {
+      "reason" : "Resubmitted by qwan",
+      "state" : 0,
+      "state_name" : "init",
+      "time" : "2017-04-14T05:56:04Z"
+    }, {
+      "reason" : null,
+      "state" : 1,
+      "state_name" : "wait",
+      "time" : "2017-04-14T05:56:07Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-04-14T05:56:09Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-04-14T05:56:10Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-04-14T05:56:12Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-04-14T05:56:13Z"
+    }, {
+      "reason" : "Resubmitted by qwan",
+      "state" : 0,
+      "state_name" : "init",
+      "time" : "2017-04-14T12:17:47Z"
+    }, {
+      "reason" : null,
+      "state" : 1,
+      "state_name" : "wait",
+      "time" : "2017-04-14T12:17:49Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-04-14T12:17:53Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-04-14T12:17:53Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-04-14T12:17:55Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-04-14T12:17:55Z"
+    }, {
+      "reason" : "Resubmitted by qwan",
+      "state" : 0,
+      "state_name" : "init",
+      "time" : "2017-04-14T12:29:56Z"
+    }, {
+      "reason" : null,
+      "state" : 1,
+      "state_name" : "wait",
+      "time" : "2017-04-14T12:29:59Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-04-14T12:30:01Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-04-14T12:30:02Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-04-14T12:30:04Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-04-14T12:30:04Z"
+    }, {
+      "reason" : "Resubmitted by qwan",
+      "state" : 0,
+      "state_name" : "init",
+      "time" : "2017-04-26T12:41:32Z"
+    }, {
+      "reason" : null,
+      "state" : 1,
+      "state_name" : "wait",
+      "time" : "2017-04-26T12:41:34Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-04-26T12:41:38Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-04-26T12:41:38Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-04-26T12:41:42Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-04-26T12:41:42Z"
+    }, {
+      "reason" : "Resubmitted by qwan",
+      "state" : 0,
+      "state_name" : "init",
+      "time" : "2017-05-02T08:08:11Z"
+    }, {
+      "reason" : null,
+      "state" : 1,
+      "state_name" : "wait",
+      "time" : "2017-05-02T08:08:13Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-05-02T08:08:37Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-05-02T08:08:37Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-05-02T08:08:40Z"
+    }, {
+      "reason" : "<Fault 1: \"'NoneType' object has no attribute '__getitem__'\">",
+      "state" : 4,
+      "state_name" : "failed",
+      "time" : "2017-05-02T08:08:40Z"
+    }, {
+      "reason" : "Resubmitted by qwan",
+      "state" : 0,
+      "state_name" : "init",
+      "time" : "2017-05-24T11:47:46Z"
+    }, {
+      "reason" : null,
+      "state" : 1,
+      "state_name" : "wait",
+      "time" : "2017-05-24T11:47:55Z"
+    }, {
+      "reason" : "Resubmitted by qwan",
+      "state" : 1,
+      "state_name" : "wait",
+      "time" : "2017-05-24T11:48:01Z"
     }, {
       "reason" : null,
       "state" : 2,
       "state_name" : "build",
-      "time" : 1.491567387E9
+      "time" : "2017-05-24T11:48:02Z"
     }, {
-      "reason" : null,
+      "reason" : "Resubmitted by qwan",
       "state" : 2,
       "state_name" : "build",
-      "time" : 1.491567387E9
+      "time" : "2017-05-24T11:54:12Z"
+    }, {
+      "reason" : "Resubmitted by qwan",
+      "state" : 2,
+      "state_name" : "build",
+      "time" : "2017-05-24T12:00:46Z"
+    }, {
+      "reason" : "Resubmitted by qwan",
+      "state" : 2,
+      "state_name" : "build",
+      "time" : "2017-05-24T12:15:42Z"
+    }, {
+      "reason" : "Resubmitted by qwan",
+      "state" : 2,
+      "state_name" : "build",
+      "time" : "2017-05-24T12:20:58Z"
+    }, {
+      "reason" : "Resubmitted by qwan",
+      "state" : 2,
+      "state_name" : "build",
+      "time" : "2017-05-24T12:22:51Z"
     } ],
-    "state_url" : "http://localhost/module-build-service/1/module-builds/157",
+    "state_url" : "http://localhost/module-build-service/1/module-builds/190",
     "stream" : "master",
     "tasks" : {
       "rpms" : {
         "ed" : {
-          "nvr" : "ed-1.14.1-2.module_bd6e0eb1",
-          "state" : 1,
-          "state_reason" : "Reused component from previous module build",
-          "task_id" : 18790602
-        },
-        "mksh" : {
-          "nvr" : "mksh-54-2.module_a4b724ca",
-          "state" : 1,
-          "state_reason" : "Reused component from previous module build",
-          "task_id" : 18831744
-        },
-        "module-build-macros" : {
-          "nvr" : "module-build-macros-0.1-1.module_da0b9d8e",
+          "nvr" : "ed-1.14.1-2.module_d8b6e7bc",
           "state" : 1,
           "state_reason" : "",
-          "task_id" : 18835447
+          "task_id" : 19715268
+        },
+        "mksh" : {
+          "nvr" : "mksh-55-1.module_d8b6e7bc",
+          "state" : 1,
+          "state_reason" : "",
+          "task_id" : 19715325
+        },
+        "module-build-macros" : {
+          "nvr" : "module-build-macros-0.1-1.module_d8b6e7bc",
+          "state" : 1,
+          "state_reason" : "",
+          "task_id" : 19714704
         }
       }
     },
-    "time_completed" : 1.493909455E9,
-    "time_modified" : 1.493909455E9,
-    "time_submitted" : 1.49156737E9,
-    "version" : "20170407121558"
+    "time_completed" : "2017-05-24T12:23:18Z",
+    "time_modified" : "2017-05-24T12:23:18Z",
+    "time_submitted" : "2017-04-13T14:23:36Z",
+    "version" : "20170413142055"
   },
-  "i" : 29,
+  "i" : 244,
   "topic" : "org.fedoraproject.prod.mbs.module.state.change",
-  "msg_id" : "2017-bb707ade-4588-432a-bfcd-80c875b3da99",
+  "msg_id" : "2017-c2aa38d4-664d-4a63-acf2-75c7b1ed1ef4",
   "crypto" : "x509",
-  "timestamp" : 1493909455,
+  "timestamp" : 1495628598,
   "username" : "fedmsg"
 }
