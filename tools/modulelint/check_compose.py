@@ -44,7 +44,7 @@ class ComposeTest(module_framework.NspawnAvocadoTest):
         for profile in self.getModulemdYamlconfig()["data"].get("profiles"):
             actualpackagelist = " ".join(
                 set(self.getModulemdYamlconfig()["data"]["profiles"].get(profile))
-                -set(self.bootstrappackages)
+                -set(self.backend.bootstrappackages)
             )
             packager = common.trans_dict["GUESTPACKAGER"]
             if actualpackagelist:
