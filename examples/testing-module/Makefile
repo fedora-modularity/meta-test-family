@@ -1,7 +1,8 @@
-CMD=python -m avocado run --filter-by-tags=-WIP --show-job-log
+CMD=python -m avocado run --filter-by-tags=-WIP
 TESTS=$(shell ls *.py *.sh modulelint/*.py)
-export MTF_REMOTE_REPOS=yes
+export MTF_REMOTE_REPOS=
 export MTF_DO_NOT_CLEANUP=yes
+export DEBUG=yes
 
 check-docker:
 	MODULE=docker $(CMD) $(TESTS)
@@ -24,11 +25,11 @@ check-behave-docker:
 	@true
 
 check-multihost-testing:
-	cd ../multios_testing; MTF_DO_NOT_CLEANUP= DEBUG=yes MTF_DISABLE_MODULE=yes $(CMD) *.py
+	cd ../multios_testing; MTF_DO_NOT_CLEANUP= MTF_DISABLE_MODULE=yes $(CMD) *.py
 	@true
 
 check-run-them-pdc-baseruntime:
-	MTF_REMOTE_REPOS= MTF_DO_NOT_CLEANUP= ../../tools/run-them.sh base-runtime base-runtime-f26-20170504201340 pdc
+	MTF_DO_NOT_CLEANUP= ../../tools/run-them.sh base-runtime base-runtime-f26-20170504201340 pdc
 	@true
 
 check-run-them-pdc-testmodule:

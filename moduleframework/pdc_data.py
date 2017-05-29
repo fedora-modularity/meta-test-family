@@ -48,12 +48,14 @@ def getBasePackageSet(modulesDict = None, isModule=True, isContainer=False):
     :return: list of packages to install 
     """
     # nspawn container need to install also systemd to be able to boot
+    out=[]
+    brmod="base-runtime"
+    brmod_profile="baseimage"
     BASEPACKAGESET_WORKAROUND = ["systemd"]
     BASEPACKAGESET_WORKAROUND_NOMODULE = ["systemd", "yum"]
-    if modulesDict.has_key("base-runtime"):
+    if modulesDict.has_key(brmod):
         pdc = PDCParser()
-        pdc.setLatestPDC("base-runtime", modulesDict["base-runtime"])
-        basepackageset = pdc.getmoduleMD()['data']['profiles']['container']['rpms']
+        pdc.setLatestPDC(brmod, modulesDict[brmod])
     if isModule:
         # copied from http://pkgs.stg.fedoraproject.org/cgit/modules/base-runtime.git/tree/base-runtime.yaml baseimage profile
         basepackageset = ["bash",
@@ -67,16 +69,18 @@ def getBasePackageSet(modulesDict = None, isModule=True, isContainer=False):
                           "util-linux"
                           ]
         if isContainer:
-            return basepackageset
+            out = basepackageset
         else:
-            return basepackageset + BASEPACKAGESET_WORKAROUND
+            basepackageset = pdc.getmoduleMD()['data']['profiles'][brmod_profile]['rpms']
+            out = basepackageset + BASEPACKAGESET_WORKAROUND
     else:
         basepackageset = ""
         if isContainer:
-            return basepackageset
+            out = basepackageset
         else:
-            return basepackageset + BASEPACKAGESET_WORKAROUND_NOMODULE
-
+            out = basepackageset + BASEPACKAGESET_WORKAROUND_NOMODULE
+    print_info("ALL packages to install:", out)
+    return out
 
 class PDCParser():
     """
@@ -161,7 +165,7 @@ class PDCParser():
             return "master"
 
     def getmoduleMD(self):
-        return json.load(self.pdcdata["modulemd"])
+        return yaml.load(self.pdcdata["modulemd"])
 
     def generateModuleMDFile(self):
         """
@@ -172,7 +176,7 @@ class PDCParser():
         """
         omodulefile = MODULEFILE
         mdfile = open(omodulefile, mode="w")
-        mdfile.write(json.dumps(self.getmoduleMD()))
+        mdfile.write(yaml.dump(self.getmoduleMD()))
         mdfile.close()
         return "file://%s" % os.path.abspath(omodulefile)
 
@@ -190,7 +194,7 @@ class PDCParser():
         return output
 
     def generateDepModules(self):
-        x = yaml.load(self.pdcdata["modulemd"])
+        x = self.getmoduleMD()
         out = {}
         if x["data"].get("dependencies") and x["data"]["dependencies"].get("requires"):
             deps = x["data"]["dependencies"]["requires"]
