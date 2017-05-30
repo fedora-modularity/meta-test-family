@@ -818,7 +818,7 @@ gpgcheck=0
                 shutil.copy(filename, pkipath_ch)
             print_info("repo prepared for microdnf:", insiderepopath, open(insiderepopath, 'r').read())
 
-        @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, delay=21)
+        @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, delay=21, error=Exception("Timeout: Unable to start nspawn machine"))
         def tempfnc():
             print_debug("starting container via command:", "systemd-nspawn --machine=%s -bD %s" % (self.jmeno, self.chrootpath))
             nspawncont = utils.process.SubProcess(

@@ -227,7 +227,7 @@ class PDCParser():
                 if len(pkgbouid) > 4:
                     print_info("DOWNLOADING: %s" % foo)
 
-                    @Retry(attempts=DEFAULTRETRYCOUNT*10, timeout=DEFAULTRETRYTIMEOUT*60, delay=DEFAULTRETRYTIMEOUT)
+                    @Retry(attempts=DEFAULTRETRYCOUNT*10, timeout=DEFAULTRETRYTIMEOUT*60, delay=DEFAULTRETRYTIMEOUT, error=Exception("Unbale to fetch package from koji after %d attempts" % (DEFAULTRETRYCOUNT*10)))
                     def tmpfunc():
                         a = utils.process.run(
                             "cd %s; koji download-build %s  -a %s -a noarch" %
