@@ -74,13 +74,14 @@ class Retry(object):
             self.failed_attempts = 0
             self.timeouts_triggered = 0
 
-    def handle_failure(self, start_time, orig_excpt):
+    def handle_failure(self, start_time, orig_excpt=None):
         if __debug__:
             self.failed_attempts += 1
-
+        if orig_excpt is not None:
+            self.error.args += (str(orig_excpt),)
         self.attempts -= 1
         if self.attempts == 0:
-            self.error.args += (orig_excpt,)
+
             raise self.error
 
         # Before the next iteration sleep $delay seconds. It's the
@@ -104,7 +105,6 @@ class Retry(object):
             delay = None  # no delay yet
 
             while True:
-                e = None
                 if delay is not None:
                   time.sleep(delay)
 
@@ -132,7 +132,7 @@ class Retry(object):
                             self.failed_attempts += 1
                         raise e
 
-                delay = self.handle_failure(start_time, e)
+                delay = self.handle_failure(start_time)
 
         return __wrap
 
