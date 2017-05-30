@@ -50,7 +50,7 @@ def getBasePackageSet(modulesDict = None, isModule=True, isContainer=False):
     # nspawn container need to install also systemd to be able to boot
     out=[]
     brmod="base-runtime"
-    brmod_profile="baseimage"
+    brmod_profiles=["container", "baseimage"]
     BASEPACKAGESET_WORKAROUND = ["systemd"]
     BASEPACKAGESET_WORKAROUND_NOMODULE = ["systemd", "yum"]
     pdc = None
@@ -59,7 +59,10 @@ def getBasePackageSet(modulesDict = None, isModule=True, isContainer=False):
         if modulesDict.has_key(brmod):
             pdc = PDCParser()
             pdc.setLatestPDC(brmod, modulesDict[brmod])
-            basepackageset = pdc.getmoduleMD()['data']['profiles'][brmod_profile]['rpms']
+            for pr in brmod_profiles:
+                if pdc.getmoduleMD()['data']['profiles'].get(pr):
+                    basepackageset = pdc.getmoduleMD()['data']['profiles'][pr]['rpms']
+                    break
         if isContainer:
             out = basepackageset
         else:
