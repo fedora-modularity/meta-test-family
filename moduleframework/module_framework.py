@@ -38,7 +38,6 @@ import urllib
 import glob
 from avocado import Test
 from avocado import utils
-from avocado.core import exceptions
 from avocado.utils import service
 from compose_info import ComposeParser
 import pdc_data
@@ -59,7 +58,7 @@ def skipTestIf(value, text="Test not intended for this module profile"):
     :return: None
     """
     if value:
-        raise exceptions.TestDecoratorSkip(text)
+        raise BaseException("DEPRECATED, don't use this skip, use self.cancel() inside test function, or self.skip() in setUp()")
 
 
 class CommonFunctions(object):
