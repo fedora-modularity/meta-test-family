@@ -29,15 +29,15 @@ check-multihost-testing:
 	@true
 
 check-run-them-pdc-baseruntime:
-	MTF_REMOTE_REPOS= MTF_DO_NOT_CLEANUP= ../../tools/run-them.sh base-runtime base-runtime-f26-20170504201340 pdc
+	MTF_DO_NOT_CLEANUP= ../../tools/run-them.sh base-runtime base-runtime-f26-20170504201340 pdc
 	@true
 
 check-run-them-pdc-testmodule:
-	MTF_REMOTE_REPOS= ../../tools/run-them.sh testmodule testmodule-master-20170413142055 pdc
+	../../tools/run-them.sh testmodule testmodule-master-20170413142055 pdc
 	@true
 
 check-run-them-fedmsg-testmodule:
-	MTF_REMOTE_REPOS= ../../tools/run-them.sh testmodule ../../tools/example_message_module.yaml fedmsg
+	../../tools/run-them.sh testmodule ../../tools/example_message_module.yaml fedmsg
 	@true
 
 
