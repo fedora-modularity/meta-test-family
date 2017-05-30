@@ -53,28 +53,18 @@ def getBasePackageSet(modulesDict = None, isModule=True, isContainer=False):
     brmod_profile="baseimage"
     BASEPACKAGESET_WORKAROUND = ["systemd"]
     BASEPACKAGESET_WORKAROUND_NOMODULE = ["systemd", "yum"]
-    if modulesDict.has_key(brmod):
-        pdc = PDCParser()
-        pdc.setLatestPDC(brmod, modulesDict[brmod])
+    pdc = None
+    basepackageset = []
     if isModule:
-        # copied from http://pkgs.stg.fedoraproject.org/cgit/modules/base-runtime.git/tree/base-runtime.yaml baseimage profile
-        basepackageset = ["bash",
-                          "coreutils",
-                          "filesystem",
-                          "glibc-minimal-langpack",
-                          "libcrypt",
-                          "microdnf",
-                          "rpm",
-                          "shadow-utils",
-                          "util-linux"
-                          ]
+        if modulesDict.has_key(brmod):
+            pdc = PDCParser()
+            pdc.setLatestPDC(brmod, modulesDict[brmod])
+            basepackageset = pdc.getmoduleMD()['data']['profiles'][brmod_profile]['rpms']
         if isContainer:
             out = basepackageset
         else:
-            basepackageset = pdc.getmoduleMD()['data']['profiles'][brmod_profile]['rpms']
             out = basepackageset + BASEPACKAGESET_WORKAROUND
     else:
-        basepackageset = ""
         if isContainer:
             out = basepackageset
         else:
