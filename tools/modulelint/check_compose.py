@@ -43,7 +43,7 @@ class ComposeTest(module_framework.NspawnAvocadoTest):
         self.log.info("Checking availability of component and installation and remove them")
         for profile in self.getModulemdYamlconfig()["data"].get("profiles"):
             actualpackagelist = " ".join(
-                set(self.getModulemdYamlconfig()["data"]["profiles"].get(profile))
+                set(self.getModulemdYamlconfig()["data"]["profiles"][profile]["rpms"])
                 -set(self.backend.bootstrappackages)
             )
             packager = common.trans_dict["GUESTPACKAGER"]
