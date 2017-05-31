@@ -48,6 +48,7 @@ import warnings
 
 PROFILE = None
 
+
 def skipTestIf(value, text="Test not intended for this module profile"):
     """
     function what solves troubles that it is not possible to call SKIP inside code
@@ -176,7 +177,7 @@ class CommonFunctions(object):
             return cconfig
         elif not get_if_module():
             trans_dict["GUESTPACKAGER"] = "yum -y"
-            return {"data":{}}
+            return {"data": {}}
         else:
             if self.config is None:
                 self.loadconfig()
@@ -1226,7 +1227,6 @@ class NspawnAvocadoTest(AvocadoTest):
         if self.moduleType != "nspawn":
             self.skip("Nspawn specific test")
         super(NspawnAvocadoTest, self).setUp()
-
 
 
 def get_correct_backend():

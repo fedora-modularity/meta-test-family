@@ -21,8 +21,63 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
+import pprint
+import os
+
 
 from moduleframework import module_framework
+from dockerfile_parse import DockerfileParser
+
+# Dockerfile path
+DOCKERFILE = "Dockerfile"
+
+FROM = "FROM"
+RUN = "RUN"
+
+
+def _get_from(val):
+    if "baseruntime/baseruntime" in val:
+        return True
+    else:
+        return False
+
+
+def _get_run(val):
+    if val.startswith("dnf") or " dnf " in val:
+        return False
+    else:
+        return True
+
+functions = {FROM: _get_from,
+             RUN: _get_run}
+
+
+class DockerfileLinter(module_framework.ContainerAvocadoTest):
+    """
+    :avocado: enable
+    """
+
+    def testDockerFromBaseruntime(self):
+        tmp_dir = os.path.join(os.getcwd(), "..")
+        Dockerfile = os.path.join(tmp_dir, DOCKERFILE)
+        if os.path.exists(Dockerfile):
+            dfp = DockerfileParser(path=tmp_dir)
+            for struct in dfp.structure:
+                key = struct["instruction"]
+                val = struct["value"]
+                if key == FROM:
+                    self.assertTrue(functions[key](val))
+
+    def testDockerRunMicrodnf(self):
+        tmp_dir = os.path.join(os.getcwd(), "..")
+        Dockerfile = os.path.join(tmp_dir, DOCKERFILE)
+        if os.path.exists(Dockerfile):
+            dfp = DockerfileParser(path=tmp_dir)
+            for struct in dfp.structure:
+                key = struct["instruction"]
+                val = struct["value"]
+                if key == RUN and "dnf" in val:
+                    self.assertTrue(functions[key](val))
 
 
 class DockerLint(module_framework.ContainerAvocadoTest):
