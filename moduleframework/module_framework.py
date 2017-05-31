@@ -1019,7 +1019,7 @@ class AvocadoTest(Test):
     def cancel(self, *args, **kwargs):
         try:
             super(AvocadoTest, self).cancel(*args, **kwargs)
-        except:
+        except AttributeError:
             raise exceptions.TestDecoratorSkip(*args, **kwargs)
 
     def setUp(self):
