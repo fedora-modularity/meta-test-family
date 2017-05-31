@@ -722,6 +722,7 @@ class NspawnHelper(RpmHelper):
         self.installTestDependencies()
         self.__prepareSetup()
         self.__callSetupFromConfig()
+        self.__bootMachine()
 
     def __is_killed(self):
         for foo in range(DEFAULTRETRYTIMEOUT):
@@ -819,14 +820,19 @@ gpgcheck=0
                 shutil.copy(filename, pkipath_ch)
             print_info("repo prepared for microdnf:", insiderepopath, open(insiderepopath, 'r').read())
 
-        @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, delay=21, error=Exception("Timeout: Unable to start nspawn machine"))
+    def __bootMachine(self):
+
+        @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, delay=21,
+               error=Exception("Timeout: Unable to start nspawn machine"))
         def tempfnc():
-            print_debug("starting container via command:", "systemd-nspawn --machine=%s -bD %s" % (self.jmeno, self.chrootpath))
+            print_debug("starting container via command:",
+                        "systemd-nspawn --machine=%s -bD %s" % (self.jmeno, self.chrootpath))
             nspawncont = utils.process.SubProcess(
                 "systemd-nspawn --machine=%s -bD %s" %
                 (self.jmeno, self.chrootpath))
             nspawncont.start()
             self.__is_booted()
+
         tempfnc()
         print_info("machine: %s started" % self.jmeno)
 
