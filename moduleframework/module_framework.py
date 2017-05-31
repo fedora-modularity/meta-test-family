@@ -914,7 +914,7 @@ gpgcheck=0
             if comout.exit_status == 0 or should_ignore:
                 return comout
             else:
-                utils.process.CmdError(comout.command, comout)
+                raise utils.process.CmdError(comout.command, comout)
 
     def selfcheck(self):
         """
