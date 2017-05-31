@@ -9,7 +9,7 @@ check-docker:
 	@true
 
 check-rpm:
-	MODULE=nspawn $(CMD) $(TESTS)
+	MTF_DO_NOT_CLEANUP= MODULE=nspawn $(CMD) $(TESTS)
 	@true
 
 check-minimal-config-docker:
@@ -29,11 +29,11 @@ check-multihost-testing:
 	@true
 
 check-run-them-pdc-baseruntime:
-	MTF_DO_NOT_CLEANUP= ../../tools/run-them.sh base-runtime base-runtime-f26-20170504201340 pdc
+	../../tools/run-them.sh base-runtime base-runtime-f26-20170504201340 pdc
 	@true
 
 check-run-them-pdc-testmodule:
-	../../tools/run-them.sh testmodule testmodule-master-20170413142055 pdc
+	MTF_DO_NOT_CLEANUP= ../../tools/run-them.sh testmodule testmodule-master-20170413142055 pdc
 	@true
 
 check-run-them-fedmsg-testmodule:
