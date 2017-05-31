@@ -38,6 +38,7 @@ import urllib
 import glob
 from avocado import Test
 from avocado import utils
+from avocado.core import exceptions
 from avocado.utils import service
 from compose_info import ComposeParser
 import pdc_data
@@ -1015,6 +1016,11 @@ class AvocadoTest(Test):
                 (self.moduleType, self.moduleProfile))
         tmpfunc()
 
+    def cancel(self, *args, **kwargs):
+        try:
+            super(AvocadoTest, self).cancel(*args, **kwargs)
+        except:
+            raise exceptions.TestDecoratorSkip(*args, **kwargs)
 
     def setUp(self):
         """
