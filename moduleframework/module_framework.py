@@ -766,7 +766,7 @@ class NspawnHelper(RpmHelper):
                     self.moduleName, counter, repo)
             try:
                 self.runHost(
-                    "%s --nogpgcheck install --installroot %s --allowerasing --disablerepo=* --enablerepo=%s* %s %s" %
+                    "%s install --nogpgcheck --setopt=install_weak_deps=False --installroot %s --allowerasing --disablerepo=* --enablerepo=%s* %s %s" %
                     (trans_dict["HOSTPACKAGER"], self.chrootpath, self.moduleName, repos_to_use, self.whattoinstallrpm))
             except Exception as e:
                 raise Exception(
