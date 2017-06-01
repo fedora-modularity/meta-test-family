@@ -208,9 +208,11 @@ class CommonFunctions(object):
                         ymlfile = urllib.urlopen(modulemd)
                         self.modulemdConf = yaml.load(ymlfile)
                 link = self.modulemdConf
-        except:
-            raise ConfigExc('wrong or no urllink')
-        return link
+            return link
+        except IOError as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            raise ConfigExc("Cannot load file, {0}, line number: {1}".format(e, exc_tb.tb_lineno))
+
 
     def getIPaddr(self):
         """
