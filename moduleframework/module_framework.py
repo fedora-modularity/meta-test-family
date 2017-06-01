@@ -51,15 +51,23 @@ PROFILE = None
 
 class NspawnExc(Exception):
     def __init__(self,*args,**kwargs):
+        super(NspawnExc, self).__init__(*args,**kwargs)
         print ('EXCEPTION nspawn', args)
 
 class RpmExc(Exception):
     def __init__(self,*args,**kwargs):
+        super(RpmExc, self).__init__(*args,**kwargs)
         print ('EXCEPTION rpm dnf yum', args)
 
 class ContainerExc(Exception):
     def __init__(self,*args,**kwargs):
+        super(ContainerExc, self).__init__(*args,**kwargs)
         print ('EXCEPTION container', args)
+
+class ConfigExc(Exception):
+    def __init__(self,*args,**kwargs):
+        super(ConfigExc, self).__init__(*args,**kwargs)
+        print ('EXCEPTION config', args)
 
 def skipTestIf(value, text="Test not intended for this module profile"):
     """
@@ -183,22 +191,26 @@ class CommonFunctions(object):
         :param urllink: load this url instead of default one defined in config, or redefined by vaiable CONFIG
         :return: dict
         """
-        if urllink:
-            ymlfile = urllib.urlopen(urllink)
-            cconfig = yaml.load(ymlfile)
-            return cconfig
-        elif not get_if_module():
-            trans_dict["GUESTPACKAGER"] = "yum -y"
-            return {"data":{}}
-        else:
-            if self.config is None:
-                self.loadconfig()
-            if not self.modulemdConf:
-                modulemd = get_correct_modulemd()
-                if modulemd:
-                    ymlfile = urllib.urlopen(modulemd)
-                    self.modulemdConf = yaml.load(ymlfile)
-            return self.modulemdConf
+        try:
+            if urllink:
+                ymlfile = urllib.urlopen(urllink)
+                cconfig = yaml.load(ymlfile)
+                link = cconfig
+            elif not get_if_module():
+                trans_dict["GUESTPACKAGER"] = "yum -y"
+                link = {"data":{}}
+            else:
+                if self.config is None:
+                    self.loadconfig()
+                if not self.modulemdConf:
+                    modulemd = get_correct_modulemd()
+                    if modulemd:
+                        ymlfile = urllib.urlopen(modulemd)
+                        self.modulemdConf = yaml.load(ymlfile)
+                link = self.modulemdConf
+        except:
+            raise ConfigExc('wrong or no urllink')
+        return link
 
     def getIPaddr(self):
         """
@@ -933,7 +945,7 @@ gpgcheck=0
             if comout.exit_status == 0 or should_ignore:
                 return comout
             else:
-                raise ContainerExc(utils.process.CmdError(comout.command, comout))
+                raise utils.process.CmdError(comout.command, comout)
 
     def selfcheck(self):
         """

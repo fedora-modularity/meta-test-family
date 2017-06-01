@@ -40,6 +40,10 @@ check-run-them-fedmsg-testmodule:
 	MODULEMDURL= ../../tools/run-them.sh testmodule ../../tools/example_message_module.yaml fedmsg
 	@true
 
+check-exceptions:
+	MODULEMDURL=XXX  MODULE=nspawn $(CMD) --show-job-log simpleTest.py  | grep 'raise ConfigExc' &>/dev/null
+	@true
+
 
 
 check: check-docker check-minimal-config-rpm check-run-them-pdc-testmodule
