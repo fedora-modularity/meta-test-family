@@ -49,6 +49,26 @@ import warnings
 
 PROFILE = None
 
+class NspawnExc(Exception):
+    def __init__(self,*args,**kwargs):
+        super(NspawnExc, self).__init__(*args,**kwargs)
+        print ('EXCEPTION nspawn', args)
+
+class RpmExc(Exception):
+    def __init__(self,*args,**kwargs):
+        super(RpmExc, self).__init__(*args,**kwargs)
+        print ('EXCEPTION rpm dnf yum', args)
+
+class ContainerExc(Exception):
+    def __init__(self,*args,**kwargs):
+        super(ContainerExc, self).__init__(*args,**kwargs)
+        print ('EXCEPTION container', args)
+
+class ConfigExc(Exception):
+    def __init__(self,*args,**kwargs):
+        super(ConfigExc, self).__init__(*args,**kwargs)
+        print ('EXCEPTION config', args)
+
 def skipTestIf(value, text="Test not intended for this module profile"):
     """
     function what solves troubles that it is not possible to call SKIP inside code
@@ -171,22 +191,28 @@ class CommonFunctions(object):
         :param urllink: load this url instead of default one defined in config, or redefined by vaiable CONFIG
         :return: dict
         """
-        if urllink:
-            ymlfile = urllib.urlopen(urllink)
-            cconfig = yaml.load(ymlfile)
-            return cconfig
-        elif not get_if_module():
-            trans_dict["GUESTPACKAGER"] = "yum -y"
-            return {"data":{}}
-        else:
-            if self.config is None:
-                self.loadconfig()
-            if not self.modulemdConf:
-                modulemd = get_correct_modulemd()
-                if modulemd:
-                    ymlfile = urllib.urlopen(modulemd)
-                    self.modulemdConf = yaml.load(ymlfile)
-            return self.modulemdConf
+        try:
+            if urllink:
+                ymlfile = urllib.urlopen(urllink)
+                cconfig = yaml.load(ymlfile)
+                link = cconfig
+            elif not get_if_module():
+                trans_dict["GUESTPACKAGER"] = "yum -y"
+                link = {"data":{}}
+            else:
+                if self.config is None:
+                    self.loadconfig()
+                if not self.modulemdConf:
+                    modulemd = get_correct_modulemd()
+                    if modulemd:
+                        ymlfile = urllib.urlopen(modulemd)
+                        self.modulemdConf = yaml.load(ymlfile)
+                link = self.modulemdConf
+            return link
+        except IOError as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            raise ConfigExc("Cannot load file, {0}, line number: {1}".format(e, exc_tb.tb_lineno))
+
 
     def getIPaddr(self):
         """
@@ -355,7 +381,7 @@ class ContainerHelper(CommonFunctions):
                 else:
                     print_info("Nothing installed (nor via {HOSTPACKAGER} nor {GUESTPACKAGER}), but package list is not empty", self.getPackageList())
         if self.status() is False:
-            raise BaseException("Container %s (for module %s) is not running, probably DEAD immediately after start (ID: %s)" % (self.jmeno, self.moduleName, self.docker_id))
+            raise ContainerExc("Container %s (for module %s) is not running, probably DEAD immediately after start (ID: %s)" % (self.jmeno, self.moduleName, self.docker_id))
 
     def stop(self):
         """
@@ -522,7 +548,7 @@ class RpmHelper(CommonFunctions):
                 elif self.info.get('repos'):
                     self.repos = self.info.get('repos')
                 else:
-                    raise ValueError("no RPM given in file or via URL")
+                    raise RpmExc("no RPM given in file or via URL")
         if whattooinstall:
             self.whattoinstallrpm = " ".join(set(whattooinstall))
         else:
@@ -573,7 +599,7 @@ gpgcheck=0
                 "%s --disablerepo=* --enablerepo=%s* --allowerasing distro-sync" %
                 (trans_dict["HOSTPACKAGER"], self.moduleName), ignore_status=True)
         except Exception as e:
-            raise Exception(
+            raise RpmExc(
                 "ERROR: Unable to install packages %s from repositories \n%s\n original exeption:\n%s\n" %
                 (self.whattoinstallrpm,
                  self.runHost(
@@ -731,7 +757,7 @@ class NspawnHelper(RpmHelper):
             if out.exit_status != 0:
                 print_debug("NSPAWN machine %s stopped" % self.jmeno)
                 return True
-        raise BaseException("Unable to stop machine %s within %d" % (self.jmeno,DEFAULTRETRYTIMEOUT))
+        raise NspawnExc("Unable to stop machine %s within %d" % (self.jmeno,DEFAULTRETRYTIMEOUT))
 
     def __is_booted(self):
         for foo in range(DEFAULTRETRYTIMEOUT):
@@ -741,7 +767,7 @@ class NspawnHelper(RpmHelper):
                 time.sleep(2)
                 print_debug("NSPAWN machine %s booted" % self.jmeno)
                 return True
-        raise BaseException("Unable to start machine %s within %d" % (self.jmeno,DEFAULTRETRYTIMEOUT))
+        raise NspawnExc("Unable to start machine %s within %d" % (self.jmeno,DEFAULTRETRYTIMEOUT))
 
     def __prepareSetup(self):
         """
@@ -770,7 +796,7 @@ class NspawnHelper(RpmHelper):
                     "%s install --nogpgcheck --setopt=install_weak_deps=False --installroot %s --allowerasing --disablerepo=* --enablerepo=%s* %s %s" %
                     (trans_dict["HOSTPACKAGER"], self.chrootpath, self.moduleName, repos_to_use, self.whattoinstallrpm))
             except Exception as e:
-                raise Exception(
+                raise NspawnExc(
                     "ERROR: Unable to install packages %s\n original exeption:\n%s\n" %
                     (self.whattoinstallrpm, str(e)))
             # COPY yum repository inside NSPAW, to be able to do installations
