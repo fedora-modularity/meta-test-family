@@ -792,9 +792,12 @@ class NspawnHelper(RpmHelper):
                 repos_to_use += " --repofrompath %s%d,%s" % (
                     self.moduleName, counter, repo)
             try:
-                self.runHost(
-                    "%s install --nogpgcheck --setopt=install_weak_deps=False --installroot %s --allowerasing --disablerepo=* --enablerepo=%s* %s %s" %
-                    (trans_dict["HOSTPACKAGER"], self.chrootpath, self.moduleName, repos_to_use, self.whattoinstallrpm))
+                @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT*60, delay=2*60, error=Exception("Timeout: Unable to install packages"))
+                def tmpfunc():
+                    self.runHost(
+                        "%s install --nogpgcheck --setopt=install_weak_deps=False --installroot %s --allowerasing --disablerepo=* --enablerepo=%s* %s %s" %
+                        (trans_dict["HOSTPACKAGER"], self.chrootpath, self.moduleName, repos_to_use, self.whattoinstallrpm))
+                tmpfunc()
             except Exception as e:
                 raise NspawnExc(
                     "ERROR: Unable to install packages %s\n original exeption:\n%s\n" %
