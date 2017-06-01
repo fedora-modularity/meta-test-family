@@ -89,7 +89,7 @@ class PDCParser():
         """
         PDC = "%s/?variant_name=%s&variant_version=%s&variant_release=%s&active=True" % (
             PDCURL, self.name, self.stream, self.version)
-        print_debug("attemt to contact PDC with:", PDC)
+        print_info("Attemt to contact PDC (may take longer time) with query:", PDC)
         out=json.load(urllib.urlopen(PDC))["results"]
         if out:
             self.pdcdata = out[-1]
