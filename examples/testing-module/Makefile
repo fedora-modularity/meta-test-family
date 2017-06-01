@@ -33,11 +33,11 @@ check-run-them-pdc-baseruntime:
 	@true
 
 check-run-them-pdc-testmodule:
-	MTF_DO_NOT_CLEANUP= ../../tools/run-them.sh testmodule testmodule-master-20170413142055 pdc
+	MTF_DO_NOT_CLEANUP= MODULEMDURL= ../../tools/run-them.sh testmodule testmodule-master-20170413142055 pdc
 	@true
 
 check-run-them-fedmsg-testmodule:
-	../../tools/run-them.sh testmodule ../../tools/example_message_module.yaml fedmsg
+	MODULEMDURL= ../../tools/run-them.sh testmodule ../../tools/example_message_module.yaml fedmsg
 	@true
 
 
