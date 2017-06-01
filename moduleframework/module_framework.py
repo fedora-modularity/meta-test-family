@@ -49,6 +49,18 @@ import warnings
 
 PROFILE = None
 
+class NspawnExc(Exception):
+    def __init__(self,*args,**kwargs):
+        print ('EXCEPTION nspawn', args)
+
+class RpmExc(Exception):
+    def __init__(self,*args,**kwargs):
+        print ('EXCEPTION rpm dnf yum', args)
+
+class ContainerExc(Exception):
+    def __init__(self,*args,**kwargs):
+        print ('EXCEPTION container', args)
+
 def skipTestIf(value, text="Test not intended for this module profile"):
     """
     function what solves troubles that it is not possible to call SKIP inside code
@@ -355,7 +367,7 @@ class ContainerHelper(CommonFunctions):
                 else:
                     print_info("Nothing installed (nor via {HOSTPACKAGER} nor {GUESTPACKAGER}), but package list is not empty", self.getPackageList())
         if self.status() is False:
-            raise BaseException("Container %s (for module %s) is not running, probably DEAD immediately after start (ID: %s)" % (self.jmeno, self.moduleName, self.docker_id))
+            raise ContainerExc("Container %s (for module %s) is not running, probably DEAD immediately after start (ID: %s)" % (self.jmeno, self.moduleName, self.docker_id))
 
     def stop(self):
         """
@@ -522,7 +534,7 @@ class RpmHelper(CommonFunctions):
                 elif self.info.get('repos'):
                     self.repos = self.info.get('repos')
                 else:
-                    raise ValueError("no RPM given in file or via URL")
+                    raise RpmExc("no RPM given in file or via URL")
         if whattooinstall:
             self.whattoinstallrpm = " ".join(set(whattooinstall))
         else:
@@ -573,7 +585,7 @@ gpgcheck=0
                 "%s --disablerepo=* --enablerepo=%s* --allowerasing distro-sync" %
                 (trans_dict["HOSTPACKAGER"], self.moduleName), ignore_status=True)
         except Exception as e:
-            raise Exception(
+            raise RpmExc(
                 "ERROR: Unable to install packages %s from repositories \n%s\n original exeption:\n%s\n" %
                 (self.whattoinstallrpm,
                  self.runHost(
@@ -731,7 +743,7 @@ class NspawnHelper(RpmHelper):
             if out.exit_status != 0:
                 print_debug("NSPAWN machine %s stopped" % self.jmeno)
                 return True
-        raise BaseException("Unable to stop machine %s within %d" % (self.jmeno,DEFAULTRETRYTIMEOUT))
+        raise NspawnExc("Unable to stop machine %s within %d" % (self.jmeno,DEFAULTRETRYTIMEOUT))
 
     def __is_booted(self):
         for foo in range(DEFAULTRETRYTIMEOUT):
@@ -741,7 +753,7 @@ class NspawnHelper(RpmHelper):
                 time.sleep(2)
                 print_debug("NSPAWN machine %s booted" % self.jmeno)
                 return True
-        raise BaseException("Unable to start machine %s within %d" % (self.jmeno,DEFAULTRETRYTIMEOUT))
+        raise NspawnExc("Unable to start machine %s within %d" % (self.jmeno,DEFAULTRETRYTIMEOUT))
 
     def __prepareSetup(self):
         """
@@ -770,7 +782,7 @@ class NspawnHelper(RpmHelper):
                     "%s install --nogpgcheck --setopt=install_weak_deps=False --installroot %s --allowerasing --disablerepo=* --enablerepo=%s* %s %s" %
                     (trans_dict["HOSTPACKAGER"], self.chrootpath, self.moduleName, repos_to_use, self.whattoinstallrpm))
             except Exception as e:
-                raise Exception(
+                raise NspawnExc(
                     "ERROR: Unable to install packages %s\n original exeption:\n%s\n" %
                     (self.whattoinstallrpm, str(e)))
             # COPY yum repository inside NSPAW, to be able to do installations
@@ -921,7 +933,7 @@ gpgcheck=0
             if comout.exit_status == 0 or should_ignore:
                 return comout
             else:
-                raise utils.process.CmdError(comout.command, comout)
+                raise ContainerExc(utils.process.CmdError(comout.command, comout))
 
     def selfcheck(self):
         """
