@@ -44,6 +44,7 @@ Vagrant.configure(2) do |config|
         set -x
         dnf install -y make docker httpd git python2-avocado python2-avocado-plugins-output-html python-netifaces
         cd /home/vagrant
+        make install
         make check
         cp -r /root/avocado /var/www/html/
         chmod -R a+x /var/www/html/
