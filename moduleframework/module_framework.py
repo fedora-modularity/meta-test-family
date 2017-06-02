@@ -571,21 +571,20 @@ gpgcheck=0
 
         :return: None
         """
-        try:
-            self.runHost(
-                "%s --disablerepo=* --enablerepo=%s* --allowerasing install %s" %
-                (trans_dict["HOSTPACKAGER"],self.moduleName, self.whattoinstallrpm), verbose=is_not_silent())
-            self.runHost(
-                "%s --disablerepo=* --enablerepo=%s* --allowerasing distro-sync" %
-                (trans_dict["HOSTPACKAGER"], self.moduleName), ignore_status=True, verbose=is_not_silent())
-        except Exception as e:
-            raise RpmExc(
-                "ERROR: Unable to install packages %s from repositories \n%s\n original exeption:\n%s\n" %
-                (self.whattoinstallrpm,
-                 self.runHost(
-                     "cat %s" %
-                     self.yumrepo, verbose=is_not_silent()).stdout,
-                    e))
+
+        a = self.runHost(
+            "%s --disablerepo=* --enablerepo=%s* --allowerasing install %s" %
+            (trans_dict["HOSTPACKAGER"],self.moduleName, self.whattoinstallrpm), ignore_status=True, verbose=is_not_silent())
+        b =self.runHost(
+            "%s --disablerepo=* --enablerepo=%s* --allowerasing distro-sync" %
+            (trans_dict["HOSTPACKAGER"], self.moduleName), ignore_status=True, verbose=is_not_silent())
+
+        if a.exit_status != 0 and b.exit_status != 0:
+            raise RpmExc("ERROR: Unable to install packages %s" % self.whattoinstallrpm,
+                         "repositories are: ",
+                         self.runHost("cat %s" % self.yumrepo, verbose=is_not_silent()).stdout)
+
+        self.ipaddr = trans_dict["GUESTIPADDR"]
 
     def status(self, command="/bin/true"):
         """
@@ -843,6 +842,9 @@ gpgcheck=0
 
         tempfnc()
         print_info("machine: %s started" % self.jmeno)
+
+        trans_dict["GUESTIPADDR"] = trans_dict["HOSTIPADDR"]
+        self.ipaddr = trans_dict["GUESTIPADDR"]
 
     def status(self, command="/bin/true"):
         """

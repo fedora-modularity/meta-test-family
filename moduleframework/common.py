@@ -77,6 +77,7 @@ if os.path.exists('/usr/bin/dnf'):
 
 # translation table for config.yaml files syntax is {VARIABLE} in config file
 trans_dict = {"HOSTIPADDR": hostipaddr,
+              "GUESTIPADDR": hostipaddr,
               "DEFROUTE": defroutedev,
               "HOSTNAME": hostname,
               "ROOT": "/",
