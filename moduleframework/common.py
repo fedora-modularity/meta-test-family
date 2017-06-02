@@ -101,6 +101,9 @@ DEFAULTNSPAWNTIMEOUT = 10
 def is_debug():
     return bool(os.environ.get("DEBUG"))
 
+def is_not_silent():
+    return not is_debug()
+
 def print_info(*args):
     """
     Print data to selected output in case you are not in testing class, there is self.log

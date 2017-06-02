@@ -117,7 +117,7 @@ class CommonFunctions(object):
             self.runHost(
                 "{HOSTPACKAGER} install " +
                 " ".join(packages),
-                ignore_status=True)
+                ignore_status=True, verbose=is_not_silent())
 
     def loadconfig(self):
         """
@@ -286,7 +286,7 @@ class ContainerHelper(CommonFunctions):
         :return: None
         """
         if not os.path.isfile('/usr/bin/docker-current'):
-            self.runHost("{HOSTPACKAGER} install docker")
+            self.runHost("{HOSTPACKAGER} install docker",verbose=is_not_silent())
 
     def __prepareContainer(self):
         """
@@ -314,16 +314,16 @@ class ContainerHelper(CommonFunctions):
         if self.tarbased:
             self.runHost(
                 "docker import %s %s" %
-                (self.icontainer, self.jmeno))
+                (self.icontainer, self.jmeno), verbose=is_not_silent())
         elif "docker=" in self.icontainer:
             pass
         else:
-            self.runHost("docker pull %s" % self.jmeno)
+            self.runHost("docker pull %s" % self.jmeno, verbose=is_not_silent())
 
         self.containerInfo = json.loads(
             self.runHost(
                 "docker inspect %s" %
-                self.jmeno).stdout)[0]["Config"]
+                self.jmeno, verbose=is_not_silent()).stdout)[0]["Config"]
 
     def start(self, args="-it -d", command="/bin/bash"):
         """
@@ -337,11 +337,11 @@ class ContainerHelper(CommonFunctions):
             if 'start' in self.info and self.info['start']:
                 self.docker_id = self.runHost(
                     "%s -d %s" %
-                    (self.info['start'], self.jmeno), shell=True, ignore_bg_processes=True).stdout
+                    (self.info['start'], self.jmeno), shell=True, ignore_bg_processes=True, verbose=is_not_silent()).stdout
             else:
                 self.docker_id = self.runHost(
                     "docker run %s %s %s" %
-                    (args, self.jmeno, command), shell=True, ignore_bg_processes=True).stdout
+                    (args, self.jmeno, command), shell=True, ignore_bg_processes=True, verbose=is_not_silent()).stdout
             self.docker_id = self.docker_id.strip()
             if self.getPackageList():
                 a = self.run(
@@ -371,8 +371,8 @@ class ContainerHelper(CommonFunctions):
         """
         if self.status():
             try:
-                self.runHost("docker stop %s" % self.docker_id)
-                self.runHost("docker rm %s" % self.docker_id)
+                self.runHost("docker stop %s" % self.docker_id, verbose=is_not_silent())
+                self.runHost("docker rm %s" % self.docker_id, verbose=is_not_silent())
             except Exception as e:
                 print_debug(e, "docker already removed")
                 pass
@@ -385,7 +385,7 @@ class ContainerHelper(CommonFunctions):
         """
         if self.docker_id and self.docker_id[
                 : 12] in self.runHost(
-                "docker ps", shell=True).stdout:
+                "docker ps", shell=True, verbose=is_not_silent()).stdout:
             return True
         else:
             return False
@@ -413,7 +413,7 @@ class ContainerHelper(CommonFunctions):
         :return: None
         """
         self.start()
-        self.runHost("docker cp %s %s:%s" % (src, self.docker_id, dest))
+        self.runHost("docker cp %s %s:%s" % (src, self.docker_id, dest), verbose=is_not_silent())
 
     def copyFrom(self, src, dest):
         """
@@ -424,7 +424,7 @@ class ContainerHelper(CommonFunctions):
         :return: None
         """
         self.start()
-        self.runHost("docker cp %s:%s %s" % (self.docker_id, src, dest))
+        self.runHost("docker cp %s:%s %s" % (self.docker_id, src, dest), verbose=is_not_silent())
 
     def __callSetupFromConfig(self):
         """
@@ -433,7 +433,7 @@ class ContainerHelper(CommonFunctions):
         :return: None
         """
         if self.info.get("setup"):
-            self.runHost(self.info.get("setup"), shell=True, ignore_bg_processes=True)
+            self.runHost(self.info.get("setup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
 
     def __callCleanupFromConfig(self):
         """
@@ -442,7 +442,7 @@ class ContainerHelper(CommonFunctions):
         :return: None
         """
         if self.info.get("cleanup"):
-            self.runHost(self.info.get("cleanup"), shell=True, ignore_bg_processes=True)
+            self.runHost(self.info.get("cleanup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
 
 
 class RpmHelper(CommonFunctions):
@@ -574,17 +574,17 @@ gpgcheck=0
         try:
             self.runHost(
                 "%s --disablerepo=* --enablerepo=%s* --allowerasing install %s" %
-                (trans_dict["HOSTPACKAGER"],self.moduleName, self.whattoinstallrpm))
+                (trans_dict["HOSTPACKAGER"],self.moduleName, self.whattoinstallrpm), verbose=is_not_silent())
             self.runHost(
                 "%s --disablerepo=* --enablerepo=%s* --allowerasing distro-sync" %
-                (trans_dict["HOSTPACKAGER"], self.moduleName), ignore_status=True)
+                (trans_dict["HOSTPACKAGER"], self.moduleName), ignore_status=True, verbose=is_not_silent())
         except Exception as e:
             raise RpmExc(
                 "ERROR: Unable to install packages %s from repositories \n%s\n original exeption:\n%s\n" %
                 (self.whattoinstallrpm,
                  self.runHost(
                      "cat %s" %
-                     self.yumrepo).stdout,
+                     self.yumrepo, verbose=is_not_silent()).stdout,
                     e))
 
     def status(self, command="/bin/true"):
@@ -596,9 +596,9 @@ gpgcheck=0
         """
         try:
             if 'status' in self.info and self.info['status']:
-                a = self.runHost(self.info['status'], shell=True, verbose=False, ignore_bg_processes=True)
+                a = self.runHost(self.info['status'], shell=True, ignore_bg_processes=True, verbose=is_not_silent())
             else:
-                a = self.runHost("%s" % command, shell=True, verbose=False, ignore_bg_processes=True)
+                a = self.runHost("%s" % command, shell=True, ignore_bg_processes=True, verbose=is_not_silent())
             print_debug("command:",a.command ,"stdout:",a.stdout, "stderr:", a.stderr)
             return True
         except BaseException:
@@ -613,9 +613,9 @@ gpgcheck=0
         :return: None
         """
         if 'start' in self.info and self.info['start']:
-            self.runHost(self.info['start'], shell=True, ignore_bg_processes=True)
+            self.runHost(self.info['start'], shell=True, ignore_bg_processes=True, verbose=is_not_silent())
         else:
-            self.runHost("%s" % command, shell=True, ignore_bg_processes=True)
+            self.runHost("%s" % command, shell=True, ignore_bg_processes=True, verbose=is_not_silent())
 
     def stop(self, command="/bin/true"):
         """
@@ -626,9 +626,9 @@ gpgcheck=0
         :return: None
         """
         if 'stop' in self.info and self.info['stop']:
-            self.runHost(self.info['stop'], shell=True, ignore_bg_processes=True)
+            self.runHost(self.info['stop'], shell=True, ignore_bg_processes=True, verbose=is_not_silent())
         else:
-            self.runHost("%s" % command, shell=True, ignore_bg_processes=True)
+            self.runHost("%s" % command, shell=True, ignore_bg_processes=True, verbose=is_not_silent())
 
     def run(self, command="ls /", **kwargs):
         """
@@ -649,7 +649,7 @@ gpgcheck=0
         :param dest: str
         :return: None
         """
-        self.runHost("cp -r %s %s" % (src, dest))
+        self.runHost("cp -r %s %s" % (src, dest), verbose=is_not_silent())
 
     def copyFrom(self, src, dest):
         """
@@ -659,7 +659,7 @@ gpgcheck=0
         :param dest: str
         :return: None
         """
-        self.runHost("cp -r %s %s" % (src, dest))
+        self.runHost("cp -r %s %s" % (src, dest), verbose=is_not_silent())
 
     def __callSetupFromConfig(self):
         """
@@ -668,7 +668,7 @@ gpgcheck=0
         :return: None
         """
         if self.info.get("setup"):
-            self.runHost(self.info.get("setup"), shell=True, ignore_bg_processes=True)
+            self.runHost(self.info.get("setup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
 
     def __callCleanupFromConfig(self):
         """
@@ -677,7 +677,7 @@ gpgcheck=0
         :return: None
         """
         if self.info.get("cleanup"):
-            self.runHost(self.info.get("cleanup"), shell=True, ignore_bg_processes=True)
+            self.runHost(self.info.get("cleanup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
 
 
 class NspawnHelper(RpmHelper):
@@ -722,7 +722,7 @@ class NspawnHelper(RpmHelper):
             # (failing because of selinux)
             self.__selinuxState = self.runHost(
                 "getenforce", ignore_status=True).stdout.strip()
-            self.runHost("setenforce Permissive", ignore_status=True)
+            self.runHost("setenforce Permissive", ignore_status=True, verbose=is_not_silent())
         self.setModuleDependencies()
         self.setRepositoriesAndWhatToInstall()
         self.installTestDependencies()
@@ -759,12 +759,12 @@ class NspawnHelper(RpmHelper):
             shutil.rmtree(self.chrootpath, ignore_errors=True)
             os.mkdir(self.chrootpath)
         try:
-            self.runHost("machinectl terminate %s" % self.jmeno)
+            self.runHost("machinectl terminate %s" % self.jmeno, verbose=is_debug())
             self.__is_killed()
         except BaseException:
             pass
         if not os.path.exists(os.path.join(self.chrootpath, "usr")):
-            self.runHost("{HOSTPACKAGER} install systemd-container")
+            self.runHost("{HOSTPACKAGER} install systemd-container", verbose=is_not_silent())
             repos_to_use = ""
             counter = 0
             for repo in self.repos:
@@ -772,11 +772,11 @@ class NspawnHelper(RpmHelper):
                 repos_to_use += " --repofrompath %s%d,%s" % (
                     self.moduleName, counter, repo)
             try:
-                @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT*60, delay=2*60, error=Exception("Timeout: Unable to install packages"))
+                @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT*60, delay=2*60, error=NspawnExc("RETRY: Unable to install packages"))
                 def tmpfunc():
                     self.runHost(
                         "%s install --nogpgcheck --setopt=install_weak_deps=False --installroot %s --allowerasing --disablerepo=* --enablerepo=%s* %s %s" %
-                        (trans_dict["HOSTPACKAGER"], self.chrootpath, self.moduleName, repos_to_use, self.whattoinstallrpm))
+                        (trans_dict["HOSTPACKAGER"], self.chrootpath, self.moduleName, repos_to_use, self.whattoinstallrpm), verbose=is_not_silent())
                 tmpfunc()
             except Exception as e:
                 raise NspawnExc(
@@ -786,8 +786,7 @@ class NspawnHelper(RpmHelper):
             insiderepopath = os.path.join(self.chrootpath, self.yumrepo[1:])
             try:
                 os.makedirs(os.path.dirname(insiderepopath))
-            except Exception as e:
-                print_debug(e)
+            except:
                 pass
             counter = 0
             f = open(insiderepopath, 'w')
@@ -832,13 +831,13 @@ gpgcheck=0
     def __bootMachine(self):
 
         @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, delay=21,
-               error=Exception("Timeout: Unable to start nspawn machine"))
+               error=NspawnExc("RETRY: Unable to start nspawn machine"))
         def tempfnc():
             print_debug("starting container via command:",
                         "systemd-nspawn --machine=%s -bD %s" % (self.jmeno, self.chrootpath))
             nspawncont = utils.process.SubProcess(
                 "systemd-nspawn --machine=%s -bD %s" %
-                (self.jmeno, self.chrootpath))
+                (self.jmeno, self.chrootpath), verbose=is_debug())
             nspawncont.start()
             self.__is_booted()
 
@@ -912,7 +911,7 @@ gpgcheck=0
         try:
             if not kwargs:
                 kwargs = {}
-            kwargs["verbose"]=False
+            kwargs["verbose"]=is_not_silent()
             should_ignore=kwargs.get("ignore_status")
             kwargs["ignore_status"]=True
             b = self.runHost(
@@ -951,7 +950,7 @@ gpgcheck=0
         """
         self.runHost(
             " machinectl copy-to  %s %s %s" %
-            (self.jmeno, src, dest), timeout = DEFAULTPROCESSTIMEOUT, ignore_bg_processes=True)
+            (self.jmeno, src, dest), timeout = DEFAULTPROCESSTIMEOUT, ignore_bg_processes=True, verbose=is_not_silent())
 
     def copyFrom(self, src, dest):
         """
@@ -963,7 +962,7 @@ gpgcheck=0
         """
         self.runHost(
             " machinectl copy-from  %s %s %s" %
-            (self.jmeno, src, dest), timeout = DEFAULTPROCESSTIMEOUT, ignore_bg_processes=True)
+            (self.jmeno, src, dest), timeout = DEFAULTPROCESSTIMEOUT, ignore_bg_processes=True, verbose=is_not_silent())
 
     def tearDown(self):
         """
@@ -972,7 +971,7 @@ gpgcheck=0
         :return: None
         """
         self.stop()
-        self.runHost("machinectl poweroff %s" % self.jmeno)
+        self.runHost("machinectl poweroff %s" % self.jmeno, verbose=is_not_silent())
         # self.nspawncont.stop()
         self.__is_killed()
         if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
@@ -981,7 +980,7 @@ gpgcheck=0
             self.runHost(
                 "setenforce %s" %
                 self.__selinuxState,
-                ignore_status=True)
+                ignore_status=True, verbose=is_not_silent())
         if get_if_do_cleanup() and os.path.exists(self.chrootpath):
             shutil.rmtree(self.chrootpath, ignore_errors=True)
         self.__callCleanupFromConfig()
@@ -994,7 +993,7 @@ gpgcheck=0
         :return: None
         """
         if self.info.get("setup"):
-            self.runHost(self.info.get("setup"), shell=True, ignore_bg_processes=True)
+            self.runHost(self.info.get("setup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
 
     def __callCleanupFromConfig(self):
         """
@@ -1003,7 +1002,7 @@ gpgcheck=0
         :return: None
         """
         if self.info.get("cleanup"):
-            self.runHost(self.info.get("cleanup"), shell=True, ignore_bg_processes=True)
+            self.runHost(self.info.get("cleanup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
 
 
 # INTERFACE CLASS FOR GENERAL TESTS OF MODULES
@@ -1158,7 +1157,7 @@ class AvocadoTest(Test):
         :return: str
         """
         self.start()
-        allpackages = self.run(r'rpm -qa --qf="%{{name}}\n"').stdout.split('\n')
+        allpackages = self.run(r'rpm -qa --qf="%{{name}}\n"', verbose=is_not_silent()).stdout.split('\n')
         return allpackages
 
     def copyTo(self, *args, **kwargs):

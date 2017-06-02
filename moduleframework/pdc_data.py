@@ -80,7 +80,7 @@ class PDCParser():
     Class for parsing PDC data via some setters line setFullVersion, setViaFedMsg, setLatestPDC
     """
 
-    @Retry(attempts=DEFAULTRETRYCOUNT*5, timeout=DEFAULTRETRYTIMEOUT, delay=20)
+    @Retry(attempts=DEFAULTRETRYCOUNT*5, timeout=DEFAULTRETRYTIMEOUT, delay=20, error=PDCExc("RETRY: Unable to get data from PDC"))
     def __getDataFromPdc(self):
         """
         Internal method, do not use it
@@ -221,7 +221,7 @@ class PDCParser():
                 if len(pkgbouid) > 4:
                     print_info("DOWNLOADING: %s" % foo)
 
-                    @Retry(attempts=DEFAULTRETRYCOUNT*10, timeout=DEFAULTRETRYTIMEOUT*60, delay=DEFAULTRETRYTIMEOUT, error=Exception("Unbale to fetch package from koji after %d attempts" % (DEFAULTRETRYCOUNT*10)))
+                    @Retry(attempts=DEFAULTRETRYCOUNT*10, timeout=DEFAULTRETRYTIMEOUT*60, delay=DEFAULTRETRYTIMEOUT, error=KojiExc("RETRY: Unbale to fetch package from koji after %d attempts" % (DEFAULTRETRYCOUNT*10)))
                     def tmpfunc():
                         a = utils.process.run(
                             "cd %s; koji download-build %s  -a %s -a noarch" %
