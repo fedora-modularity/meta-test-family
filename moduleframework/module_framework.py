@@ -1021,15 +1021,13 @@ class AvocadoTest(Test):
     :avocado: disable
     """
     def __init__(self,*args, **kwargs):
-        @Retry(attempts=1,timeout=55)
-        def tmpfunc():
-            super(AvocadoTest,self).__init__(*args, **kwargs)
-            (self.backend, self.moduleType) = get_correct_backend()
-            self.moduleProfile = get_correct_profile()
-            print_info(
-                "Module Type: %s; Profile: %s" %
-                (self.moduleType, self.moduleProfile))
-        tmpfunc()
+        super(AvocadoTest,self).__init__(*args, **kwargs)
+
+        (self.backend, self.moduleType) = get_correct_backend()
+        self.moduleProfile = get_correct_profile()
+        print_info(
+            "Module Type: %s; Profile: %s" %
+            (self.moduleType, self.moduleProfile))
 
     def cancel(self, *args, **kwargs):
         try:
@@ -1270,7 +1268,7 @@ def get_correct_backend():
     elif amodule == 'nspawn':
         return NspawnHelper(), amodule
     else:
-        raise ModuleFrameworkException("Unsupported MODULE={0}".format(amodule))
+        raise ModuleFrameworkException("Unsupported MODULE={0}".format(amodule), "supproted are: docker, rpm, nspawn")
 
 
 def get_correct_profile():

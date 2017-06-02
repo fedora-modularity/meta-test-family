@@ -35,7 +35,7 @@ import os
 
 class ModuleFrameworkException(Exception):
     def __init__(self,*args,**kwargs):
-        super(NspawnExc, self).__init__(*args,**kwargs)
+        super(ModuleFrameworkException, self).__init__(*args,**kwargs)
         print_info('EXCEPTION nspawn', *args)
 
 class NspawnExc(ModuleFrameworkException):
@@ -56,11 +56,11 @@ class ConfigExc(ModuleFrameworkException):
 
 class PDCExc(ModuleFrameworkException):
     def __init__(self,*args,**kwargs):
-        super(ConfigExc, self).__init__('EXCEPTION PDC', *args,**kwargs)
+        super(PDCExc, self).__init__('EXCEPTION PDC', *args,**kwargs)
 
 class KojiExc(ModuleFrameworkException):
     def __init__(self,*args,**kwargs):
-        super(ConfigExc, self).__init__('EXCEPTION Koji', *args,**kwargs)
+        super(KojiExc, self).__init__('EXCEPTION Koji', *args,**kwargs)
 
 
 defroutedev = netifaces.gateways().get('default').values(
