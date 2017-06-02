@@ -49,26 +49,6 @@ import warnings
 
 PROFILE = None
 
-class NspawnExc(Exception):
-    def __init__(self,*args,**kwargs):
-        super(NspawnExc, self).__init__(*args,**kwargs)
-        print ('EXCEPTION nspawn', args)
-
-class RpmExc(Exception):
-    def __init__(self,*args,**kwargs):
-        super(RpmExc, self).__init__(*args,**kwargs)
-        print ('EXCEPTION rpm dnf yum', args)
-
-class ContainerExc(Exception):
-    def __init__(self,*args,**kwargs):
-        super(ContainerExc, self).__init__(*args,**kwargs)
-        print ('EXCEPTION container', args)
-
-class ConfigExc(Exception):
-    def __init__(self,*args,**kwargs):
-        super(ConfigExc, self).__init__(*args,**kwargs)
-        print ('EXCEPTION config', args)
-
 def skipTestIf(value, text="Test not intended for this module profile"):
     """
     function what solves troubles that it is not possible to call SKIP inside code
@@ -79,7 +59,7 @@ def skipTestIf(value, text="Test not intended for this module profile"):
     :return: None
     """
     if value:
-        raise BaseException("DEPRECATED, don't use this skip, use self.cancel() inside test function, or self.skip() in setUp()")
+        raise ModuleFrameworkException("DEPRECATED, don't use this skip, use self.cancel() inside test function, or self.skip() in setUp()")
 
 
 class CommonFunctions(object):
@@ -108,7 +88,7 @@ class CommonFunctions(object):
         try:
             formattedcommand = command.format(**trans_dict)
         except KeyError:
-            raise BaseException("Command is formatted by using trans_dict, if you want to use brackets { } in your code please use {{ or }}, possible values in trans_dict are:", trans_dict)
+            raise ModuleFrameworkException("Command is formatted by using trans_dict, if you want to use brackets { } in your code please use {{ or }}, possible values in trans_dict are:", trans_dict)
         return utils.process.run("%s" % formattedcommand, **kwargs)
 
     def installTestDependencies(self, packages=None):
@@ -1290,7 +1270,7 @@ def get_correct_backend():
     elif amodule == 'nspawn':
         return NspawnHelper(), amodule
     else:
-        raise ValueError("Unsupported MODULE={0}".format(amodule))
+        raise ModuleFrameworkException("Unsupported MODULE={0}".format(amodule))
 
 
 def get_correct_profile():
@@ -1330,13 +1310,13 @@ def get_correct_config():
     if not cfgfile:
         cfgfile = "config.yaml"
     if not os.path.exists(cfgfile):
-        raise ValueError(
+        raise ConfigExc(
             "Config file (%s) does not exist or is inaccesible (you can also redefine own by CONFIG=path/to/configfile.yaml env variable)" %
             cfgfile)
     with open(cfgfile, 'r') as ymlfile:
         xcfg = yaml.load(ymlfile.read())
         if xcfg['document'] != 'modularity-testing':
-            raise ValueError(
+            raise ConfigExc(
                 "Bad Config file, not yaml or does not contain proper document type" %
                 cfgfile)
     return xcfg

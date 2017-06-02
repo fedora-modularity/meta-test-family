@@ -32,6 +32,37 @@ import netifaces
 import socket
 import os
 
+
+class ModuleFrameworkException(Exception):
+    def __init__(self,*args,**kwargs):
+        super(NspawnExc, self).__init__(*args,**kwargs)
+        print_info('EXCEPTION nspawn', *args)
+
+class NspawnExc(ModuleFrameworkException):
+    def __init__(self,*args,**kwargs):
+        super(NspawnExc, self).__init__('EXCEPTION nspawn', *args,**kwargs)
+
+class RpmExc(ModuleFrameworkException):
+    def __init__(self,*args,**kwargs):
+        super(RpmExc, self).__init__('EXCEPTION rpm dnf yum', *args,**kwargs)
+
+class ContainerExc(ModuleFrameworkException):
+    def __init__(self,*args,**kwargs):
+        super(ContainerExc, self).__init__('EXCEPTION container', *args,**kwargs)
+
+class ConfigExc(ModuleFrameworkException):
+    def __init__(self,*args,**kwargs):
+        super(ConfigExc, self).__init__('EXCEPTION config', *args,**kwargs)
+
+class PDCExc(ModuleFrameworkException):
+    def __init__(self,*args,**kwargs):
+        super(ConfigExc, self).__init__('EXCEPTION PDC', *args,**kwargs)
+
+class KojiExc(ModuleFrameworkException):
+    def __init__(self,*args,**kwargs):
+        super(ConfigExc, self).__init__('EXCEPTION Koji', *args,**kwargs)
+
+
 defroutedev = netifaces.gateways().get('default').values(
 )[0][1] if netifaces.gateways().get('default') else "lo"
 hostipaddr = netifaces.ifaddresses(defroutedev)[2][0]['addr']
@@ -83,7 +114,7 @@ def print_info(*args):
             try:
                 out = arg.format(**trans_dict)
             except KeyError:
-                raise BaseException(
+                raise ModuleFrameworkException(
                     "String is formatted by using trans_dict, if you want to use brackets { } in your code please use {{ or }}, possible values in trans_dict are:",
                     trans_dict)
         print >> sys.stderr, out

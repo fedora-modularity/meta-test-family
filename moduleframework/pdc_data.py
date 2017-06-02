@@ -94,7 +94,7 @@ class PDCParser():
         if out:
             self.pdcdata = out[-1]
         else:
-            raise BaseException("Unable to get data from PDC URL: %s" % PDC)
+            raise PDCExc("Unable to get data from PDC URL: %s" % PDC)
 
     def setFullVersion(self, nvr):
         """
@@ -230,7 +230,7 @@ class PDCParser():
                             if "packages available for" in a.stdout.strip():
                                 print_info('UNABLE TO DOWNLOAD package (intended for other architectures, GOOD):', a.command)
                             else:
-                                raise BaseException('UNABLE TO DOWNLOAD package (KOJI issue, BAD):', a.command)
+                                raise KojiExc('UNABLE TO DOWNLOAD package (KOJI issue, BAD):', a.command)
                     tmpfunc()
             utils.process.run(
                 "cd %s; createrepo -v %s" %
