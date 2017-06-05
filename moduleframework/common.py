@@ -35,8 +35,8 @@ import os
 
 class ModuleFrameworkException(Exception):
     def __init__(self,*args,**kwargs):
-        super(ModuleFrameworkException, self).__init__(*args,**kwargs)
-        print_info('EXCEPTION nspawn', *args)
+        super(ModuleFrameworkException, self).__init__('EXCEPTION MTF', *args,**kwargs)
+        print_debug('exception block entered', *args)
 
 class NspawnExc(ModuleFrameworkException):
     def __init__(self,*args,**kwargs):
@@ -44,7 +44,7 @@ class NspawnExc(ModuleFrameworkException):
 
 class RpmExc(ModuleFrameworkException):
     def __init__(self,*args,**kwargs):
-        super(RpmExc, self).__init__('EXCEPTION rpm dnf yum', *args,**kwargs)
+        super(RpmExc, self).__init__('EXCEPTION rpm', *args,**kwargs)
 
 class ContainerExc(ModuleFrameworkException):
     def __init__(self,*args,**kwargs):
