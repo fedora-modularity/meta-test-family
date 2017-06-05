@@ -219,7 +219,7 @@ class PDCParser():
                     "koji list-tagged --quiet %s" % self.pdcdata["koji_tag"], verbose=is_debug()).stdout.split("\n"):
                 pkgbouid = foo.strip().split(" ")[0]
                 if len(pkgbouid) > 4:
-                    print_info("DOWNLOADING: %s" % foo)
+                    print_debug("DOWNLOADING: %s" % foo)
 
                     @Retry(attempts=DEFAULTRETRYCOUNT*10, timeout=DEFAULTRETRYTIMEOUT*60, delay=DEFAULTRETRYTIMEOUT, error=KojiExc("RETRY: Unbale to fetch package from koji after %d attempts" % (DEFAULTRETRYCOUNT*10)))
                     def tmpfunc():
@@ -228,7 +228,7 @@ class PDCParser():
                             (absdir, pkgbouid, ARCH), shell=True, verbose=is_debug(),ignore_status=True)
                         if a.exit_status == 1:
                             if "packages available for" in a.stdout.strip():
-                                print_info('UNABLE TO DOWNLOAD package (intended for other architectures, GOOD):', a.command)
+                                print_debug('UNABLE TO DOWNLOAD package (intended for other architectures, GOOD):', a.command)
                             else:
                                 raise KojiExc('UNABLE TO DOWNLOAD package (KOJI issue, BAD):', a.command)
                     tmpfunc()

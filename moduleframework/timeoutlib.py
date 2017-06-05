@@ -18,14 +18,21 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with Cockpit; If not, see <http://www.gnu.org/licenses/>.
 # Author: Miloš Prchlík (https://gist.github.com/happz/d50897af8a2e90cce8c7)
+#         Jan Scotka <jscotka@redhat.com>
 
 import signal
 import time
+import logging
+from common import print_info
+
+log = logging.getLogger('avocado.test')
 
 class Timeout(object):
     def __init__(self, retry, timeout):
         self.retry = retry
         self.timeout = timeout
+        log.debug("Started timeout period: ", timeout)
+        log.debug("Number of remainig retry: ", retry)
 
     def __enter__(self):
         def timeout_handler(signum, frame):
@@ -38,6 +45,7 @@ class Timeout(object):
         signal.alarm(self.timeout)
 
     def __exit__(self, type, value, traceback):
+        log.debug("Time were exceeded")
         signal.alarm(0)
         signal.signal(signal.SIGALRM, self.orig_sighand)
 
@@ -74,12 +82,13 @@ class Retry(object):
             self.failed_attempts = 0
             self.timeouts_triggered = 0
 
-    def handle_failure(self, start_time):
+    def handle_failure(self, start_time, exc):
         if __debug__:
             self.failed_attempts += 1
-
         self.attempts -= 1
+        log.debug("Remaining attempts: ", self.attempts)
         if self.attempts == 0:
+            print_info("Original exeption:", exc)
             raise self.error
 
         # Before the next iteration sleep $delay seconds. It's the
@@ -104,6 +113,7 @@ class Retry(object):
 
             while True:
                 if delay is not None:
+                  log.debug("Sleeping for delay:", delay)
                   time.sleep(delay)
 
                 with self.timeout_wrapper(self, self.timeout):
@@ -120,7 +130,9 @@ class Retry(object):
 
                         # Handle exceptions we are expected to catch, by logging a failed
                         # attempt, and checking the number of attempts.
-                        delay = self.handle_failure(start_time)
+                        delay = self.handle_failure(start_time, e)
+                        log.debug("Exception were catch:", e)
+                        log.debug("Continue to next round")
                         continue
 
                     except Exception as e:
@@ -130,7 +142,7 @@ class Retry(object):
                             self.failed_attempts += 1
                         raise e
 
-                delay = self.handle_failure(start_time)
+                delay = self.handle_failure(start_time, "")
 
         return __wrap
 
