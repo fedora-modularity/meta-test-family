@@ -34,33 +34,32 @@ import os
 
 
 class ModuleFrameworkException(Exception):
-    def __init__(self,*args,**kwargs):
-        super(ModuleFrameworkException, self).__init__('EXCEPTION MTF', *args,**kwargs)
-        print_debug('exception block entered', *args)
+    def __init__(self, *args,**kwargs):
+        super(ModuleFrameworkException, self).__init__('EXCEPTION MTF: ', *args,**kwargs)
 
 class NspawnExc(ModuleFrameworkException):
     def __init__(self,*args,**kwargs):
-        super(NspawnExc, self).__init__('EXCEPTION nspawn', *args,**kwargs)
+        super(NspawnExc, self).__init__('TYPE nspawn', *args,**kwargs)
 
 class RpmExc(ModuleFrameworkException):
     def __init__(self,*args,**kwargs):
-        super(RpmExc, self).__init__('EXCEPTION rpm', *args,**kwargs)
+        super(RpmExc, self).__init__('TYPE rpm', *args,**kwargs)
 
 class ContainerExc(ModuleFrameworkException):
     def __init__(self,*args,**kwargs):
-        super(ContainerExc, self).__init__('EXCEPTION container', *args,**kwargs)
+        super(ContainerExc, self).__init__('TYPE container', *args,**kwargs)
 
 class ConfigExc(ModuleFrameworkException):
     def __init__(self,*args,**kwargs):
-        super(ConfigExc, self).__init__('EXCEPTION config', *args,**kwargs)
+        super(ConfigExc, self).__init__('TYPE config', *args,**kwargs)
 
 class PDCExc(ModuleFrameworkException):
     def __init__(self,*args,**kwargs):
-        super(PDCExc, self).__init__('EXCEPTION PDC', *args,**kwargs)
+        super(PDCExc, self).__init__('TYPE PDC', *args,**kwargs)
 
 class KojiExc(ModuleFrameworkException):
     def __init__(self,*args,**kwargs):
-        super(KojiExc, self).__init__('EXCEPTION Koji', *args,**kwargs)
+        super(KojiExc, self).__init__('TYPE Koji', *args,**kwargs)
 
 
 defroutedev = netifaces.gateways().get('default').values(
