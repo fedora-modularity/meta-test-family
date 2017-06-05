@@ -190,8 +190,7 @@ class CommonFunctions(object):
                 link = self.modulemdConf
             return link
         except IOError as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            raise ConfigExc("Cannot load file, {0}, line number: {1}".format(e, exc_tb.tb_lineno))
+            raise ConfigExc("Cannot load file")
 
 
     def getIPaddr(self):

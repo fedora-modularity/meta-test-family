@@ -31,11 +31,19 @@ import sys
 import netifaces
 import socket
 import os
-
+import linecache
 
 class ModuleFrameworkException(Exception):
     def __init__(self, *args,**kwargs):
         super(ModuleFrameworkException, self).__init__('EXCEPTION MTF: ', *args,**kwargs)
+        exc_type, exc_obj, tb = sys.exc_info()
+        if tb is not None:
+            f = tb.tb_frame
+            lineno = tb.tb_lineno
+            filename = f.f_code.co_filename
+            linecache.checkcache(filename)
+            line = linecache.getline(filename, lineno, f.f_globals)
+            print "-----------\n| EXCEPTION IN: {} \n| LINE: {}, {} \n| ERROR: {}\n-----------".format(filename, lineno, line.strip(), exc_obj)
 
 class NspawnExc(ModuleFrameworkException):
     def __init__(self,*args,**kwargs):
