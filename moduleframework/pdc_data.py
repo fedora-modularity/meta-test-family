@@ -37,20 +37,20 @@ from common import *
 from timeoutlib import Retry
 
 
-def getBasePackageSet(modulesDict = None, isModule=True, isContainer=False):
+def getBasePackageSet(modulesDict=None, isModule=True, isContainer=False):
     """
     Get list of base packages (for bootstrapping of various module types)
     It is used internally, you should not use it in case you don't know where to use it.
-    
+
     :param modulesDict: dictionary of dependent modules
     :param isModule: bool is module
     :param isContainer: bool is contaner?
     :return: list of packages to install 
     """
     # nspawn container need to install also systemd to be able to boot
-    out=[]
-    brmod="base-runtime"
-    brmod_profiles=["container", "baseimage"]
+    out = []
+    brmod = "base-runtime"
+    brmod_profiles = ["container", "baseimage"]
     BASEPACKAGESET_WORKAROUND = ["systemd"]
     BASEPACKAGESET_WORKAROUND_NOMODULE = ["systemd", "yum"]
     pdc = None
@@ -61,7 +61,8 @@ def getBasePackageSet(modulesDict = None, isModule=True, isContainer=False):
             pdc.setLatestPDC(brmod, modulesDict[brmod])
             for pr in brmod_profiles:
                 if pdc.getmoduleMD()['data']['profiles'].get(pr):
-                    basepackageset = pdc.getmoduleMD()['data']['profiles'][pr]['rpms']
+                    basepackageset = pdc.getmoduleMD(
+                    )['data']['profiles'][pr]['rpms']
                     break
         if isContainer:
             out = basepackageset
@@ -75,12 +76,13 @@ def getBasePackageSet(modulesDict = None, isModule=True, isContainer=False):
     print_info("ALL packages to install:", out)
     return out
 
+
 class PDCParser():
     """
     Class for parsing PDC data via some setters line setFullVersion, setViaFedMsg, setLatestPDC
     """
 
-    @Retry(attempts=DEFAULTRETRYCOUNT*5, timeout=DEFAULTRETRYTIMEOUT, delay=20, error=PDCExc("RETRY: Unable to get data from PDC"))
+    @Retry(attempts=DEFAULTRETRYCOUNT * 5, timeout=DEFAULTRETRYTIMEOUT, delay=20, error=PDCExc("RETRY: Unable to get data from PDC"))
     def __getDataFromPdc(self):
         """
         Internal method, do not use it
@@ -89,8 +91,9 @@ class PDCParser():
         """
         PDC = "%s/?variant_name=%s&variant_version=%s&variant_release=%s&active=True" % (
             PDCURL, self.name, self.stream, self.version)
-        print_info("Attemt to contact PDC (may take longer time) with query:", PDC)
-        out=json.load(urllib.urlopen(PDC))["results"]
+        print_info(
+            "Attemt to contact PDC (may take longer time) with query:", PDC)
+        out = json.load(urllib.urlopen(PDC))["results"]
         if out:
             self.pdcdata = out[-1]
         else:
@@ -142,7 +145,7 @@ class PDCParser():
 
         :return: str
         """
-        #rpmrepo = "http://kojipkgs.fedoraproject.org/repos/%s/latest/%s" % (
+        # rpmrepo = "http://kojipkgs.fedoraproject.org/repos/%s/latest/%s" % (
         #    self.pdcdata["koji_tag"] + "-build", ARCH)
         rpmrepo = "https://kojipkgs.stg.fedoraproject.org/compose/branched/jkaluza/latest-Fedora-Modular-26/compose/Server/%s/os/" % ARCH
         return rpmrepo
@@ -208,7 +211,8 @@ class PDCParser():
 
         :return: str
         """
-        utils.process.run("{HOSTPACKAGER} install createrepo koji".format(**trans_dict), ignore_status=True)
+        utils.process.run("{HOSTPACKAGER} install createrepo koji".format(
+            **trans_dict), ignore_status=True)
         dirname = "localrepo_%s_%s_%s" % (self.name, self.stream, self.version)
         absdir = os.path.abspath(dirname)
         if os.path.exists(absdir):
@@ -221,16 +225,18 @@ class PDCParser():
                 if len(pkgbouid) > 4:
                     print_debug("DOWNLOADING: %s" % foo)
 
-                    @Retry(attempts=DEFAULTRETRYCOUNT*10, timeout=DEFAULTRETRYTIMEOUT*60, delay=DEFAULTRETRYTIMEOUT, error=KojiExc("RETRY: Unbale to fetch package from koji after %d attempts" % (DEFAULTRETRYCOUNT*10)))
+                    @Retry(attempts=DEFAULTRETRYCOUNT * 10, timeout=DEFAULTRETRYTIMEOUT * 60, delay=DEFAULTRETRYTIMEOUT, error=KojiExc("RETRY: Unbale to fetch package from koji after %d attempts" % (DEFAULTRETRYCOUNT * 10)))
                     def tmpfunc():
                         a = utils.process.run(
                             "cd %s; koji download-build %s  -a %s -a noarch" %
-                            (absdir, pkgbouid, ARCH), shell=True, verbose=is_debug(),ignore_status=True)
+                            (absdir, pkgbouid, ARCH), shell=True, verbose=is_debug(), ignore_status=True)
                         if a.exit_status == 1:
                             if "packages available for" in a.stdout.strip():
-                                print_debug('UNABLE TO DOWNLOAD package (intended for other architectures, GOOD):', a.command)
+                                print_debug(
+                                    'UNABLE TO DOWNLOAD package (intended for other architectures, GOOD):', a.command)
                             else:
-                                raise KojiExc('UNABLE TO DOWNLOAD package (KOJI issue, BAD):', a.command)
+                                raise KojiExc(
+                                    'UNABLE TO DOWNLOAD package (KOJI issue, BAD):', a.command)
                     tmpfunc()
             utils.process.run(
                 "cd %s; createrepo -v %s" %

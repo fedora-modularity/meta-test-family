@@ -33,9 +33,11 @@ import socket
 import os
 import linecache
 
+
 class ModuleFrameworkException(Exception):
-    def __init__(self, *args,**kwargs):
-        super(ModuleFrameworkException, self).__init__('EXCEPTION MTF: ', *args,**kwargs)
+    def __init__(self, *args, **kwargs):
+        super(ModuleFrameworkException, self).__init__(
+            'EXCEPTION MTF: ', *args, **kwargs)
         exc_type, exc_obj, tb = sys.exc_info()
         if tb is not None:
             f = tb.tb_frame
@@ -45,29 +47,35 @@ class ModuleFrameworkException(Exception):
             line = linecache.getline(filename, lineno, f.f_globals)
             print "-----------\n| EXCEPTION IN: {} \n| LINE: {}, {} \n| ERROR: {}\n-----------".format(filename, lineno, line.strip(), exc_obj)
 
+
 class NspawnExc(ModuleFrameworkException):
-    def __init__(self,*args,**kwargs):
-        super(NspawnExc, self).__init__('TYPE nspawn', *args,**kwargs)
+    def __init__(self, *args, **kwargs):
+        super(NspawnExc, self).__init__('TYPE nspawn', *args, **kwargs)
+
 
 class RpmExc(ModuleFrameworkException):
-    def __init__(self,*args,**kwargs):
-        super(RpmExc, self).__init__('TYPE rpm', *args,**kwargs)
+    def __init__(self, *args, **kwargs):
+        super(RpmExc, self).__init__('TYPE rpm', *args, **kwargs)
+
 
 class ContainerExc(ModuleFrameworkException):
-    def __init__(self,*args,**kwargs):
-        super(ContainerExc, self).__init__('TYPE container', *args,**kwargs)
+    def __init__(self, *args, **kwargs):
+        super(ContainerExc, self).__init__('TYPE container', *args, **kwargs)
+
 
 class ConfigExc(ModuleFrameworkException):
-    def __init__(self,*args,**kwargs):
-        super(ConfigExc, self).__init__('TYPE config', *args,**kwargs)
+    def __init__(self, *args, **kwargs):
+        super(ConfigExc, self).__init__('TYPE config', *args, **kwargs)
+
 
 class PDCExc(ModuleFrameworkException):
-    def __init__(self,*args,**kwargs):
-        super(PDCExc, self).__init__('TYPE PDC', *args,**kwargs)
+    def __init__(self, *args, **kwargs):
+        super(PDCExc, self).__init__('TYPE PDC', *args, **kwargs)
+
 
 class KojiExc(ModuleFrameworkException):
-    def __init__(self,*args,**kwargs):
-        super(KojiExc, self).__init__('TYPE Koji', *args,**kwargs)
+    def __init__(self, *args, **kwargs):
+        super(KojiExc, self).__init__('TYPE Koji', *args, **kwargs)
 
 
 defroutedev = netifaces.gateways().get('default').values(
@@ -100,17 +108,20 @@ PDCURL = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
 REPOMD = "repodata/repomd.xml"
 MODULEFILE = 'tempmodule.yaml'
 # default value of process timeout in sec
-DEFAULTPROCESSTIMEOUT = 2*60
+DEFAULTPROCESSTIMEOUT = 2 * 60
 DEFAULTRETRYCOUNT = 3
 # time in seconds
 DEFAULTRETRYTIMEOUT = 30
 DEFAULTNSPAWNTIMEOUT = 10
 
+
 def is_debug():
     return bool(os.environ.get("DEBUG"))
 
+
 def is_not_silent():
     return not is_debug()
+
 
 def print_info(*args):
     """
@@ -129,6 +140,7 @@ def print_info(*args):
                     "String is formatted by using trans_dict, if you want to use brackets { } in your code please use {{ or }}, possible values in trans_dict are:",
                     trans_dict)
         print >> sys.stderr, out
+
 
 def print_debug(*args):
     """

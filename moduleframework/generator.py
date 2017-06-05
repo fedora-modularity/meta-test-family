@@ -66,7 +66,9 @@ class GeneratedTestsConfig(module_framework.AvocadoTest):
         for line in testlines:
             # only use shell=True for runHost() calls, otherwise variables etc.
             # get expanded too early, i.e. on the host
-            self.output = self.output + '        self.%s(""" %s """,  shell=%r)\n' % (method, line, method == "runHost")
+            self.output = self.output + \
+                '        self.%s(""" %s """,  shell=%r)\n' % (
+                    method, line, method == "runHost")
         print("Added test (runmethod: %s): %s" % (method, testname))
 
 

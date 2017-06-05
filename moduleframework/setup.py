@@ -54,7 +54,7 @@ class Module(module_framework.CommonFunctions):
             allmodulerpms = " ".join(self.whattoinstall['rpms'])
         if self.baseruntimeyaml:
             allbasertrpms = " ".join(self.baseruntimeyaml['data'][
-                                 'profiles']['default']['rpms'])
+                'profiles']['default']['rpms'])
         if allbasertrpms is not None and allmodulerpms is not None:
             utils.process.run(
                 "yumdownloader --destdir=%s --resolve %s %s" %

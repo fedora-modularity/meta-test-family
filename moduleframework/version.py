@@ -17,9 +17,11 @@ def version_func():
         for line in infile.readlines():
             if "Version:        " in line:
                 return line[16:].strip()
-    raise BaseException("Unable to read Version string from specfile:", SPECFILEPATH)
+    raise BaseException(
+        "Unable to read Version string from specfile:", SPECFILEPATH)
 
-VERSION=version_func()
+
+VERSION = version_func()
 
 if __name__ == '__main__':
     print VERSION
