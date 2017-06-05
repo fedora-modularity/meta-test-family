@@ -41,7 +41,7 @@ check-run-them-fedmsg-testmodule:
 	@true
 
 check-exceptions:
-	MODULEMDURL=XXX  MODULE=nspawn $(CMD) --show-job-log simpleTest.py  | grep 'raise ConfigExc' &>/dev/null
+	MODULEMDURL=XXX  MODULE=nspawn $(CMD) --show-job-log simpleTest.py  | grep 'raise ConfigExc' >/dev/null
 	@true
 
 
