@@ -28,18 +28,16 @@ main module provides helpers for various module types and AVOCADO(unittest) clas
 what you should use for your tests (inherited)
 """
 
-import os
 import re
 import shutil
 import yaml
 import json
-import time
 import urllib
 import glob
 from avocado import Test
-from avocado import utils
 from avocado.core import exceptions
 from avocado.utils import service
+from avocado.utils import process
 from compose_info import ComposeParser
 import pdc_data
 from common import *
@@ -84,8 +82,8 @@ class CommonFunctions(object):
         Run commands on host
 
         :param command: command to exectute
-        :param kwargs: (avocado utils.process.run) params like: shell, ignore_status, verbose
-        :return: avocado.utils.process.run
+        :param kwargs: (avocado process.run) params like: shell, ignore_status, verbose
+        :return: avocado.process.run
         """
         try:
             formattedcommand = command.format(**trans_dict)
@@ -94,7 +92,7 @@ class CommonFunctions(object):
                 "Command is formatted by using trans_dict, if you want to use brackets { } in your code please use {{ "
                 "or }}, possible values in trans_dict are:",
                 trans_dict)
-        return utils.process.run("%s" % formattedcommand, **kwargs)
+        return process.run("%s" % formattedcommand, **kwargs)
 
     def installTestDependencies(self, packages=None):
         """
@@ -153,22 +151,19 @@ class CommonFunctions(object):
                     'packages'].get('rpms') else []
                 packages_profiles = []
                 for x in self.config['packages'].get('profiles') if self.config[
-                        'packages'].get('profiles') else []:
+                    'packages'].get('profiles') else []:
                     packages_profiles = packages_profiles + \
-                        self.getModulemdYamlconfig()[
-                            'data']['profiles'][x]['rpms']
+                                        self.getModulemdYamlconfig()['data']['profiles'][x]['rpms']
                 out += packages_rpm + packages_profiles
 
             elif self.getModulemdYamlconfig()['data'].get('profiles') and self.getModulemdYamlconfig()['data'][
-                    'profiles'].get(get_correct_profile()):
-                out += self.getModulemdYamlconfig(
-                )['data']['profiles'][get_correct_profile()]['rpms']
+                'profiles'].get(get_correct_profile()):
+                out += self.getModulemdYamlconfig()['data']['profiles'][get_correct_profile()]['rpms']
             else:
                 # fallback solution when it is not known what to install
                 out.append("bash")
         else:
-            out += self.getModulemdYamlconfig(
-            )['data']['profiles'][profile]['rpms']
+            out += self.getModulemdYamlconfig()['data']['profiles'][profile]['rpms']
         print_info("PCKGs to install inside module:", out)
         return out
 
@@ -293,8 +288,7 @@ class ContainerHelper(CommonFunctions):
         :return: None
         """
         if not os.path.isfile('/usr/bin/docker-current'):
-            self.runHost("{HOSTPACKAGER} install docker",
-                         verbose=is_not_silent())
+            self.runHost("{HOSTPACKAGER} install docker", verbose=is_not_silent())
 
     def __prepareContainer(self):
         """
@@ -303,7 +297,7 @@ class ContainerHelper(CommonFunctions):
         :return: None
         """
         if self.tarbased is False and self.jmeno == self.icontainer and "docker.io" not in self.info[
-                'container']:
+            'container']:
             registry = re.search("([^/]*)", self.icontainer).groups()[0]
             if registry not in open('/etc/sysconfig/docker', 'rw').read():
                 with open("/etc/sysconfig/docker", "a") as myfile:
@@ -326,8 +320,7 @@ class ContainerHelper(CommonFunctions):
         elif "docker=" in self.icontainer:
             pass
         else:
-            self.runHost("docker pull %s" %
-                         self.jmeno, verbose=is_not_silent())
+            self.runHost("docker pull %s" % self.jmeno, verbose=is_not_silent())
 
         self.containerInfo = json.loads(
             self.runHost(
@@ -346,8 +339,7 @@ class ContainerHelper(CommonFunctions):
             if 'start' in self.info and self.info['start']:
                 self.docker_id = self.runHost(
                     "%s -d %s" %
-                    (self.info['start'],
-                     self.jmeno), shell=True, ignore_bg_processes=True,
+                    (self.info['start'], self.jmeno), shell=True, ignore_bg_processes=True,
                     verbose=is_not_silent()).stdout
             else:
                 self.docker_id = self.runHost(
@@ -366,11 +358,9 @@ class ContainerHelper(CommonFunctions):
                         self.getPackageList())),
                     ignore_status=True, verbose=False)
                 if a.exit_status == 0:
-                    print_info(
-                        "Packages installed via {HOSTPACKAGER}", a.stdout)
+                    print_info("Packages installed via {HOSTPACKAGER}", a.stdout)
                 elif b.exit_status == 0:
-                    print_info(
-                        "Packages installed via {GUESTPACKAGER}", b.stdout)
+                    print_info("Packages installed via {GUESTPACKAGER}", b.stdout)
                 else:
                     print_info(
                         "Nothing installed (nor via {HOSTPACKAGER} nor {GUESTPACKAGER}), but package list is not empty",
@@ -388,10 +378,8 @@ class ContainerHelper(CommonFunctions):
         """
         if self.status():
             try:
-                self.runHost("docker stop %s" %
-                             self.docker_id, verbose=is_not_silent())
-                self.runHost("docker rm %s" %
-                             self.docker_id, verbose=is_not_silent())
+                self.runHost("docker stop %s" % self.docker_id, verbose=is_not_silent())
+                self.runHost("docker rm %s" % self.docker_id, verbose=is_not_silent())
             except Exception as e:
                 print_debug(e, "docker already removed")
                 pass
@@ -403,8 +391,8 @@ class ContainerHelper(CommonFunctions):
         :return: bool
         """
         if self.docker_id and self.docker_id[
-                : 12] in self.runHost(
-                "docker ps", shell=True, verbose=is_not_silent()).stdout:
+                              : 12] in self.runHost(
+            "docker ps", shell=True, verbose=is_not_silent()).stdout:
             return True
         else:
             return False
@@ -415,7 +403,7 @@ class ContainerHelper(CommonFunctions):
 
         :param command: str
         :param kwargs: dict
-        :return: avocado.utils.process.run
+        :return: avocado.process.run
         """
         self.start()
         return self.runHost(
@@ -432,8 +420,7 @@ class ContainerHelper(CommonFunctions):
         :return: None
         """
         self.start()
-        self.runHost("docker cp %s %s:%s" %
-                     (src, self.docker_id, dest), verbose=is_not_silent())
+        self.runHost("docker cp %s %s:%s" % (src, self.docker_id, dest), verbose=is_not_silent())
 
     def copyFrom(self, src, dest):
         """
@@ -444,8 +431,7 @@ class ContainerHelper(CommonFunctions):
         :return: None
         """
         self.start()
-        self.runHost("docker cp %s:%s %s" %
-                     (self.docker_id, src, dest), verbose=is_not_silent())
+        self.runHost("docker cp %s:%s %s" % (self.docker_id, src, dest), verbose=is_not_silent())
 
     def __callSetupFromConfig(self):
         """
@@ -454,8 +440,7 @@ class ContainerHelper(CommonFunctions):
         :return: None
         """
         if self.info.get("setup"):
-            self.runHost(self.info.get("setup"), shell=True,
-                         ignore_bg_processes=True, verbose=is_not_silent())
+            self.runHost(self.info.get("setup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
 
     def __callCleanupFromConfig(self):
         """
@@ -464,8 +449,7 @@ class ContainerHelper(CommonFunctions):
         :return: None
         """
         if self.info.get("cleanup"):
-            self.runHost(self.info.get("cleanup"), shell=True,
-                         ignore_bg_processes=True, verbose=is_not_silent())
+            self.runHost(self.info.get("cleanup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
 
 
 class RpmHelper(CommonFunctions):
@@ -493,9 +477,8 @@ class RpmHelper(CommonFunctions):
     def setModuleDependencies(self):
         temprepositories = {}
         if self.getModulemdYamlconfig()["data"].get("dependencies") and self.getModulemdYamlconfig()["data"][
-                "dependencies"].get("requires"):
-            temprepositories = self.getModulemdYamlconfig(
-            )["data"]["dependencies"]["requires"]
+            "dependencies"].get("requires"):
+            temprepositories = self.getModulemdYamlconfig()["data"]["dependencies"]["requires"]
         temprepositories_cycle = dict(temprepositories)
         for x in temprepositories_cycle:
             pdc = pdc_data.PDCParser()
@@ -546,8 +529,7 @@ class RpmHelper(CommonFunctions):
         else:
             if not self.repos:
                 for dep in self.moduledeps:
-                    alldrepos.append(get_latest_repo_url(
-                        dep, self.moduledeps[dep]))
+                    alldrepos.append(get_latest_repo_url(dep, self.moduledeps[dep]))
                 if get_correct_url():
                     self.repos = [get_correct_url()] + alldrepos
                 elif self.info.get('repo'):
@@ -562,8 +544,7 @@ class RpmHelper(CommonFunctions):
             if not self.whattoinstallrpm:
                 self.bootstrappackages = pdc_data.getBasePackageSet(modulesDict=self.moduledeps,
                                                                     isModule=get_if_module(), isContainer=False)
-                self.whattoinstallrpm = " ".join(
-                    set(self.getPackageList() + self.bootstrappackages))
+                self.whattoinstallrpm = " ".join(set(self.getPackageList() + self.bootstrappackages))
 
     def tearDown(self):
         """
@@ -603,8 +584,7 @@ gpgcheck=0
 
         a = self.runHost(
             "%s --disablerepo=* --enablerepo=%s* --allowerasing install %s" %
-            (trans_dict["HOSTPACKAGER"], self.moduleName,
-             self.whattoinstallrpm), ignore_status=True,
+            (trans_dict["HOSTPACKAGER"], self.moduleName, self.whattoinstallrpm), ignore_status=True,
             verbose=is_not_silent())
         b = self.runHost(
             "%s --disablerepo=* --enablerepo=%s* --allowerasing distro-sync" %
@@ -626,13 +606,10 @@ gpgcheck=0
         """
         try:
             if 'status' in self.info and self.info['status']:
-                a = self.runHost(
-                    self.info['status'], shell=True, ignore_bg_processes=True, verbose=is_not_silent())
+                a = self.runHost(self.info['status'], shell=True, ignore_bg_processes=True, verbose=is_not_silent())
             else:
-                a = self.runHost("%s" % command, shell=True,
-                                 ignore_bg_processes=True, verbose=is_not_silent())
-            print_debug("command:", a.command, "stdout:",
-                        a.stdout, "stderr:", a.stderr)
+                a = self.runHost("%s" % command, shell=True, ignore_bg_processes=True, verbose=is_not_silent())
+            print_debug("command:", a.command, "stdout:", a.stdout, "stderr:", a.stderr)
             return True
         except BaseException:
             return False
@@ -645,11 +622,9 @@ gpgcheck=0
         :return: None
         """
         if 'start' in self.info and self.info['start']:
-            self.runHost(self.info['start'], shell=True,
-                         ignore_bg_processes=True, verbose=is_not_silent())
+            self.runHost(self.info['start'], shell=True, ignore_bg_processes=True, verbose=is_not_silent())
         else:
-            self.runHost("%s" % command, shell=True,
-                         ignore_bg_processes=True, verbose=is_not_silent())
+            self.runHost("%s" % command, shell=True, ignore_bg_processes=True, verbose=is_not_silent())
 
     def stop(self, command="/bin/true"):
         """
@@ -659,19 +634,17 @@ gpgcheck=0
         :return: None
         """
         if 'stop' in self.info and self.info['stop']:
-            self.runHost(self.info['stop'], shell=True,
-                         ignore_bg_processes=True, verbose=is_not_silent())
+            self.runHost(self.info['stop'], shell=True, ignore_bg_processes=True, verbose=is_not_silent())
         else:
-            self.runHost("%s" % command, shell=True,
-                         ignore_bg_processes=True, verbose=is_not_silent())
+            self.runHost("%s" % command, shell=True, ignore_bg_processes=True, verbose=is_not_silent())
 
     def run(self, command="ls /", **kwargs):
         """
         Run command inside module, for RPM based it is same as runHost
 
         :param command: str of command to execute
-        :param kwargs: dict from avocado.utils.process.run
-        :return: avocado.utils.process.run
+        :param kwargs: dict from avocado.process.run
+        :return: avocado.process.run
         """
         return self.runHost('bash -c "%s"' %
                             command.replace('"', r'\"'), **kwargs)
@@ -703,8 +676,7 @@ gpgcheck=0
         :return: None
         """
         if self.info.get("setup"):
-            self.runHost(self.info.get("setup"), shell=True,
-                         ignore_bg_processes=True, verbose=is_not_silent())
+            self.runHost(self.info.get("setup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
 
     def __callCleanupFromConfig(self):
         """
@@ -713,8 +685,7 @@ gpgcheck=0
         :return: None
         """
         if self.info.get("cleanup"):
-            self.runHost(self.info.get("cleanup"), shell=True,
-                         ignore_bg_processes=True, verbose=is_not_silent())
+            self.runHost(self.info.get("cleanup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
 
 
 class NspawnHelper(RpmHelper):
@@ -732,8 +703,7 @@ class NspawnHelper(RpmHelper):
         relative change root path
         """
         super(NspawnHelper, self).__init__()
-        self.__selinuxState = self.runHost(
-            "getenforce", ignore_status=True).stdout.strip()
+        self.__selinuxState = None
         time.time()
         actualtime = time.time()
         if get_if_do_cleanup():
@@ -759,8 +729,9 @@ class NspawnHelper(RpmHelper):
         if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
             # TODO: workaround because systemd nspawn is now working well in F-25
             # (failing because of selinux)
-            self.runHost("setenforce Permissive",
-                         ignore_status=True, verbose=is_not_silent())
+            self.__selinuxState = self.runHost(
+            "getenforce", ignore_status=True).stdout.strip()
+            self.runHost("setenforce Permissive", ignore_status=True, verbose=is_not_silent())
         self.setModuleDependencies()
         self.setRepositoriesAndWhatToInstall()
         self.installTestDependencies()
@@ -771,25 +742,21 @@ class NspawnHelper(RpmHelper):
     def __is_killed(self):
         for foo in range(DEFAULTRETRYTIMEOUT):
             time.sleep(foo)
-            out = self.runHost("machinectl status %s" %
-                               self.jmeno, verbose=is_debug(), ignore_status=True)
+            out = self.runHost("machinectl status %s" % self.jmeno, verbose=is_debug(), ignore_status=True)
             if out.exit_status != 0:
                 print_debug("NSPAWN machine %s stopped" % self.jmeno)
                 return True
-        raise NspawnExc("Unable to stop machine %s within %d" %
-                        (self.jmeno, DEFAULTRETRYTIMEOUT))
+        raise NspawnExc("Unable to stop machine %s within %d" % (self.jmeno, DEFAULTRETRYTIMEOUT))
 
     def __is_booted(self):
         for foo in range(DEFAULTRETRYTIMEOUT):
             time.sleep(foo)
-            out = self.runHost("machinectl status %s" %
-                               self.jmeno, verbose=is_debug(), ignore_status=True)
+            out = self.runHost("machinectl status %s" % self.jmeno, verbose=is_debug(), ignore_status=True)
             if "logind.service" in out.stdout:
                 time.sleep(2)
                 print_debug("NSPAWN machine %s booted" % self.jmeno)
                 return True
-        raise NspawnExc("Unable to start machine %s within %d" %
-                        (self.jmeno, DEFAULTRETRYTIMEOUT))
+        raise NspawnExc("Unable to start machine %s within %d" % (self.jmeno, DEFAULTRETRYTIMEOUT))
 
     def __prepareSetup(self):
         """
@@ -801,14 +768,12 @@ class NspawnHelper(RpmHelper):
             shutil.rmtree(self.chrootpath, ignore_errors=True)
             os.mkdir(self.chrootpath)
         try:
-            self.runHost("machinectl terminate %s" %
-                         self.jmeno, verbose=is_debug())
+            self.runHost("machinectl terminate %s" % self.jmeno, verbose=is_debug())
             self.__is_killed()
         except BaseException:
             pass
         if not os.path.exists(os.path.join(self.chrootpath, "usr")):
-            self.runHost("{HOSTPACKAGER} install systemd-container",
-                         verbose=is_not_silent())
+            self.runHost("{HOSTPACKAGER} install systemd-container", verbose=is_not_silent())
             repos_to_use = ""
             counter = 0
             for repo in self.repos:
@@ -858,14 +823,12 @@ gpgcheck=0
                     try:
                         os.makedirs(os.path.dirname(srcto))
                     except Exception as e:
-                        print_debug(
-                            e, "Unable to create DIR (already created)", srcto)
+                        print_debug(e, "Unable to create DIR (already created)", srcto)
                         pass
                     try:
                         shutil.copytree(src, srcto)
                     except Exception as e:
-                        print_debug(e, "Unable to copy files from:",
-                                    src, "to:", srcto)
+                        print_debug(e, "Unable to copy files from:", src, "to:", srcto)
                         pass
             pkipath = "/etc/pki/rpm-gpg"
             pkipath_ch = os.path.join(self.chrootpath, pkipath[1:])
@@ -875,8 +838,7 @@ gpgcheck=0
                 pass
             for filename in glob.glob(os.path.join(pkipath, '*')):
                 shutil.copy(filename, pkipath_ch)
-            print_info("repo prepared for microdnf:", insiderepopath,
-                       open(insiderepopath, 'r').read())
+            print_info("repo prepared for microdnf:", insiderepopath, open(insiderepopath, 'r').read())
 
     def __bootMachine(self):
 
@@ -885,7 +847,7 @@ gpgcheck=0
         def tempfnc():
             print_debug("starting container via command:",
                         "systemd-nspawn --machine=%s -bD %s" % (self.jmeno, self.chrootpath))
-            nspawncont = utils.process.SubProcess(
+            nspawncont = process.SubProcess(
                 "systemd-nspawn --machine=%s -bD %s" %
                 (self.jmeno, self.chrootpath), verbose=is_debug())
             nspawncont.start()
@@ -906,13 +868,10 @@ gpgcheck=0
         """
         try:
             if 'status' in self.info and self.info['status']:
-                a = self.run(self.info['status'], shell=True,
-                             verbose=False, ignore_bg_processes=True)
+                a = self.run(self.info['status'], shell=True, verbose=False, ignore_bg_processes=True)
             else:
-                a = self.run("%s" % command, shell=True,
-                             verbose=False, ignore_bg_processes=True)
-            print_debug("command:", a.command, "stdout:",
-                        a.stdout, "stderr:", a.stderr)
+                a = self.run("%s" % command, shell=True, verbose=False, ignore_bg_processes=True)
+            print_debug("command:", a.command, "stdout:", a.stdout, "stderr:", a.stderr)
             return True
         except BaseException:
             return False
@@ -951,8 +910,8 @@ gpgcheck=0
         systemd-run should be used, but in F-25 it does not contain --wait option
 
         :param command: str command to be executed
-        :param kwargs: dict parameters passed to avocado.utils.process.run
-        :return: avocado.utils.process.run
+        :param kwargs: dict parameters passed to avocado.process.run
+        :return: avocado.process.run
         """
         lpath = "/var/tmp"
         comout = self.runHost(
@@ -962,7 +921,7 @@ gpgcheck=0
                     '"',
                     r'\"'),
                 pin=lpath),
-            **kwargs)
+            **kwargs)   
         try:
             if not kwargs:
                 kwargs = {}
@@ -984,14 +943,14 @@ gpgcheck=0
             if comout.exit_status == 0 or should_ignore:
                 return comout
             else:
-                raise utils.process.CmdError(comout.command, comout)
+                raise process.CmdError(comout.command, comout)
 
     def selfcheck(self):
         """
         Test if default command will pass, it is more important for nspawn, because it happens that
         it does not returns anything
 
-        :return: avocado.utils.process.run
+        :return: avocado.process.run
         """
         return self.run().stdout
 
@@ -1026,8 +985,7 @@ gpgcheck=0
         :return: None
         """
         self.stop()
-        self.runHost("machinectl poweroff %s" %
-                     self.jmeno, verbose=is_not_silent())
+        self.runHost("machinectl poweroff %s" % self.jmeno, verbose=is_not_silent())
         # self.nspawncont.stop()
         self.__is_killed()
         if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
@@ -1048,8 +1006,7 @@ gpgcheck=0
         :return: None
         """
         if self.info.get("setup"):
-            self.runHost(self.info.get("setup"), shell=True,
-                         ignore_bg_processes=True, verbose=is_not_silent())
+            self.runHost(self.info.get("setup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
 
     def __callCleanupFromConfig(self):
         """
@@ -1058,8 +1015,7 @@ gpgcheck=0
         :return: None
         """
         if self.info.get("cleanup"):
-            self.runHost(self.info.get("cleanup"), shell=True,
-                         ignore_bg_processes=True, verbose=is_not_silent())
+            self.runHost(self.info.get("cleanup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
 
 
 # INTERFACE CLASS FOR GENERAL TESTS OF MODULES
@@ -1143,7 +1099,7 @@ class AvocadoTest(Test):
 
         :param args: command
         :param kwargs: shell, ignore_status, verbose
-        :return: object avocado.utils.process.run
+        :return: object avocado.process.run
         """
         return self.backend.run(*args, **kwargs)
 
@@ -1193,7 +1149,7 @@ class AvocadoTest(Test):
 
         :param args: pass thru
         :param kwargs: pass thru
-        :return: object of avocado.utils.process.run
+        :return: object of avocado.process.run
         """
         return self.backend.runHost(*args, **kwargs)
 
@@ -1215,8 +1171,7 @@ class AvocadoTest(Test):
         :return: str
         """
         self.start()
-        allpackages = self.run(
-            r'rpm -qa --qf="%{{name}}\n"', verbose=is_not_silent()).stdout.split('\n')
+        allpackages = self.run(r'rpm -qa --qf="%{{name}}\n"', verbose=is_not_silent()).stdout.split('\n')
         return allpackages
 
     def copyTo(self, *args, **kwargs):
@@ -1272,7 +1227,7 @@ class ContainerAvocadoTest(AvocadoTest):
         :return: bool
         """
         if key in self.backend.containerInfo['Labels'] and (
-                value in self.backend.containerInfo['Labels'][key]):
+                    value in self.backend.containerInfo['Labels'][key]):
             return True
         return False
 
@@ -1316,7 +1271,7 @@ def get_correct_backend():
     readconfig = CommonFunctions()
     readconfig.loadconfig()
     if "default_module" in readconfig.config and readconfig.config[
-            "default_module"] is not None and amodule is None:
+        "default_module"] is not None and amodule is None:
         amodule = readconfig.config["default_module"]
     if amodule == 'docker':
         return ContainerHelper(), amodule
@@ -1325,8 +1280,7 @@ def get_correct_backend():
     elif amodule == 'nspawn':
         return NspawnHelper(), amodule
     else:
-        raise ModuleFrameworkException("Unsupported MODULE={0}".format(
-            amodule), "supproted are: docker, rpm, nspawn")
+        raise ModuleFrameworkException("Unsupported MODULE={0}".format(amodule), "supproted are: docker, rpm, nspawn")
 
 
 def get_correct_profile():
