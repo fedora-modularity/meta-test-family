@@ -21,63 +21,82 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
-import pprint
 import os
 
 
 from moduleframework import module_framework
-from dockerfile_parse import DockerfileParser
-
-# Dockerfile path
-DOCKERFILE = "Dockerfile"
-
-FROM = "FROM"
-RUN = "RUN"
-
-
-def _get_from(val):
-    if "baseruntime/baseruntime" in val:
-        return True
-    else:
-        return False
-
-
-def _get_run(val):
-    if val.startswith("dnf") or " dnf " in val:
-        return False
-    else:
-        return True
-
-functions = {FROM: _get_from,
-             RUN: _get_run}
+from moduleframework import dockerlinter
 
 
 class DockerfileLinter(module_framework.ContainerAvocadoTest):
     """
     :avocado: enable
+
     """
 
+    dp = None
+
+    def setUp(self):
+        # it is not intended just for docker, but just docker packages are
+        # actually properly signed
+        self.dp = dockerlinter.DockerLinter(os.path.join(os.getcwd(), ".."))
+        super(self.__class__, self).setUp()
+
     def testDockerFromBaseruntime(self):
-        tmp_dir = os.path.join(os.getcwd(), "..")
-        Dockerfile = os.path.join(tmp_dir, DOCKERFILE)
-        if os.path.exists(Dockerfile):
-            dfp = DockerfileParser(path=tmp_dir)
-            for struct in dfp.structure:
-                key = struct["instruction"]
-                val = struct["value"]
-                if key == FROM:
-                    self.assertTrue(functions[key](val))
+        if self.dp is not None:
+            self.assertTrue(self.dp.check_baseruntime())
 
     def testDockerRunMicrodnf(self):
-        tmp_dir = os.path.join(os.getcwd(), "..")
-        Dockerfile = os.path.join(tmp_dir, DOCKERFILE)
-        if os.path.exists(Dockerfile):
-            dfp = DockerfileParser(path=tmp_dir)
-            for struct in dfp.structure:
-                key = struct["instruction"]
-                val = struct["value"]
-                if key == RUN and "dnf" in val:
-                    self.assertTrue(functions[key](val))
+        if self.dp is not None:
+            self.assertTrue(self.dp.check_microdnf())
+
+    def testArchitectureInEnvAndLabelExists(self):
+        if self.dp is not None:
+            env_list = self.dp.get_docker_env()
+            self.assertTrue(x for x in env_list if "ARCH=" in x)
+            label_list = self.dp.get_docker_labels()
+            self.assertTrue("architecture" in label_list)
+
+    def testNameInEnvAndLabelExists(self):
+        if self.dp is not None:
+            env_list = self.dp.get_docker_env()
+            self.assertTrue([x for x in env_list if "NAME=" in x])
+            label_list = self.dp.get_docker_labels()
+            self.assertTrue("name" in label_list)
+
+    def testReleaseLabelExists(self):
+        if self.dp is not None:
+            label_list = self.dp.get_docker_labels()
+            self.assertTrue("release" in label_list)
+
+    def testVersionLabelExists(self):
+        if self.dp is not None:
+            label_list = self.dp.get_docker_labels()
+            self.assertTrue("version" in label_list)
+
+    def testComRedHatComponentLabelExists(self):
+        if self.dp is not None:
+            label_list = self.dp.get_docker_labels()
+            self.assertTrue("com.redhat.component" in label_list)
+
+    def testIok8sDescriptionExists(self):
+        if self.dp is not None:
+            label_list = self.dp.get_docker_labels()
+            self.assertTrue("io.k8s.description" in label_list)
+
+    def testIoOpenshiftExposeServicesExists(self):
+        label_io_openshift = "io.openshift.expose-services"
+        if self.dp is not None:
+            exposes = self.dp.get_docker_expose()
+            label_list = self.dp.get_docker_labels()
+            self.assertTrue(label_list[label_io_openshift])
+            for exp in exposes:
+                self.assertTrue("%s" % exp in label_list[label_io_openshift])
+
+    def testIoOpenShiftTagsExists(self):
+        if self.dp is not None:
+            label_list = self.dp.get_docker_labels()
+            self.assertTrue("io.openshift.tags" in label_list)
 
 
 class DockerLint(module_framework.ContainerAvocadoTest):

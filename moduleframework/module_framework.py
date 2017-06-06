@@ -28,12 +28,10 @@ main module provides helpers for various module types and AVOCADO(unittest) clas
 what you should use for your tests (inherited)
 """
 
-import os
 import re
 import shutil
 import yaml
 import json
-import time
 import urllib
 import glob
 from avocado import Test
@@ -45,7 +43,6 @@ from common import *
 from timeoutlib import Retry
 import time
 import warnings
-
 PROFILE = None
 
 
