@@ -1,0 +1,4 @@
+[submodule "tools/check_module"]
+	path = tools/check_module
+	url = https://github.com/jscotka/check_modulemd.git
+	branch = mtf_integration
