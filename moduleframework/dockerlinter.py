@@ -22,7 +22,7 @@ def get_string(value):
     return ast.literal_eval(value)
 
 
-class DockerLinter(object):
+class DockerfileLinter(object):
     """
     Class checks a Dockerfile
     It requires only directory with Dockerfile.
@@ -51,16 +51,13 @@ class DockerLinter(object):
             return False
         return True
 
-    def _get_expose(self, value):
-        """Function returns exposes as field"""
-        return value.split()
-
-    def _get_from(self, value):
-        """Function returns exposes as field"""
-        return value.split()
-
-    def _get_run(self, value):
-        """Function returns exposes as field"""
+    def _get_general(self, value):
+        """
+        Function returns exposes as field.
+        It is used for RUN, EXPOSE and FROM
+        :param value:
+        :return:
+        """
         return value.split()
 
     def _get_env(self, value):
@@ -91,11 +88,11 @@ class DockerLinter(object):
 
     def _get_structure_as_dict(self):
         functions = {ENV: self._get_env,
-                     EXPOSE: self._get_expose,
+                     EXPOSE: self._get_general,
                      VOLUME: self._get_volume,
                      LABEL: self._get_label,
-                     FROM: self._get_from,
-                     RUN: self._get_run}
+                     FROM: self._get_general,
+                     RUN: self._get_general}
 
         for struct in self.dfp.structure:
             key = struct["instruction"]
@@ -121,6 +118,17 @@ class DockerLinter(object):
         if ENV in self.docker_dict and self.docker_dict[ENV]:
             return self.docker_dict[ENV]
 
+    def get_docker_specific_env(self, env_name=None):
+        """
+        Function returns list of specific env_names or empty list
+        :param env_name: Specify env_name for check
+        :return: List of env or empty list
+        """
+        if env_name is None:
+            return []
+        env_list = self.get_docker_env()
+        return [env_name in env_list]
+
     def get_docker_expose(self):
         """
         Function return docker EXPOSE directives
@@ -141,6 +149,17 @@ class DockerLinter(object):
             return self.docker_dict[LABEL]
         return None
 
+    def get_specific_label(self, label_name=None):
+        """
+        Function returns list of specific label names or empty list
+        :param label_name: Specify label_name for check
+        :return: List of labels or empty list.
+        """
+        if label_name is None:
+            return []
+        label_list = self.get_docker_labels()
+        return [label_name in label_list]
+
     def check_baseruntime(self):
         """
         Function returns docker labels
@@ -156,6 +175,8 @@ class DockerLinter(object):
         """
         if RUN in self.docker_dict:
             for val in self.docker_dict[RUN]:
+                if val.startswith("yum") or " yum " in val:
+                    return False
                 if val.startswith("dnf") or " dnf " in val:
                     return False
                 else:
