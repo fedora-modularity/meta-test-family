@@ -42,6 +42,7 @@ export MODULENAME=$1
 export PARSEITEM=$2
 # compose fedmsg or None same as fedmsg
 export PARSEITEMTYPE=$3
+export SELECTION=$4
 export MTF_PATH=/usr/share/moduleframework
 export MODULE_LINT="$MTF_PATH/tools/modulelint/*.py"
 export MODULE_TESTS="*.py *.sh"
@@ -83,6 +84,18 @@ function loadexampletests(){
     test -e $MTF_PATH/examples/$MODULENAME
 }
 
+function is_selected(){
+    test -n "$SELECTION"
+}
+
+function runselected(){
+    if [ "$SELECTION" = "lint" ]; then
+        run_modulelint
+    fi
+}
+
+
+
 function distgit_wrapper_rpm(){
     cd $MODULENAME/tests
     eval $PARAMS make
@@ -119,7 +132,9 @@ fi
 
 test "$MODULENAME" = "testmodule" && MODULENAME="testing-module"
 
-if loaddistgittests; then
+if is_selected; then
+    runselected
+elif loaddistgittests; then
     distgit_wrapper_rpm
 elif loadexampletests; then
     avocado_wrapper
