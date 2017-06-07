@@ -97,6 +97,7 @@ setup(
     install_requires=['avocado-framework',
                       'netifaces',
                       'behave',
-                      'PyYAML'
+                      'PyYAML',
+                      'dockerfile-parse'
                       ]
 )

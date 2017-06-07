@@ -21,8 +21,66 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
+import os
+
 
 from moduleframework import module_framework
+from moduleframework import dockerlinter
+
+
+class DockerfileLinter(module_framework.ContainerAvocadoTest):
+    """
+    :avocado: enable
+
+    """
+
+    dp = None
+
+    def setUp(self):
+        # it is not intended just for docker, but just docker packages are
+        # actually properly signed
+        super(self.__class__, self).setUp()
+        self.dp = dockerlinter.DockerLinter(os.path.join(os.getcwd(), ".."))
+        if self.dp is None:
+            self.skip()
+
+    def testDockerFromBaseruntime(self):
+        self.assertTrue(self.dp.check_baseruntime())
+
+    def testDockerRunMicrodnf(self):
+        self.assertTrue(self.dp.check_microdnf())
+
+    def testArchitectureInEnvAndLabelExists(self):
+        self.assertTrue(self.dp.get_docker_specific_env("ARCH="))
+        self.assertTrue(self.dp.get_specific_label("architecture"))
+
+    def testNameInEnvAndLabelExists(self):
+        self.assertTrue(self.dp.get_docker_specific_env("NAME="))
+        self.assertTrue(self.dp.get_specific_label("name"))
+
+    def testReleaseLabelExists(self):
+        self.assertTrue(self.dp.get_specific_label("release"))
+
+    def testVersionLabelExists(self):
+        self.assertTrue(self.dp.get_specific_label("version"))
+
+    def testComRedHatComponentLabelExists(self):
+        self.assertTrue(self.dp.get_specific_label("com.redhat.component"))
+
+    def testIok8sDescriptionExists(self):
+        self.assertTrue(self.dp.get_specific_label("io.k8s.description"))
+
+    def testIoOpenshiftExposeServicesExists(self):
+        label_io_openshift = "io.openshift.expose-services"
+        exposes = self.dp.get_docker_expose()
+        label_list = self.dp.get_docker_labels()
+        self.assertTrue(label_list[label_io_openshift])
+        for exp in exposes:
+            self.assertTrue("%s" % exp in label_list[label_io_openshift])
+
+    def testIoOpenShiftTagsExists(self):
+        label_list = self.dp.get_docker_labels()
+        self.assertTrue("io.openshift.tags" in label_list)
 
 
 class DockerLint(module_framework.ContainerAvocadoTest):
@@ -35,10 +93,18 @@ class DockerLint(module_framework.ContainerAvocadoTest):
         self.assertTrue("bin" in self.run("ls /").stdout)
 
     def testContainerIsRunning(self):
+        """
+        Function tests whether container is running
+        :return:
+        """
         self.start()
         self.assertIn(self.backend.jmeno, self.runHost("docker ps").stdout)
 
     def testLabels(self):
+        """
+        Function tests whether labels are set in modulemd YAML file properly.
+        :return:
+        """
         llabels = self.getConfigModule().get('labels')
         if llabels is None or len(llabels) == 0:
             print "No labels defined in config to check"
