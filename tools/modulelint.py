@@ -40,8 +40,8 @@ class DockerfileLinter(module_framework.ContainerAvocadoTest):
         # it is not intended just for docker, but just docker packages are
         # actually properly signed
         super(self.__class__, self).setUp()
-        self.dp = dockerlinter.DockerLinter(os.path.join(os.getcwd(), ".."))
-        if self.dp is None:
+        self.dp = dockerlinter.DockerfileLinter(os.path.join(os.getcwd(), ".."))
+        if self.dp.dockerfile is None:
             self.skip()
 
     def testDockerFromBaseruntime(self):

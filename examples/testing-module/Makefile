@@ -2,6 +2,7 @@ CMD=python -m avocado run --filter-by-tags=-WIP
 TESTS=$(shell ls *.py *.sh modulelint/*.py)
 export MTF_REMOTE_REPOS=yes
 export DEBUG=yes
+export DOCKERFILE=./Dockerfile
 
 check-docker:
 	MODULE=docker $(CMD) $(TESTS)

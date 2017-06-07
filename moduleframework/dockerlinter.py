@@ -1,14 +1,15 @@
-from __future__ import absolute_import, print_function
+#!/usr/bin/python
+
+from __future__ import print_function
 
 import os
 import re
 import ast
-
 from dockerfile_parse import DockerfileParser
+import common
 
 # Dockerfile path
 DOCKERFILE = "Dockerfile"
-
 EXPOSE = "EXPOSE"
 VOLUME = "VOLUME"
 LABEL = "LABEL"
@@ -21,6 +22,16 @@ RUN = "RUN"
 def get_string(value):
     return ast.literal_eval(value)
 
+def getDockerFile(dir_name):
+    fromenv = os.environ.get("DOCKERFILE")
+    if fromenv:
+        dockerfile = fromenv
+        dir_name = os.path.dirname(dockerfile)
+    else:
+        dockerfile = os.path.join(dir_name, DOCKERFILE)
+    if not os.path.exists(dockerfile):
+        common.print_debug("Dockerfile should exists in the %s directory." % dir_name)
+    return dockerfile
 
 class DockerfileLinter(object):
     """
@@ -34,22 +45,14 @@ class DockerfileLinter(object):
     docker_dict = {}
 
     def __init__(self, dir_name=None):
-        self.dockerfile = os.path.join(dir_name, DOCKERFILE)
-        if not self._exist_docker_file():
-            self.dfp = None
-        else:
-            self.dfp = DockerfileParser(path=dir_name)
+        dockerfile = getDockerFile(dir_name)
+        if dockerfile:
+            self.dfp = DockerfileParser(path=os.path.dirname(dockerfile))
+            self.dockerfile  = dockerfile
             self._get_structure_as_dict()
-
-    def _exist_docker_file(self):
-        """
-        Function checks if docker file exists
-        :return: True if exists
-        """
-        if not os.path.exists(self.dockerfile):
-            print("Dockerfile has to exists in the %s directory." % self.dir)
-            return False
-        return True
+        else:
+            self.dfp = None
+            self.dockerfile = None
 
     def _get_general(self, value):
         """
