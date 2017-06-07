@@ -24,11 +24,11 @@
 Vagrant.configure(2) do |config|
 
     config.vm.box = "fedora/25-cloud-base"
-    config.vm.synced_folder ".", "/vagrant"
+    config.vm.synced_folder ".", "/home/vagrant"
     config.vm.network "private_network", ip: "192.168.50.10"
     config.vm.network "forwarded_port", guest: 80, host: 8888
     config.vm.hostname = "moduletesting"
-    config.vm.post_up_message = "Results: http://localhost:8888/job-results"
+    config.vm.post_up_message = "Results: http://localhost:8888/avocado/job-results/latest/html/results.html"
 
     config.vm.provider "libvirt" do |libvirt|
         libvirt.memory = 1024
@@ -42,9 +42,10 @@ Vagrant.configure(2) do |config|
 
     config.vm.provision "shell", inline: <<-SHELL
         set -x
-        dnf install -y python-pip make docker httpd git python2-avocado python2-avocado-plugins-output-html
-        cd /vagrant
-        make all
+        dnf install -y make docker httpd git python2-avocado python2-avocado-plugins-output-html python-netifaces
+        cd /home/vagrant
+        make install
+        make check
         cp -r /root/avocado /var/www/html/
         chmod -R a+x /var/www/html/
         restorecon -r /var/www/html/

@@ -31,6 +31,10 @@ class CheckCopyFiles(module_framework.AvocadoTest):
 
     def testCopyThereAndBack(self):
         self.start()
+        #cleanup of all files, because there is bug in nspawn copying of files causing that it hang in case of existing file (F-25)
+        self.runHost("rm a b", ignore_status=True)
+        self.run("rm /a.test", ignore_status=True)
+
         self.runHost("echo x > a", shell=True)
         self.copyTo("a", "/a.test")
         self.assertIn("x", self.run("cat /a.test").stdout)

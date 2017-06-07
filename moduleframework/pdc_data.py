@@ -80,7 +80,7 @@ class PDCParser():
     Class for parsing PDC data via some setters line setFullVersion, setViaFedMsg, setLatestPDC
     """
 
-    @Retry(attempts=DEFAULTRETRYCOUNT*5, timeout=DEFAULTRETRYTIMEOUT, delay=20)
+    @Retry(attempts=DEFAULTRETRYCOUNT*5, timeout=DEFAULTRETRYTIMEOUT, delay=20, error=PDCExc("RETRY: Unable to get data from PDC"))
     def __getDataFromPdc(self):
         """
         Internal method, do not use it
@@ -89,12 +89,12 @@ class PDCParser():
         """
         PDC = "%s/?variant_name=%s&variant_version=%s&variant_release=%s&active=True" % (
             PDCURL, self.name, self.stream, self.version)
-        print_debug("attemt to contact PDC with:", PDC)
+        print_info("Attemt to contact PDC (may take longer time) with query:", PDC)
         out=json.load(urllib.urlopen(PDC))["results"]
         if out:
             self.pdcdata = out[-1]
         else:
-            raise BaseException("Unable to get data from PDC URL: %s" % PDC)
+            raise PDCExc("Unable to get data from PDC URL: %s" % PDC)
 
     def setFullVersion(self, nvr):
         """
@@ -142,8 +142,9 @@ class PDCParser():
 
         :return: str
         """
-        rpmrepo = "http://kojipkgs.fedoraproject.org/repos/%s/latest/%s" % (
-            self.pdcdata["koji_tag"] + "-build", ARCH)
+        #rpmrepo = "http://kojipkgs.fedoraproject.org/repos/%s/latest/%s" % (
+        #    self.pdcdata["koji_tag"] + "-build", ARCH)
+        rpmrepo = "https://kojipkgs.stg.fedoraproject.org/compose/branched/jkaluza/latest-Fedora-Modular-26/compose/Server/%s/os/" % ARCH
         return rpmrepo
 
     def generateGitHash(self):
@@ -220,7 +221,7 @@ class PDCParser():
                 if len(pkgbouid) > 4:
                     print_info("DOWNLOADING: %s" % foo)
 
-                    @Retry(attempts=DEFAULTRETRYCOUNT*10, timeout=DEFAULTRETRYTIMEOUT*60, delay=DEFAULTRETRYTIMEOUT, error=Exception("Unbale to fetch package from koji after %d attempts" % (DEFAULTRETRYCOUNT*10)))
+                    @Retry(attempts=DEFAULTRETRYCOUNT*10, timeout=DEFAULTRETRYTIMEOUT*60, delay=DEFAULTRETRYTIMEOUT, error=KojiExc("RETRY: Unbale to fetch package from koji after %d attempts" % (DEFAULTRETRYCOUNT*10)))
                     def tmpfunc():
                         a = utils.process.run(
                             "cd %s; koji download-build %s  -a %s -a noarch" %
@@ -229,7 +230,7 @@ class PDCParser():
                             if "packages available for" in a.stdout.strip():
                                 print_info('UNABLE TO DOWNLOAD package (intended for other architectures, GOOD):', a.command)
                             else:
-                                raise BaseException('UNABLE TO DOWNLOAD package (KOJI issue, BAD):', a.command)
+                                raise KojiExc('UNABLE TO DOWNLOAD package (KOJI issue, BAD):', a.command)
                     tmpfunc()
             utils.process.run(
                 "cd %s; createrepo -v %s" %
