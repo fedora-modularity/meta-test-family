@@ -37,6 +37,7 @@ class DockerfileLinter(object):
         self.dockerfile = os.path.join(dir_name, DOCKERFILE)
         if not self._exist_docker_file():
             self.dfp = None
+            return None
         else:
             self.dfp = DockerfileParser(path=dir_name)
             self._get_structure_as_dict()
