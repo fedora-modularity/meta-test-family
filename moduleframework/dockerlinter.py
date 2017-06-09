@@ -30,6 +30,7 @@ def getDockerFile(dir_name):
     else:
         dockerfile = os.path.join(dir_name, DOCKERFILE)
     if not os.path.exists(dockerfile):
+        dockerfile = None
         common.print_debug("Dockerfile should exists in the %s directory." % dir_name)
     return dockerfile
 
