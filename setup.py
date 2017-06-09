@@ -22,7 +22,6 @@
 
 import os
 import sys
-from moduleframework.version import VERSION
 
 try:
     from setuptools import setup, find_packages
@@ -31,6 +30,7 @@ except ImportError:
 
 # copy from https://github.com/avocado-framework/avocado/blob/master/setup.py
 VIRTUAL_ENV = hasattr(sys, 'real_prefix')
+
 
 def get_dir(system_path=None, virtual_path=None):
     """
@@ -58,15 +58,12 @@ for path in paths:
     for root, dirs, files in os.walk(path, followlinks=True):
         data_files[
             get_dir(
-                ['usr','share','moduleframework',
-                root])] = [
-            os.path.join(
-                root,
-                f) for f in files]
+                ['usr', 'share', 'moduleframework', root])] = [
+            os.path.join(root, f) for f in files]
 
 setup(
     name='modularity-testing-framework',
-    version=VERSION,
+    version="0.4.58",
     description='Framework for testing modules and containers.',
     keywords='modules,containers,testing,framework',
     author='Jan Scotka',
