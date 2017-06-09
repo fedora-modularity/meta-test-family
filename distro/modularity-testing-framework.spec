@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.4.56
+Version:        0.4.57
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -45,6 +45,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 %{_datadir}/moduleframework/
 
 %changelog
+* Fri Jun 09 2017 Jan Scotka <jscotka@redhat.com> 0.4.57-1
+- 
+
 * Wed Jun 07 2017 Jan Scotka <jscotka@redhat.com> 0.4.56-1
 - Add dependency into python2-dockerfile-parse (phracek@redhat.com)
 
