@@ -79,6 +79,11 @@ class CommonFunctions(object):
         trans_dict["GUESTARCH"] = self.getArch()
 
     def getArch(self):
+        """
+        get system architecture string
+
+        :return: str
+        """
         out = self.runHost(command='uname -m', verbose=False).stdout.strip()
         return out
 
@@ -1212,7 +1217,8 @@ class AvocadoTest(Test):
 
     def getArch(self):
         """
-        It returns architecture indentificatior
+        get system architecture string
+
         :return: str
         """
         return self.backend.getArch()
