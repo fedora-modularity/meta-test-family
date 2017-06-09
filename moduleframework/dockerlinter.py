@@ -33,6 +33,7 @@ def getDockerFile(dir_name):
         common.print_debug("Dockerfile should exists in the %s directory." % dir_name)
     return dockerfile
 
+
 class DockerfileLinter(object):
     """
     Class checks a Dockerfile
