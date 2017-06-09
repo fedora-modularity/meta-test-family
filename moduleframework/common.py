@@ -89,6 +89,7 @@ hostpackager = "yum -y"
 guestpackager = "microdnf"
 if os.path.exists('/usr/bin/dnf'):
     hostpackager = "dnf -y"
+ARCH = "x86_64"
 
 # translation table for config.yaml files syntax is {VARIABLE} in config file
 trans_dict = {"HOSTIPADDR": hostipaddr,
@@ -100,10 +101,12 @@ trans_dict = {"HOSTIPADDR": hostipaddr,
               "PASSWORD": dpassword,
               "DATABASENAME": ddatabase,
               "HOSTPACKAGER": hostpackager,
-              "GUESTPACKAGER": guestpackager
+              "GUESTPACKAGER": guestpackager,
+              "GUESTARCH": ARCH,
+              "HOSTARCH": ARCH
               }
 
-ARCH = "x86_64"
+
 PDCURL = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
 REPOMD = "repodata/repomd.xml"
 MODULEFILE = 'tempmodule.yaml'

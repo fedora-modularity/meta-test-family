@@ -73,8 +73,14 @@ class CommonFunctions(object):
         self.modulemdConf = None
         self.moduleName = None
         self.source = None
+        self.arch = None
         # general use case is to have forwarded services to host (so thats why it is same)
         self.ipaddr = trans_dict["HOSTIPADDR"]
+        trans_dict["GUESTARCH"] = self.getArch()
+
+    def getArch(self):
+        out = self.runHost(command='uname -m', verbose=False).stdout.strip()
+        return out
 
     def runHost(self, command="ls /", **kwargs):
         """
@@ -203,6 +209,8 @@ class CommonFunctions(object):
         :return: str
         """
         return self.ipaddr
+
+
 
 
 class ContainerHelper(CommonFunctions):
@@ -1201,6 +1209,13 @@ class AvocadoTest(Test):
         :return: str
         """
         return self.backend.getIPaddr(*args, **kwargs)
+
+    def getArch(self):
+        """
+        It returns architecture indentificatior
+        :return: str
+        """
+        return self.backend.getArch()
 
 
 # INTERFACE CLASSES FOR SPECIFIC MODULE TESTS
