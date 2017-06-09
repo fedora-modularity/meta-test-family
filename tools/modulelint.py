@@ -28,7 +28,7 @@ from moduleframework import module_framework
 from moduleframework import dockerlinter
 
 
-class DockerfileLinter(module_framework.ContainerAvocadoTest):
+class DockerfileLinter(module_framework.AvocadoTest):
     """
     :avocado: enable
 
@@ -45,42 +45,33 @@ class DockerfileLinter(module_framework.ContainerAvocadoTest):
             self.skip()
 
     def testDockerFromBaseruntime(self):
-        self.start()
         self.assertTrue(self.dp.check_baseruntime())
 
     def testDockerRunMicrodnf(self):
-        self.start()
         self.assertTrue(self.dp.check_microdnf())
 
     def testArchitectureInEnvAndLabelExists(self):
-        self.start()
         self.assertTrue(self.dp.get_docker_specific_env("ARCH="))
         self.assertTrue(self.dp.get_specific_label("architecture"))
 
     def testNameInEnvAndLabelExists(self):
-        self.start()
         self.assertTrue(self.dp.get_docker_specific_env("NAME="))
         self.assertTrue(self.dp.get_specific_label("name"))
 
     def testReleaseLabelExists(self):
-        self.start()
         self.assertTrue(self.dp.get_specific_label("release"))
 
     def testVersionLabelExists(self):
-        self.start()
         self.assertTrue(self.dp.get_specific_label("version"))
 
     def testComRedHatComponentLabelExists(self):
-        self.start()
         self.assertTrue(self.dp.get_specific_label("com.redhat.component"))
 
     def testIok8sDescriptionExists(self):
-        self.start()
         self.assertTrue(self.dp.get_specific_label("io.k8s.description"))
 
     def testIoOpenshiftExposeServicesExists(self):
         label_io_openshift = "io.openshift.expose-services"
-        self.start()
         exposes = self.dp.get_docker_expose()
         label_list = self.dp.get_docker_labels()
         self.assertTrue(label_list[label_io_openshift])
@@ -88,7 +79,6 @@ class DockerfileLinter(module_framework.ContainerAvocadoTest):
             self.assertTrue("%s" % exp in label_list[label_io_openshift])
 
     def testIoOpenShiftTagsExists(self):
-        self.start()
         label_list = self.dp.get_docker_labels()
         self.assertTrue("io.openshift.tags" in label_list)
 
