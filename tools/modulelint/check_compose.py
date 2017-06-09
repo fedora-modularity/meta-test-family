@@ -41,7 +41,8 @@ class ComposeTest(module_framework.NspawnAvocadoTest):
         try to install and remove components for each profile
         """
         self.log.info("Checking availability of component and installation and remove them")
-        for profile in self.getModulemdYamlconfig()["data"].get("profiles"):
+        allprofiles = self.getModulemdYamlconfig()["data"].get("profiles") if self.getModulemdYamlconfig()["data"].get("profiles") else []
+        for profile in allprofiles:
             actualpackagelist = set(self.getModulemdYamlconfig()["data"]["profiles"][profile]["rpms"]) - set(self.backend.bootstrappackages)
             packager = common.trans_dict["GUESTPACKAGER"]
             if actualpackagelist:
