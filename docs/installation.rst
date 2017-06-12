@@ -1,161 +1,135 @@
-Modularity-testing-framework
-============================
-
-Recent documentation on:
-    http://modularity-testing-framework.readthedocs.io
-
-Modularity prototype testing
-----------------------------
-
-- General Structure
-    - **YAML Config file**
-        - Each module will need to have yaml config file
-        - Config file should cover non generic part - part focused on general module testing
-        - It could contain also simple test
-        - **how to write config file** https://pagure.io/modularity-testing-framework/blob/master/f/docs/howtowriteyamlconf.md
-
-    - **Self generated tests**
-        - there is possible to write simple tests directly in yaml config file
-        - Bash style testing
-        - It has  to have solved dependencies inside each module type
-        - Now it just expect to end with *0* return code of command (like: *ls / |grep sbin* directory sbin exists in root dir)
-        - It can contain multiple lines
-        - It generates python covered bash tests
-        - You has to call `mtf-generator` binary explicitly, it then create these pythonish tests with bash inside, *Unittest* doesn not allow to have dynamic tests.
-
-    - **Avocado tests**
-        - There is wrapper class what helps you to tests modules not focusing on module type
-        - It uses avocado-framework
-        - This test could be primarily used for more complex testing, not previous one
-        - General test for modules: *./base/modulelint.py*
-        - Example tests in *memcached* module
-
-    - **Simple bash tests**
-        - There is helper what you can use for writing *bash* like tests
-        - library is https://pagure.io/modularity-testing-framework/blob/master/f/moduleframework/bashhelper.py and it is installed as *moduleframework-cmd* command in */usr/bin*
-        - Test has to call setup and cleanup of module explicitly
-        - These tests are dependent on return code of commands in test, so in case you have more tests subtest, just count return codes
-        - see example test for https://pagure.io/modularity-testing-framework/blob/master/f/examples/memcached/sanity2.sh
-
-
-    - **WIP: Behave tests**
-        - You can write tests for you module also in behave style
-        - it is first prototype
-        - see example in https://pagure.io/modularity-testing-framework/blob/master/f/examples/memcached-behave
-
-Running using VAGRANT
----------------------
-- install vagrant *dnf -y install vagrant*
-- just run *vagrant up*
-
 Installation
-------------
-- base dependencies: **docker python-pip**
-- python dependencies: **avocado-framework yaml json behave**
+============
 
-Stable version
-~~~~~~~~~~~~~~
-- It is built as package for fedora (>26)
-- stable COPR repo
-    - https://copr.fedorainfracloud.org/coprs/phracek/Modularity-testing-framework/
-    - `dnf copr enable phracek/Modularity-testing-framework`
-    - `dnf install -y modularity-testing-framework`
+There are two ways to install and use MTF: to set up it locally or alternatively on a virtual machine via the Vagrant tool.
 
-Development version
-~~~~~~~~~~~~~~
-- Automatically built packages
-    - https://copr.fedorainfracloud.org/coprs/jscotka/modularity-testing-framework/
+.. contents:: Topics
 
+.. _using_vagrant:
+Vagrant
+---------------------
 
+`Vagrant`_ is a tool to aid developers in quickly deploying development environments. There is a `Vagrantfile`_ in the `modularity-testing-framework`_ git repository on Pagure that can automatically deploy a virtual machine on your host with a MTF environment configured.
 
-Enviromental variables
-----------------------
-- variables allows you to overwrite some values inside *config.yaml*
-- *AVOCADO_LOG_DEBUG=yes* enables avocado debug output - in case you find some strange hard to debug issues
-- *DEBUG* Enable debugging output to test output
-- *CONFIG* file with MTF configuration default is *config.yaml*
-- *MODULE* which module type to test (in case there is not set *default-module* in config, you **HAVE TO** set it)
-    - *=docker* uses section *docker* inside config file and will use docker containerisation
-    - *=nspawn* systemd nspawn, it is lightweight virtualization, it does something like **MOCK** but it is not just chroot, but has own systemd etc.
-    - *=rpm* testing of local RPM packages directly on HOST (it could be **DESTRUCTIVE**)
+.. _Vagrant: https://docs.vagrantup.com/
+.. _Vagrantfile: https://pagure.io/modularity-testing-framework/blob/master/f/Vagrantfile
+.. _modularity-testing-framework: https://pagure.io/modularity-testing-framework
 
-- *URL* see example config. It overwrites value *module.docker.container* or *module.rpm.repo* to whatever you want. It has to be proper type what is set in *MODULE*
-- *MODULEMDURL* overwrite location of moduleMD file
-- *COMPOSEURL* overwrite location of compose repo location
-- *PROFILE* overwrite *default* profile to whatever you want to install instead of that
-- *MTF_SKIP_DISABLING_SELINUX* In nspawn type on fedora-25 we have to disable selinux, because it does not work well with selinux enabled, this option allows to not do that.
-- *MTF_DO_NOT_CLEANUP* Do not cleanup modules between tests, in case there is no interference in your tests you can use it, and it will be **fast**
-- *MTF_REMOTE_REPOS* It disables downloading of packages done by koji and creating local repo, it make tests **fast**. (There is issue that composes (repos) are sometimes bad in fedora, unable to use)
+The MTF tool has made available for use of two providers: ``libvirt`` (for Linux host only) and ``virtualbox`` (for MAC OS, Windows and Linux hosts), where ``libvirt`` is a default one. See more about Vagrant providers `here`_.
 
+.. _here: https://www.vagrantup.com/docs/providers/basic_usage.html#default-provider
 
+This document assumes that you are running a recent version of Fedora although these steps should be roughly the same on other distributions, just be aware that package managers and names can differ if you are not using Fedora as your host. Consult `Vagrant installation documentation`_ to set up Vagrant for a different platform and adjuest the steps of this document accordingly.
 
-Schedule Tests
---------------
-- Now it is expected to run this **under root**
-- Install modularity-testing-framework from COPR repo like:
-    - **dnf copr enable phracek/Modularity-testing-framework**
-    - install it by command: **dnf install -y modularity-testing-framework**
-    - It installs packages to python site-packages and to /usr/share/moduleframework
-- To include tests into your module, add to your Makefile section **test**
-- **test** section runs another Makefile in directory **tests**
-- Your **Makefile** should contain:
-    - **Docker based module testing:** `cd tests; MODULE=docker make all`
-    - **Repo based module testing:** `MODULE=nspawn make all `
-    - **Host Rpm based module testing:** `MODULE=rpm make all`
+.. _Vagrant installation documentation: https://www.vagrantup.com/docs/installation/
 
-- Makefile in tests directory looks like:
+.. note::
+   Before you start using Vagrant-libvirt, please make sure your libvirt and qemu installation is working correctly and you are able to create qemu or kvm type virtual machines with virsh or virt-manager.
 
-    $ cat tests/Makefile
-    MODULE_LINT=/usr/share/moduleframework/tools/modulelint.py
-    CMD=python -m avocado run --filter-by-tags=-WIP $(MODULE_LINT) *.py
+Prerequisites for Vagrant
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    #
-    all: $(CMD)
+1. Install Vagrant. Ensure that ``vagrant-libvirt`` is among pulled dependencies.
 
-    - **Makefile in MTF** https://pagure.io/modularity-testing-framework/blob/master/f/examples/testing-module/Makefile
+.. code-block:: bash
 
-- `make check` -  runs tests in your module directory
+    # install Vagrant
+    $ sudo dnf -y install vagrant
 
+2. Start ``libvirtd`` service
 
-How to write tests
+.. code-block:: bash
+
+    # start libvirtd service
+    $ sudo systemctl start libvirtd
+
+Creating the Vagrant environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+After preparing the libvirt prerequisites using the instructions above:
+
+1. You are now prepared to check out the MTF code into your preferred location.
+
+.. code-block:: bash
+
+   # cd to your prefered location
+   $ cd $HOME/  # Season to taste.
+   $ git clone https://pagure.io/modularity-testing-framework.git
+
+2. Next, cd into the ``modularity-testing-framework`` directory.
+
+.. code-block:: bash
+
+   # cd in modularity-testing-framework
+   $ cd modularity-testing-framework
+
+3. The MTF tool provides a configuration Vagrantfile that you can use to configure the Vagrant environment as given or open the Vagrantfile in your favorite editor and modify it to better fit your development preferences. This step is entirely optional as the default Vagrantfile should  work for most users.
+
+.. code-block:: bash
+
+   # vim Vagrantfile
+   $ vim Vagrantfile
+
+4. If you’ve happy with the Vagrantfile, you can begin provisioning your Vagrant environment. Finish by running ``vagrant reload`` to reboot machine after provisioning and apply the latest kernel updates.
+
+.. code-block:: bash
+
+      # Provision the Vagrant environment:
+      $ sudo vagrant up --provider=libvirt # or just `sudo vagrant up` as libvirt is a default one
+      # The above will run for a while while it provisions your development environment.
+      $ sudo vagrant reload  # Reboot the machine at the end to apply kernel updates, etc.
+
+5. Once you have followed the steps above, you should have a running deployed MTF development machine. ssh into your Vagrant environment::
+
+.. code-block:: bash
+
+      # ssh into the Vagrant environment
+      $ sudo vagrant ssh
+
+.. _local_requirements:
+
+Local installation
 ------------------
-- **minimal path creation**
-- Install modularity-testing-framework from COPR repo like:
-   - *dnf copr enable phracek/Modularity-testing-framework*
-   - install it by command: *dnf install -y modularity-testing-framework*
-- CREATE your config.yaml (see example https://pagure.io/modularity-testing-framework/blob/master/f/docs/example-config.yaml)
-- If you have tests in config file call:  */usr/bin/mtf-generator* or simply *mtf-generator*.
-- Call command for running all python tests:  **MODULE=docker avocado run /usr/share/moduleframework/tools/modulelint.py ./*.py**
-- **additional tests** - see tests in https://pagure.io/modularity-testing-framework/blob/master/f/examples/testing-module directory as an example for you
 
-License
--------
-Framework is released under the GPL, version 2 or later, see LICENSE file in project
+Requirements
+~~~~~~~~~~~~
 
+MTF installer pulls its latest dependencies: ``python-devel``, ``python-setuptools`` and ``python-netifcaes``, ``docker``, `avocado`_, ``yaml`` and ``json``.
 
-Debugging & How To
-------------------
+MTF supports Gherkin-based testing in Python. To write tests in a natural language style, backed up by Python code, install BBD tool `behave`_ . Execute the following command to install behave with pip:
 
-First test takes so long time
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-It is normal, because first test downloads all packages from koji and creates localrepo.
-It is workaround because of missing composes for modules (on demand done by pungi)
-- If you would like to make it faster use env variables:
-    - *MTF_REMOTE_REPOS=yes* - It heps in case there are repos in koji https://kojipkgs.fedoraproject.org/repos/ (they are there just temporary, deleted after 2 weeks and probably it will not be created in near future anyhow)
-    - *MTF_DO_NOT_CLEANUP=yes* - in case it is still slow for you, it disable test cleaup (between tests) could cause side effects
+.. _avocado: https://avocado-framework.github.io/
+.. _behave: http://pythonhosted.org/behave/
 
-Unable to debug avocado output errors
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-- If you see error like: *Avocado crashed: TestError: Process died before it pushed early test_status.*
-    - add env variables:
-        - *AVOCADO_LOG_DEBUG=yes*
-        - *DEBUG=yes*
-    - **This is preferred variant for submitting issues to pagure**
+.. code-block:: bash
 
+    # install behave
+    $ sudo pip install behave
 
-How it works
-------------
-- Structure of MTF:
-  - https://pagure.io/modularity-testing-framework/blob/master/f/docs/howitworks.png
-- Test types:
-  - https://pagure.io/modularity-testing-framework/blob/master/f/docs/TestTypes.png
+.. _installing_mtg:
+Installing MTF
+~~~~~~~~~~~~~
+Install MTF rpm from `Fedora Copr repo`_.
+
+.. _Fedora Copr repo: https://copr.fedorainfracloud.org/coprs/phracek/Modularity-testing-framework/
+
+.. code-block:: bash
+
+    # add modularity-testing-framework yum repo
+    $ sudo dnf copr enable phracek/Modularity-testing-framework
+    $ sudo dnf install -y modularity-testing-framework
+
+.. _getting_mtf:
+Source code
+-----------
+
+You may also wish to follow the `Pagure MTF repo`_ if you have a Pagure account. This stores the source code and the issue tracker for sharing bugs and feature ideas. The repository should be forked into your personal Pagure account where all work will be done. Any changes should be submitted through the pull request process.
+
+.. _Pagure MTF repo: https://pagure.io/modularity-testing-framework
+
+.. seealso::
+
+   :doc:`user_guide/index`
+       User Guide
+   `webchat.freenode.net  <https://webchat.freenode.net>`_
+       Questions? Help? Ideas? Stop by the #fedora-modularity on freenode IRC chat channel
