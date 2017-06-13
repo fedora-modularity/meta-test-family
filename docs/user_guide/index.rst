@@ -13,10 +13,9 @@ User Guide
 
 .. _Environment variables: environment_variables.
 
-4. Write your tests, for example see `sanity tests`_ and various tests examples in ``/usr/share/moduleframework/examples/testing-module/``. All tests methods are listed in section `Method index`_.
+4. Write your tests, for example see `sanity tests`_ and various tests examples in ``/usr/share/moduleframework/examples/testing-module/``. All tests methods are listed in section :ref:`genindex`.
   
 .. _sanity tests: https://pagure.io/modularity-testing-framework/blob/master/f/examples/template/sanity_template.py
-.. _Method index: docs/module_framework#modularity-testing-framework
 
 5. In a directory ``tests`` create a ``Makefile`` as below. Line ``generator`` is optional and needed only if you have multi like Bash snippet tests.
 
