@@ -1,85 +1,92 @@
-## Document identification
-There is nothing important, just parser inside check if config yaml is the proper one, that nobody for example does not used modulemd.yaml as config.yaml
-```yaml
-document: modularity-testing
-version: 1
-```
+Configuration file
+==================
 
-## Module generic part
-This part contain generic part of module
-```yaml
-name: memcached
-modulemd-url: http://raw.githubusercontent.com/container-images/memcached/master/memcached.yaml
-compose-url: url_to_compose_in done in fedora
-service:
-    port: 11211
-packages:
-    rpms:
-        - memcached
-        - perl-Carp
-testdependencies:
-    rpms:
-        - nc
-```
- * `name:` name of module
- * `modulemd-url:` link to modulemd file, now it is not used anyhow, just for installing packages for proper module
- * `compose-url:` final compose build (done by pungi) it contains repositories + moduleMD infromations for tooling
- * `service:` In case module is service like memcached, store there port number, can be then used in tests, to not hardcode port number *(Optional)*
- * `packages:` Which packages will be installed inside module (docker container, guest, any type of module)
- * `testdependencies:` Install dependencies on host, what are important for module testing, for example when you would like to use `nc`, you have to install it explicitly, it is not in cloud images.
+To test a module create its configuration file ``config.yaml`` similar to an `example configuration file`_ described further. If the tested module doesn't represent any service, the `minimal configuration file`_ structure can be used.
 
-## Module types specification
-It contains specification for each type of module, now for __rpm__ and __docker__ based modules
-```yaml
-module:
-    docker:
-        setup: echo Do magic with general config stored on host;
-               echo More magic
-        cleanup: echo Cleanup magic
-        start: "docker run -it -e CACHE_SIZE=128 -p 11211:11211"
-        labels:
-            description: "memcached is a high-performance, distributed memory"
-            io.k8s.description: "memcached is a high-performance, distributed memory"
-        source: https://github.com/container-images/memcached.git
-        container: docker.io/phracek/memcached
-    rpm:
-        setup: echo Do magic with general config stored on host;
-               echo More magic
-        cleanup: echo Cleanup magic
-        start: systemctl start memcached
-        stop: systemctl stop memcached
-        status: systemctl status memcached
-        repos:
-            - http://download.englab.brq.redhat.com/pub/fedora/releases/25/Everything/x86_64/os/
-            - https://phracek.fedorapeople.org/memcached-module-repo/
-```
- * `setup:` run setup/cleanup commands on HOST, for example config manipulation, selinux boolean manipulation there could be used also variables in python style like: {ROOT}, {HOSTNAME} see trans_dict in  file https://pagure.io/modularity-testing-framework/blob/master/f/moduleframework/module_framework.py
- * `cleanup:` similar to setup but done in after test finished.
- * `start:` how to start service in case it is service, in case of generic module it is *(Optional)*
- * `stop:` how to service service in case it is service, in case of generic module it is *(Optional)*
- * `status:` how to check service state, in case of generic module it is *(Optional)*
- * `labels:` docker labels to check, specific just for *docker* container *(Docker specific)*
- * `container:` where is link to container, now it support docker.io link or using locally tar.gz file specified *(Docker specific)*
- * `repo:` if *compose* is not set then this is used and contains repo what has to be used for this module (dependent repos are searched in PDC via moduleMD definition) *(Rpm specific)*
- * `repos:` if *compose* and *repo* not set: contains all repos what has to be used for this module (typically baseruntime + specific one) *(Rpm specific)* *(OBSOLOTE)*
+.. _example configuration file: https://pagure.io/modularity-testing-framework/blob/master/f/examples/memcached/config.yaml
+.. _minimal configuration file: https://pagure.io/modularity-testing-framework/blob/master/f/docs/example-config-minimal.yaml
 
-## Simple tests inside config
- This part is little but __controversial__ , some of users are fans and some hates this. It allows you to specify bash style tests directly inside config file
-```yaml
-test:
-    processrunning:
-        - 'ls  /proc/*/exe -alh | grep memcached'
-testhost:
-    selfcheck:
-        - 'echo errr | nc localhost 11211'
-        - 'echo set AAA 0 4 2 | nc localhost 11211'
-        - 'echo get AAA | nc localhost 11211'
-    selcheckError:
-        - 'echo errr | nc localhost 11211 |grep ERROR'
-```
- * `test:` tests what will run inside container - it means that there has to be all dependencies for these test *(Optional)*
-  * every command has to finish with __0 return code__ otherwise it will __fail__
-  * next level like __processrunning__ is test name what will be visible on output of avocado run, then all lines will be run as commands for this test
- * `testhost:` it is similar to *test*,  just difference is that it runs commands on host machine so that there could be more dependencies than just are in module. I', not sure if this part is useful, will see after discussion *(Optional)*
-  * other specification is same as `test`
- * you have to call `mtf-generator` binary to generate python files from that (because unittests does not allow to have dynamically created tests)
+An example of ``config.yaml`` header:
+
+.. code-block:: yaml
+
+    document: modularity-testing
+    version: 1
+
+An example of module general description:
+
+.. code-block:: yaml
+
+    name: memcached
+    modulemd-url: http://raw.githubusercontent.com/container-images/memcached/master/memcached.yaml
+    compose-url: https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server/x86_64/os/Packages/m/memcached-1.4.36-1.module_b2e063be.x86_64.rpm
+    service:
+        port: 11211
+    packages:
+        rpms:
+            - memcached
+            - perl-Carp
+    testdependencies:
+        rpms:
+            - nc
+
+* **name** defines module name
+* **modulemd-url** contains a link to a moduleMD file
+* **compose-url** links to a final compose Pungi build. **repo** or **repos** can be used instead, see further
+* **service** stores a port if a module has any
+* **packages** defines a module type (by the moment only `rpms` type is supported)
+* **testdependencies** covers dependencies to be installed and used in tests
+
+An example of module types specification:
+
+.. code-block:: yaml
+    default_module: docker
+    module:
+        docker:
+            setup: "docker run -it -e CACHE_SIZE=128 -p 11211:11211"
+            cleanup:"echo Cleanup magic"
+            labels:
+                description: "memcached is a high-performance, distributed memory"
+                io.k8s.description: "memcached is a high-performance, distributed memory"
+            source: https://github.com/container-images/memcached.git
+            container: docker.io/phracek/memcached
+        rpm:
+            setup: /usr/bin/memcached -p 11211
+            cleanup: echo Cleanup magic
+            start: systemctl start memcached
+            stop: systemctl stop memcached
+            status: systemctl status memcached
+            repo:
+                - http://download.englab.brq.redhat.com/pub/fedora/releases/25/Everything/x86_64/os/
+                - https://phracek.fedorapeople.org/memcached-module-repo/
+
+* **default_module**, if specified, sets the default tested module type
+* **setup** runs setup commands on a host machine, not in container, and prepares the environemt for tests, for example changes selinux policy or hostname
+* **cleanup**: similar to setup but done after test finished
+* **start** defines how to start module service if there is any
+* **stop**  defines how to stop module service if there is any
+* **status** defines how to check the status of module service if there is any
+* **labels** contains docker labels to check if any
+* **container** contains a link to a container (docker.io or local tar.gz file)
+* **repo** is used when **compose-url** is not set and contains a repo to be used for rpm module type testing
+
+Multi like Bash snippet tests
+-----------------------------
+A ``config.yaml`` file may contain multi like Bash snippet tests directly. Every Bash command has to finish with 0 return code otherwise it returns fail:
+
+.. code-block:: yaml
+
+    test:
+        processrunning:
+            - 'ls  /proc/*/exe -alh | grep memcached'
+    testhost:
+        selfcheck:
+            - 'echo errr | nc localhost 11211'
+            - 'echo set AAA 0 4 2 | nc localhost 11211'
+            - 'echo get AAA | nc localhost 11211'
+        selcheckError:
+            - 'echo errr | nc localhost 11211 |grep ERROR'
+
+* **test** defines a section of multi like bash snippet tests
+* **processrunning**  contains commands to run as tests and displayed as avocado output
+* **testhost** is optional and similar to **test**. The difference is that it runs commands on host machine so that there could be more dependencies than just are in a module.

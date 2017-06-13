@@ -119,6 +119,8 @@ Install MTF rpm from `Fedora Copr repo`_.
     $ sudo dnf copr enable phracek/Modularity-testing-framework
     $ sudo dnf install -y modularity-testing-framework
 
+MTF scripts, examples and documentation will be installed into ``/usr/share/moduleframework``
+
 .. _getting_mtf:
 Source code
 -----------
@@ -131,5 +133,5 @@ You may also wish to follow the `Pagure MTF repo`_ if you have a Pagure account.
 
    :doc:`user_guide/index`
        User Guide
-   `webchat.freenode.net  <https://webchat.freenode.net>`_
+   `webchat.freenode.net  <https://webchat.freenode.net/?channels=fedora-modularity>`_
        Questions? Help? Ideas? Stop by the #fedora-modularity on freenode IRC chat channel
