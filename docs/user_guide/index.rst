@@ -84,7 +84,7 @@ Contents:
    #python_tests
    scheduling
    #general-reference
-   #glossary
+   glossary
    troubleshooting
 
 .. seealso::
