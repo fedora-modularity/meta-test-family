@@ -996,10 +996,20 @@ gpgcheck=0
 
         :return: None
         """
-        self.stop()
-        self.runHost("machinectl poweroff %s" % self.jmeno, verbose=is_not_silent())
-        # self.nspawncont.stop()
-        self.__is_killed()
+        try:
+            self.stop()
+        except Exception as stopexception:
+            print_info("STOP caused exception this is bad, but have to continue to terminate machine!!!", stopexception)
+            pass
+
+        try:
+            self.runHost("machinectl poweroff %s" % self.jmeno, verbose=is_not_silent())
+            self.__is_killed()
+        except Exception as poweroffex:
+            print_info("Unable to stop machine via poweroff, terminating", poweroffex)
+            self.runHost("machinectl terminate %s" % self.jmeno, ignore_status=True)
+            pass
+
         if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
             # TODO: workaround because systemd nspawn is now working well in F-25
             # (failing because of selinux)
