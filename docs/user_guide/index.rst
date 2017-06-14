@@ -5,25 +5,25 @@ User Guide
 
 .. _Configuration file: how_to_write_conf_file
 
-2. Optionally write multi like Bash snippet tests directly in ``tests/config.yaml`` file as described in section `Multi like Bash snippet tests`_.
+2. Optionally write multiline Bash snippet tests directly in the ``tests/config.yaml`` file as described in section `Multiline Bash snippet tests`_.
 
-.. _Multi like Bash snippet tests: how_to_write_conf_file#multi-like-bash-snippet-tests
+.. _Multiline Bash snippet tests: how_to_write_conf_file#multiline-bash-snippet-tests
 
 3. Check the list of `Environment variables`_.
 
 .. _Environment variables: environment_variables.
 
 4. Write your tests, for example see `sanity tests`_ and various tests examples in ``/usr/share/moduleframework/examples/testing-module/``. All tests methods are listed in section :ref:`genindex`.
-  
+
 .. _sanity tests: https://pagure.io/modularity-testing-framework/blob/master/f/examples/template/sanity_template.py
 
-5. In a directory ``tests`` create a ``Makefile`` as below. Line ``generator`` is optional and needed only if you have multi like Bash snippet tests.
+5. In the directory ``tests`` create a ``Makefile`` as below. Line ``generator`` is optional and needed only if you have multiline Bash snippet tests.
 
  .. code-block:: makefile
 
     MODULE_LINT=/usr/share/moduleframework/tools/modulelint.py
     CMD=python -m avocado run $(MODULE_LINT) *.py
-    
+
     #
     all:
         generator
@@ -37,16 +37,16 @@ User Guide
 
     IMAGE_NAME = debugging-tools
     MODULEMDURL=file://debugging-tools.yaml
-    
+
     all: run
     default: run
-    
+
     build:
         docker build --tag=$(IMAGE_NAME) .
-    
+
     run: build
         docker run -it --name $(IMAGE_NAME) --privileged --ipc=host --net=host --pid=host -e HOST=/host -e NAME=$(IMAGE_NAME) -e IMAGE=$(IMAGE_NAME) -v /run:/run -v /var/log:/var/log -v /etc/machine-id:/etc/machine-id -v /etc/localtime:/etc/localtime -v /:/host $(IMAGE_NAME)
-    
+
     test: build
         cd tests; MODULE=docker MODULEMD=$(MODULEMDURL) URL="docker=$(IMAGE_NAME)" make all
         cd tests; MODULE=rpm MODULEMD=$(MODULEMDURL) URL="docker=$(IMAGE_NAME)" make all
@@ -58,18 +58,18 @@ User Guide
     #run tests from a module root directory
     $ make test
 
- or from ``tests`` directory by running
+ or from the ``tests`` directory by running
 
  .. code-block:: shell
- 
-    #run Python tests from tests/ directory
+
+    #run Python tests from the tests/ directory
     $ sudo MODULE=docker avocado run ./*.py
 
  or
 
  .. code-block:: shell
 
-    #run Bash tests from tests/ directory
+    #run Bash tests from the tests/ directory
     $ sudo MODULE=docker avocado run ./*.sh
 
 
@@ -90,5 +90,4 @@ Contents:
 .. seealso::
 
    `webchat.freenode.net  <https://webchat.freenode.net/?channels=fedora-modularity>`_
-       Questions? Help? Ideas? Stop by the #fedora-modularity on freenode IRC chat channel
-
+       Questions? Help? Ideas? Stop by the #fedora-modularity chat channel on freenode IRC.

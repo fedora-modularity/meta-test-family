@@ -15,7 +15,7 @@ Vagrant
 .. _Vagrantfile: https://pagure.io/modularity-testing-framework/blob/master/f/Vagrantfile
 .. _modularity-testing-framework: https://pagure.io/modularity-testing-framework
 
-The MTF tool has made available for use of two providers: ``libvirt`` (for Linux host only) and ``virtualbox`` (for MAC OS, Windows and Linux hosts), where ``libvirt`` is a default one. See more about Vagrant providers `here`_.
+The MTF tool has been made available for use of two providers: ``libvirt`` (for Linux host only) and ``virtualbox`` (for MAC OS, Windows and Linux hosts), where ``libvirt`` is a default one. See more about Vagrant providers `here`_.
 
 .. _here: https://www.vagrantup.com/docs/providers/basic_usage.html#default-provider
 
@@ -56,7 +56,7 @@ After preparing the libvirt prerequisites using the instructions above:
    $ cd $HOME/  # Season to taste.
    $ git clone https://pagure.io/modularity-testing-framework.git
 
-2. Next, cd into the ``modularity-testing-framework`` directory.
+2. Next, enter into the ``modularity-testing-framework`` directory.
 
 .. code-block:: bash
 
@@ -79,7 +79,7 @@ After preparing the libvirt prerequisites using the instructions above:
       # The above will run for a while while it provisions your development environment.
       $ sudo vagrant reload  # Reboot the machine at the end to apply kernel updates, etc.
 
-5. Once you have followed the steps above, you should have a running deployed MTF development machine. ssh into your Vagrant environment::
+5. Once you have followed the steps above, you should have a running deployed MTF development machine. Log into your Vagrant environment::
 
 .. code-block:: bash
 
@@ -96,7 +96,7 @@ Requirements
 
 MTF installer pulls its latest dependencies: ``python-devel``, ``python-setuptools`` and ``python-netifcaes``, ``docker``, `avocado`_, ``yaml`` and ``json``.
 
-MTF supports Gherkin-based testing in Python. To write tests in a natural language style, backed up by Python code, install BBD tool `behave`_ . Execute the following command to install behave with pip:
+MTF supports Gherkin-based testing in Python. To write tests in a natural language style, backed up by Python code, install the  BBD tool `behave`_ . Execute the following command to install behave with pip:
 
 .. _avocado: https://avocado-framework.github.io/
 .. _behave: http://pythonhosted.org/behave/
@@ -134,4 +134,4 @@ You may also wish to follow the `Pagure MTF repo`_ if you have a Pagure account.
    :doc:`user_guide/index`
        User Guide
    `webchat.freenode.net  <https://webchat.freenode.net/?channels=fedora-modularity>`_
-       Questions? Help? Ideas? Stop by the #fedora-modularity on freenode IRC chat channel
+       Questions? Help? Ideas? Stop by the #fedora-modularity chat channel on freenode IRC.

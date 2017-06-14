@@ -11,7 +11,7 @@ Modularity Testing Framework (MTF) is a tool to test `Fedora modules`_.
 Using MTF you can:
 
 * write tests for RPMs, modules and Docker containers
-* write multi like Bash snippet tests in YAML definition file
+* write multiline Bash snippet tests in YAML definition file
 * write Bash tests
 * write Python tests
 * schedule tests with Jenkins and Taskotron
@@ -47,4 +47,4 @@ Index and Search
 .. seealso::
 
    `webchat.freenode.net  <https://webchat.freenode.net/?channels=fedora-modularity>`_
-       Questions? Help? Ideas? Stop by the #fedora-modularity on freenode IRC chat channel
+       Questions? Help? Ideas? Stop by the #fedora-modularity chat channelon freenode IRC.

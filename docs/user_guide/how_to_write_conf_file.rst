@@ -34,7 +34,7 @@ An example of module general description:
 * **modulemd-url** contains a link to a moduleMD file
 * **compose-url** links to a final compose Pungi build. **repo** or **repos** can be used instead, see further
 * **service** stores a port if a module has any
-* **packages** defines a module type (by the moment only `rpms` type is supported)
+* **packages** defines a module type (at the moment only `rpms` type is supported)
 * **testdependencies** covers dependencies to be installed and used in tests
 
 An example of module types specification:
@@ -66,13 +66,13 @@ An example of module types specification:
 * **start** defines how to start module service if there is any
 * **stop**  defines how to stop module service if there is any
 * **status** defines how to check the status of module service if there is any
-* **labels** contains docker labels to check if any
+* **labels** contains docker labels to check if there is any
 * **container** contains a link to a container (docker.io or local tar.gz file)
 * **repo** is used when **compose-url** is not set and contains a repo to be used for rpm module type testing
 
-Multi like Bash snippet tests
+Multiline Bash snippet tests
 -----------------------------
-A ``config.yaml`` file may contain multi like Bash snippet tests directly. Every Bash command has to finish with 0 return code otherwise it returns fail:
+A ``config.yaml`` file may contain multiline Bash snippet tests directly. Every Bash command has to finish with 0 return code otherwise it returns fail:
 
 .. code-block:: yaml
 
@@ -87,6 +87,13 @@ A ``config.yaml`` file may contain multi like Bash snippet tests directly. Every
         selcheckError:
             - 'echo errr | nc localhost 11211 |grep ERROR'
 
-* **test** defines a section of multi like bash snippet tests
+* **test** defines a section of multiline bash snippet tests
 * **processrunning**  contains commands to run as tests and displayed as avocado output
-* **testhost** is optional and similar to **test**. The difference is that it runs commands on host machine so that there could be more dependencies than just are in a module.
+* **testhost** is optional and similar to **test**. The difference is that it runs commands on host machine so that there could be more dependencies than there are just in a module.
+
+.. seealso::
+
+   :doc:`index`
+       User Guide
+   `webchat.freenode.net  <https://webchat.freenode.net/?channels=fedora-modularity>`_
+       Questions? Help? Ideas? Stop by the #fedora-modularity chat channel on freenode IRC.
