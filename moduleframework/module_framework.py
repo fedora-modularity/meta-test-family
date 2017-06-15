@@ -533,7 +533,7 @@ class RpmHelper(CommonFunctions):
         if name in self.dependencylist:
             self.dependencylist[name]['urls'].append(url)
         else:
-            self.dependencylist[name] = {'urls':url, 'stream':stream}
+            self.dependencylist[name] = {'urls':[url], 'stream':stream}
 
 
     def setRepositoriesAndWhatToInstall(self, repos=None, whattooinstall=None):
