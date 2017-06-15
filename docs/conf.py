@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.abspath('.'))
 mtf_dir = os.path.abspath('..')
 sys.path.insert(0, mtf_dir)
 
-from moduleframework import version as mtf_version
+#from moduleframework import version as mtf_version
 
 # Determine if this script is running inside RTD build environment
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
