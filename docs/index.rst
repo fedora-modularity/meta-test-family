@@ -1,20 +1,51 @@
-Welcome to modularity-testing-framework's documentation!
-========================================================
+Modularity Testing Framework Documentation
+==========================================
 
-Contents:
+Welcome to the Modularity Testing Framework documentation!
+
+About
+=====
+
+Modularity testing framework (MTF) is a tool to test components of `a modular Fedora`_.
+
+Using MTF you can:
+
+* write tests for RPMs, modules and Docker containers
+* write multiline Bash snippet tests in YAML definition file
+* write multihost tests
+* write Bash tests
+* write Python tests
+* schedule tests with Jenkins and Taskotron
+* run tests on a local host or in Vagrant environment
+
+MTF has a presence on the following websites:
+
+* `Documentation`_ is available on ReadTheDocs.
+* A `Package repository`_ is available on Fedora Copr.
+* `MTF's code`_ and the issue tracker for sharing bugs and feature ideas are stored on Pagure.
+
+.. _Documentation: http://modularity-testing-framework.readthedocs.io
+.. _a modular Fedora: https://docs.pagure.org/modularity/
+.. _Package repository: https://copr.fedorainfracloud.org/coprs/phracek/Modularity-testing-framework/
+.. _MTF's code: https://pagure.io/modularity-testing-framework
+
+Content
+=======
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 1
 
-   overview
-   how_to_schedule
-   workflow_integration
-   levels
-   clsoverview
+   installation
+   user_guide/index
+   license
 
-Indices and tables
-==================
+Index and Search
+================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
+
+.. seealso::
+
+   `webchat.freenode.net  <https://webchat.freenode.net/?channels=fedora-modularity>`_
+       Questions? Help? Ideas? Stop by the #fedora-modularity chat channelon freenode IRC.
