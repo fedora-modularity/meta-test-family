@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.5.0
+Version:        0.5.1
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -45,6 +45,14 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 %{_datadir}/moduleframework/
 
 %changelog
+* Thu Jun 15 2017 Jan Scotka <jscotka@redhat.com> 0.5.1-1
+- added symlink to solve moving minimal config example to user guide
+  (jscotka@redhat.com)
+
+* Thu Jun 15 2017 Jan Scotka <jscotka@redhat.com>
+- added symlink to solve moving minimal config example to user guide
+  (jscotka@redhat.com)
+
 * Thu Jun 15 2017 Jan Scotka <jscotka@redhat.com> 0.5.0-1
 - docs removing readme.rst link (igulina@redhat.com)
 - docs following PR review remarks (igulina@redhat.com)
