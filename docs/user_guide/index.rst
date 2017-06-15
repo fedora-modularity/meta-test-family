@@ -17,7 +17,7 @@ User Guide
 
 .. _sanity tests: https://pagure.io/modularity-testing-framework/blob/master/f/examples/template/sanity_template.py
 
-5. In the directory ``tests`` create a ``Makefile`` as below. Line ``generator`` is optional and needed only if you have multiline Bash snippet tests.
+5. In the directory ``tests`` create a ``Makefile`` as below. Mind to keep the ``generator`` line only if there are multiline Bash snippet tests in the ``tests/config.yaml`` file.
 
  .. code-block:: makefile
 

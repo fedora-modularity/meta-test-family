@@ -6,16 +6,17 @@ Welcome to the Modularity Testing Framework documentation!
 About
 =====
 
-Modularity Testing Framework (MTF) is a tool to test `Fedora modules`_.
+Modularity testing framework (MTF) is a tool to test components of `a modular Fedora`_.
 
 Using MTF you can:
 
 * write tests for RPMs, modules and Docker containers
 * write multiline Bash snippet tests in YAML definition file
+* write multihost tests
 * write Bash tests
 * write Python tests
 * schedule tests with Jenkins and Taskotron
-* work in Vagrant environment
+* run tests on a local host or in Vagrant environment
 
 MTF has a presence on the following websites:
 
@@ -24,7 +25,7 @@ MTF has a presence on the following websites:
 * `MTF's code`_ and the issue tracker for sharing bugs and feature ideas are stored on Pagure.
 
 .. _Documentation: http://modularity-testing-framework.readthedocs.io
-.. _Fedora modules: https://github.com/modularity-modules
+.. _a modular Fedora: https://docs.pagure.org/modularity/
 .. _Package repository: https://copr.fedorainfracloud.org/coprs/phracek/Modularity-testing-framework/
 .. _MTF's code: https://pagure.io/modularity-testing-framework
 

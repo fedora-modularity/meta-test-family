@@ -1,4 +1,4 @@
-Modularity testing framework (MTF) is a tool to test [Fedora modules](https://github.com/modularity-modules).
+Modularity testing framework (MTF) is a tool to test components of [a modular Fedora](https://docs.pagure.org/modularity/).
 
 For more information, check out the documentation page:
 
