@@ -74,6 +74,7 @@ class CommonFunctions(object):
         self.moduleName = None
         self.source = None
         self.arch = None
+        self.dependencylist = {}
         # general use case is to have forwarded services to host (so thats why it is same)
         self.ipaddr = trans_dict["HOSTIPADDR"]
         trans_dict["GUESTARCH"] = self.getArch()
@@ -176,6 +177,9 @@ class CommonFunctions(object):
             out += self.getModulemdYamlconfig()['data']['profiles'][profile]['rpms']
         print_info("PCKGs to install inside module:", out)
         return out
+
+    def getModuleDependencies(self):
+        return self.dependencylist
 
     def getModulemdYamlconfig(self, urllink=None):
         """
@@ -524,6 +528,15 @@ class RpmHelper(CommonFunctions):
         self.__prepare()
         self.__prepareSetup()
 
+    def __addModuleDependency(self, url, name=None, stream="master"):
+        name = name if name else self.moduleName
+        if name in self.dependencylist:
+            self.dependencylist[name]['urls'].append(url)
+        else:
+            self.dependencylist[name]['urls'] = [url]
+            self.dependencylist[name]['stream'] = stream
+
+
     def setRepositoriesAndWhatToInstall(self, repos=None, whattooinstall=None):
         """
         set repositories and packages what to install inside module
@@ -538,16 +551,22 @@ class RpmHelper(CommonFunctions):
         alldrepos = []
         if repos:
             self.repos = repos
+            map(self.__addModuleDependency, repos)
         else:
             if not self.repos:
                 for dep in self.moduledeps:
-                    alldrepos.append(get_latest_repo_url(dep, self.moduledeps[dep]))
+                    latesturl = get_latest_repo_url(dep, self.moduledeps[dep])
+                    alldrepos.append(latesturl)
+                    self.__addModuleDependency(url=latesturl, name = dep, stream = self.moduledeps[dep])
                 if get_correct_url():
                     self.repos = [get_correct_url()] + alldrepos
+                    self.__addModuleDependency(get_correct_url())
                 elif self.info.get('repo'):
                     self.repos = [self.info.get('repo')] + alldrepos
+                    self.__addModuleDependency(self.info.get('repo'))
                 elif self.info.get('repos'):
                     self.repos = self.info.get('repos')
+                    self.__addModuleDependency(self.info.get('repos'))
                 else:
                     raise RpmExc("no RPM given in file or via URL")
         if whattooinstall:
@@ -1232,6 +1251,16 @@ class AvocadoTest(Test):
         :return: str
         """
         return self.backend.getArch()
+
+    def getModuleDependencies(self):
+        """
+        get list of module dependencies dictionary, there is structure like:
+        {module_name: {stream: master, urls=[repo_url1, repo_url2]},
+         dependent_module_name: {stream: f26, urls=[repo_url3]}}
+
+        :return: dict
+        """
+        return self.backend.getModuleDependencies()
 
 
 # INTERFACE CLASSES FOR SPECIFIC MODULE TESTS
