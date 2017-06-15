@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.4.63
+Version:        0.4.64
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -45,6 +45,10 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 %{_datadir}/moduleframework/
 
 %changelog
+* Thu Jun 15 2017 Jan Scotka <jscotka@redhat.com> 0.4.64-1
+- fixed issue when using repos. mistake caused that it created list in list
+  (jscotka@redhat.com)
+
 * Thu Jun 15 2017 Jan Scotka <jscotka@redhat.com> 0.4.63-1
 - fixed issue with adding to list what is not list (jscotka@redhat.com)
 
