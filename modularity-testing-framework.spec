@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.4.61
+Version:        0.4.62
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -45,6 +45,12 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 %{_datadir}/moduleframework/
 
 %changelog
+* Thu Jun 15 2017 Jan Scotka <jscotka@redhat.com> 0.4.62-1
+- fixed self test check (jscotka@redhat.com)
+- possible to get dependencies with urls via dictionary (jscotka@redhat.com)
+- added fixes for stopping nspawn container. in case there is some traceback it
+  should remove nspawn machine (jscotka@redhat.com)
+
 * Mon Jun 12 2017 Jan Scotka <jscotka@redhat.com> 0.4.61-1
 - Add upstream check_modulemd (phracek@redhat.com)
 - added doc strings (jscotka@redhat.com)
