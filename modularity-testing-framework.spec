@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.4.64
+Version:        0.5.0
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -45,6 +45,17 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 %{_datadir}/moduleframework/
 
 %changelog
+* Thu Jun 15 2017 Jan Scotka <jscotka@redhat.com> 0.5.0-1
+- docs removing readme.rst link (igulina@redhat.com)
+- docs following PR review remarks (igulina@redhat.com)
+- docs typos, errors and whitespaces (igulina@redhat.com)
+- docs introducing glossary page (igulina@redhat.com)
+- docs list of test methods (igulina@redhat.com)
+- docs user guide main steps, conf file,env variables, troubleshooting
+  (igulina@redhat.com)
+- docs intro page, license, installation (igulina@redhat.com)
+- Simple README with what MTF is and a link to docs (igulina@redhat.com)
+
 * Thu Jun 15 2017 Jan Scotka <jscotka@redhat.com> 0.4.64-1
 - fixed issue when using repos. mistake caused that it created list in list
   (jscotka@redhat.com)
