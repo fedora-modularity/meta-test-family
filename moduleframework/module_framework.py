@@ -565,7 +565,7 @@ class RpmHelper(CommonFunctions):
                     self.__addModuleDependency(self.info.get('repo'))
                 elif self.info.get('repos'):
                     self.repos = self.info.get('repos')
-                    self.__addModuleDependency(self.info.get('repos'))
+                    map(self.__addModuleDependency,self.info.get('repos'))
                 else:
                     raise RpmExc("no RPM given in file or via URL")
         if whattooinstall:
