@@ -1368,10 +1368,10 @@ def get_correct_url():
 
 def get_correct_config():
     """
-    Return proper config what should be used
-    default location is ./config.yaml, could be refedined via
-    env variable CONFIG
+    Read the module's configuration file
 
+    :default: ``./config.yaml`` in the ``tests`` directory of the module's root directory
+    :envvar: **CONFIG=path/to/file** overrides default value.
     :return: str
     """
     cfgfile = os.environ.get('CONFIG')
