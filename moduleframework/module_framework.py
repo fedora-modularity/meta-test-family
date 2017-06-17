@@ -141,7 +141,7 @@ class CommonFunctions(object):
         :return: None
         """
         try:
-            self.config = get_correct_config()
+            self.config = get_config()
             self.moduleName = self.config['name']
             self.source = self.config.get('source') if self.config.get(
                 'source') else self.config['module']['rpm'].get('source')
@@ -1366,7 +1366,7 @@ def get_correct_url():
     return amodule
 
 
-def get_correct_config():
+def get_config():
     """
     Read the module's configuration file
 
