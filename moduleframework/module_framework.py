@@ -1374,9 +1374,7 @@ def get_correct_config():
     :envvar: **CONFIG=path/to/file** overrides default value.
     :return: str
     """
-    cfgfile = os.environ.get('CONFIG')
-    if not cfgfile:
-        cfgfile = "config.yaml"
+    cfgfile = os.environ.get('CONFIG') or './config.yaml'
     if not os.path.exists(cfgfile):
         raise ConfigExc(
             "Config file (%s) does not exist or is inaccesible (you can also redefine own by CONFIG=path/to/configfile.yaml env variable)" %
