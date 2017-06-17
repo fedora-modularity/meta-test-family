@@ -1375,18 +1375,15 @@ def get_correct_config():
     :return: str
     """
     cfgfile = os.environ.get('CONFIG') or './config.yaml'
-    if not os.path.exists(cfgfile):
-        raise ConfigExc(
-            "Config file (%s) does not exist or is inaccesible (you can also redefine own by CONFIG=path/to/configfile.yaml env variable)" %
-            cfgfile)
-    with open(cfgfile, 'r') as ymlfile:
-        xcfg = yaml.load(ymlfile.read())
-        if xcfg['document'] != 'modularity-testing':
-            raise ConfigExc(
-                "Bad Config file, not yaml or does not contain proper document type" %
-                cfgfile)
-    return xcfg
-
+    try:
+       with open(cfgfile, 'r') as ymlfile:
+           xcfg = yaml.load(ymlfile.read())
+           return xcfg
+    except IOError:
+       raise ConfigExc(
+           "Error: File '%s' doesn't appear to exist or it's not a YAML file." %
+            cfgfile + " " +
+           "Tip: If the CONFIG envvar is not set, mtf-generator looks for './config'.")
 
 def get_compose_url():
     """
