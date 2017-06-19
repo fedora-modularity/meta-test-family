@@ -95,6 +95,7 @@ setup(
                       'netifaces',
                       'behave',
                       'PyYAML',
-                      'dockerfile-parse'
+                      'dockerfile-parse',
+                      'pdc_client'
                       ]
 )

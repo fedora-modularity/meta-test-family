@@ -66,7 +66,7 @@ function getparams_int(){
 
 function inst_env(){
     dnf install -y python-pip make docker httpd git python2-avocado fedpkg python2-avocado-plugins-output-html
-    pip install PyYAML behave
+    pip install PyYAML behave pdc_query
 #    pip install --upgrade avocado-framework avocado-framework-plugin-result-html
 
 }

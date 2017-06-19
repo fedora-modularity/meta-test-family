@@ -29,11 +29,10 @@ Construct parameters for automatization (CIs)
 """
 
 import yaml
-import json
-import urllib
 import re
 from avocado import utils
 from common import *
+from pdc_client import PDCClient
 from timeoutlib import Retry
 
 
@@ -82,22 +81,28 @@ class PDCParser():
     Class for parsing PDC data via some setters line setFullVersion, setViaFedMsg, setLatestPDC
     """
 
-    @Retry(attempts=DEFAULTRETRYCOUNT * 5, timeout=DEFAULTRETRYTIMEOUT, delay=20, error=PDCExc("RETRY: Unable to get data from PDC"))
     def __getDataFromPdc(self):
         """
         Internal method, do not use it
 
         :return: None
         """
-        PDC = "%s/?variant_name=%s&variant_version=%s&variant_release=%s&active=True" % (
-            PDCURL, self.name, self.stream, self.version)
-        print_info(
-            "Attemt to contact PDC (may take longer time) with query:", PDC)
-        out = json.load(urllib.urlopen(PDC))["results"]
-        if out:
-            self.pdcdata = out[-1]
-        else:
-            raise PDCExc("Unable to get data from PDC URL: %s" % PDC)
+        pdc_server = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
+        # Using develop=True to not authenticate to the server
+        pdc_session = PDCClient(pdc_server, ssl_verify=True, develop=True)
+        pdc_query = { 'variant_id' : self.name, 'active': True }
+        if self.stream:
+            pdc_query['variant_version'] = self.stream
+        if self.version:
+            pdc_query['variant_release'] = self.version
+        try:
+            mod_info = pdc_session(**pdc_query)
+        except Exception as ex:
+            raise PDCExc("Could not query PDC server", ex)
+        if not mod_info or "results" not in mod_info.keys() or not mod_info["results"]:
+            raise PDCExc("QUERY: %s is not available on PDC" % pdc_query)
+        self.pdcdata = mod_info["results"][-1]
+        self.modulemd = yaml.load(self.pdcdata["modulemd"])
 
     def setFullVersion(self, nvr):
         """
@@ -156,13 +161,10 @@ class PDCParser():
 
         :return: str
         """
-        try:
-            return self.pdcdata["scmurl"].split("#")[1]
-        except BaseException:
-            return "master"
+        return self.getmoduleMD()['data']['xmd']['mbs']['commit']
 
     def getmoduleMD(self):
-        return yaml.load(self.pdcdata["modulemd"])
+        return self.modulemd
 
     def generateModuleMDFile(self):
         """
