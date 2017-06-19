@@ -35,6 +35,7 @@ from common import *
 from pdc_client import PDCClient
 from timeoutlib import Retry
 
+PDC_SERVER = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
 
 def getBasePackageSet(modulesDict=None, isModule=True, isContainer=False):
     """
@@ -87,9 +88,8 @@ class PDCParser():
 
         :return: None
         """
-        pdc_server = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
         # Using develop=True to not authenticate to the server
-        pdc_session = PDCClient(pdc_server, ssl_verify=True, develop=True)
+        pdc_session = PDCClient(PDC_SERVER, ssl_verify=True, develop=True)
         pdc_query = { 'variant_id' : self.name, 'active': True }
         if self.stream:
             pdc_query['variant_version'] = self.stream
