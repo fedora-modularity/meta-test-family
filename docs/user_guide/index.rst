@@ -11,11 +11,12 @@ User Guide
 
 3. Check the list of `Environment variables`_.
 
-.. _Environment variables: environment_variables.
+.. _Environment variables: environment_variables
 
-4. Write your tests, for example see `sanity tests`_ and various tests examples in ``/usr/share/moduleframework/examples/testing-module/``. All tests methods are listed in section :ref:`genindex`.
+4. Write your tests, for example see `sanity tests`_ and various tests examples in ``/usr/share/moduleframework/examples/testing-module/``. All tests methods are listed in section `API Index`_ and alphabetically in :ref:`genindex` section.
 
 .. _sanity tests: https://pagure.io/modularity-testing-framework/blob/master/f/examples/template/sanity_template.py
+.. _API Index: ../api/index
 
 5. In the directory ``tests`` create a ``Makefile`` as below. Mind to keep the ``generator`` line only if there are multiline Bash snippet tests in the ``tests/config.yaml`` file.
 
@@ -89,5 +90,7 @@ Contents:
 
 .. seealso::
 
+   :doc:`../api/index`
+       API Index
    `webchat.freenode.net  <https://webchat.freenode.net/?channels=fedora-modularity>`_
        Questions? Help? Ideas? Stop by the #fedora-modularity chat channel on freenode IRC.

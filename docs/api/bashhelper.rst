@@ -1,5 +1,5 @@
-BASH Helper module
-==================
+BASH Helper
+===========
 
 .. automodule:: moduleframework.bashhelper
    :members:

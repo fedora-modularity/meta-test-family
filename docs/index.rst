@@ -37,6 +37,7 @@ Content
 
    installation
    user_guide/index
+   api/index
    license
 
 Index and Search

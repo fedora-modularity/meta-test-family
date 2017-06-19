@@ -1,5 +1,5 @@
-Main Module Framework module
-============================
+Module Framework
+================
 
 .. automodule:: moduleframework.module_framework
    :members:

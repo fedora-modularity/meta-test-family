@@ -22,8 +22,6 @@
 #
 
 """
-MODULARITY TESTING FRAMEWORK
-----------------------------
 main module provides helpers for various module types and AVOCADO(unittest) classes
 what you should use for your tests (inherited)
 """

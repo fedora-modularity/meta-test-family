@@ -1,5 +1,5 @@
-Module for PDC
-==============
+PDC data
+========
 
 .. automodule:: moduleframework.pdc_data
    :members:

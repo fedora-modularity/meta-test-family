@@ -22,8 +22,6 @@
 #
 
 """
-MODULARITY TESTING FRAMEWORK - common
-----------------------------
 It provides some general functions
 """
 

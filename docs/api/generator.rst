@@ -1,5 +1,5 @@
-Generator module
-================
+MTF Generator
+=============
 
 .. automodule:: moduleframework.generator
    :members:
