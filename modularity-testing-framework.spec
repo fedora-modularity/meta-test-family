@@ -17,6 +17,7 @@ Requires:       python2-avocado-plugins-output-html
 Requires:       python-netifaces
 Requires:       docker
 Requires:       python2-dockerfile-parse
+Requires:       pdc-client
 
 %description
 %{summary}.
