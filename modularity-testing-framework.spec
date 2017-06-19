@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.5.1
+Version:        0.5.2
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -47,6 +47,20 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 %{_datadir}/moduleframework/
 
 %changelog
+* Mon Jun 19 2017 Jan Scotka <jscotka@redhat.com> 0.5.2-1
+- added deps to runthem script (jscotka@redhat.com)
+- added dependency on modulemd for furure usage (jscotka@redhat.com)
+- bad version from pip (jscotka@redhat.com)
+- added constant instead of variable inside class (jscotka@redhat.com)
+- added pdc library dependency, removed own solution, used API
+  (jscotka@redhat.com)
+- rename get_correct_config (igulina@redhat.com)
+- update error handler for get_correct_config (igulina@redhat.com)
+- fix var assignment for get_correct_config (igulina@redhat.com)
+- update docstring for get_correct_config (igulina@redhat.com)
+- removed version string from conf.py (jscotka@redhat.com)
+- removed version string from conf.py (jscotka@redhat.com)
+
 * Thu Jun 15 2017 Jan Scotka <jscotka@redhat.com> 0.5.1-1
 - added symlink to solve moving minimal config example to user guide
   (jscotka@redhat.com)
