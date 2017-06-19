@@ -96,6 +96,7 @@ setup(
                       'behave',
                       'PyYAML',
                       'dockerfile-parse',
-                      'pdc_client'
+                      'pdc_client',
+                      'modulemd'
                       ]
 )
