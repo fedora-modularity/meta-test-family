@@ -18,7 +18,9 @@ User Guide
 .. _sanity tests: https://pagure.io/modularity-testing-framework/blob/master/f/examples/template/sanity_template.py
 .. _API Index: ../api/index
 
-5. In the directory ``tests`` create a ``Makefile`` as below. Mind to keep the ``generator`` line only if there are multiline Bash snippet tests in the ``tests/config.yaml`` file.
+5. In the directory ``tests`` create a ``Makefile`` as below.
+
+   Mind to keep the ``mtf_generator`` line only if there are multiline Bash snippet tests in the ``tests/config.yaml`` file.
 
  .. code-block:: makefile
 
@@ -27,7 +29,7 @@ User Guide
 
     #
     all:
-        generator
+        mtf_generator
         $(CMD)
 
 6. In a module's root directory create a ``Makefile``, which contains a secton **test**. For example:

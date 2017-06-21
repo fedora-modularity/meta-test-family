@@ -9,7 +9,7 @@ This section contains the MTF API, auto generated from `the source code`_.
 
    module_framework
    exceptions_debug
-   generator
+   mtf_generator
    compose_info
    pdc_data
    dockerlinter
