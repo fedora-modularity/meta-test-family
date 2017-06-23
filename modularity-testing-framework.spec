@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.5.2
+Version:        0.5.3
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -47,6 +47,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 %{_datadir}/moduleframework/
 
 %changelog
+* Fri Jun 23 2017 Jan Scotka <jscotka@redhat.com> 0.5.3-1
+- docs building up api menu in main menu (igulina@redhat.com)
+
 * Mon Jun 19 2017 Jan Scotka <jscotka@redhat.com> 0.5.2-1
 - added deps to runthem script (jscotka@redhat.com)
 - added dependency on modulemd for furure usage (jscotka@redhat.com)
