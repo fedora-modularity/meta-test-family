@@ -76,7 +76,7 @@ function loaddistgittests(){
     fedpkg_alt clone --anonymous modules/$MODULENAME
     (
         cd $MODULENAME
-        git reset `getparams_int --commit`
+        git checkout `getparams_int --commit`
     )
     test -f $MODULENAME/tests/Makefile
 }
@@ -140,8 +140,12 @@ elif loaddistgittests; then
 elif loadexampletests; then
     avocado_wrapper
 else
-    run_modulelint
+    # moduleLint Disabled
+    # run_modulelint
+    # return code what means SKIP results and do not interpret it
+    exit 126
 fi
+
 TESTRESULT=$?
 
 if [ "$RESULTTOOLS" -ne 0 ]; then
@@ -149,7 +153,9 @@ if [ "$RESULTTOOLS" -ne 0 ]; then
 fi
 
 if [ "$TESTRESULT" -eq 0 ]; then
+# return code what means PASS
     exit 0
 else
+# return code what means that some part of infra failed
     exit 125
 fi
