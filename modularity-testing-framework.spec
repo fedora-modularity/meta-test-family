@@ -15,10 +15,13 @@ BuildRequires:  python2-setuptools
 Requires:       python2-avocado
 Requires:       python2-avocado-plugins-output-html
 Requires:       python-netifaces
-Requires:       docker
 Requires:       python2-dockerfile-parse
 Requires:       pdc-client
 Requires:       python2-modulemd
+
+%ifarch x86_64 i686
+Requires:       docker
+%endif
 
 %description
 %{summary}.
