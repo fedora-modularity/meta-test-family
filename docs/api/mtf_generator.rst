@@ -1,6 +1,6 @@
 MTF Generator
 =============
 
-.. automodule:: moduleframework.generator
+.. automodule:: moduleframework.mtf_generator
    :members:
    :undoc-members:
