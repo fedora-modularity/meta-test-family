@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.5.5
+Version:        0.5.6
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -50,6 +50,12 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 %{_datadir}/moduleframework/
 
 %changelog
+* Mon Jun 26 2017 Jan Scotka <jscotka@redhat.com> 0.5.6-1
+- added more comments to receent changes (jscotka@redhat.com)
+- fix issue 36 (igulina@redhat.com)
+- docs replacing generator with mtf-generator (igulina@redhat.com)
+- remove deprecated generator func (igulina@redhat.com)
+
 * Mon Jun 26 2017 Jan Scotka <jscotka@redhat.com> 0.5.5-1
 - 
 
