@@ -78,13 +78,5 @@ def main():
     configout.write(config.output)
     configout.close()
 
-
-def deprecated_main():
-    import sys
-    print("The 'generator' name is deprecated and will go away eventually, "
-          "please use\n'mtf-generator' instead!", file=sys.stderr)
-    main()
-
-
 if __name__ == '__main__':
     main()
