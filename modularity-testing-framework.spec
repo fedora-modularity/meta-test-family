@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.5.7
+Version:        0.5.8
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -49,6 +49,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,mtf_
 %{_datadir}/moduleframework/
 
 %changelog
+* Mon Jun 26 2017 Jan Scotka <jscotka@redhat.com> 0.5.8-1
+- last generator item in spec (jscotka@redhat.com)
+
 * Mon Jun 26 2017 Jan Scotka <jscotka@redhat.com> 0.5.7-1
 - removed generator from specfile (jscotka@redhat.com)
 
