@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.5.3
+Version:        0.5.4
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -50,6 +50,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,gene
 %{_datadir}/moduleframework/
 
 %changelog
+* Mon Jun 26 2017 Jan Scotka <jscotka@redhat.com> 0.5.4-1
+- require docker just for intel (jscotka@redhat.com)
+
 * Fri Jun 23 2017 Jan Scotka <jscotka@redhat.com> 0.5.3-1
 - docs building up api menu in main menu (igulina@redhat.com)
 
