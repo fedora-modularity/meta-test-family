@@ -37,7 +37,7 @@ rm -rf %{name}.egg-info
 %install
 %py2_install
 install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
-chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,generator,bashhelper,setup}.py
+chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,mtf_generator,bashhelper,setup}.py
 
 %files
 %license LICENSE
