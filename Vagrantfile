@@ -24,7 +24,7 @@
 Vagrant.configure(2) do |config|
 
     config.vm.box = "fedora/25-cloud-base"
-    config.vm.synced_folder ".", "/home/vagrant"
+    config.vm.synced_folder ".", "/home/vagrant/modularity-testing-framework"
     config.vm.network "private_network", ip: "192.168.50.10"
     config.vm.network "forwarded_port", guest: 80, host: 8888
     config.vm.hostname = "moduletesting"
@@ -43,7 +43,7 @@ Vagrant.configure(2) do |config|
     config.vm.provision "shell", inline: <<-SHELL
         set -x
         dnf install -y make docker httpd git python2-avocado python2-avocado-plugins-output-html python-netifaces
-        cd /home/vagrant
+        cd /home/vagrant/modularity-testing-framework
         make install
         make check
         cp -r /root/avocado /var/www/html/
