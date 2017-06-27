@@ -52,6 +52,7 @@ mkdir -p $AVDIR
 export XUFILE="$AVDIR/out.xunit"
 export AVOCADOCMD="avocado run --xunit $XUFILE"
 export RESULTTOOLS=0
+export MTF_RECURSIVE_DOWNLOAD=yes
 
 function getparams_int(){
     ADDIT="$1"
@@ -122,7 +123,7 @@ function run_modulelint(){
 set -x
 inst_env
 RESULTTOOLS=$(($RESULTTOOLS+$?))
-PARAMS="`getparams_int`"
+PARAMS="`DEBUG=yes getparams_int`"
 RESULTTOOLS=$(($RESULTTOOLS+$?))
 export PARAMS
 
