@@ -9,19 +9,19 @@ License:        GPLv2+
 URL:            https://pagure.io/modularity-testing-framework
 Source0:        http://releases.pagure.org/%{name}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
+# Exlcude ppc64: there is no docker package on ppc64
+# https://bugzilla.redhat.com/show_bug.cgi?id=1465176
+ExcludeArch:    ppc64
 
 BuildRequires:  python2-devel
 BuildRequires:  python2-setuptools
 Requires:       python2-avocado
 Requires:       python2-avocado-plugins-output-html
 Requires:       python-netifaces
+Requires:       docker
 Requires:       python2-dockerfile-parse
 Requires:       pdc-client
 Requires:       python2-modulemd
-
-%ifarch x86_64 i686
-Requires:       docker
-%endif
 
 %description
 %{summary}.
