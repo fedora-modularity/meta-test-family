@@ -206,6 +206,29 @@ class PDCParser():
             out = {}
         return out
 
+    def download_tagged(self,dirname):
+        for foo in utils.process.run("koji list-tagged --quiet %s" % self.pdcdata["koji_tag"], verbose=is_debug()).stdout.split("\n"):
+            pkgbouid = foo.strip().split(" ")[0]
+            if len(pkgbouid) > 4:
+                print_debug("DOWNLOADING: %s" % foo)
+
+                @Retry(attempts=DEFAULTRETRYCOUNT * 10, timeout=DEFAULTRETRYTIMEOUT * 60, delay=DEFAULTRETRYTIMEOUT,
+                       error=KojiExc(
+                           "RETRY: Unbale to fetch package from koji after %d attempts" % (DEFAULTRETRYCOUNT * 10)))
+                def tmpfunc():
+                    a = utils.process.run(
+                        "cd %s; koji download-build %s  -a %s -a noarch" %
+                        (dirname, pkgbouid, ARCH), shell=True, verbose=is_debug(), ignore_status=True)
+                    if a.exit_status == 1:
+                        if "packages available for" in a.stdout.strip():
+                            print_debug(
+                                'UNABLE TO DOWNLOAD package (intended for other architectures, GOOD):', a.command)
+                        else:
+                            raise KojiExc(
+                                'UNABLE TO DOWNLOAD package (KOJI issue, BAD):', a.command)
+
+                tmpfunc()
+
     def createLocalRepoFromKoji(self):
         """
         Return string of generated repository located LOCALLY
@@ -221,25 +244,9 @@ class PDCParser():
             pass
         else:
             os.mkdir(absdir)
-            for foo in utils.process.run(
-                    "koji list-tagged --quiet %s" % self.pdcdata["koji_tag"], verbose=is_debug()).stdout.split("\n"):
-                pkgbouid = foo.strip().split(" ")[0]
-                if len(pkgbouid) > 4:
-                    print_debug("DOWNLOADING: %s" % foo)
-
-                    @Retry(attempts=DEFAULTRETRYCOUNT * 10, timeout=DEFAULTRETRYTIMEOUT * 60, delay=DEFAULTRETRYTIMEOUT, error=KojiExc("RETRY: Unbale to fetch package from koji after %d attempts" % (DEFAULTRETRYCOUNT * 10)))
-                    def tmpfunc():
-                        a = utils.process.run(
-                            "cd %s; koji download-build %s  -a %s -a noarch" %
-                            (absdir, pkgbouid, ARCH), shell=True, verbose=is_debug(), ignore_status=True)
-                        if a.exit_status == 1:
-                            if "packages available for" in a.stdout.strip():
-                                print_debug(
-                                    'UNABLE TO DOWNLOAD package (intended for other architectures, GOOD):', a.command)
-                            else:
-                                raise KojiExc(
-                                    'UNABLE TO DOWNLOAD package (KOJI issue, BAD):', a.command)
-                    tmpfunc()
+            self.download_tagged(absdir)
+            if if_recursive_download():
+                self.generateDepModules()
             utils.process.run(
                 "cd %s; createrepo -v %s" %
                 (absdir, absdir), shell=True, verbose=is_debug())

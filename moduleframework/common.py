@@ -153,3 +153,6 @@ def print_debug(*args):
     """
     if is_debug():
         print_info(*args)
+
+def if_recursive_download():
+    return bool(os.environ.get("MTF_RECURSIVE_DOWNLOAD"))
