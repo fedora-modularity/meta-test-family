@@ -241,7 +241,7 @@ class PDCParser():
         utils.process.run("{HOSTPACKAGER} install createrepo koji".format(
             **trans_dict), ignore_status=True)
         if is_recursive_download():
-            dirname="localrepo_recursive"
+            dirname = "localrepo_recursive"
         else:
             dirname = "localrepo_%s_%s_%s" % (self.name, self.stream, self.version)
         absdir = os.path.abspath(dirname)
