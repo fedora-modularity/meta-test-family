@@ -21,14 +21,26 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
-from __future__ import print_function
+"""
+The ``mtf-generator`` command converts multiline Bash snippet tests
+from the ``tests/config.yaml`` file into Python tests and stores
+them in the ``tests/generated.py`` file, which is processed
+further by avocado.
 
+See `Multiline Bash snippet tests`_ for more information.
+
+
+.. _Multiline Bash snippet tests: ../user_guide/how_to_write_conf_file#multiline-bash-snippet-tests
+"""
+
+from __future__ import print_function
 from moduleframework.module_framework import CommonFunctions
 
-
 class TestGenerator(CommonFunctions):
-
     def __init__(self):
+        """
+        The ``tests/generated.py`` file constructor.
+        """
         self.loadconfig()
         self.output = ""
         self.templateClassBefore()
@@ -43,6 +55,9 @@ class TestGenerator(CommonFunctions):
                     method="runHost")
 
     def templateClassBefore(self):
+        """
+        Defines the constant part of the ``tests/generated.py`` file.
+        """
         self.output = """#!/usr/bin/python
 
 import socket
@@ -59,6 +74,10 @@ class GeneratedTestsConfig(module_framework.AvocadoTest):
 """
 
     def templateTest(self, testname, testlines, method="run"):
+        """
+        Defines multiline Bash snippet tests part
+        of the ``tests/generated.py`` file.
+        """
         self.output = self.output + """
     def test_%s(self):
         self.start()
@@ -71,8 +90,10 @@ class GeneratedTestsConfig(module_framework.AvocadoTest):
                     method, line, method == "runHost")
         print("Added test (runmethod: %s): %s" % (method, testname))
 
-
 def main():
+    """
+    Creates ``tests/generated.py`` file .
+    """
     config = TestGenerator()
     configout = open('generated.py', 'w')
     configout.write(config.output)
