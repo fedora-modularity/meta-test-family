@@ -207,6 +207,7 @@ class PDCParser():
         return out
 
     def download_tagged(self,dirname):
+        print_info("DOWLOADING ALL packages for %s_%s_%s" % (self.name, self.stream, self.version))
         for foo in utils.process.run("koji list-tagged --quiet %s" % self.pdcdata["koji_tag"], verbose=is_debug()).stdout.split("\n"):
             pkgbouid = foo.strip().split(" ")[0]
             if len(pkgbouid) > 4:
@@ -228,6 +229,7 @@ class PDCParser():
                                 'UNABLE TO DOWNLOAD package (KOJI issue, BAD):', a.command)
 
                 tmpfunc()
+        print_info("DOWLOADING finished" % (self.name, self.stream, self.version))
 
     def createLocalRepoFromKoji(self):
         """
@@ -238,7 +240,10 @@ class PDCParser():
         """
         utils.process.run("{HOSTPACKAGER} install createrepo koji".format(
             **trans_dict), ignore_status=True)
-        dirname = "localrepo_%s_%s_%s" % (self.name, self.stream, self.version)
+        if if_recursive_download():
+            dirname="localrepo_recursive"
+        else:
+            dirname = "localrepo_%s_%s_%s" % (self.name, self.stream, self.version)
         absdir = os.path.abspath(dirname)
         if os.path.exists(absdir):
             pass
@@ -246,7 +251,12 @@ class PDCParser():
             os.mkdir(absdir)
             self.download_tagged(absdir)
             if if_recursive_download():
-                self.generateDepModules()
+                allmodules = self.generateDepModules()
+                for mo in allmodules:
+                    localrepo = PDCParser()
+                    localrepo.setLatestPDC(mo, allmodules[mo])
+                    localrepo.download_tagged(dirname)
+
             utils.process.run(
                 "cd %s; createrepo -v %s" %
                 (absdir, absdir), shell=True, verbose=is_debug())
