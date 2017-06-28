@@ -229,7 +229,7 @@ class PDCParser():
                                 'UNABLE TO DOWNLOAD package (KOJI issue, BAD):', a.command)
 
                 tmpfunc()
-        print_info("DOWLOADING finished" % (self.name, self.stream, self.version))
+        print_info("DOWLOADING finished")
 
     def createLocalRepoFromKoji(self):
         """
