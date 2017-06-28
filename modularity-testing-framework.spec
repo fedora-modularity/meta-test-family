@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.5.8
+Version:        0.5.9
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -49,6 +49,21 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,mtf_
 %{_datadir}/moduleframework/
 
 %changelog
+* Wed Jun 28 2017 Jan Scotka <jscotka@redhat.com> 0.5.9-1
+- mistake in function causing traceback (jscotka@redhat.com)
+- added doc string to helps to understand why MTF_RECURSIVE_DOWNLOAD
+  (jscotka@redhat.com)
+- added link to official compose instead of jkaluza's one (jscotka@redhat.com)
+- if is bad name prefix, is_ is better (jscotka@redhat.com)
+- if is bad name prefix, is_ is better (jscotka@redhat.com)
+- added new option to run-them script (jscotka@redhat.com)
+- solved issues with multiple directories, create just one repo, and do not
+  overwrite it (jscotka@redhat.com)
+- initial commit of recursive downloading of all dependent modules to one
+  repository (jscotka@redhat.com)
+- fixed vagrant issue with removing ssh keys (jscotka@redhat.com)
+- Fix for ExcludeArch. BZ #1465176 (phracek@redhat.com)
+
 * Mon Jun 26 2017 Jan Scotka <jscotka@redhat.com> 0.5.8-1
 - last generator item in spec (jscotka@redhat.com)
 
