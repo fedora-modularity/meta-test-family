@@ -207,6 +207,13 @@ class PDCParser():
         return out
 
     def download_tagged(self,dirname):
+        """
+        Downloads packages to directory, based on koji tags
+        It downloads just ARCH and noarch packages
+
+        :param dirname: string
+        :return: None
+        """
         print_info("DOWLOADING ALL packages for %s_%s_%s" % (self.name, self.stream, self.version))
         for foo in utils.process.run("koji list-tagged --quiet %s" % self.pdcdata["koji_tag"], verbose=is_debug()).stdout.split("\n"):
             pkgbouid = foo.strip().split(" ")[0]
@@ -245,7 +252,8 @@ class PDCParser():
         else:
             dirname = "localrepo_%s_%s_%s" % (self.name, self.stream, self.version)
         absdir = os.path.abspath(dirname)
-        if os.path.exists(absdir):
+        # Test if directory contains repository, otherwise download everything again
+        if os.path.exists(os.path.join(absdir,"repodata","repomd.xml")):
             pass
         else:
             os.mkdir(absdir)
