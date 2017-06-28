@@ -1,4 +1,4 @@
-CMD=avocado run --filter-by-tags=-WIP --show-job-log
+CMD=avocado run --filter-by-tags=-WIP
 TESTS=$(shell ls *.py *.sh modulelint/*.py)
 export MTF_REMOTE_REPOS=yes
 export DEBUG=yes
