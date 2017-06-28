@@ -156,4 +156,13 @@ def print_debug(*args):
         print_info(*args)
 
 def is_recursive_download():
+    """
+    Purpose: Workaround for taskotron
+    It changes behaviour of createLocalRepoFromKoji fuction of pdc_data module.
+    It tries to download all packages with all dependent modules, not just for one module.
+    It fixes issue with taskotron issues caused by checking stdout/stderr activity,
+    after 15 minutes without any output it is killed.
+
+    :return: bool
+    """
     return bool(os.environ.get("MTF_RECURSIVE_DOWNLOAD"))
