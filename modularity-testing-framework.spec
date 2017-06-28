@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.5.13
+Version:        0.5.14
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -49,6 +49,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,mtf_
 %{_datadir}/moduleframework/
 
 %changelog
+* Wed Jun 28 2017 Jan Scotka <jscotka@redhat.com> 0.5.14-1
+- solved issue with fails caused by dependencies (jscotka@redhat.com)
+
 * Wed Jun 28 2017 Jan Scotka <jscotka@redhat.com> 0.5.13-1
 - store repository to /opt instead of actual dir. it should help much with
   persistent data (jscotka@redhat.com)
