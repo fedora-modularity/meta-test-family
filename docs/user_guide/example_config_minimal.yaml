@@ -10,6 +10,6 @@ module:
     docker:
         container: docker.io/phracek/memcached
     rpm:
-        repo: https://kojipkgs.stg.fedoraproject.org/compose/branched/jkaluza/latest-Fedora-Modular-26/compose/Server/x86_64/os/
+        repo: https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server/x86_64/os/
 
 

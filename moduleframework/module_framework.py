@@ -796,7 +796,7 @@ class NspawnHelper(RpmHelper):
             shutil.rmtree(self.chrootpath, ignore_errors=True)
             os.mkdir(self.chrootpath)
         try:
-            self.runHost("machinectl terminate %s" % self.jmeno, verbose=is_debug())
+            self.runHost("machinectl terminate %s" % self.jmeno, verbose=is_debug(), ignore_status=True)
             self.__is_killed()
         except BaseException:
             pass

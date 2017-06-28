@@ -74,7 +74,7 @@ module:
 # use "compose", this will be ignored
 # env var: URL
 # MANDATORY
-        repo: https://kojipkgs.stg.fedoraproject.org/compose/branched/jkaluza/latest-Fedora-Modular-26/compose/Server/x86_64/os/
+        repo: https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server/x86_64/os/
 # if you will not use "compose" nor repo, you can use repos, which caused that just mentioned
 # repos will be used, not additional repos from moduleMD file
 # env var: URL

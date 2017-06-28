@@ -152,7 +152,7 @@ class PDCParser():
         """
         # rpmrepo = "http://kojipkgs.fedoraproject.org/repos/%s/latest/%s" % (
         #    self.pdcdata["koji_tag"] + "-build", ARCH)
-        rpmrepo = "https://kojipkgs.stg.fedoraproject.org/compose/branched/jkaluza/latest-Fedora-Modular-26/compose/Server/%s/os/" % ARCH
+        rpmrepo = "%s/%s/os/" % (URLBASECOMPOSE, ARCH)
         return rpmrepo
 
     def generateGitHash(self):
