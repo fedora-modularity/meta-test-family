@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.5.9
+Version:        0.5.10
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -49,6 +49,10 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,mtf_
 %{_datadir}/moduleframework/
 
 %changelog
+* Wed Jun 28 2017 Jan Scotka <jscotka@redhat.com> 0.5.10-1
+- enable show job log for avocado, in testing module to have better output in
+  taskotron (jscotka@redhat.com)
+
 * Wed Jun 28 2017 Jan Scotka <jscotka@redhat.com> 0.5.9-1
 - mistake in function causing traceback (jscotka@redhat.com)
 - added doc string to helps to understand why MTF_RECURSIVE_DOWNLOAD

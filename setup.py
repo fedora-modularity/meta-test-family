@@ -63,7 +63,7 @@ for path in paths:
 
 setup(
     name='modularity-testing-framework',
-    version="0.5.9",
+    version="0.5.10",
     description='Framework for testing modules and containers.',
     keywords='modules,containers,testing,framework',
     author='Jan Scotka',
