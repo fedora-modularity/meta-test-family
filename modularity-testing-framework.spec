@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.5.11
+Version:        0.5.12
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -49,6 +49,10 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,mtf_
 %{_datadir}/moduleframework/
 
 %changelog
+* Wed Jun 28 2017 Jan Scotka <jscotka@redhat.com> 0.5.12-1
+- added show-job-log to proper place for testing module and module linter
+  (jscotka@redhat.com)
+
 * Wed Jun 28 2017 Jan Scotka <jscotka@redhat.com> 0.5.11-1
 - iproved testing if repo directory contains proper data (jscotka@redhat.com)
 
