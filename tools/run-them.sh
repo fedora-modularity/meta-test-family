@@ -69,6 +69,8 @@ function inst_env(){
     dnf install -y python-pip make docker httpd git python2-avocado fedpkg python2-avocado-plugins-output-html \
     pdc-client python2-modulemd python-netifaces python2-dockerfile-parse
     pip install PyYAML behave
+# it should not fail anyhow
+    true
 #    pip install --upgrade avocado-framework avocado-framework-plugin-result-html
 
 }
