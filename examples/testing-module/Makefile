@@ -14,11 +14,11 @@ check-minimal-config-docker:
 
 
 check-rpm:
-	MODULE=nspawn $(CMD) $(TESTS)
+	MODULE=nspawn CONFIG=./fullconfig.yaml $(CMD) $(TESTS)
 	@true
 
 check-minimal-config-rpm:
-	MODULE=nspawn CONFIG=./minimal.yaml $(CMD) $(TESTS)
+	MODULE=nspawn $(CMD) $(TESTS)
 	@true
 
 check-behave-docker:

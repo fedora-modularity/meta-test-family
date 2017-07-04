@@ -33,8 +33,9 @@ export PARSEITEM=$2
 # compose fedmsg or None same as fedmsg
 export PARSEITEMTYPE=$3
 export SELECTION=$4
-export MTF_PATH=/usr/share/moduleframework
+export MTF_PATH="/usr/share/moduleframework"
 export MODULE_LINT="$MTF_PATH/tools/modulelint/*.py"
+export MINIMAL_CONFIG="$MTF_PATH/docs/example-config-minimal.yaml"
 export MODULE_TESTS="*.py *.sh"
 
 export AVDIR=~/avocado
@@ -43,7 +44,6 @@ export XUFILE="$AVDIR/out.xunit"
 export AVOCADOCMD="avocado run --xunit $XUFILE --show-job-log"
 export RESULTTOOLS=0
 export MTF_RECURSIVE_DOWNLOAD=yes
-
 
 function getparams_int(){
     ADDIT="$1"
@@ -110,7 +110,7 @@ function run_modulelint(){
 
     TESTS="`ls $MODULE_LINT`"
     echo "RUN AT LEAST MODULE LINTER: $TESTS"
-    eval $PARAMS CONFIG=$MTF_PATH/docs/example-config-minimal.yaml $AVOCADOCMD $TESTS
+    eval $PARAMS CONFIG=$MINIMAL_CONFIG $AVOCADOCMD $TESTS
 }
 
 set -x
