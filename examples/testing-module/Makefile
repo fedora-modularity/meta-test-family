@@ -5,11 +5,11 @@ export DEBUG=yes
 export DOCKERFILE=./Dockerfile
 
 check-docker:
-	MODULE=docker $(CMD) $(TESTS)
+	MODULE=docker CONFIG=./fullconfig.yaml $(CMD) $(TESTS)
 	@true
 
 check-minimal-config-docker:
-	MODULE=docker CONFIG=./minimal.yaml $(CMD) $(TESTS)
+	MODULE=docker $(CMD) $(TESTS)
 	@true
 
 
