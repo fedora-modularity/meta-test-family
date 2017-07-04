@@ -731,6 +731,7 @@ class NspawnHelper(RpmHelper):
         relative change root path
         """
         super(NspawnHelper, self).__init__()
+        self.baseprefix = os.path.join(BASEPATHDIR, "chroot_")
         self.__selinuxState = None
         time.time()
         actualtime = time.time()
@@ -738,9 +739,7 @@ class NspawnHelper(RpmHelper):
             self.jmeno = "%s_%r" % (self.moduleName, actualtime)
         else:
             self.jmeno = self.moduleName
-        self.chrootpath = os.path.abspath(
-            os.path.join(
-                "/opt", "chroot_%s" % self.jmeno))
+        self.chrootpath = os.path.abspath(self.baseprefix + self.jmeno)
         print_info("name of CHROOT directory:", self.chrootpath)
         trans_dict["ROOT"] = self.chrootpath
 
@@ -786,20 +785,37 @@ class NspawnHelper(RpmHelper):
                 return True
         raise NspawnExc("Unable to start machine %s within %d" % (self.jmeno, DEFAULTRETRYTIMEOUT))
 
+    def __do_smart_start_cleanup(self):
+        """
+        Internal method, do not use it anyhow
+
+        :return: None
+        """
+
+        if get_if_do_cleanup():
+            # delete directory with same same (in case used option DO NOT CLEANUP)
+            if os.path.exists(self.chrootpath):
+                shutil.rmtree(self.chrootpath, ignore_errors=True)
+            # DELETE every chroot dir in case any exists
+            dirstodelete = glob.glob(self.baseprefix + "*")
+            if dirstodelete:
+                for dtd in dirstodelete:
+                    shutil.rmtree(dtd, ignore_errors=True)
+            # Terminate machine in case of same name and still running
+        try:
+            self.runHost("machinectl terminate %s" % self.jmeno, verbose=is_debug(), ignore_status=True)
+            self.__is_killed()
+        except BaseException:
+            pass
+        os.mkdir(self.chrootpath)
+
     def __prepareSetup(self):
         """
         Internal method, do not use it anyhow
 
         :return: None
         """
-        if get_if_do_cleanup() and os.path.exists(self.chrootpath):
-            shutil.rmtree(self.chrootpath, ignore_errors=True)
-            os.mkdir(self.chrootpath)
-        try:
-            self.runHost("machinectl terminate %s" % self.jmeno, verbose=is_debug(), ignore_status=True)
-            self.__is_killed()
-        except BaseException:
-            pass
+        self.__do_smart_start_cleanup()
         if not os.path.exists(os.path.join(self.chrootpath, "usr")):
             self.runHost("{HOSTPACKAGER} install systemd-container", verbose=is_not_silent())
             repos_to_use = ""
@@ -1023,7 +1039,14 @@ gpgcheck=0
             self.__is_killed()
         except Exception as poweroffex:
             print_info("Unable to stop machine via poweroff, terminating", poweroffex)
-            self.runHost("machinectl terminate %s" % self.jmeno, ignore_status=True)
+            try:
+                time.sleep(1)
+                self.runHost("machinectl terminate %s" % self.jmeno, ignore_status=True)
+                self.__is_killed()
+            except Exception as poweroffexterm:
+                print_info("Unable to stop machine via terminate, STRANGE", poweroffexterm)
+                time.sleep(DEFAULTRETRYTIMEOUT)
+                pass
             pass
 
         if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
