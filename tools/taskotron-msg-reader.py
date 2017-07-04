@@ -41,12 +41,6 @@ if __name__ == '__main__':
     parser.add_option("-l", "--latest", dest="latest",
                       help="Use latest bits, build by MBS and stored in PDC")
     parser.add_option(
-        "--localrepo",
-        dest="localrepo",
-        action="store_true",
-        default=False,
-        help="generate local repository based on koji tag from PDC")
-    parser.add_option(
         "--commit",
         dest="commit",
         action="store_true",
@@ -55,10 +49,6 @@ if __name__ == '__main__':
 
     a = PDCParser()
     (options, args) = parser.parse_args()
-    if options.localrepo:
-        callfnc = "generateParamsLocalKojiPkgs"
-    else:
-        callfnc = "generateParams"
     if options.filename:
         flh = open(options.filename)
         stdinput = "".join(flh.readlines()).strip()
@@ -74,4 +64,4 @@ if __name__ == '__main__':
     if options.commit:
         print a.generateGitHash()
     else:
-        print " ".join(getattr(a, callfnc)())
+        print " ".join(a.generateParams())

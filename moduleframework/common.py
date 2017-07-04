@@ -167,3 +167,36 @@ def is_recursive_download():
     :return: bool
     """
     return bool(os.environ.get("MTF_RECURSIVE_DOWNLOAD"))
+
+
+def get_if_do_cleanup():
+    """
+    Returns boolean value in case variable is set.
+     It is used internally in code
+
+    :return: bool
+    """
+    cleanup = os.environ.get('MTF_DO_NOT_CLEANUP')
+    return not bool(cleanup)
+
+
+def get_if_remoterepos():
+    """
+    Returns boolean value in case variable is set.
+    It is used internally in code
+
+    :return: bool
+    """
+    rreps = os.environ.get('MTF_REMOTE_REPOS')
+    return bool(rreps)
+
+
+def get_if_module():
+    """
+    Returns boolean value in case variable is set.
+    It is used internally in code
+
+    :return: bool
+    """
+    rreps = os.environ.get('MTF_DISABLE_MODULE')
+    return not bool(rreps)
