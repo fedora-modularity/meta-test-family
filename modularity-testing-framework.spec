@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.5.15
+Version:        0.5.16
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -49,6 +49,10 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,mtf_
 %{_datadir}/moduleframework/
 
 %changelog
+* Tue Jul 04 2017 Jan Scotka <jscotka@redhat.com> 0.5.16-1
+- PDC library install python3 version now by default, so have to ensure that
+  python2 is there (jscotka@redhat.com)
+
 * Tue Jul 04 2017 Jan Scotka <jscotka@redhat.com> 0.5.15-1
 - 
 
