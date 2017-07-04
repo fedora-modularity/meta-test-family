@@ -245,7 +245,7 @@ class PDCParser():
 
         :return: str
         """
-        dir_prefix = "/opt"
+        dir_prefix = BASEPATHDIR
         utils.process.run("{HOSTPACKAGER} install createrepo koji".format(
             **trans_dict), ignore_status=True)
         if is_recursive_download():

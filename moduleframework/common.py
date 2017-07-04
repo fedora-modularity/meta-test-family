@@ -105,6 +105,7 @@ trans_dict = {"HOSTIPADDR": hostipaddr,
               }
 
 
+BASEPATHDIR = "/opt"
 PDCURL = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
 URLBASECOMPOSE = "https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server"
 REPOMD = "repodata/repomd.xml"
