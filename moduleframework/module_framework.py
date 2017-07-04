@@ -1464,42 +1464,6 @@ def get_latest_repo_url(wmodule="base-runtime", wstream="master", fake=False):
     if fake:
         return "http://mirror.vutbr.cz/fedora/releases/25/Everything/x86_64/os/"
     else:
-        localrepo = pdc_data.PDCParser()
-        localrepo.setLatestPDC(wmodule, wstream)
-        if get_if_remoterepos():
-            return localrepo.generateRepoUrl()
-        else:
-            return localrepo.createLocalRepoFromKoji()
-
-
-def get_if_do_cleanup():
-    """
-    Returns boolean value in case variable is set.
-     It is used internally in code
-
-    :return: bool
-    """
-    cleanup = os.environ.get('MTF_DO_NOT_CLEANUP')
-    return not bool(cleanup)
-
-
-def get_if_remoterepos():
-    """
-    Returns boolean value in case variable is set.
-    It is used internally in code
-
-    :return: bool
-    """
-    rreps = os.environ.get('MTF_REMOTE_REPOS')
-    return bool(rreps)
-
-
-def get_if_module():
-    """
-    Returns boolean value in case variable is set.
-    It is used internally in code
-
-    :return: bool
-    """
-    rreps = os.environ.get('MTF_DISABLE_MODULE')
-    return not bool(rreps)
+        tmp_pdc = pdc_data.PDCParser()
+        tmp_pdc.setLatestPDC(wmodule, wstream)
+        return tmp_pdc.generateRepoUrl()

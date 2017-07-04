@@ -152,8 +152,11 @@ class PDCParser():
         """
         # rpmrepo = "http://kojipkgs.fedoraproject.org/repos/%s/latest/%s" % (
         #    self.pdcdata["koji_tag"] + "-build", ARCH)
-        rpmrepo = "%s/%s/os/" % (URLBASECOMPOSE, ARCH)
-        return rpmrepo
+        if get_if_remoterepos():
+            rpmrepo = "%s/%s/os/" % (URLBASECOMPOSE, ARCH)
+            return rpmrepo
+        else:
+            return self.createLocalRepoFromKoji()
 
     def generateGitHash(self):
         """
@@ -271,15 +274,3 @@ class PDCParser():
                 (absdir, absdir), shell=True, verbose=is_debug())
         return "file://%s" % absdir
 
-    def generateParamsLocalKojiPkgs(self):
-        """
-        Return list of params what has to be set for automation like (local repo):
-        MODULE=nspawn MODULEMDURL=file:///...  URL=file:///localrepo
-
-        :return: list
-        """
-        output = []
-        output.append("URL=%s" % self.createLocalRepoFromKoji())
-        output.append("MODULEMDURL=%s" % self.generateModuleMDFile())
-        output.append("MODULE=%s" % "nspawn")
-        return output
