@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.5.16
+Version:        0.5.17
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -49,6 +49,17 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,mtf_
 %{_datadir}/moduleframework/
 
 %changelog
+* Fri Jul 07 2017 Jan Scotka <jscotka@redhat.com> 0.5.17-1
+- Added unitetest to pdc module (jscotka@redhat.com)
+- make docker linter faster, not need to invoke parent setup in own setup
+  class, because it does offline checking (jscotka@redhat.com)
+- minimal config path fix (jscotka@redhat.com)
+- changed testing module to minimal config. mksh is not in compose
+  (jscotka@redhat.com)
+- koji package downloading cleanup, moved to pdc instead of hardcoding in MTF
+  main file (jscotka@redhat.com)
+- fixed issues with deleting (jscotka@redhat.com)
+
 * Tue Jul 04 2017 Jan Scotka <jscotka@redhat.com> 0.5.16-1
 - PDC library install python3 version now by default, so have to ensure that
   python2 is there (jscotka@redhat.com)
