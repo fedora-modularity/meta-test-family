@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.5.17
+Version:        0.5.18
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -49,6 +49,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,mtf_
 %{_datadir}/moduleframework/
 
 %changelog
+* Mon Jul 10 2017 Jan Scotka <jscotka@redhat.com> 0.5.18-1
+- improved name handling replacing bad chanracters (jscotka@redhat.com)
+
 * Fri Jul 07 2017 Jan Scotka <jscotka@redhat.com> 0.5.17-1
 - Added unitetest to pdc module (jscotka@redhat.com)
 - make docker linter faster, not need to invoke parent setup in own setup
