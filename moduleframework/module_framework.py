@@ -140,7 +140,7 @@ class CommonFunctions(object):
         """
         try:
             self.config = get_config()
-            self.moduleName = self.config['name']
+            self.moduleName = normalize_text(self.config['name'])
             self.source = self.config.get('source') if self.config.get(
                 'source') else self.config['module']['rpm'].get('source')
         except ValueError:

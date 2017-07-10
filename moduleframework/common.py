@@ -200,3 +200,17 @@ def get_if_module():
     """
     rreps = os.environ.get('MTF_DISABLE_MODULE')
     return not bool(rreps)
+
+
+def normalize_text(text, replacement="_"):
+    """
+    Improve string, replace all bad characters with another one expecially with "_"
+
+    :param text: string
+    :return: string
+    """
+    out = text
+    badchars=["/", ";", "&", ">", "<", "|"]
+    for foo in badchars:
+        out = out.replace(foo, replacement)
+    return out
