@@ -214,3 +214,7 @@ def normalize_text(text, replacement="_"):
     for foo in badchars:
         out = out.replace(foo, replacement)
     return out
+
+def normalize_cmd(cmd):
+    cmd = cmd.replace('"', r'\"')
+    return cmd

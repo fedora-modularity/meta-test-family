@@ -73,6 +73,7 @@ class CommonFunctions(object):
         self.source = None
         self.arch = None
         self.dependencylist = {}
+        self.moduledeps = None
         # general use case is to have forwarded services to host (so thats why it is same)
         self.ipaddr = trans_dict["HOSTIPADDR"]
         trans_dict["GUESTARCH"] = self.getArch()
@@ -422,7 +423,7 @@ class ContainerHelper(CommonFunctions):
         self.start()
         return self.runHost(
             'docker exec %s bash -c "%s"' %
-            (self.docker_id, command.replace('"', r'\"')),
+            (self.docker_id, normalize_cmd(command)),
             **kwargs)
 
     def copyTo(self, src, dest):
@@ -675,7 +676,7 @@ gpgcheck=0
         :return: avocado.process.run
         """
         return self.runHost('bash -c "%s"' %
-                            command.replace('"', r'\"'), **kwargs)
+                            normalize_cmd(command), **kwargs)
 
     def copyTo(self, src, dest):
         """
@@ -758,7 +759,7 @@ class NspawnHelper(RpmHelper):
             # (failing because of selinux)
             self.__selinuxState = self.runHost(
             "getenforce", ignore_status=True).stdout.strip()
-            self.runHost("setenforce Permissive", ignore_status=True, verbose=is_not_silent())
+            self.runHost("setenforce Permissive", ignore_status=True, verbose=is_not_silent(), sudo=True)
         self.setModuleDependencies()
         self.setRepositoriesAndWhatToInstall()
         self.installTestDependencies()
@@ -768,7 +769,7 @@ class NspawnHelper(RpmHelper):
 
     def __is_killed(self):
         for foo in range(DEFAULTRETRYTIMEOUT):
-            time.sleep(foo)
+            time.sleep(1)
             out = self.runHost("machinectl status %s" % self.jmeno, verbose=is_debug(), ignore_status=True)
             if out.exit_status != 0:
                 print_debug("NSPAWN machine %s stopped" % self.jmeno)
@@ -777,9 +778,9 @@ class NspawnHelper(RpmHelper):
 
     def __is_booted(self):
         for foo in range(DEFAULTRETRYTIMEOUT):
-            time.sleep(foo)
+            time.sleep(1)
             out = self.runHost("machinectl status %s" % self.jmeno, verbose=is_debug(), ignore_status=True)
-            if "logind.service" in out.stdout:
+            if "systemd-logind" in out.stdout:
                 time.sleep(2)
                 print_debug("NSPAWN machine %s booted" % self.jmeno)
                 return True
@@ -797,17 +798,12 @@ class NspawnHelper(RpmHelper):
             if os.path.exists(self.chrootpath):
                 shutil.rmtree(self.chrootpath, ignore_errors=True)
             # DELETE every chroot dir in case any exists
-            dirstodelete = glob.glob(self.baseprefix + "*")
-            if dirstodelete:
-                for dtd in dirstodelete:
-                    shutil.rmtree(dtd, ignore_errors=True)
-            # Terminate machine in case of same name and still running
-        try:
-            self.runHost("machinectl terminate %s" % self.jmeno, verbose=is_debug(), ignore_status=True)
-            self.__is_killed()
-        except BaseException:
-            pass
-        os.mkdir(self.chrootpath)
+            # Commented out, because it had side effect for multihost testing. Has to be improved
+            #dirstodelete = glob.glob(self.baseprefix + "*")
+            #if get_if_module() and dirstodelete:
+            #    for dtd in dirstodelete:
+            #        shutil.rmtree(dtd, ignore_errors=True)
+            os.mkdir(self.chrootpath)
 
     def __prepareSetup(self):
         """
@@ -817,7 +813,9 @@ class NspawnHelper(RpmHelper):
         """
         self.__do_smart_start_cleanup()
         if not os.path.exists(os.path.join(self.chrootpath, "usr")):
-            self.runHost("{HOSTPACKAGER} install systemd-container", verbose=is_not_silent())
+            self.runHost("{HOSTPACKAGER} install systemd-container", verbose=is_not_silent(), sudo=True)
+            # workaround in case machined blocked by selinux, disabled for now
+            # self.runHost("sudo systemctl restart systemd-machined", verbose=is_not_silent(), sudo=True)
             repos_to_use = ""
             counter = 0
             for repo in self.repos:
@@ -958,20 +956,20 @@ gpgcheck=0
         :return: avocado.process.run
         """
         lpath = "/var/tmp"
-        comout = self.runHost(
-            """machinectl shell root@{machine} /bin/bash -c "({comm})>{pin}/stdout 2>{pin}/stderr; echo $?>{pin}/retcode; sleep 1" """.format(
+        if not kwargs:
+            kwargs = {}
+        should_ignore = kwargs.get("ignore_status")
+        kwargs["ignore_status"] = True
+
+        comout = self.runHost("""machinectl shell root@{machine} /bin/bash -c "({comm})>{pin}/stdout 2>{pin}/stderr; echo $?>{pin}/retcode; sleep 1" """.format(
                 machine=self.jmeno,
-                comm=command.replace(
-                    '"',
-                    r'\"'),
+                comm=normalize_cmd(command),
                 pin=lpath),
-            **kwargs)   
+            **kwargs)
+        if comout.exit_status != 0:
+            raise NspawnExc("This command should not fail anyhow inside NSPAWN:", normalize_cmd(command))
         try:
-            if not kwargs:
-                kwargs = {}
             kwargs["verbose"] = is_not_silent()
-            should_ignore = kwargs.get("ignore_status")
-            kwargs["ignore_status"] = True
             b = self.runHost(
                 'bash -c "cat {chroot}{pin}/stdout; cat {chroot}{pin}/stderr > /dev/stderr; exit `cat {chroot}{pin}/retcode`"'.format(
                     chroot=self.chrootpath,
@@ -1040,7 +1038,6 @@ gpgcheck=0
         except Exception as poweroffex:
             print_info("Unable to stop machine via poweroff, terminating", poweroffex)
             try:
-                time.sleep(1)
                 self.runHost("machinectl terminate %s" % self.jmeno, ignore_status=True)
                 self.__is_killed()
             except Exception as poweroffexterm:
