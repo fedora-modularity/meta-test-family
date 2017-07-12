@@ -70,7 +70,7 @@ def main():
             "Unable to call bash helper without function, there is possible to use: ",
             [a[0]
              for a in inspect.getmembers(
-                module_framework.get_correct_backend(),
+                module_framework.get_backend(),
                 predicate=inspect.ismethod)
              if '__' not in a[0]])
     method = args[0]
@@ -86,7 +86,7 @@ def main():
         printIfVerbose("reading from pickled object", helper)
         pkl_file.close()
     else:
-        (helper, moduletype) = module_framework.get_correct_backend()
+        (helper, moduletype) = module_framework.get_backend()
         printIfVerbose("created new instance for module")
 
     pkl_file = open(picklefile, 'wb')
