@@ -141,7 +141,7 @@ class CommonFunctions(object):
         """
         try:
             self.config = get_config()
-            self.moduleName = normalize_text(self.config['name'])
+            self.moduleName = sanitize_text(self.config['name'])
             self.source = self.config.get('source') if self.config.get(
                 'source') else self.config['module']['rpm'].get('source')
         except ValueError:
@@ -167,8 +167,8 @@ class CommonFunctions(object):
                 out += packages_rpm + packages_profiles
 
             elif self.getModulemdYamlconfig()['data'].get('profiles') and self.getModulemdYamlconfig()['data'][
-                'profiles'].get(get_correct_profile()):
-                out += self.getModulemdYamlconfig()['data']['profiles'][get_correct_profile()]['rpms']
+                'profiles'].get(get_profile()):
+                out += self.getModulemdYamlconfig()['data']['profiles'][get_profile()]['rpms']
             else:
                 # fallback solution when it is not known what to install
                 out.append("bash")
@@ -200,7 +200,7 @@ class CommonFunctions(object):
                 if self.config is None:
                     self.loadconfig()
                 if not self.modulemdConf:
-                    modulemd = get_correct_modulemd()
+                    modulemd = get_modulemd()
                     if modulemd:
                         ymlfile = urllib.urlopen(modulemd)
                         self.modulemdConf = yaml.load(ymlfile)
@@ -238,8 +238,8 @@ class ContainerHelper(CommonFunctions):
         self.tarbased = None
         self.jmeno = None
         self.docker_id = None
-        self.icontainer = get_correct_url(
-        ) if get_correct_url() else self.info['container']
+        self.icontainer = get_url(
+        ) if get_url() else self.info['container']
         if ".tar" in self.icontainer:
             self.jmeno = "testcontainer"
             self.tarbased = True
@@ -423,7 +423,7 @@ class ContainerHelper(CommonFunctions):
         self.start()
         return self.runHost(
             'docker exec %s bash -c "%s"' %
-            (self.docker_id, normalize_cmd(command)),
+            (self.docker_id, sanitize_cmd(command)),
             **kwargs)
 
     def copyTo(self, src, dest):
@@ -553,12 +553,12 @@ class RpmHelper(CommonFunctions):
         else:
             if not self.repos:
                 for dep in self.moduledeps:
-                    latesturl = get_latest_repo_url(dep, self.moduledeps[dep])
+                    latesturl = get_repo_url(dep, self.moduledeps[dep])
                     alldrepos.append(latesturl)
                     self.__addModuleDependency(url=latesturl, name = dep, stream = self.moduledeps[dep])
-                if get_correct_url():
-                    self.repos = [get_correct_url()] + alldrepos
-                    self.__addModuleDependency(get_correct_url())
+                if get_url():
+                    self.repos = [get_url()] + alldrepos
+                    self.__addModuleDependency(get_url())
                 elif self.info.get('repo'):
                     self.repos = [self.info.get('repo')] + alldrepos
                     self.__addModuleDependency(self.info.get('repo'))
@@ -676,7 +676,7 @@ gpgcheck=0
         :return: avocado.process.run
         """
         return self.runHost('bash -c "%s"' %
-                            normalize_cmd(command), **kwargs)
+                            sanitize_cmd(command), **kwargs)
 
     def copyTo(self, src, dest):
         """
@@ -963,11 +963,11 @@ gpgcheck=0
 
         comout = self.runHost("""machinectl shell root@{machine} /bin/bash -c "({comm})>{pin}/stdout 2>{pin}/stderr; echo $?>{pin}/retcode; sleep 1" """.format(
                 machine=self.jmeno,
-                comm=normalize_cmd(command),
+                comm=sanitize_cmd(command),
                 pin=lpath),
             **kwargs)
         if comout.exit_status != 0:
-            raise NspawnExc("This command should not fail anyhow inside NSPAWN:", normalize_cmd(command))
+            raise NspawnExc("This command should not fail anyhow inside NSPAWN:", sanitize_cmd(command))
         try:
             kwargs["verbose"] = is_not_silent()
             b = self.runHost(
@@ -1094,8 +1094,8 @@ class AvocadoTest(Test):
     def __init__(self, *args, **kwargs):
         super(AvocadoTest, self).__init__(*args, **kwargs)
 
-        (self.backend, self.moduleType) = get_correct_backend()
-        self.moduleProfile = get_correct_profile()
+        (self.backend, self.moduleType) = get_backend()
+        self.moduleProfile = get_profile()
         print_info(
             "Module Type: %s; Profile: %s" %
             (self.moduleType, self.moduleProfile))
@@ -1336,7 +1336,7 @@ class NspawnAvocadoTest(AvocadoTest):
         super(NspawnAvocadoTest, self).setUp()
 
 
-def get_correct_backend():
+def get_backend():
     """
     Return proper module type, set by config by default_module section, or defined via
     env variable "MODULE"
@@ -1359,7 +1359,7 @@ def get_correct_backend():
         raise ModuleFrameworkException("Unsupported MODULE={0}".format(amodule), "supproted are: docker, rpm, nspawn")
 
 
-def get_correct_profile():
+def get_profile():
     """
     Return profile name string
 
@@ -1371,7 +1371,7 @@ def get_correct_profile():
     return amodule
 
 
-def get_correct_url():
+def get_url():
     """
     Return actual URL if overwritten by
     env variable "URL"
@@ -1403,6 +1403,7 @@ def get_config():
             cfgfile + " " +
            "Tip: If the CONFIG envvar is not set, mtf-generator looks for './config'.")
 
+
 def get_compose_url():
     """
     Return Compose Url if set in config or via
@@ -1423,7 +1424,7 @@ def get_compose_url():
     return compose
 
 
-def get_correct_modulemd():
+def get_modulemd():
     """
     Return dict of moduleMD file for module, It is read from config, from module-url section,
     if not defined it reads modulemd file from compose-url in case of set, or there is used
@@ -1445,22 +1446,3 @@ def get_correct_modulemd():
             return [x[12:] for x in b if 'MODULEMDURL=' in x][0]
     except AttributeError:
         return None
-
-
-def get_latest_repo_url(wmodule="base-runtime", wstream="master", fake=False):
-    """
-    Return URL location of rpm repository.
-    It reads data from PDC and construct url locator.
-    It is used to solve repos for dependent modules (eg. memcached is dependent on perl and baseruntime)
-
-    :param wmodule: module name
-    :param wstream: module stream
-    :param fake:
-    :return: str
-    """
-    if fake:
-        return "http://mirror.vutbr.cz/fedora/releases/25/Everything/x86_64/os/"
-    else:
-        tmp_pdc = pdc_data.PDCParser()
-        tmp_pdc.setLatestPDC(wmodule, wstream)
-        return tmp_pdc.generateRepoUrl()

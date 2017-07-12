@@ -202,19 +202,32 @@ def get_if_module():
     return not bool(rreps)
 
 
-def normalize_text(text, replacement="_"):
+def sanitize_text(text, replacement="_"):
+
     """
-    Improve string, replace all bad characters with another one expecially with "_"
+    Replace invalid characters in a string.
+
+    invalid_chars=["/", ";", "&", ">", "<", "|"]
 
     :param text: string
+    :param replacement: replacement char, default: "_"
     :return: string
     """
-    out = text
-    badchars=["/", ";", "&", ">", "<", "|"]
-    for foo in badchars:
-        out = out.replace(foo, replacement)
-    return out
+    invalid_chars=["/", ";", "&", ">", "<", "|"]
+    for char in invalid_chars:
+        if char in text:
+            text = text.replace(char, replacement)
+    return text
 
-def normalize_cmd(cmd):
-    command = cmd.replace('"', r'\"')
-    return command
+def sanitize_cmd(cmd):
+    """
+    Do escaping of characters for command inside apostrophes
+
+    :param cmd: string
+    :return: string
+    """
+    escaping_chars = ['"']
+    for char in escaping_chars:
+        if char in cmd:
+            cmd = cmd.replace(char, '\\'.join(char))
+    return cmd
