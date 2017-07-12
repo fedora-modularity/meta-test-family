@@ -553,7 +553,7 @@ class RpmHelper(CommonFunctions):
         else:
             if not self.repos:
                 for dep in self.moduledeps:
-                    latesturl = get_repo_url(dep, self.moduledeps[dep])
+                    latesturl = pdc_data.get_repo_url(dep, self.moduledeps[dep])
                     alldrepos.append(latesturl)
                     self.__addModuleDependency(url=latesturl, name = dep, stream = self.moduledeps[dep])
                 if get_url():
