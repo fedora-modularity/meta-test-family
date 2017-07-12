@@ -216,5 +216,5 @@ def normalize_text(text, replacement="_"):
     return out
 
 def normalize_cmd(cmd):
-    cmd = cmd.replace('"', r'\"')
-    return cmd
+    command = cmd.replace('"', r'\"')
+    return command
