@@ -25,56 +25,15 @@
 It provides some general functions
 """
 
-import sys
 import netifaces
 import socket
 import os
-import linecache
+import urllib
 
+from avocado.utils import process
 
-class ModuleFrameworkException(Exception):
-    def __init__(self, *args, **kwargs):
-        super(ModuleFrameworkException, self).__init__(
-            'EXCEPTION MTF: ', *args, **kwargs)
-        exc_type, exc_obj, tb = sys.exc_info()
-        if tb is not None:
-            f = tb.tb_frame
-            lineno = tb.tb_lineno
-            filename = f.f_code.co_filename
-            linecache.checkcache(filename)
-            line = linecache.getline(filename, lineno, f.f_globals)
-            print "-----------\n| EXCEPTION IN: {} \n| LINE: {}, {} \n| ERROR: {}\n-----------".format(filename, lineno, line.strip(), exc_obj)
-
-
-class NspawnExc(ModuleFrameworkException):
-    def __init__(self, *args, **kwargs):
-        super(NspawnExc, self).__init__('TYPE nspawn', *args, **kwargs)
-
-
-class RpmExc(ModuleFrameworkException):
-    def __init__(self, *args, **kwargs):
-        super(RpmExc, self).__init__('TYPE rpm', *args, **kwargs)
-
-
-class ContainerExc(ModuleFrameworkException):
-    def __init__(self, *args, **kwargs):
-        super(ContainerExc, self).__init__('TYPE container', *args, **kwargs)
-
-
-class ConfigExc(ModuleFrameworkException):
-    def __init__(self, *args, **kwargs):
-        super(ConfigExc, self).__init__('TYPE config', *args, **kwargs)
-
-
-class PDCExc(ModuleFrameworkException):
-    def __init__(self, *args, **kwargs):
-        super(PDCExc, self).__init__('TYPE PDC', *args, **kwargs)
-
-
-class KojiExc(ModuleFrameworkException):
-    def __init__(self, *args, **kwargs):
-        super(KojiExc, self).__init__('TYPE Koji', *args, **kwargs)
-
+from moduleframework.exceptions import *
+from moduleframework.module_framework import get_profile
 
 defroutedev = netifaces.gateways().get('default').values(
 )[0][1] if netifaces.gateways().get('default') else "lo"
@@ -231,3 +190,164 @@ def sanitize_cmd(cmd):
         if char in cmd:
             cmd = cmd.replace(char, '\\'.join(char))
     return cmd
+
+
+class CommonFunctions(object):
+    """
+    Basic class doing configuration reading and allow do commands on host machine
+    """
+    config = None
+    modulemdConf = None
+
+    def __init__(self, *args, **kwargs):
+        self.config = None
+        self.modulemdConf = None
+        self.moduleName = None
+        self.source = None
+        self.arch = None
+        self.dependencylist = {}
+        self.moduledeps = None
+        # general use case is to have forwarded services to host (so thats why it is same)
+        self.ipaddr = trans_dict["HOSTIPADDR"]
+        trans_dict["GUESTARCH"] = self.getArch()
+
+    def getArch(self):
+        """
+        get system architecture string
+
+        :return: str
+        """
+        out = self.runHost(command='uname -m', verbose=False).stdout.strip()
+        return out
+
+    def runHost(self, command="ls /", **kwargs):
+        """
+        Run commands on host
+
+        :param command: command to exectute
+        :param kwargs: (avocado process.run) params like: shell, ignore_status, verbose
+        :return: avocado.process.run
+        """
+        try:
+            formattedcommand = command.format(**trans_dict)
+        except KeyError:
+            raise ModuleFrameworkException(
+                "Command is formatted by using trans_dict, if you want to use brackets { } in your code please use {{ "
+                "or }}, possible values in trans_dict are:",
+                trans_dict)
+        return process.run("%s" % formattedcommand, **kwargs)
+
+    def installTestDependencies(self, packages=None):
+        """
+        Which packages install to host system to satisfy environment
+
+        :param packages: List of packages, if not set, it will install rpms from config.yaml
+        :return: None
+        """
+        if not packages:
+            typo = 'testdependecies' in self.config
+            if typo:
+                warnings.warn("'testdependecies' is a typo, please fix",
+                              DeprecationWarning)
+
+            # try section without typo first
+            packages = self.config.get('testdependencies', {}).get('rpms')
+            if packages:
+                if typo:
+                    warnings.warn("preferring section without typo")
+            else:
+                # fall back to mistyped test dependency section
+                packages = self.config.get('testdependecies', {}).get('rpms')
+
+        if packages:
+            self.runHost(
+                "{HOSTPACKAGER} install " +
+                " ".join(packages),
+                ignore_status=True, verbose=is_not_silent())
+
+    def loadconfig(self):
+        """
+        Load configuration from config.yaml file (it is better to call this explicitly, than in
+        __init__ method for our purposes)
+
+        :return: None
+        """
+        try:
+            self.config = get_config()
+            self.moduleName = sanitize_text(self.config['name'])
+            self.source = self.config.get('source') if self.config.get(
+                'source') else self.config['module']['rpm'].get('source')
+        except ValueError:
+            pass
+
+    def getPackageList(self, profile=None):
+        """
+        Return list of packages what has to be installed inside module
+
+        :param profile: get list for intended profile instead of default method for searching
+        :return: list of packages (rpms)
+        """
+        out = []
+        if not profile:
+            if 'packages' in self.config:
+                packages_rpm = self.config['packages'].get('rpms') if self.config[
+                    'packages'].get('rpms') else []
+                packages_profiles = []
+                for x in self.config['packages'].get('profiles') if self.config[
+                    'packages'].get('profiles') else []:
+                    packages_profiles = packages_profiles + \
+                                        self.getModulemdYamlconfig()['data']['profiles'][x]['rpms']
+                out += packages_rpm + packages_profiles
+
+            elif self.getModulemdYamlconfig()['data'].get('profiles') and self.getModulemdYamlconfig()['data'][
+                'profiles'].get(get_profile()):
+                out += self.getModulemdYamlconfig()['data']['profiles'][get_profile()]['rpms']
+            else:
+                # fallback solution when it is not known what to install
+                out.append("bash")
+        else:
+            out += self.getModulemdYamlconfig()['data']['profiles'][profile]['rpms']
+        print_info("PCKGs to install inside module:", out)
+        return out
+
+    def getModuleDependencies(self):
+        return self.dependencylist
+
+    def getModulemdYamlconfig(self, urllink=None):
+        """
+        Return moduleMD file yaml object.
+        It can be used also for loading another yaml file via url parameter
+
+        :param urllink: load this url instead of default one defined in config, or redefined by vaiable CONFIG
+        :return: dict
+        """
+        try:
+            if urllink:
+                ymlfile = urllib.urlopen(urllink)
+                cconfig = yaml.load(ymlfile)
+                link = cconfig
+            elif not get_if_module():
+                trans_dict["GUESTPACKAGER"] = "yum -y"
+                link = {"data": {}}
+            else:
+                if self.config is None:
+                    self.loadconfig()
+                if not self.modulemdConf:
+                    modulemd = get_modulemd()
+                    if modulemd:
+                        ymlfile = urllib.urlopen(modulemd)
+                        self.modulemdConf = yaml.load(ymlfile)
+                link = self.modulemdConf
+            return link
+        except IOError as e:
+            raise ConfigExc("Cannot load file")
+
+    def getIPaddr(self):
+        """
+        Return ip addr string of guest machine
+        In many cases it should be same as host machine and port should be forwarded to host
+
+        :return: str
+        """
+        return self.ipaddr
+

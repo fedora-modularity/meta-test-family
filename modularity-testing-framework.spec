@@ -22,6 +22,7 @@ Requires:       docker
 Requires:       python2-dockerfile-parse
 Requires:       python2-pdc-client
 Requires:       python2-modulemd
+Requires:       python-retrying
 
 %description
 %{summary}.
