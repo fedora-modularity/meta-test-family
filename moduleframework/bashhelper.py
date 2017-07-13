@@ -45,7 +45,7 @@
 import os
 import pickle
 import inspect
-import module_framework
+from moduleframework import module_framework
 from optparse import OptionParser
 
 

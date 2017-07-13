@@ -22,7 +22,6 @@
 #
 
 from moduleframework import module_framework
-import os
 
 
 class microDNFTest(module_framework.AvocadoTest):

@@ -21,9 +21,7 @@
 # Authors: Petr Hracek <phracek@redhat.com>
 #
 
-import pdc_data
-
-from moduleframework.module_framework import get_url
+from moduleframework import pdc_data
 from moduleframework.common import *
 from moduleframework.exceptions import *
 
@@ -94,7 +92,6 @@ class RpmHelper(CommonFunctions):
             self.dependencylist[name]['urls'].append(url)
         else:
             self.dependencylist[name] = {'urls':[url], 'stream':stream}
-
 
     def setRepositoriesAndWhatToInstall(self, repos=None, whattooinstall=None):
         """

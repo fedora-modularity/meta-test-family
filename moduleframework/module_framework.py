@@ -26,11 +26,9 @@ main module provides helpers for various module types and AVOCADO(unittest) clas
 what you should use for your tests (inherited)
 """
 
-import yaml
 from avocado import Test
 from avocado.core import exceptions
 
-from moduleframework.compose_info import ComposeParser
 from moduleframework.common import *
 from moduleframework.exceptions import *
 from moduleframework.helpers.container_helper import ContainerHelper
@@ -283,91 +281,3 @@ def get_backend():
 # To keep backward compatibility. This method could be used by pure avocado tests and is already used
 get_correct_backend = get_backend
 
-
-def get_profile():
-    """
-    Return profile name string
-
-    :return: str
-    """
-    amodule = os.environ.get('PROFILE')
-    if not amodule:
-        amodule = "default"
-    return amodule
-
-
-def get_url():
-    """
-    Return actual URL if overwritten by
-    env variable "URL"
-
-    It redefines location of testing subject
-
-    :return:
-    """
-    amodule = os.environ.get('URL')
-    return amodule
-
-
-def get_config():
-    """
-    Read the module's configuration file
-
-    :default: ``./config.yaml`` in the ``tests`` directory of the module's root directory
-    :envvar: **CONFIG=path/to/file** overrides default value.
-    :return: str
-    """
-    cfgfile = os.environ.get('CONFIG') or './config.yaml'
-    try:
-       with open(cfgfile, 'r') as ymlfile:
-           xcfg = yaml.load(ymlfile.read())
-           return xcfg
-    except IOError:
-       raise ConfigExc(
-           "Error: File '%s' doesn't appear to exist or it's not a YAML file." %
-            cfgfile + " " +
-           "Tip: If the CONFIG envvar is not set, mtf-generator looks for './config'.")
-
-
-def get_compose_url():
-    """
-    Return Compose Url if set in config or via
-    env variable COMPOSEURL
-
-    :return: str
-    """
-    compose = os.environ.get('COMPOSEURL')
-    readconfig = CommonFunctions()
-    readconfig.loadconfig()
-    if compose is None:
-        if readconfig.config.get("compose-url"):
-            compose = readconfig.config.get("compose-url")
-        elif readconfig.config['module']['rpm'].get("repo"):
-            compose = readconfig.config['module']['rpm'].get("repo")
-        else:
-            compose = readconfig.config['module']['rpm'].get("repos")[0]
-    return compose
-
-
-def get_modulemd():
-    """
-    Return dict of moduleMD file for module, It is read from config, from module-url section,
-    if not defined it reads modulemd file from compose-url in case of set, or there is used
-    env variable MODULEMDURL (eventually COMPOSEURL) for that
-
-    :return: dict
-    """
-    mdf = os.environ.get('MODULEMDURL')
-    readconfig = CommonFunctions()
-    readconfig.loadconfig()
-    try:
-        if mdf:
-            return mdf
-        elif readconfig.config.get("modulemd-url"):
-            return readconfig.config.get("modulemd-url")
-        else:
-            a = ComposeParser(get_compose_url())
-            b = a.variableListForModule(readconfig.config.get("name"))
-            return [x[12:] for x in b if 'MODULEMDURL=' in x][0]
-    except AttributeError:
-        return None

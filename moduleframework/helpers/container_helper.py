@@ -26,7 +26,6 @@ import json
 
 from avocado.utils import service
 
-from moduleframework.module_framework import get_url
 from moduleframework.common import *
 
 

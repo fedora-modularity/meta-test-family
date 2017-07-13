@@ -26,9 +26,7 @@ import re
 import glob
 import time
 
-from avocado.utils import process
-
-from timeoutlib import Retry
+from moduleframework.timeoutlib import Retry
 from moduleframework.common import *
 from moduleframework.exceptions import *
 from moduleframework.module_framework import get_if_do_cleanup
