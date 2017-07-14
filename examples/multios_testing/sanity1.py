@@ -43,7 +43,7 @@ class SanityCheck1(module_framework.AvocadoTest):
         time.sleep(2)
         b = self.run("cat %s" %TFILE).stdout.strip()
         self.assertEqual(a,b)
-        self.assertIn("25", b)
+        self.assertIn("26", b)
 
 
 

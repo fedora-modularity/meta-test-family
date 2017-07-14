@@ -18,27 +18,5 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# Authors: Jan Scotka <jscotka@redhat.com>
+# Authors: Petr Hracek <phracek@redhat.com>
 #
-
-from moduleframework import module_framework
-
-
-class microDNFTest(module_framework.AvocadoTest):
-    """
-    :avocado: enable
-    """
-
-    def setUp(self):
-        super(self.__class__, self).setUp()
-        if self.moduleType != "nspawn":
-            try:
-                self.tearDown()
-            except Exception as e:
-                print e
-                pass
-            self.skip("NSPAWN specific test (there is microdnf now)")
-
-    def testInstallMicroDNFEmpty(self):
-        self.start()
-        self.run("microdnf install microdnf", ignore_status=True)
