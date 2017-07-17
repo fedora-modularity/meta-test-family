@@ -104,6 +104,18 @@ class CommonFunctions(object):
                 trans_dict)
         return process.run("%s" % formattedcommand, **kwargs)
 
+    def PackagesInstalled(self,packagelist, func="runHost"):
+        """
+        Check if package list is already installed on Host
+
+        :param packagelist: list
+        :return: bool
+        """
+        return True
+        #rpmout = getattr(self, func)("rpm -q %s" % " ".join(packagelist), ignore_status=True, verbose=is_not_silent())
+        #return bool(rpmout.exit_status)
+
+
     def installTestDependencies(self, packages=None):
         """
         Which packages install to host system to satisfy environment
@@ -126,7 +138,7 @@ class CommonFunctions(object):
                 # fall back to mistyped test dependency section
                 packages = self.config.get('testdependecies', {}).get('rpms')
 
-        if packages:
+        if packages and not self.PackagesInstalled(packages):
             self.runHost(
                 "{HOSTPACKAGER} install " +
                 " ".join(packages),
@@ -361,24 +373,17 @@ class ContainerHelper(CommonFunctions):
                     "docker run %s %s %s" %
                     (args, self.jmeno, command), shell=True, ignore_bg_processes=True, verbose=is_not_silent()).stdout
             self.docker_id = self.docker_id.strip()
-            if self.getPackageList():
+            if self.getPackageList() and not self.PackagesInstalled(self.getPackageList(),"run"):
                 a = self.run(
-                    "%s install %s" %
-                    (trans_dict["HOSTPACKAGER"], " ".join(
-                        self.getPackageList())),
-                    ignore_status=True, verbose=False)
-                b = self.run(
                     "%s install %s" %
                     (trans_dict["GUESTPACKAGER"], " ".join(
                         self.getPackageList())),
                     ignore_status=True, verbose=False)
                 if a.exit_status == 0:
-                    print_info("Packages installed via {HOSTPACKAGER}", a.stdout)
-                elif b.exit_status == 0:
-                    print_info("Packages installed via {GUESTPACKAGER}", b.stdout)
+                    print_info("Packages installed via {GUESTPACKAGER}", a.stdout)
                 else:
                     print_info(
-                        "Nothing installed (nor via {HOSTPACKAGER} nor {GUESTPACKAGER}), but package list is not empty",
+                        "Nothing installed via {GUESTPACKAGER}), but package list is not empty",
                         self.getPackageList())
         if self.status() is False:
             raise ContainerExc(
@@ -422,7 +427,7 @@ class ContainerHelper(CommonFunctions):
         """
         self.start()
         return self.runHost(
-            'docker exec %s bash -c "%s"' %
+            """docker exec %s bash -c "%s" """ %
             (self.docker_id, sanitize_cmd(command)),
             **kwargs)
 
@@ -675,7 +680,7 @@ gpgcheck=0
         :param kwargs: dict from avocado.process.run
         :return: avocado.process.run
         """
-        return self.runHost('bash -c "%s"' %
+        return self.runHost("""bash -c "%s" """ %
                             sanitize_cmd(command), **kwargs)
 
     def copyTo(self, src, dest):
@@ -781,7 +786,6 @@ class NspawnHelper(RpmHelper):
             time.sleep(1)
             out = self.runHost("machinectl status %s" % self.jmeno, verbose=is_debug(), ignore_status=True)
             if "systemd-logind" in out.stdout:
-                time.sleep(2)
                 print_debug("NSPAWN machine %s booted" % self.jmeno)
                 return True
         raise NspawnExc("Unable to start machine %s within %d" % (self.jmeno, DEFAULTRETRYTIMEOUT))
@@ -813,7 +817,8 @@ class NspawnHelper(RpmHelper):
         """
         self.__do_smart_start_cleanup()
         if not os.path.exists(os.path.join(self.chrootpath, "usr")):
-            self.runHost("{HOSTPACKAGER} install systemd-container", verbose=is_not_silent(), sudo=True)
+            if not self.PackagesInstalled(["systemd-container"]):
+                self.runHost("{HOSTPACKAGER} install systemd-container", verbose=is_not_silent(), sudo=True)
             # workaround in case machined blocked by selinux, disabled for now
             # self.runHost("sudo systemctl restart systemd-machined", verbose=is_not_silent(), sudo=True)
             repos_to_use = ""
@@ -884,7 +889,7 @@ gpgcheck=0
 
     def __bootMachine(self):
 
-        @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, delay=21,
+        @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT,
                error=NspawnExc("RETRY: Unable to start nspawn machine"))
         def tempfnc():
             print_debug("starting container via command:",
@@ -961,6 +966,8 @@ gpgcheck=0
         should_ignore = kwargs.get("ignore_status")
         kwargs["ignore_status"] = True
 
+        # workaound, try to stop shell in case already running (it sometimes happened)
+        # self.runHost("systemctl -M {machine} stop container-shell@0.service".format(machine=self.jmeno), ignore_status=True, verbose=is_debug())
         comout = self.runHost("""machinectl shell root@{machine} /bin/bash -c "({comm})>{pin}/stdout 2>{pin}/stderr; echo $?>{pin}/retcode; sleep 1" """.format(
                 machine=self.jmeno,
                 comm=sanitize_cmd(command),
@@ -1042,7 +1049,6 @@ gpgcheck=0
                 self.__is_killed()
             except Exception as poweroffexterm:
                 print_info("Unable to stop machine via terminate, STRANGE", poweroffexterm)
-                time.sleep(DEFAULTRETRYTIMEOUT)
                 pass
             pass
 

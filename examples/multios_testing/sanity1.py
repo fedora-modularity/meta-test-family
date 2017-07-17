@@ -39,11 +39,11 @@ class SanityCheck1(module_framework.AvocadoTest):
         self.run(" nohup nc -l %d > %s 2>&1 &" % (PORT, TFILE), shell=True, ignore_bg_processes=True)
         time.sleep(2)
         a = self.runHost("cat /etc/redhat-release").stdout.strip()
-        self.runHost("cat /etc/redhat-release | nc localhost %d" % PORT, shell=True)
+        self.runHost("Im Host | nc localhost %d" % PORT, shell=True)
         time.sleep(2)
         b = self.run("cat %s" %TFILE).stdout.strip()
         self.assertEqual(a,b)
-        self.assertIn("26", b)
+        self.assertIn("Im Host", b)
 
 
 
@@ -54,11 +54,11 @@ class SanityCheck1(module_framework.AvocadoTest):
         self.runHost("nohup nc -l %d > %s 2>&1 &" % (PORT, TFILE), shell=True, ignore_bg_processes=True)
         time.sleep(2)
         a = self.run("cat /etc/redhat-release").stdout.strip()
-        self.run("cat /etc/redhat-release | nc localhost %d" % PORT, shell=True)
+        self.run("echo Im guest | nc localhost %d" % PORT, shell=True)
         time.sleep(2)
         b = self.runHost("cat %s" %TFILE).stdout.strip()
         self.assertEqual(a,b)
-        self.assertIn("26", b)
+        self.assertIn("Im guest", b)
 
 if __name__ == '__main__':
     main()

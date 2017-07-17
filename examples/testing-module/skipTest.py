@@ -39,12 +39,12 @@ class SkipTest(module_framework.AvocadoTest):
         self.start()
         self.run("gcc -v")
 
-    @skipIf(module_framework.get_correct_profile() == "default")
+    @skipIf(module_framework.get_profile() == "default")
     def testDecoratorNotSkippedForDefault(self):
         self.start()
         self.run("echo for default profile")
 
-    @skipUnless(module_framework.get_correct_profile() == "gcc")
+    @skipUnless(module_framework.get_profile() == "gcc")
     def testDecoratorSkip(self):
         self.start()
         self.run("gcc -v")
