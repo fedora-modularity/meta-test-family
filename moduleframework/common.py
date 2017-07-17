@@ -22,7 +22,7 @@
 #
 
 """
-It provides some general functions
+Custom exceptions and debugging library.
 """
 
 import sys
@@ -33,6 +33,11 @@ import linecache
 
 
 class ModuleFrameworkException(Exception):
+    """
+    Formats exception output.
+
+    :return: None
+    """
     def __init__(self, *args, **kwargs):
         super(ModuleFrameworkException, self).__init__(
             'EXCEPTION MTF: ', *args, **kwargs)
@@ -47,31 +52,57 @@ class ModuleFrameworkException(Exception):
 
 
 class NspawnExc(ModuleFrameworkException):
+    """
+    Indicates Nspawn module error.
+    """
     def __init__(self, *args, **kwargs):
         super(NspawnExc, self).__init__('TYPE nspawn', *args, **kwargs)
 
 
 class RpmExc(ModuleFrameworkException):
+    """
+    Indicates Rpm module error.
+    """
     def __init__(self, *args, **kwargs):
         super(RpmExc, self).__init__('TYPE rpm', *args, **kwargs)
 
 
 class ContainerExc(ModuleFrameworkException):
+    """
+    Indicates Docker module error.
+    """
     def __init__(self, *args, **kwargs):
         super(ContainerExc, self).__init__('TYPE container', *args, **kwargs)
 
 
 class ConfigExc(ModuleFrameworkException):
+    """
+    Indicates ``tests/config.yaml`` or module's ModuleMD YAML file error.
+    File doesn't exist or has a wrong format.
+
+    TIP: If the **CONFIG** envvar is not set, mtf-generator looks for ``./config.yaml``.
+
+    See :mod:`moduleframework.mtf_generator` and `Configuration file`_
+    for more information
+
+    .. _Configuration file: ../user_guide/how_to_write_conf_file
+    """
     def __init__(self, *args, **kwargs):
         super(ConfigExc, self).__init__('TYPE config', *args, **kwargs)
 
 
 class PDCExc(ModuleFrameworkException):
+    """
+    Indicates PDC error.
+    """
     def __init__(self, *args, **kwargs):
         super(PDCExc, self).__init__('TYPE PDC', *args, **kwargs)
 
 
 class KojiExc(ModuleFrameworkException):
+    """
+    Indicates Koji error: Unable to download a package from Koji.
+    """
     def __init__(self, *args, **kwargs):
         super(KojiExc, self).__init__('TYPE Koji', *args, **kwargs)
 
@@ -89,7 +120,7 @@ if os.path.exists('/usr/bin/dnf'):
     hostpackager = "dnf -y"
 ARCH = "x86_64"
 
-# translation table for config.yaml files syntax is {VARIABLE} in config file
+# translation table for {VARIABLE} in the config.yaml file
 trans_dict = {"HOSTIPADDR": hostipaddr,
               "GUESTIPADDR": hostipaddr,
               "DEFROUTE": defroutedev,
@@ -110,7 +141,7 @@ PDCURL = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
 URLBASECOMPOSE = "https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server"
 REPOMD = "repodata/repomd.xml"
 MODULEFILE = 'tempmodule.yaml'
-# default value of process timeout in sec
+# default value of process timeout in seconds
 DEFAULTPROCESSTIMEOUT = 2 * 60
 DEFAULTRETRYCOUNT = 3
 # time in seconds
@@ -119,16 +150,31 @@ DEFAULTNSPAWNTIMEOUT = 10
 
 
 def is_debug():
+    """
+    Returns the **DEBUG** envvar.
+
+    :return: bool
+    """
     return bool(os.environ.get("DEBUG"))
 
 
 def is_not_silent():
+    """
+    Returns the opposite of the **DEBUG** envvar.
+
+    :return: bool
+    """
     return not is_debug()
 
 
 def print_info(*args):
     """
-    Print data to selected output in case you are not in testing class, there is self.log
+    Prints information from the expected stdout and
+    stderr files from the native test scope.
+
+    See `Test log, stdout and stderr in native Avocado modules
+    <https://avocado-framework.readthedocs.io/en/latest/WritingTests.html
+    #test-log-stdout-and-stderr-in-native-avocado-modules>`_ for more information.
 
     :param args: object
     :return: None
@@ -140,15 +186,22 @@ def print_info(*args):
                 out = arg.format(**trans_dict)
             except KeyError:
                 raise ModuleFrameworkException(
-                    "String is formatted by using trans_dict, if you want to use brackets { } in your code please use {{ or }}, possible values in trans_dict are:",
-                    trans_dict)
+                    "String is formatted by using trans_dict."
+                    + " " +
+                    "If you want to use brackets { } in your code, please use double brackets {{  }}."
+                    + " " +
+                    "Possible values in trans_dict are: ", trans_dict)
         print >> sys.stderr, out
 
 
 def print_debug(*args):
     """
-    Print data to selected output in case you are not in testing class, there is self.log
-    In case DEBUG variable is set
+    Prints information from the expected stdout and
+    stderr files from the native test scope.
+
+    See `Test log, stdout and stderr in native Avocado modules
+    <https://avocado-framework.readthedocs.io/en/latest/WritingTests.html
+    #test-log-stdout-and-stderr-in-native-avocado-modules>`_ for more information.
 
     :param args: object
     :return: None
@@ -158,21 +211,15 @@ def print_debug(*args):
 
 def is_recursive_download():
     """
-    Purpose: Workaround for taskotron
-    It changes behaviour of createLocalRepoFromKoji fuction of pdc_data module.
-    It tries to download all packages with all dependent modules, not just for one module.
-    It fixes issue with taskotron issues caused by checking stdout/stderr activity,
-    after 15 minutes without any output it is killed.
+    Returns the **MTF_RECURSIVE_DOWNLOAD** envvar.
 
     :return: bool
     """
     return bool(os.environ.get("MTF_RECURSIVE_DOWNLOAD"))
 
-
 def get_if_do_cleanup():
     """
-    Returns boolean value in case variable is set.
-     It is used internally in code
+    Returns the **MTF_DO_NOT_CLEANUP** envvar.
 
     :return: bool
     """
@@ -182,8 +229,7 @@ def get_if_do_cleanup():
 
 def get_if_remoterepos():
     """
-    Returns boolean value in case variable is set.
-    It is used internally in code
+    Returns the **MTF_REMOTE_REPOS** envvar.
 
     :return: bool
     """
@@ -193,8 +239,7 @@ def get_if_remoterepos():
 
 def get_if_module():
     """
-    Returns boolean value in case variable is set.
-    It is used internally in code
+    Returns the **MTF_DISABLE_MODULE** envvar.
 
     :return: bool
     """
@@ -204,9 +249,12 @@ def get_if_module():
 
 def normalize_text(text, replacement="_"):
     """
-    Improve string, replace all bad characters with another one expecially with "_"
+    Replace invalid characters in a string.
 
-    :param text: string
+    invalid_chars=["/", ";", "&", ">", "<", "|"]
+
+    :arg1: string
+    :arg2: replacement char, default: "_"
     :return: string
     """
     out = text
