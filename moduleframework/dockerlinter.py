@@ -173,18 +173,16 @@ class DockerfileLinter(object):
         if FROM in self.docker_dict:
             return [x for x in self.docker_dict[FROM] if "baseruntime/baseruntime" in x]
 
-    def check_microdnf(self):
+    def check_dnf(self):
         """
         Function returns docker labels
         :return: label dictionary
         """
         if RUN in self.docker_dict:
             for val in self.docker_dict[RUN]:
-                if val.startswith("yum") or " yum " in val:
-                    return False
                 if val.startswith("dnf") or " dnf " in val:
-                    return False
-                else:
                     return True
+                else:
+                    return False
 
 
