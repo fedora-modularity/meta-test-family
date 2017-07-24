@@ -39,6 +39,8 @@ class DockerfileLinter(module_framework.AvocadoTest):
     def setUp(self):
         # it is not intended just for docker, but just docker packages are
         # actually properly signed
+        if self.moduleType != "docker":
+            self.skip("Docker specific test")
         self.dp = dockerlinter.DockerfileLinter(os.path.join(os.getcwd(), ".."))
         if self.dp.dockerfile is None:
             self.skip()
