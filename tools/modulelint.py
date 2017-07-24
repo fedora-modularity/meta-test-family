@@ -47,7 +47,7 @@ class DockerfileLinter(module_framework.AvocadoTest):
         self.assertTrue(self.dp.check_baseruntime())
 
     def testDockerRunMicrodnf(self):
-        self.assertTrue(self.dp.check_microdnf())
+        self.assertTrue(self.dp.check_dnf())
 
     def testArchitectureInEnvAndLabelExists(self):
         self.assertTrue(self.dp.get_docker_specific_env("ARCH="))

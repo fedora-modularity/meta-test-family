@@ -115,7 +115,7 @@ dusername = "test"
 dpassword = "test"
 ddatabase = "basic"
 hostpackager = "yum -y"
-guestpackager = "microdnf"
+guestpackager = "dnf"
 if os.path.exists('/usr/bin/dnf'):
     hostpackager = "dnf -y"
 ARCH = "x86_64"
