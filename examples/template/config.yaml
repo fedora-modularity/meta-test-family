@@ -23,4 +23,7 @@ module:
         stop: systemctl stop <service name>
         status: systemctl status <service name>
         repo: Path to module-build repo from koji
-
+    only_tests:
+        setup: Do whatever you want for starting tests
+        start: Command for starting a service
+        stop: Command for stopping a service if needed.
