@@ -34,15 +34,14 @@ Taskotron Wokflow
             - If None: Try to find module dir in MTF project tests in `/usr/share/moduleframework/examples` directory
             - If None: Run at least general ModuleLinter (`/usr/share/moduleframework/tools/modulelint`) with general minimal config.yaml located in `docs` directory
 
-Internal Jenkins Instance
+Arbitrary Jenkins Instance
 ----------------------------
-- Production instance: `hidden`
-    - Trigerred via `fedmsg file`
-        - Used **tools/run-them.sh** script, for same behaviour as Taskotron
-    - **run-them.sh** script for Jenkins based on whole fedmsg
-        - Test Subject: Same as *Taskotron Workflow*
-        - Located in: Same as *Taskotron Workflow*
-        - Scheduled as: `run-them.sh testmodule /usr/share/moduleframework/tools/example_message_module.yaml fedmsg`
-        - Example targets: `check-run-them-fedmsg-testmodule`
-        - Internal logic
-            - Same as *Taskotron Workflow*
+- Trigerred via `fedmsg file`
+    - Used **tools/run-them.sh** script, for same behaviour as Taskotron
+- **run-them.sh** script for Jenkins based on whole fedmsg
+    - Test Subject: Same as *Taskotron Workflow*
+    - Located in: Same as *Taskotron Workflow*
+    - Scheduled as: `run-them.sh testmodule /usr/share/moduleframework/tools/example_message_module.yaml fedmsg`
+    - Example targets: `check-run-them-fedmsg-testmodule`
+    - Internal logic
+        - Same as *Taskotron Workflow*
