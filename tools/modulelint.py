@@ -46,11 +46,21 @@ class DockerfileLinter(module_framework.AvocadoTest):
     def testDockerFromBaseruntime(self):
         self.assertTrue(self.dp.check_baseruntime())
 
-    def testDockerDNFNodocs(self):
-        self.assertTrue(self.dp.check_dnf_nodocs_flag())
+    def testDockerNodocs(self):
+        self.assertTrue(self.dp.check_nodocs_flag())
 
-    def testDockerDNFCleanAll(self):
-        self.assertTrue(self.dp.check_dnf_cleanall())
+    def testDockerCleanAll(self):
+        self.start()
+        pkg_mgr = "yum"
+        # Detect distro in image
+        distro = self.run("cat /etc/redhat-release").stdout
+        if 'Fedora' in distro:
+            pkg_mgr = "dnf"
+        # Look, whether we have solv files in /var/cache/<pkg_mgr>/*.solv
+        # dnf|yum clean all deletes the file *.solv
+        ret = self.run("ls /var/cache/%s/*.solv" % pkg_mgr, ignore_status=True)
+        self.assertNotEqual(0, ret.exit_status)
+        self.assertEqual("", ret.stdout.strip())
 
     def testArchitectureInEnvAndLabelExists(self):
         self.assertTrue(self.dp.get_docker_specific_env("ARCH="))
