@@ -1,9 +1,9 @@
 # identifier of document for modularity testing framework
-# COPY of https://pagure.io/modularity-testing-framework/blob/master/f/docs/example-config.yaml
+# COPY of https://github.com/fedora-modularity/meta-test-family/blob/master/docs/example-config.yaml
 # if your module does not provide any service, you can use minimal version:
-# https://pagure.io/modularity-testing-framework/blob/master/f/docs/example-config-minimal.yaml
+# https://github.com/fedora-modularity/meta-test-family/blob/master/docs/example-config-minimal.yaml
 # MANDATORY
-document: modularity-testing
+document: meta-test
 # MANDATORY
 version: 1
 # name of module for testing (it should be same as moduleMD yaml file without extension)
@@ -45,7 +45,7 @@ module:
     docker:
 # run setup/cleanup commands on HOST, for example config manipulation, selinux boolean manipulation
 # there could be used also variables in python style like: {ROOT}, {HOSTNAME} see
-# trans_dict in  file https://pagure.io/modularity-testing-framework/blob/master/f/moduleframework/module_framework.py
+# trans_dict in  file https://github.com/fedora-modularity/meta-test-family/blob/master/moduleframework/module_framework.py
         setup: echo Do magic with general config stored on host;
                echo More magic
         cleanup: echo Cleanup magic
@@ -82,4 +82,3 @@ module:
         repos:
             - https://kojipkgs.stg.fedoraproject.org/compose/branched/jkaluza/latest-Fedora-Modular-26/compose/Server/x86_64/os/
             - https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server/x86_64/os/
-

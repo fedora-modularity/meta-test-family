@@ -15,7 +15,7 @@ User Guide
 
 4. Write your tests, for example see `sanity tests`_ and various tests examples in ``/usr/share/moduleframework/examples/testing-module/``. All tests methods are listed in section `API Index`_ and alphabetically in :ref:`genindex` section.
 
-.. _sanity tests: https://pagure.io/modularity-testing-framework/blob/master/f/examples/template/sanity_template.py
+.. _sanity tests: https://github.com/fedora-modularity/meta-test-family/blob/master/examples/template/sanity_template.py
 .. _API Index: ../api/index
 
 5. In the directory ``tests`` create a ``Makefile`` as below.

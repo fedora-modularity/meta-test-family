@@ -1,1 +1,15 @@
-user_guide/example_config_minimal.yaml
+document: modularity-testing
+version: 1
+name: bash
+modulemd-url: https://src.fedoraproject.org/cgit/modules/memcached.git/plain/memcached.yaml
+packages:
+    rpms:
+        - bash
+        - rpm
+module:
+    docker:
+        container: docker.io/phracek/memcached
+    rpm:
+        repo: https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server/x86_64/os/
+
+
