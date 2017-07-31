@@ -114,13 +114,13 @@ Installing MTF
 
 Install MTF rpm from `Fedora Copr repo`_.
 
-.. _Fedora Copr repo: https://copr.fedorainfracloud.org/coprs/phracek/Modularity-testing-framework/
+.. _Fedora Copr repo: https://copr.fedorainfracloud.org/coprs/phracek/meta-test-family/
 
 .. code-block:: bash
 
-    # add modularity-testing-framework yum repo
-    $ sudo dnf copr enable phracek/Modularity-testing-framework
-    $ sudo dnf install -y modularity-testing-framework
+    # add meta-test-family yum repo
+    $ sudo dnf copr enable phracek/meta-test-family
+    $ sudo dnf install -y meta-test-family
 
 MTF scripts, examples and documentation will be installed into ``/usr/share/moduleframework``
 

@@ -26,7 +26,7 @@ MTF has a presence on the following websites:
 
 .. _Documentation: http://meta-test-family.readthedocs.io
 .. _a modular Fedora: https://docs.pagure.org/modularity/
-.. _Package repository: https://copr.fedorainfracloud.org/coprs/phracek/Modularity-testing-framework/
+.. _Package repository: https://copr.fedorainfracloud.org/coprs/phracek/meta-test-family/
 .. _MTF's code: https://github.com/fedora-modularity/meta-test-family
 
 Content
