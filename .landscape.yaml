@@ -1,4 +1,4 @@
-# Include warnings about missing documentation?dd
+# Include warnings about missing documentation?
 doc-warnings: False
 
 # Include warnings about tests?
