@@ -47,9 +47,14 @@ class DockerfileLinter(module_framework.AvocadoTest):
         self.assertTrue(self.dp.check_baseruntime())
 
     def testDockerNodocs(self):
-        docs = self.run("rpm -qad").stdout
-        for doc in docs.split('\n'):
-            self.assertNotEqual(0, self.run("test -f %s" % doc, ignore_status=True).exit_status)
+        self.start()
+        # This returns a list of packages defined in config.yaml for testing
+        # e.g. ["bash", "rpm", "memcached"] in case of memcached
+        pkgs = self.backend.getPackageList()
+        for pkg in pkgs:
+            docs = self.run("rpm -qad %s" % pkg).stdout
+            for doc in docs.strip().split('\n'):
+                self.assertNotEqual(0, self.run("test -f %s" % doc, ignore_status=True).exit_status)
 
     def testDockerCleanAll(self):
         self.start()
