@@ -47,7 +47,9 @@ class DockerfileLinter(module_framework.AvocadoTest):
         self.assertTrue(self.dp.check_baseruntime())
 
     def testDockerNodocs(self):
-        self.assertTrue(self.dp.check_nodocs_flag())
+        docs = self.run("rpm -qad").stdout
+        for doc in docs.split('\n'):
+            self.assertNotEqual(0, self.run("test -f %s" % doc, ignore_status=True).exit_status)
 
     def testDockerCleanAll(self):
         self.start()

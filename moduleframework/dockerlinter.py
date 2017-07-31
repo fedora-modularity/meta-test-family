@@ -170,15 +170,3 @@ class DockerfileLinter(object):
         """
         if FROM in self.docker_dict:
             return [x for x in self.docker_dict[FROM] if "baseruntime/baseruntime" in x]
-
-    def check_nodocs_flag(self):
-        """
-        Function returns whether --nodocs is present
-        :return: True if nodocs is present otherwise False
-        """
-        if RUN in self.docker_dict:
-            # List self.docker_dict[RUN] contains all commands used in RUN layer.
-            if '--nodocs' in self.docker_dict[RUN]:
-                return True
-            else:
-                return False
