@@ -11,6 +11,7 @@ Environment variables allow to overwrite some values of a module configuration f
     - **=docker** uses the **docker** section of ``config.yaml``.
     - **=rpm** uses the **rpm** section of ``config.yaml`` and tests RPMs directly on a host.
     - **=nspawn** tests RPMs in a virtual environment of lightweight virtualization with systemd-nspawn.
+    - **=only_tests** tests a service. It does not modify an environment.
 
 - **URL** overrides the value of **module.docker.container** or **module.rpm.repo**. The **URL** should correspond to the **MODULE** variable, for example
 

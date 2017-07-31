@@ -4,6 +4,7 @@ Manual testing
 - Scheduled on host machine
     - **docker, nspawn** `MODULE` type does not affect Host machine
     - **rpm** `MODULE` type test directly on host machine. It installs things there and may be **very dangerous**
+    - **only_tests** `MODULE` type test directly on host machine. It does not install anything. It only runs tests.
 - Intended for test debugging
 
 modules dist-git integration

@@ -34,6 +34,7 @@ from moduleframework.exceptions import *
 from moduleframework.helpers.container_helper import ContainerHelper
 from moduleframework.helpers.nspawn_helper import NspawnHelper
 from moduleframework.helpers.rpm_helper import RpmHelper
+from moduleframework.helpers.only_tests_helper import OnlyTestsHelper
 
 PROFILE = None
 
@@ -256,6 +257,8 @@ class AvocadoTest(Test):
         return self.backend.getModuleDependencies()
 
 
+# INTERFACE CLASSES FOR SPECIFIC MODULE TESTS
+
 def get_backend():
     """
     Return proper module type, set by config by default_module section, or defined via
@@ -275,6 +278,8 @@ def get_backend():
         return RpmHelper(), amodule
     elif amodule == 'nspawn':
         return NspawnHelper(), amodule
+    elif amodule == 'only_tests':
+        return OnlyTestsHelper(), amodule
     else:
         raise ModuleFrameworkException("Unsupported MODULE={0}".format(amodule), "supproted are: docker, rpm, nspawn")
 

@@ -59,6 +59,7 @@ An example of module types specification:
             repo:
                 - http://download.englab.brq.redhat.com/pub/fedora/releases/25/Everything/x86_64/os/
                 - https://phracek.fedorapeople.org/memcached-module-repo/
+        only_tests:
 
 * **default_module**, if specified, sets the default tested module type
 * **setup** runs setup commands on a host machine, not in container, and prepares the environemt for tests, for example changes selinux policy or hostname
