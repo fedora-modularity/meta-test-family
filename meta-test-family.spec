@@ -2,7 +2,7 @@
 
 Name:           meta-test-family
 Version:        0.5.18
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Tool to test components of a modular Fedora
 
 License:        GPLv2+
@@ -22,6 +22,8 @@ Requires:       docker
 Requires:       python2-dockerfile-parse
 Requires:       python2-pdc-client
 Requires:       python2-modulemd
+Provides:       modularity-testing-framework = %{version}-%{release}
+Obsoletes:      modularity-testing-framework < %{version}-1
 
 %description
 %{summary}.
@@ -49,6 +51,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,mtf_
 %{_datadir}/moduleframework/
 
 %changelog
+* Tue Aug 01 2017 Petr Hracek <phracek@redhat.com> - 0.5.18-2
+- Renaming package to the new name meta-test-family
+
 * Mon Jul 10 2017 Jan Scotka <jscotka@redhat.com> 0.5.18-1
 - improved name handling replacing bad chanracters (jscotka@redhat.com)
 
