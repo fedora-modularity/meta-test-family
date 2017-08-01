@@ -1,7 +1,8 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
 #
-# This Modularity Testing Framework helps you to write tests for modules
+# Meta test family (MTF) is a tool to test components of a modular Fedora:
+# https://docs.pagure.org/modularity/
 # Copyright (C) 2017 Red Hat, Inc.
 #
 # This program is free software; you can redistribute it and/or modify

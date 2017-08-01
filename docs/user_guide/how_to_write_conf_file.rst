@@ -3,8 +3,8 @@ Configuration file
 
 To test a module create its configuration file ``config.yaml`` similar to an `example configuration file`_ described further. If the tested module doesn't represent any service, the `minimal configuration file`_ structure can be used.
 
-.. _example configuration file: https://pagure.io/modularity-testing-framework/blob/master/f/examples/memcached/config.yaml
-.. _minimal configuration file: https://pagure.io/modularity-testing-framework/blob/master/f/docs/example-config-minimal.yaml
+.. _example configuration file: https://github.com/fedora-modularity/meta-test-family/blob/master/examples/memcached/config.yaml
+.. _minimal configuration file: https://github.com/fedora-modularity/meta-test-family/blob/master/docs/example-config-minimal.yaml
 
 An example of ``config.yaml`` header:
 

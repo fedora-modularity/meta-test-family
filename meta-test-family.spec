@@ -1,13 +1,13 @@
 %global framework_name moduleframework
 
-Name:           modularity-testing-framework
+Name:           meta-test-family
 Version:        0.5.18
 Release:        1%{?dist}
-Summary:        Framework for writing tests for modules and containers
+Summary:        Tool to test components of a modular Fedora
 
 License:        GPLv2+
-URL:            https://pagure.io/modularity-testing-framework
-Source0:        http://releases.pagure.org/%{name}/%{name}-%{version}.tar.gz
+URL:            https://github.com/fedora-modularity/meta-test-family
+Source0:        https://codeload.github.com/fedora-modularity/%{name}/tar.gz/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 # Exlcude ppc64: there is no docker package on ppc64
 # https://bugzilla.redhat.com/show_bug.cgi?id=1465176

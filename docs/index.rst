@@ -1,12 +1,12 @@
-Modularity Testing Framework Documentation
+Meta Test Family Documentation
 ==========================================
 
-Welcome to the Modularity Testing Framework documentation!
+Welcome to the Meta Test Family documentation!
 
 About
 =====
 
-Modularity testing framework (MTF) is a tool to test components of `a modular Fedora`_.
+**M**eta **T**est **F**amily (MTF) is a tool to test components of `a modular Fedora`_.
 
 Using MTF you can:
 
@@ -22,12 +22,12 @@ MTF has a presence on the following websites:
 
 * `Documentation`_ is available on ReadTheDocs.
 * A `Package repository`_ is available on Fedora Copr.
-* `MTF's code`_ and the issue tracker for sharing bugs and feature ideas are stored on Pagure.
+* `MTF's code`_ and the issue tracker for sharing bugs and feature ideas are stored on GitHub.
 
-.. _Documentation: http://modularity-testing-framework.readthedocs.io
+.. _Documentation: http://meta-test-family.readthedocs.io
 .. _a modular Fedora: https://docs.pagure.org/modularity/
-.. _Package repository: https://copr.fedorainfracloud.org/coprs/phracek/Modularity-testing-framework/
-.. _MTF's code: https://pagure.io/modularity-testing-framework
+.. _Package repository: https://copr.fedorainfracloud.org/coprs/phracek/meta-test-family/
+.. _MTF's code: https://github.com/fedora-modularity/meta-test-family
 
 Content
 =======

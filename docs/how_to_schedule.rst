@@ -67,5 +67,5 @@ Multihost
 - Internal logic of testing
     - could be same as previous ones that there is one *Host* and one  *Guest* machine what can cooperate togetger
     - Or it could be used for general multihost testing with *N* machines where *N>1* via use backends directly in setUp sections
-        - see example of test: https://pagure.io/modularity-testing-framework/blob/master/f/examples/multios_testing/sanityRealMultiHost.py
+        - see example of test: https://github.com/fedora-modularity/meta-test-family/blob/master/examples/multios_testing/sanityRealMultiHost.py
         - this example creates 3 machines *(using nspawn)* with various fedora versions and gather data.
