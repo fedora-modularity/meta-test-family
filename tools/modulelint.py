@@ -48,13 +48,15 @@ class DockerfileLinter(module_framework.AvocadoTest):
 
     def testDockerNodocs(self):
         self.start()
+        installed_pkgs = self.run("rpm -qa --qf '%{{NAME}}\n'", ignore_status=True).stdout
         # This returns a list of packages defined in config.yaml for testing
         # e.g. ["bash", "rpm", "memcached"] in case of memcached
         pkgs = self.backend.getPackageList()
-        for pkg in pkgs:
-            docs = self.run("rpm -qad %s" % pkg).stdout
-            for doc in docs.strip().split('\n'):
-                self.assertNotEqual(0, self.run("test -f %s" % doc, ignore_status=True).exit_status)
+        for pkg in installed_pkgs.split('\n'):
+            if pkg in pkgs:
+                all_docs = self.run("rpm -qad %s" % pkg).stdout
+                for doc in all_docs.strip().split('\n'):
+                    self.assertNotEqual(0, self.run("test -e %s" % doc, ignore_status=True).exit_status)
 
     def testDockerCleanAll(self):
         self.start()
