@@ -6,7 +6,7 @@ Welcome to the Meta Test Family documentation!
 About
 =====
 
-**M**eta **T**est **F**amily (MTF) is a tool to test components of `a modular Fedora`_.
+**M**\ eta **T**\ est **F**\ amily (MTF) is a tool to test components of `a modular Fedora`_.
 
 Using MTF you can:
 

@@ -40,6 +40,7 @@ An example of module general description:
 An example of module types specification:
 
 .. code-block:: yaml
+
     default_module: docker
     module:
         docker:
