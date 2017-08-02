@@ -23,7 +23,7 @@ Requires:       python2-dockerfile-parse
 Requires:       python2-pdc-client
 Requires:       python2-modulemd
 Provides:       modularity-testing-framework = %{version}-%{release}
-Obsoletes:      modularity-testing-framework < %{version}-1
+Obsoletes:      modularity-testing-framework < 0.5.18-1
 
 %description
 %{summary}.
