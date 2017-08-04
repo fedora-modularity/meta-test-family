@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           modularity-testing-framework
-Version:        0.5.18
+Version:        0.5.19
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
@@ -50,6 +50,20 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,mtf_
 %{_datadir}/moduleframework/
 
 %changelog
+* Fri Aug 04 2017 Petr "Stone" Hracek <phracek@redhat.com> 0.5.19-1
+- Add Landscap.io into project (#27) (phracek@redhat.com)
+- Update scheduling.rst (phracek@redhat.com)
+- Several fixes caused by missing testing. (phracek@redhat.com)
+- Draft of refactoring avocado-tests. (phracek@redhat.com)
+- replaced get_correct_backed in all internal tests by get_backend
+  (jscotka@redhat.com)
+- fixed typo caused by function moving to other module (jscotka@redhat.com)
+- function names cleanup, removed "correct" "latest" words  fixing command
+  sanitizer (jscotka@redhat.com)
+- changed return variable to not be same as input param (jscotka@redhat.com)
+- improved multihost test handling and created functions for normalizing
+  commands before run (escaping) (jscotka@redhat.com)
+
 * Mon Jul 10 2017 Jan Scotka <jscotka@redhat.com> 0.5.18-1
 - improved name handling replacing bad chanracters (jscotka@redhat.com)
 
