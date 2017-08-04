@@ -1,9 +1,9 @@
 %global framework_name moduleframework
 
 Name:           meta-test-family
-Version:        0.5.19
-Release:        1%{?dist}
-Summary:        Framework for writing tests for modules and containers
+Version:        0.5.18
+Release:        2%{?dist}
+Summary:        Tool to test components of a modular Fedora
 
 License:        GPLv2+
 URL:            https://github.com/fedora-modularity/meta-test-family
