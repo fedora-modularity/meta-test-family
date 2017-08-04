@@ -35,7 +35,7 @@ See `Multiline Bash snippet tests`_ for more information.
 """
 
 from __future__ import print_function
-from moduleframework.module_framework import CommonFunctions
+from moduleframework.common import CommonFunctions
 
 class TestGenerator(CommonFunctions):
     def __init__(self):
