@@ -1,13 +1,13 @@
 %global framework_name moduleframework
 
-Name:           modularity-testing-framework
+Name:           meta-test-family
 Version:        0.5.19
 Release:        1%{?dist}
 Summary:        Framework for writing tests for modules and containers
 
 License:        GPLv2+
-URL:            https://pagure.io/modularity-testing-framework
-Source0:        http://releases.pagure.org/%{name}/%{name}-%{version}.tar.gz
+URL:            https://github.com/fedora-modularity/meta-test-family
+Source0:        https://codeload.github.com/fedora-modularity/%{name}/tar.gz/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 # Exlcude ppc64: there is no docker package on ppc64
 # https://bugzilla.redhat.com/show_bug.cgi?id=1465176
@@ -22,7 +22,8 @@ Requires:       docker
 Requires:       python2-dockerfile-parse
 Requires:       python2-pdc-client
 Requires:       python2-modulemd
-Requires:       python-retrying
+Provides:       modularity-testing-framework = %{version}-%{release}
+Obsoletes:      modularity-testing-framework < 0.5.18-1
 
 %description
 %{summary}.
@@ -63,6 +64,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,mtf_
 - changed return variable to not be same as input param (jscotka@redhat.com)
 - improved multihost test handling and created functions for normalizing
   commands before run (escaping) (jscotka@redhat.com)
+
+* Tue Aug 01 2017 Petr Hracek <phracek@redhat.com> - 0.5.18-2
+- Renaming package to the new name meta-test-family
 
 * Mon Jul 10 2017 Jan Scotka <jscotka@redhat.com> 0.5.18-1
 - improved name handling replacing bad chanracters (jscotka@redhat.com)

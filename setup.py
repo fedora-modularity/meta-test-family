@@ -62,13 +62,13 @@ for path in paths:
             os.path.join(root, f) for f in files]
 
 setup(
-    name='modularity-testing-framework',
+    name='meta-test-family',
     version="0.5.19",
-    description='Framework for testing modules and containers.',
+    description='Tool to test components fo a modular Fedora.',
     keywords='modules,containers,testing,framework',
     author='Jan Scotka',
     author_email='jscotka@redhat.com',
-    url='https://pagure.io/modularity-testing-framework',
+    url='https://github.com/fedora-modularity/meta-test-family',
     license='GPLv2+',
     packages=find_packages(exclude=['docs', 'examples', 'tools']),
     include_package_data=True,

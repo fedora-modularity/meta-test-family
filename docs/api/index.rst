@@ -3,7 +3,7 @@ API Index
 
 This section contains the MTF API, auto generated from `the source code`_.
 
-.. _the source code: https://pagure.io/modularity-testing-framework
+.. _the source code: https://github.com/fedora-modularity/meta-test-family
 
 .. toctree::
 

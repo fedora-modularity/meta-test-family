@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# modularity-testing-framework documentation build configuration file, created by
+# meta-test-family documentation build configuration file, created by
 # sphinx-quickstart on Tue Apr 21 13:42:00 2015.
 #
 # This file is execfile()d with the current directory set to its
@@ -64,7 +64,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'modularity-testing-framework'
+project = u'meta-test-family'
 copyright = u'2017, Red Hat'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -189,7 +189,7 @@ html_theme_path = [] if on_rtd else [sphinx_rtd_theme.get_html_theme_path()]
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'ModularityTestingFrameworkDoc'
+htmlhelp_basename = 'MetaTestFamilyDoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -209,7 +209,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'ModularityTestingFramework.tex', u'Modularity Testing Framework Documentation',
+  (master_doc, 'MetaTestFamily.tex', u'Meta Test Family Documentation',
    u'Petr Hracek \\and Jan Scotka', 'manual'),
 ]
 
@@ -239,7 +239,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('manpage', 'modularity-testing-framework',
+    ('manpage', 'meta-test-family',
      u'helps you with writing tests for you modules and containers',
      [u'Petr Hracek', u'Jan Scotka'], 1),
 ]
@@ -254,8 +254,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'ModularityTestingFramework', u'Modularity Testing Framework Documentation',
-   u'Petr Hracek@*Jan Scotka', 'ModularityTestingFramework', 'One line description of project.',
+  (master_doc, 'MetaTestFamily', u'MetaTestFamily Documentation',
+   u'Petr Hracek@*Jan Scotka', 'MetaTestFamily', 'One line description of project.',
    'Miscellaneous'),
 ]
 

@@ -1,4 +1,4 @@
-document: modularity-testing
+document: meta-test
 version: 1
 name: Module name
 modulemd-url: URL to Raw format of YAML file
