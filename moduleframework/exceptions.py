@@ -20,12 +20,21 @@
 #
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
+
+"""
+Custom exceptions library.
+"""
+
 from __future__ import print_function
 import sys
 import linecache
 
 
 class ModuleFrameworkException(Exception):
+    """
+    Formats exception output.
+    :return: None
+    """
     def __init__(self, *args, **kwargs):
         super(ModuleFrameworkException, self).__init__(
             'EXCEPTION MTF: ', *args, **kwargs)
@@ -40,31 +49,53 @@ class ModuleFrameworkException(Exception):
 
 
 class NspawnExc(ModuleFrameworkException):
+    """
+    Indicates Nspawn module error.
+    """
     def __init__(self, *args, **kwargs):
         super(NspawnExc, self).__init__('TYPE nspawn', *args, **kwargs)
 
 
 class RpmExc(ModuleFrameworkException):
+    """
+    Indicates Rpm module error.
+    """
     def __init__(self, *args, **kwargs):
         super(RpmExc, self).__init__('TYPE rpm', *args, **kwargs)
 
 
 class ContainerExc(ModuleFrameworkException):
+    """
+    Indicates Docker module error.
+    """
     def __init__(self, *args, **kwargs):
         super(ContainerExc, self).__init__('TYPE container', *args, **kwargs)
 
 
 class ConfigExc(ModuleFrameworkException):
+    """
+    Indicates ``tests/config.yaml`` or module's ModuleMD YAML file error.
+    File doesn't exist or has a wrong format.
+    TIP: If the **CONFIG** envvar is not set, mtf-generator looks for ``./config.yaml``.
+    See :mod:`moduleframework.mtf_generator` and `Configuration file`_
+    for more information
+    .. _Configuration file: ../user_guide/how_to_write_conf_file
+    """
     def __init__(self, *args, **kwargs):
         super(ConfigExc, self).__init__('TYPE config', *args, **kwargs)
 
 
 class PDCExc(ModuleFrameworkException):
+    """
+    Indicates PDC error.
+    """
     def __init__(self, *args, **kwargs):
         super(PDCExc, self).__init__('TYPE PDC', *args, **kwargs)
 
 
 class KojiExc(ModuleFrameworkException):
+    """
+    Indicates Koji error: Unable to download a package from Koji.
+    """
     def __init__(self, *args, **kwargs):
         super(KojiExc, self).__init__('TYPE Koji', *args, **kwargs)
-
