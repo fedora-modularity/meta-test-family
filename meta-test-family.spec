@@ -23,7 +23,7 @@ Requires:       python2-dockerfile-parse
 Requires:       python2-pdc-client
 Requires:       python2-modulemd
 Provides:       modularity-testing-framework = %{version}-%{release}
-Obsoletes:      modularity-testing-framework < 0.5.18-1
+Obsoletes:      modularity-testing-framework < 0.5.18-2
 
 %description
 %{summary}.
@@ -51,6 +51,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,mtf_
 %{_datadir}/moduleframework/
 
 %changelog
+* Mon Aug 07 2017 Nils Philippsen <nils@redhat.com> 0.5.19-1
+- obsolete modularity-testing-framework-0.5.18-1, too
+
 * Fri Aug 04 2017 Petr "Stone" Hracek <phracek@redhat.com> 0.5.19-1
 - Add Landscap.io into project (#27) (phracek@redhat.com)
 - Update scheduling.rst (phracek@redhat.com)
