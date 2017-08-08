@@ -15,8 +15,8 @@ Testsuite of project
 Taskotron Wokflow
 ----------------------------
 - Production instance: https://taskotron.fedoraproject.org/resultsdb/results?testcases=dist.modularity-testing-framework
-    - Trigerred fedmsg via **module-stream-version** string
-    - Trigerred by **Module Build system** done message, list of all: https://apps.fedoraproject.org/datagrepper/raw?topic=org.fedoraproject.prod.mbs.module.state.change
+    - Triggered fedmsg via **module-stream-version** string
+    - Triggered by **Module Build system** done message, list of all: https://apps.fedoraproject.org/datagrepper/raw?topic=org.fedoraproject.prod.mbs.module.state.change
     - There is general `runtask.yml` taskotron trigger: https://pagure.io/taskotron/task-modularity-testing-framework
         - There is just one for every module and it contains whole logic where to find tests for module.
         - Not needed to duplicate `runtash.yml` for each component. Scheduler is same (existing Makefile)
@@ -36,12 +36,13 @@ Taskotron Wokflow
 
 Arbitrary Jenkins Instance
 ----------------------------
-- Trigerred via `fedmsg file`
-    - Used **tools/run-them.sh** script, for same behaviour as Taskotron
-- **run-them.sh** script for Jenkins based on whole fedmsg
-    - Test Subject: Same as *Taskotron Workflow*
-    - Located in: Same as *Taskotron Workflow*
-    - Scheduled as: `run-them.sh testmodule /usr/share/moduleframework/tools/example_message_module.yaml fedmsg`
-    - Example targets: `check-run-them-fedmsg-testmodule`
-    - Internal logic
-        - Same as *Taskotron Workflow*
+- Production instance: `hidden`
+    - Triggered via `fedmsg file`
+        - Used **tools/run-them.sh** script, for same behaviour as Taskotron
+    - **run-them.sh** script for Jenkins based on whole fedmsg
+        - Test Subject: Same as *Taskotron Workflow*
+        - Located in: Same as *Taskotron Workflow*
+        - Scheduled as: `run-them.sh testmodule /usr/share/moduleframework/tools/example_message_module.yaml fedmsg`
+        - Example targets: `check-run-them-fedmsg-testmodule`
+        - Internal logic
+            - Same as *Taskotron Workflow*
