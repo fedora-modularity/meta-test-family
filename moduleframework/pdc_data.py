@@ -77,6 +77,24 @@ def getBasePackageSet(modulesDict=None, isModule=True, isContainer=False):
     print_info("ALL packages to install:", out)
     return out
 
+def get_repo_url(wmodule="base-runtime", wstream="master", fake=False):
+    """
+    Return URL location of rpm repository.
+    It reads data from PDC and construct url locator.
+    It is used to solve repos for dependent modules (eg. memcached is dependent on perl and baseruntime)
+
+    :param wmodule: module name
+    :param wstream: module stream
+    :param fake:
+    :return: str
+    """
+    if fake:
+        return "http://mirror.vutbr.cz/fedora/releases/25/Everything/x86_64/os/"
+    else:
+        tmp_pdc = PDCParser()
+        tmp_pdc.setLatestPDC(wmodule, wstream)
+        return tmp_pdc.generateRepoUrl()
+
 
 class PDCParser():
     """

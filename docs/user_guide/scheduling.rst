@@ -34,7 +34,7 @@ Taskotron Wokflow
             - If None: Try to find module dir in MTF project tests in `/usr/share/moduleframework/examples` directory
             - If None: Run at least general ModuleLinter (`/usr/share/moduleframework/tools/modulelint`) with general minimal config.yaml located in `docs` directory
 
-Internal Jenkins Instance
+Arbitrary Jenkins Instance
 ----------------------------
 - Production instance: `hidden`
     - Triggered via `fedmsg file`
