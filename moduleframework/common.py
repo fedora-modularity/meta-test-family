@@ -337,8 +337,7 @@ class CommonFunctions(object):
             raise ModuleFrameworkException(
                 "Command is formatted by using trans_dict, if you want to use brackets { } in your code please use {{ "
                 "or }}, possible values in trans_dict are:",
-                trans_dict)
-        print_debug("COMMAND TO RUN:", formattedcommand)
+                trans_dict, "BAD COMMAND:", command)
         return process.run("%s" % formattedcommand, **kwargs)
 
     def installTestDependencies(self, packages=None):
