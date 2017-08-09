@@ -31,6 +31,7 @@ import socket
 import os
 import urllib
 import yaml
+import warnings
 
 from avocado.utils import process
 
