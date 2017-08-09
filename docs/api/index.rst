@@ -8,7 +8,8 @@ This section contains the MTF API, auto generated from `the source code`_.
 .. toctree::
 
    module_framework
-   exceptions_debug
+   common
+   exceptions
    mtf_generator
    compose_info
    pdc_data
