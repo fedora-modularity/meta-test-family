@@ -1,5 +1,5 @@
 CMD=avocado run --filter-by-tags=-WIP
-TESTS=$(shell ls *.py *.sh modulelint/*.py)
+TESTS=$(shell ls *.py *.sh ../../tools/modulelint/*.py)
 export MTF_REMOTE_REPOS=yes
 export DEBUG=yes
 export DOCKERFILE=./Dockerfile

@@ -177,7 +177,7 @@ def get_if_module():
     return not bool(rreps)
 
 
-def sanitize_text(text, replacement="_"):
+def sanitize_text(text, replacement="_", invalid_chars=["/", ";", "&", ">", "<", "|"]):
 
     """
     Replace invalid characters in a string.
@@ -188,7 +188,6 @@ def sanitize_text(text, replacement="_"):
     :param replacement: replacement char, default: "_"
     :return: string
     """
-    invalid_chars=["/", ";", "&", ">", "<", "|"]
     for char in invalid_chars:
         if char in text:
             text = text.replace(char, replacement)
@@ -202,10 +201,8 @@ def sanitize_cmd(cmd):
     :param cmd: string
     :return: string
     """
-    escaping_chars = ['"']
-    for char in escaping_chars:
-        if char in cmd:
-            cmd = cmd.replace(char, '\\'.join(char))
+    if '"' in cmd:
+        cmd = cmd.replace('"', r'\"')
     return cmd
 
 
@@ -341,6 +338,7 @@ class CommonFunctions(object):
                 "Command is formatted by using trans_dict, if you want to use brackets { } in your code please use {{ "
                 "or }}, possible values in trans_dict are:",
                 trans_dict)
+        print_debug("COMMAND TO RUN:", formattedcommand)
         return process.run("%s" % formattedcommand, **kwargs)
 
     def installTestDependencies(self, packages=None):

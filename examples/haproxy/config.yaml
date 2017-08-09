@@ -1,42 +1,6 @@
 document: meta-test
 version: 1
 name: haproxy
-modulemd-url: https://raw.githubusercontent.com/container-images/haproxy/master/haproxy.yaml
-service:
-    port: 80
-packages:
-    rpms:
-        - haproxy
-testdependencies:
-    rpms:
-        - nc
-        - docker
-source: https://github.com/container-images/haproxy
 module:
     docker:
-        setup: cp -f my-haproxy.cfg local-haproxy.cfg;
-               sed s/127.0.0.1/{HOSTIPADDR}/ -i local-haproxy.cfg;
         start: "docker run -it -p 8077:80 -v $(pwd)/local-haproxy.cfg:/etc/haproxy/haproxy.cfg:Z"
-        labels:
-            description: "HAProxy is a TCP/HTTP reverse proxy which is particularly suited for high availability environments."
-            io.k8s.description: "HAProxy is a TCP/HTTP reverse proxy which is particularly suited for high availability environments."
-        container: docker.io/modularitycontainers/haproxy
-    rpm:
-        setup: cp -f my-haproxy.cfg local-haproxy.cfg;
-              sed -i 's/bind.*/bind :8077/' local-haproxy.cfg;
-              cp local-haproxy.cfg {ROOT}/etc/haproxy/haproxy.cfg;
-              semanage port -a -t http_port_t -p tcp 8001;
-              semanage port -a -t http_port_t -p tcp 8000;
-              semanage port -a -t http_port_t -p tcp 8077;
-              sleep 4
-        start: systemctl start haproxy
-        stop: systemctl stop haproxy
-        status: systemctl status haproxy
-        repos:
-            - http://mirror.vutbr.cz/fedora/releases/25/Everything/x86_64/os/
-            - https://phracek.fedorapeople.org/haproxy-module-repo/
-    test:
-        processrunning:
-            - 'ls  /proc/*/exe -alh | grep haproxy'
-
-

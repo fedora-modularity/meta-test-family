@@ -1,7 +1,7 @@
 document: modularity-testing
 version: 1
 name: bash
-modulemd-url: https://src.fedoraproject.org/cgit/modules/memcached.git/plain/memcached.yaml
+modulemd-url: https://src.fedoraproject.org/modules/memcached/raw/master/f/memcached.yaml
 packages:
     rpms:
         - bash
