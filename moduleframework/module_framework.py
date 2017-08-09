@@ -28,7 +28,7 @@ what you should use for your tests (inherited)
 """
 
 from moduleframework.common import *
-from moduleframework.avocado_testers.avocado_test import AvocadoTest
+from moduleframework.avocado_testers.avocado_test import *
 from moduleframework.avocado_testers.nspawn_avocado_test import NspawnAvocadoTest
 from moduleframework.avocado_testers.rpm_avocado_test import RpmAvocadoTest
 from moduleframework.avocado_testers.container_avocado_test import ContainerAvocadoTest
