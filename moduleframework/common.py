@@ -207,6 +207,7 @@ def sanitize_cmd(cmd):
     :param (str): command to sanitize
     :return: str
     """
+
     if '"' in cmd:
         cmd = cmd.replace('"', r'\"')
     return cmd
