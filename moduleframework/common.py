@@ -23,90 +23,20 @@
 #
 
 """
-Custom exceptions and debugging library.
+Custom configuration and debugging library.
 """
 
-import sys
 import netifaces
 import socket
 import os
-import linecache
+import urllib
+import yaml
+import warnings
 
+from avocado.utils import process
 
-class ModuleFrameworkException(Exception):
-    """
-    Formats exception output.
-
-    :return: None
-    """
-    def __init__(self, *args, **kwargs):
-        super(ModuleFrameworkException, self).__init__(
-            'EXCEPTION MTF: ', *args, **kwargs)
-        exc_type, exc_obj, tb = sys.exc_info()
-        if tb is not None:
-            f = tb.tb_frame
-            lineno = tb.tb_lineno
-            filename = f.f_code.co_filename
-            linecache.checkcache(filename)
-            line = linecache.getline(filename, lineno, f.f_globals)
-            print "-----------\n| EXCEPTION IN: {} \n| LINE: {}, {} \n| ERROR: {}\n-----------".format(filename, lineno, line.strip(), exc_obj)
-
-
-class NspawnExc(ModuleFrameworkException):
-    """
-    Indicates Nspawn module error.
-    """
-    def __init__(self, *args, **kwargs):
-        super(NspawnExc, self).__init__('TYPE nspawn', *args, **kwargs)
-
-
-class RpmExc(ModuleFrameworkException):
-    """
-    Indicates Rpm module error.
-    """
-    def __init__(self, *args, **kwargs):
-        super(RpmExc, self).__init__('TYPE rpm', *args, **kwargs)
-
-
-class ContainerExc(ModuleFrameworkException):
-    """
-    Indicates Docker module error.
-    """
-    def __init__(self, *args, **kwargs):
-        super(ContainerExc, self).__init__('TYPE container', *args, **kwargs)
-
-
-class ConfigExc(ModuleFrameworkException):
-    """
-    Indicates ``tests/config.yaml`` or module's ModuleMD YAML file error.
-    File doesn't exist or has a wrong format.
-
-    TIP: If the **CONFIG** envvar is not set, mtf-generator looks for ``./config.yaml``.
-
-    See :mod:`moduleframework.mtf_generator` and `Configuration file`_
-    for more information
-
-    .. _Configuration file: ../user_guide/how_to_write_conf_file
-    """
-    def __init__(self, *args, **kwargs):
-        super(ConfigExc, self).__init__('TYPE config', *args, **kwargs)
-
-
-class PDCExc(ModuleFrameworkException):
-    """
-    Indicates PDC error.
-    """
-    def __init__(self, *args, **kwargs):
-        super(PDCExc, self).__init__('TYPE PDC', *args, **kwargs)
-
-
-class KojiExc(ModuleFrameworkException):
-    """
-    Indicates Koji error: Unable to download a package from Koji.
-    """
-    def __init__(self, *args, **kwargs):
-        super(KojiExc, self).__init__('TYPE Koji', *args, **kwargs)
-
+from moduleframework.exceptions import *
+from moduleframework.compose_info import ComposeParser
 
 defroutedev = netifaces.gateways().get('default').values(
 )[0][1] if netifaces.gateways().get('default') else "lo"
@@ -152,7 +82,7 @@ DEFAULTNSPAWNTIMEOUT = 10
 
 def is_debug():
     """
-    Returns the **DEBUG** envvar.
+    Return the **DEBUG** envvar.
 
     :return: bool
     """
@@ -161,7 +91,7 @@ def is_debug():
 
 def is_not_silent():
     """
-    Returns the opposite of the **DEBUG** envvar.
+    Return the opposite of the **DEBUG** envvar.
 
     :return: bool
     """
@@ -170,7 +100,7 @@ def is_not_silent():
 
 def print_info(*args):
     """
-    Prints information from the expected stdout and
+    Print information from the expected stdout and
     stderr files from the native test scope.
 
     See `Test log, stdout and stderr in native Avocado modules
@@ -181,24 +111,24 @@ def print_info(*args):
     :return: None
     """
     for arg in args:
-        out = arg
+        result = arg
         if isinstance(arg, basestring):
             try:
-                out = arg.format(**trans_dict)
+                result = arg.format(**trans_dict)
             except KeyError:
                 raise ModuleFrameworkException(
-                    "String is formatted by using trans_dict."
-                    + " " +
-                    "If you want to use brackets { } in your code, please use double brackets {{  }}."
-                    + " " +
-                    "Possible values in trans_dict are: ", trans_dict)
-        print >> sys.stderr, out
+                    "String is formatted by using trans_dict. If you want to use "
+                    "brackets { } in your code, please use double brackets {{  }}."
+                    "Possible values in trans_dict are: %s"
+                    % trans_dict)
+        print >> sys.stderr, result
 
 
 def print_debug(*args):
     """
-    Prints information from the expected stdout and
-    stderr files from the native test scope.
+    Print information from the expected stdout and
+    stderr files from the native test scope if
+    the **DEBUG** envvar is set to True.
 
     See `Test log, stdout and stderr in native Avocado modules
     <https://avocado-framework.readthedocs.io/en/latest/WritingTests.html
@@ -212,7 +142,7 @@ def print_debug(*args):
 
 def is_recursive_download():
     """
-    Returns the **MTF_RECURSIVE_DOWNLOAD** envvar.
+    Return the **MTF_RECURSIVE_DOWNLOAD** envvar.
 
     :return: bool
     """
@@ -220,7 +150,7 @@ def is_recursive_download():
 
 def get_if_do_cleanup():
     """
-    Returns the **MTF_DO_NOT_CLEANUP** envvar.
+    Return the **MTF_DO_NOT_CLEANUP** envvar.
 
     :return: bool
     """
@@ -230,36 +160,314 @@ def get_if_do_cleanup():
 
 def get_if_remoterepos():
     """
-    Returns the **MTF_REMOTE_REPOS** envvar.
+    Return the **MTF_REMOTE_REPOS** envvar.
 
     :return: bool
     """
-    rreps = os.environ.get('MTF_REMOTE_REPOS')
-    return bool(rreps)
+    remote_repos = os.environ.get('MTF_REMOTE_REPOS')
+    return bool(remote_repos)
 
 
 def get_if_module():
     """
-    Returns the **MTF_DISABLE_MODULE** envvar.
+    Return the **MTF_DISABLE_MODULE** envvar.
 
     :return: bool
     """
-    rreps = os.environ.get('MTF_DISABLE_MODULE')
-    return not bool(rreps)
+    disable_module = os.environ.get('MTF_DISABLE_MODULE')
+    return not bool(disable_module)
 
 
-def normalize_text(text, replacement="_"):
+def sanitize_text(text, replacement="_", invalid_chars=["/", ";", "&", ">", "<", "|"]):
+
     """
     Replace invalid characters in a string.
 
     invalid_chars=["/", ";", "&", ">", "<", "|"]
 
-    :arg1: string
-    :arg2: replacement char, default: "_"
-    :return: string
+    :param (str): text to sanitize
+    :param (str): replacement char, default: "_"
+    :return: str
     """
-    out = text
-    badchars=["/", ";", "&", ">", "<", "|"]
-    for foo in badchars:
-        out = out.replace(foo, replacement)
-    return out
+    for char in invalid_chars:
+        if char in text:
+            text = text.replace(char, replacement)
+    return text
+
+
+def sanitize_cmd(cmd):
+    """
+    Escape apostrophes in a command line.
+
+    :param (str): command to sanitize
+    :return: str
+    """
+    if '"' in cmd:
+        cmd = cmd.replace('"', r'\"')
+    return cmd
+
+
+def get_profile():
+    """
+    Return a profile name.
+
+    If the **PROFILE** envvar is not set, a profile name is
+    set to be `default`.
+
+    :return: str
+    """
+    profile = os.environ.get('PROFILE')
+    if not profile:
+        profile = "default"
+    return profile
+
+
+def get_url():
+    """
+    Return the **URL** envvar.
+
+    :return: str
+    """
+    url = os.environ.get('URL')
+    return url
+
+
+def get_config():
+    """
+    Read the module's configuration file.
+
+    :default: ``./config.yaml`` in the ``tests`` directory of the module's root
+     directory
+    :envvar: **CONFIG=path/to/file** overrides default value.
+    :return: str
+    """
+    cfgfile = os.environ.get('CONFIG') or './config.yaml'
+    try:
+        with open(cfgfile, 'r') as ymlfile:
+            xcfg = yaml.load(ymlfile.read())
+            return xcfg
+    except IOError:
+        raise ConfigExc(
+            "Error: File '%s' doesn't appear to exist or it's not a YAML file. "
+            "Tip: If the CONFIG envvar is not set, mtf-generator looks for './config'."
+            % cfgfile)
+
+
+def get_compose_url():
+    """
+    Return Compose URL.
+
+    If the **COMPOSEURL** ennvar is not set, it's defined from the ``./config.yaml``.
+
+    :return: str
+    """
+    compose_url = os.environ.get('COMPOSEURL')
+    if not compose_url:
+        readconfig = CommonFunctions()
+        readconfig.loadconfig()
+        try:
+            if readconfig.config.get("compose-url"):
+                compose_url = readconfig.config.get("compose-url")
+            elif readconfig.config['module']['rpm'].get("repo"):
+                compose_url = readconfig.config['module']['rpm'].get("repo")
+            else:
+                compose_url = readconfig.config['module']['rpm'].get("repos")[0]
+        except AttributeError:
+            return None
+    return compose_url
+
+
+def get_modulemd():
+    """
+    Read a moduleMD file.
+
+    If the **MODULEMDURL** envvar is not set, module-url section of
+    the ``config.yaml`` file is checked. If none of them is set, then
+    the ***COMPOSE_URL* envvar is checked.
+
+    :return: dict
+    """
+    mdf = os.environ.get('MODULEMDURL')
+    if not mdf:
+        readconfig = CommonFunctions()
+        readconfig.loadconfig()
+        try:
+            if readconfig.config.get("modulemd-url"):
+                mdf = readconfig.config.get("modulemd-url")
+            else:
+                a = ComposeParser(get_compose_url())
+                b = a.variableListForModule(readconfig.config.get("name"))
+                mdf = [x[12:] for x in b if 'MODULEMDURL=' in x][0]
+        except AttributeError:
+            return None
+    return mdf
+
+
+class CommonFunctions(object):
+    """
+    Basic class to read configuration data and execute commands on a host machine.
+    """
+    config = None
+    modulemdConf = None
+
+    def __init__(self, *args, **kwargs):
+        self.config = None
+        self.modulemdConf = None
+        self.moduleName = None
+        self.source = None
+        self.arch = None
+        self.dependencylist = {}
+        self.moduledeps = None
+        # general use case is to have forwarded services to host (so thats why it is same)
+        self.ipaddr = trans_dict["HOSTIPADDR"]
+        trans_dict["GUESTARCH"] = self.getArch()
+
+    def getArch(self):
+        """
+        Get system architecture.
+
+        :return: str
+        """
+        sys_arch = self.runHost(command='uname -m', verbose=False).stdout.strip()
+        return sys_arch
+
+    def runHost(self, command="ls /", **kwargs):
+        """
+        Run commands on a host.
+
+        :param (str): command to exectute
+        ** kwargs: avocado process.run params like: shell, ignore_status, verbose
+        :return: avocado.process.run
+        """
+        try:
+            formattedcommand = command.format(**trans_dict)
+        except KeyError:
+            raise ModuleFrameworkException(
+                "Command is formatted by using trans_dict. If you want to use "
+                "brackets { } in your code, please use {{ }}. Possible values "
+                "in trans_dict are: %s. \nBAD COMMAND: %s"
+                % (trans_dict, command))
+        return process.run("%s" % formattedcommand, **kwargs)
+
+    def installTestDependencies(self, packages=None):
+        """
+        Install packages on a host machine to prepare a test environment.
+
+        :param (list): packages to install. If not specified, rpms from config.yaml
+                       will be installed.
+        :return: None
+        """
+        if not packages:
+            typo = 'testdependecies' in self.config
+            if typo:
+                warnings.warn("'testdependecies' is a typo, please fix",
+                              DeprecationWarning)
+
+            # try section without typo first
+            packages = self.config.get('testdependencies', {}).get('rpms')
+            if packages:
+                if typo:
+                    warnings.warn("preferring section without typo")
+            else:
+                # fall back to mistyped test dependency section
+                packages = self.config.get('testdependecies', {}).get('rpms')
+
+        if packages:
+            self.runHost(
+                "{HOSTPACKAGER} install " +
+                " ".join(packages),
+                ignore_status=True, verbose=is_not_silent())
+
+    def loadconfig(self):
+        """
+        Load configuration from config.yaml file.
+
+        :return: None
+        """
+        try:
+            self.config = get_config()
+            self.moduleName = sanitize_text(self.config['name'])
+            self.source = self.config.get('source') if self.config.get(
+                'source') else self.config['module']['rpm'].get('source')
+        except ValueError:
+            pass
+
+    def getPackageList(self, profile=None):
+        """
+        Return list of packages what has to be installed inside module
+
+        :param profile: get list for intended profile instead of default method for searching
+        :return: list of packages (rpms)
+        """
+        package_list = []
+        if not profile:
+            if 'packages' in self.config:
+                packages_rpm = self.config['packages'].get('rpms') if self.config[
+                    'packages'].get('rpms') else []
+                packages_profiles = []
+                for x in self.config['packages'].get('profiles') if self.config[
+                    'packages'].get('profiles') else []:
+                    packages_profiles = packages_profiles + \
+                                        self.getModulemdYamlconfig()['data']['profiles'][x]['rpms']
+                package_list += packages_rpm + packages_profiles
+
+            elif self.getModulemdYamlconfig()['data'].get('profiles') and self.getModulemdYamlconfig()['data'][
+                'profiles'].get(get_profile()):
+                package_list += self.getModulemdYamlconfig()['data']['profiles'][get_profile()]['rpms']
+            else:
+                # fallback solution when it is not known what to install
+                package_list.append("bash")
+        else:
+            package_list += self.getModulemdYamlconfig()['data']['profiles'][profile]['rpms']
+        print_info("PCKGs to install inside module:", package_list)
+        return package_list
+
+    def getModuleDependencies(self):
+        """
+        Return module dependencies.
+
+        :return: list
+        """
+
+        return self.dependencylist
+
+    def getModulemdYamlconfig(self, urllink=None):
+        """
+        Return moduleMD file yaml object.
+        It can be used also for loading another yaml file via url parameter
+
+        :param (str): url link to load. Default url defined in the `config.yaml` file,
+                      can be overridden by the **CONFIG** envvar.
+        :return: dict
+        """
+        try:
+            if urllink:
+                ymlfile = urllib.urlopen(urllink)
+                cconfig = yaml.load(ymlfile)
+                link = cconfig
+            elif not get_if_module():
+                trans_dict["GUESTPACKAGER"] = "yum -y"
+                link = {"data": {}}
+            else:
+                if self.config is None:
+                    self.loadconfig()
+                if not self.modulemdConf:
+                    modulemd = get_modulemd()
+                    if modulemd:
+                        ymlfile = urllib.urlopen(modulemd)
+                        self.modulemdConf = yaml.load(ymlfile)
+                link = self.modulemdConf
+            return link
+        except IOError as e:
+            raise ConfigExc("Cannot load file: '%s'" % e)
+
+    def getIPaddr(self):
+        """
+        Return protocol (IP or IPv6) address on a guest machine.
+
+        In many cases it should be same as a host machine's and a port
+        should be forwarded to a host.
+
+        :return: str
+        """
+        return self.ipaddr

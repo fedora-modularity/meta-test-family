@@ -1,8 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Meta test family (MTF) is a tool to test components of a modular Fedora:
-# https://docs.pagure.org/modularity/
+# This Modularity Testing Framework helps you to write tests for modules
 # Copyright (C) 2017 Red Hat, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -19,26 +18,22 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# Authors: Jan Scotka <jscotka@redhat.com>
+# Authors: Petr Hracek <phracek@redhat.com>
 #
-
-from moduleframework import module_framework
-from avocado import Test
-from avocado import utils
+from moduleframework.module_framework import AvocadoTest
 
 
-class PureAvocadoTest(Test):
+class NspawnAvocadoTest(AvocadoTest):
+    """
+    Class for writing tests specific just for RPM module testing inside NSPAWN env
+    derived from AvocadoTest class.
+
+    :avocado: disable
+    """
 
     def setUp(self):
-        self.backend, self.moduletype = module_framework.get_backend()
-        self.backend.setUp()
+        if self.moduleType != "nspawn":
+            self.skip("Nspawn specific test")
+        super(NspawnAvocadoTest, self).setUp()
 
-    def testInsideModule(self):
-        self.backend.start()
-        self.backend.run("ls /")
 
-    def testOnHost(self):
-        utils.process.run("ls /")
-
-    def tearDown(self):
-        self.backend.tearDown()

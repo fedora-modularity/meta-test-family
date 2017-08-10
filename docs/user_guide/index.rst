@@ -3,20 +3,20 @@ User Guide
 
 1. In a module's root directory create a directory ``tests`` and place there a module configuration file ``config.yaml`` described in detail in section `Configuration file`_.
 
-.. _Configuration file: how_to_write_conf_file
+.. _Configuration file: how_to_write_conf_file.html
 
 2. Optionally write multiline Bash snippet tests directly in the ``tests/config.yaml`` file as described in section `Multiline Bash snippet tests`_.
 
-.. _Multiline Bash snippet tests: how_to_write_conf_file#multiline-bash-snippet-tests
+.. _Multiline Bash snippet tests: how_to_write_conf_file.html#multiline-bash-snippet-tests
 
 3. Check the list of `Environment variables`_.
 
-.. _Environment variables: environment_variables
+.. _Environment variables: environment_variables.html
 
 4. Write your tests, for example see `sanity tests`_ and various tests examples in ``/usr/share/moduleframework/examples/testing-module/``. All tests methods are listed in section `API Index`_ and alphabetically in :ref:`genindex` section.
 
 .. _sanity tests: https://github.com/fedora-modularity/meta-test-family/blob/master/examples/template/sanity_template.py
-.. _API Index: ../api/index
+.. _API Index: ../api/index.html
 
 5. In the directory ``tests`` create a ``Makefile`` as below.
 

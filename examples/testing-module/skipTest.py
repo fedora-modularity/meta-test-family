@@ -22,6 +22,7 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
+from moduleframework import common
 from moduleframework import module_framework
 from avocado import skipIf
 from avocado import skipUnless
@@ -40,12 +41,12 @@ class SkipTest(module_framework.AvocadoTest):
         self.start()
         self.run("gcc -v")
 
-    @skipIf(module_framework.get_correct_profile() == "default")
+    @skipIf(common.get_profile() == "default")
     def testDecoratorNotSkippedForDefault(self):
         self.start()
         self.run("echo for default profile")
 
-    @skipUnless(module_framework.get_correct_profile() == "gcc")
+    @skipUnless(common.get_profile() == "gcc")
     def testDecoratorSkip(self):
         self.start()
         self.run("gcc -v")

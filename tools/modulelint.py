@@ -21,9 +21,8 @@
 #
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
-
+from __future__ import print_function
 import os
-
 
 from moduleframework import module_framework
 from moduleframework import dockerlinter
@@ -107,11 +106,11 @@ class DockerLint(module_framework.ContainerAvocadoTest):
         """
         llabels = self.getConfigModule().get('labels')
         if llabels is None or len(llabels) == 0:
-            print "No labels defined in config to check"
+            print("No labels defined in config to check")
             self.cancel()
         for key in self.getConfigModule()['labels']:
             aaa = self.checkLabel(key, self.getConfigModule()['labels'][key])
-            print ">>>>>> ", aaa, key
+            print(">>>>>> ", aaa, key)
             self.assertTrue(aaa)
 
 

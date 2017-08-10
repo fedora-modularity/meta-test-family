@@ -23,7 +23,7 @@ Requires:       python2-dockerfile-parse
 Requires:       python2-pdc-client
 Requires:       python2-modulemd
 Provides:       modularity-testing-framework = %{version}-%{release}
-Obsoletes:      modularity-testing-framework < 0.5.18-1
+Obsoletes:      modularity-testing-framework < 0.5.18-2
 
 %description
 %{summary}.
@@ -51,6 +51,23 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,mtf_
 %{_datadir}/moduleframework/
 
 %changelog
+* Mon Aug 07 2017 Nils Philippsen <nils@redhat.com> 0.5.19-1
+- obsolete modularity-testing-framework-0.5.18-1, too
+
+* Fri Aug 04 2017 Petr "Stone" Hracek <phracek@redhat.com> 0.5.19-1
+- Add Landscap.io into project (#27) (phracek@redhat.com)
+- Update scheduling.rst (phracek@redhat.com)
+- Several fixes caused by missing testing. (phracek@redhat.com)
+- Draft of refactoring avocado-tests. (phracek@redhat.com)
+- replaced get_correct_backed in all internal tests by get_backend
+  (jscotka@redhat.com)
+- fixed typo caused by function moving to other module (jscotka@redhat.com)
+- function names cleanup, removed "correct" "latest" words  fixing command
+  sanitizer (jscotka@redhat.com)
+- changed return variable to not be same as input param (jscotka@redhat.com)
+- improved multihost test handling and created functions for normalizing
+  commands before run (escaping) (jscotka@redhat.com)
+
 * Tue Aug 01 2017 Petr Hracek <phracek@redhat.com> - 0.5.18-2
 - Renaming package to the new name meta-test-family
 

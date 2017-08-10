@@ -1,5 +1,5 @@
-Exceptions and Debug
-====================
+Common
+=======
 
 .. automodule:: moduleframework.common
    :members:

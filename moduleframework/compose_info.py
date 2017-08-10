@@ -33,7 +33,6 @@ import urllib
 import xml.etree.ElementTree
 import gzip
 import tempfile
-import os
 from common import *
 
 

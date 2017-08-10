@@ -12,7 +12,7 @@ name: memcached
 # link to default moduleMD file (usefull for local testing wihtout any repo)
 # env var: MODULEMDURL
 # MANDATORY (or compose-url)
-modulemd-url: https://src.fedoraproject.org/cgit/modules/memcached.git/plain/memcached.yaml
+modulemd-url: https://src.fedoraproject.org/modules/memcached/raw/master/f/memcached.yaml
 # final compose done by pungi (contain also modulemd files for modules) can suppy also previous part
 # env var: COMPOSEURL
 compose-url: url_to_compose_in done in fedora
