@@ -40,6 +40,7 @@ class EnvNspawn(CommonFunctions):
     def cleanup_env(self):
         self.__cleanup()
 
+
     def __prepare_selinux(self):
         # disable selinux by default if not turned off
         if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
