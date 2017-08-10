@@ -5,7 +5,6 @@ modulemd-url: https://src.fedoraproject.org/modules/memcached/raw/master/f/memca
 packages:
     rpms:
         - bash
-        - rpm
 module:
     docker:
         container: docker.io/phracek/memcached

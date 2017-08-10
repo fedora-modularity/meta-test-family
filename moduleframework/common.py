@@ -45,10 +45,15 @@ hostname = socket.gethostname()
 dusername = "test"
 dpassword = "test"
 ddatabase = "basic"
-hostpackager = "yum -y"
-guestpackager = "microdnf"
-if os.path.exists('/usr/bin/dnf'):
-    hostpackager = "dnf -y"
+
+if os.path.exists('/etc/redhat-release'):
+    hostpackager = "yum -y"
+    guestpackager = "microdnf"
+    if os.path.exists('/usr/bin/dnf'):
+        hostpackager = "dnf -y"
+else:
+    hostpackager = "apt-get -y"
+    guestpackager = "apt-get -y"
 ARCH = "x86_64"
 
 # translation table for {VARIABLE} in the config.yaml file

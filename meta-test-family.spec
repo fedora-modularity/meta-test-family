@@ -46,6 +46,8 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,mtf_
 %{_bindir}/moduleframework-cmd
 %{_bindir}/modulelint
 %{_bindir}/mtf-generator
+%{_bindir}/mtf-env-set
+%{_bindir}/mtf-env-clean
 %{python2_sitelib}/moduleframework/
 %{python2_sitelib}/meta_test_family-*.egg-info/
 %{_datadir}/moduleframework/
