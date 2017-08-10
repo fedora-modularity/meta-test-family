@@ -27,7 +27,6 @@
 
 from moduleframework import module_framework
 from moduleframework import common
-from moduleframework import pdc_data
 
 
 class ComposeTest(module_framework.NspawnAvocadoTest):
