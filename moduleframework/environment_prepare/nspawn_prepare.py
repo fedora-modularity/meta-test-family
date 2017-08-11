@@ -44,6 +44,7 @@ class EnvNspawn(CommonFunctions):
     def __prepare_selinux(self):
         # disable selinux by default if not turned off
         if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
+            print_info("Disabling selinux")
             # TODO: workaround because systemd nspawn is now working well in F-25
             # (failing because of selinux)
             if not os.path.exists(selinux_state_file):
@@ -62,6 +63,7 @@ class EnvNspawn(CommonFunctions):
 
     def __cleanup(self):
         if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
+            print_info("Turning back selinux to previous state")
             actual_state = self.runHost("getenforce", ignore_status=True).stdout.strip()
             if os.path.exists(selinux_state_file):
                 print_info("Turning back selinux to previous state")

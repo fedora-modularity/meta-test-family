@@ -1,7 +1,7 @@
 language: python
 python:
   - "2.7"
-# command to install dependencies
+
 services:
   - docker
 
@@ -10,10 +10,11 @@ before_install:
   - sudo apt-get install -y docker
   - sudo apt-get install -y git
   - pip install avocado-framework
+  - sudo pip install avocado-framework
 
-install: "make install"
+install: "make install; sudo make install"
 
 after_script:
-  - cat $HOME/avocado/job-results/latest/job.log
+  - sudo cat $HOME/avocado/job-results/latest/job.log
 
-script: make test
+script: sudo make travis

@@ -25,7 +25,7 @@
 """
 module for environment setup and cleanup, to be able to split action for ansible, more steps instead of one complex
 """
-from moduleframework.avocado_testers.avocado_test import get_backend
+from moduleframework.module_framework import *
 from moduleframework.environment_prepare.docker_prepare import EnvDocker
 from moduleframework.environment_prepare.rpm_prepare import EnvRpm
 from moduleframework.environment_prepare.nspawn_prepare import EnvNspawn
