@@ -8,7 +8,7 @@ import time
 
 WAIT_TIME=10
 
-class OneMachine(module_framework.AvocadoTest):
+class OneMachine(module_framework.ContainerAvocadoTest):
     """
     Basic, the most straightforward example how to use it with collections,
     many configs, and similar tests
@@ -60,7 +60,7 @@ class OneMachine(module_framework.AvocadoTest):
                                         shell=True, ignore_status=True).stderr)
 
 
-class OneMachineInSetup(module_framework.AvocadoTest):
+class OneMachineInSetup(module_framework.ContainerAvocadoTest):
     """
     Example of test for collections with custom action in own setUp() method.
     It is cleaner, but it allow to have just one modificaion in one class
