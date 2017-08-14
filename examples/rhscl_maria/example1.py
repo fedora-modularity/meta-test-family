@@ -6,6 +6,7 @@ from avocado.utils import process
 from avocado import Test
 import time
 
+WAIT_TIME=10
 
 class OneMachine(module_framework.AvocadoTest):
     """
@@ -18,19 +19,19 @@ class OneMachine(module_framework.AvocadoTest):
 
     def testDefaultConfig(self):
         self.start()
-        time.sleep(10)
+        time.sleep(WAIT_TIME)
         self.assertIn("1", self.runHost("echo select 1 | mysql -h 127.0.0.1 -u root -p{PASSWORD}", shell=True).stdout)
 
     def testNonDefaultStartAction(self):
         self.getConfig()["module"]["docker"]["start"]="docker run -p 3307:3306 -e MYSQL_ROOT_PASSWORD={PASSWORD}"
         self.start()
-        time.sleep(10)
+        time.sleep(WAIT_TIME)
         self.assertIn("1", self.runHost("echo select 1 | mysql -P 3307 -h 127.0.0.1 -u root -p{PASSWORD}", shell=True).stdout)
 
     def testThisFail(self):
         self.getConfig()["module"]["docker"]["start"]="docker run -p 3308:3306 -e MYSQL_ROOT_PASSWORD={PASSWORD}"
         self.start()
-        time.sleep(10)
+        time.sleep(WAIT_TIME)
         self.assertIn("t connect to MySQL server", self.runHost("echo select 1 | mysql -P 3307 -h 127.0.0.1 -u root -p{PASSWORD}",
                                         shell=True, ignore_status=True).stderr)
 
@@ -43,9 +44,10 @@ class OneMachineInSetup(module_framework.AvocadoTest):
     def setUp(self):
         super(self.__class__,self).setUp()
         self.getConfig()["module"]["docker"]["start"] = "docker run -p 3307:3306 -e MYSQL_ROOT_PASSWORD={PASSWORD}"
+        self.start()
+        time.sleep(WAIT_TIME)
 
     def testDefaultConfig(self):
-        self.start()
         self.assertIn("1", self.runHost("echo select 1 | mysql -h 127.0.0.1 -u root -p{PASSWORD} -P 3307", shell=True).stdout)
 
 
