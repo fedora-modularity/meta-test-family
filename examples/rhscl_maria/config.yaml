@@ -1,0 +1,18 @@
+document: modularity-testing
+version: 1
+name: mariadb
+modulemd-url: https://src.fedoraproject.org/modules/base-runtime/raw/master/f/base-runtime.yaml
+packages:
+    rpms:
+        - bash
+testdependencies:
+    rpms:
+        - nc
+        - community-mysql
+default_module: docker
+module:
+    docker:
+        start: docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD={PASSWORD}
+        container: docker.io/mariadb
+    rpm:
+        source: http://ftp.fi.muni.cz/pub/linux/fedora/linux/releases/26/Everything/x86_64/os/
