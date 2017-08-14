@@ -53,7 +53,8 @@ check-exceptions: prepare-nspawn
 
 
 
-check: check-docker check-minimal-config-rpm check-run-them-pdc-testmodule
+check:
+	MODULE=docker CONFIG=./fullconfig.yaml $(CMD) --show-job-log $(TESTS)
 
 all: check
 

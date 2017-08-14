@@ -10,5 +10,3 @@ module:
         container: docker.io/modularitycontainers/memcached
     rpm:
         repo: https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server/x86_64/os/
-
-

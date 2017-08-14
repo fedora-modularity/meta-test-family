@@ -45,8 +45,8 @@ hostname = socket.gethostname()
 dusername = "test"
 dpassword = "test"
 ddatabase = "basic"
-
-if os.path.exists('/etc/redhat-release'):
+__rh_release = '/etc/redhat-release'
+if os.path.exists(__rh_release):
     hostpackager = "yum -y"
     guestpackager = "microdnf"
     if os.path.exists('/usr/bin/dnf'):
