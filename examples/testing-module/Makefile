@@ -52,7 +52,7 @@ check-exceptions: prepare-nspawn
 	@true
 
 travis:
-	MODULE=docker CONFIG=./fullconfig.yaml $(CMD) $(TESTS)
+	MODULE=docker CONFIG=./fullconfig.yaml $(CMD) --show-job-log $(TESTS)
 
 check: check-docker
 
