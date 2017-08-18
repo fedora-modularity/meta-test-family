@@ -8,7 +8,7 @@ prepare-nspawn:
 	MODULE=nspawn mtf-env-set
 
 prepare-docker:
-	MODULE=docker mtf-env-clean
+	MODULE=docker mtf-env-set
 
 check-docker: prepare-docker
 	MODULE=docker CONFIG=./fullconfig.yaml $(CMD) $(TESTS)
