@@ -20,7 +20,7 @@ Enhancement suggestions are tracked as [GitHub issues](https://guides.github.com
 
 ### Submitting changes
 
-To submitt changes, please send a [GitHub Pull Request](https://github.com/fedora-modularity/meta-test-family/pull/new/devel). Before submitting a PR, please **read the [Styleguides](#styleguides)** to know more about coding conventions used in this project. Also we will appreciate if you **check your code with pylint and pyflakes**. Always **create a new branch for each pull request** to avoid intertwingling different features or fixes on the same branch. Always **do "git pull --rebase" and "git rebase"** vs "git pull" or "git merge".
+To submit changes, please send a [GitHub Pull Request](https://github.com/fedora-modularity/meta-test-family/pull/new/devel). Before submitting a PR, please **read the [Styleguides](#styleguides)** to know more about coding conventions used in this project. Also we will appreciate if you **check your code with pylint and pyflakes**. Always **create a new branch for each pull request** to avoid intertwingling different features or fixes on the same branch. Always **do "git pull --rebase" and "git rebase"** vs "git pull" or "git merge".
 
 > **Note:** We are aware of [current syntax and style code errors](https://github.com/fedora-modularity/meta-test-family/issues/21) and working on fixing them.
 
