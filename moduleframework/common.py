@@ -100,7 +100,7 @@ def is_not_silent():
 
     :return: bool
     """
-    return not is_debug()
+    return is_debug()
 
 
 def print_info(*args):
@@ -381,7 +381,7 @@ class CommonFunctions(object):
             self.runHost(
                 "{HOSTPACKAGER} install " +
                 " ".join(packages),
-                ignore_status=True, verbose=is_not_silent())
+                ignore_status=True, verbose=is_debug())
 
     def loadconfig(self):
         """
