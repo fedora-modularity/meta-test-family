@@ -5,10 +5,10 @@ PYTHONSITE=/usr/lib/python2.7/site-packages
 all: install check
 
 check:
-	cd examples/testing-module; make check
+	make -C examples/testing-module check
 
 travis:
-	cd examples/testing-module; make travis
+	make -C examples/testing-module travis
 
 .PHONY: clean
 

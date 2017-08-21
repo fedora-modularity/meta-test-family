@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # Meta test family (MTF) is a tool to test components of a modular Fedora:
@@ -41,7 +40,11 @@ class EnvDocker(CommonFunctions):
 
     def add_insecure_registry(self, registry):
         """
+        TODO: This function is disabled, and not used anywhere.
+        We have to reconsider how to solve this.
+
         Append registry into inserure registry.
+
 
         :param registry: string cotain value to add to insecure registry variable to config file
         :return:

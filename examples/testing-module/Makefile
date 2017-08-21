@@ -48,11 +48,11 @@ check-run-them-fedmsg-testmodule: prepare-nspawn
 	@true
 
 check-exceptions: prepare-nspawn
-	MODULEMDURL=XXX  MODULE=nspawn $(CMD) --show-job-log simpleTest.py  | grep 'raise ConfigExc' >/dev/null
+	MODULEMDURL=XXX  MODULE=nspawn $(CMD) simpleTest.py  | grep 'raise ConfigExc' >/dev/null
 	@true
 
 travis:
-	MODULE=docker CONFIG=./fullconfig.yaml $(CMD) --show-job-log $(TESTS)
+	MODULE=docker $(CMD) $(TESTS)
 
 check: check-docker
 

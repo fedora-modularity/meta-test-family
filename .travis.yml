@@ -10,16 +10,11 @@ services:
 before_install:
   - sudo apt-get -y install curl python-software-properties software-properties-common python-pip python-dev build-essential git make
   - sudo apt-get install -y libkrb5-dev
-  - sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-  - sudo apt-get update
-  - sudo apt-get -y install docker-ce
-  - sudo pip install --upgrade pip
-  - sudo pip install --upgrade virtualenv
   - sudo pip install avocado-framework
   - pip install avocado-framework
-  - sudo service docker restart
 
 install: sudo make install
 
 script: sudo make travis
+
+after_script: sudo cat ~/avocado/job-results/latest/job.log
