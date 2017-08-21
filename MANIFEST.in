@@ -3,6 +3,7 @@ include Makefile
 include LICENSE
 include Vagrantfile
 include README.md
+include CONTRIBUTING.md
 recursive-include moduleframework *
 recursive-include docs *
 recursive-include examples *
