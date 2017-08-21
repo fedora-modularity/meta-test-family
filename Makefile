@@ -5,7 +5,10 @@ PYTHONSITE=/usr/lib/python2.7/site-packages
 all: install check
 
 check:
-	cd examples/testing-module; make
+	make -C examples/testing-module check
+
+travis:
+	make -C examples/testing-module travis
 
 .PHONY: clean
 
@@ -36,3 +39,4 @@ help:
 	@echo " source                  create source tarball"
 	@echo " check                   run examples/testing_module check target in Makefile"
 	@echo " html                    create HTML documentation"
+

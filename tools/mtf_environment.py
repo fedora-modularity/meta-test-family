@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # Meta test family (MTF) is a tool to test components of a modular Fedora:
@@ -24,14 +25,37 @@
 """
 module for environment setup and cleanup, to be able to split action for ansible, more steps instead of one complex
 """
+from moduleframework.module_framework import *
+from moduleframework.environment_prepare.docker_prepare import EnvDocker
+from moduleframework.environment_prepare.rpm_prepare import EnvRpm
+from moduleframework.environment_prepare.nspawn_prepare import EnvNspawn
+from optparse import OptionParser
 
-from moduleframework.common import *
+(module_object, module_name) = get_backend()
 
+parser = OptionParser()
+parser.add_option(
+    "-p",
+    "--phase",
+    dest="phase",
+    help="apply selected mtf phase, allowed are (prepare|cleanup)",
+    default=None)
 
-class EnvRpm(CommonFunctions):
+(options, args) = parser.parse_args()
 
-    def prepare_env(self):
-        pass
+if module_name == "docker":
+    env = EnvDocker()
+elif module_name == "rpm":
+    env = EnvRpm()
+elif module_name == "nspawn":
+    env = EnvNspawn()
 
-    def cleanup_env(self):
-        pass
+if options.phase:
+    if options.phase == "prepare":
+        env.prepare_env()
+    elif options.phase == "cleanup":
+        env.cleanup_env()
+    else:
+        raise Exception(parser.print_help())
+else:
+    raise Exception(parser.print_help())

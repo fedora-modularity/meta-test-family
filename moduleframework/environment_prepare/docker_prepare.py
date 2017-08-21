@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # Meta test family (MTF) is a tool to test components of a modular Fedora:
@@ -41,11 +40,16 @@ class EnvDocker(CommonFunctions):
 
     def add_insecure_registry(self, registry):
         """
+        TODO: This function is disabled, and not used anywhere.
+        We have to reconsider how to solve this.
+
         Append registry into inserure registry.
+
 
         :param registry: string cotain value to add to insecure registry variable to config file
         :return:
         """
+
         if registry not in open('/etc/sysconfig/docker', 'r').read():
             print_info("Adding %s to insecure registry" % registry)
             with open("/etc/sysconfig/docker", "a") as myfile:
@@ -58,6 +62,7 @@ class EnvDocker(CommonFunctions):
 
         :return: None
         """
+
         if not os.path.exists('/usr/bin/docker'):
             print_info("Installing docker")
             self.runHost("{HOSTPACKAGER} install docker".format(**trans_dict), verbose=is_not_silent())
@@ -68,6 +73,7 @@ class EnvDocker(CommonFunctions):
 
         :return: None
         """
+
         if not os.path.exists('/var/run/docker.sock'):
             print_info("Starting Docker")
             service_manager = service.ServiceManager()
@@ -79,6 +85,7 @@ class EnvDocker(CommonFunctions):
 
         :return: None
         """
+
         if os.path.exists('/var/run/docker.sock'):
             print_info("Stopping Docker")
             service_manager = service.ServiceManager()

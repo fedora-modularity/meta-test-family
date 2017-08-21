@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # Meta test family (MTF) is a tool to test components of a modular Fedora:
@@ -40,10 +39,12 @@ class EnvNspawn(CommonFunctions):
     def cleanup_env(self):
         self.__cleanup()
 
+
     def __prepare_selinux(self):
         # disable selinux by default if not turned off
         if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
-            # TODO: workaround because systemd nspawn is now working well in F-25
+            print_info("Disabling selinux")
+            # TODO: workaround because systemd nspawn is now working well in F-26
             # (failing because of selinux)
             if not os.path.exists(selinux_state_file):
                 print_info("Disabling selinux")
@@ -61,6 +62,7 @@ class EnvNspawn(CommonFunctions):
 
     def __cleanup(self):
         if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
+            print_info("Turning back selinux to previous state")
             actual_state = self.runHost("getenforce", ignore_status=True).stdout.strip()
             if os.path.exists(selinux_state_file):
                 print_info("Turning back selinux to previous state")

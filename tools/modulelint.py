@@ -97,7 +97,7 @@ class DockerLint(module_framework.ContainerAvocadoTest):
         :return:
         """
         self.start()
-        self.assertIn(self.backend.jmeno, self.runHost("docker ps").stdout)
+        self.assertIn(self.backend.jmeno.rsplit("/")[-1], self.runHost("docker ps").stdout)
 
     def testLabels(self):
         """
