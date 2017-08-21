@@ -53,7 +53,7 @@ if os.path.exists(__rh_release):
         hostpackager = "dnf -y"
 else:
     hostpackager = "apt-get -y"
-    guestpackager = "apt-get -y"
+    guestpackager = "dnf"
 ARCH = "x86_64"
 
 # translation table for {VARIABLE} in the config.yaml file
