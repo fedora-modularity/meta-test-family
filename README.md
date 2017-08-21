@@ -1,4 +1,4 @@
-[![Code Health](https://landscape.io/github/fedora-modularity/meta-test-family/master/landscape.svg?style=flat)](https://landscape.io/github/fedora-modularity/meta-test-family/master)
+[![Code Health](https://landscape.io/github/fedora-modularity/meta-test-family/master/landscape.svg?style=flat)](https://landscape.io/github/fedora-modularity/meta-test-family/master) [![Build Status](https://travis-ci.org/fedora-modularity/meta-test-family.svg?branch=master)](https://travis-ci.org/fedora-modularity/meta-test-family)
 
 # WELCOME TO MTF GITHUB
 
