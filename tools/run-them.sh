@@ -117,6 +117,8 @@ function run_modulelint(){
 set -x
 inst_env
 RESULTTOOLS=$(($RESULTTOOLS+$?))
+MODULE=nspawn mtf-env-set
+RESULTTOOLS=$(($RESULTTOOLS+$?))
 PARAMS="`DEBUG=yes getparams_int`"
 RESULTTOOLS=$(($RESULTTOOLS+$?))
 export PARAMS
@@ -140,8 +142,9 @@ else
     # return code what means SKIP results and do not interpret it
     exit 126
 fi
-
 TESTRESULT=$?
+
+MODULE=nspawn mtf-env-clean
 
 if [ "$RESULTTOOLS" -ne 0 ]; then
     exit 2
@@ -154,3 +157,4 @@ else
 # return code what means that some part of infra failed
     exit 125
 fi
+

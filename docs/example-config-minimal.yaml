@@ -5,10 +5,9 @@ modulemd-url: https://src.fedoraproject.org/modules/memcached/raw/master/f/memca
 packages:
     rpms:
         - bash
-        - rpm
 module:
     docker:
-        container: docker.io/phracek/memcached
+        container: docker.io/modularitycontainers/memcached
     rpm:
         repo: https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server/x86_64/os/
 

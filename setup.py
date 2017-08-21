@@ -78,6 +78,8 @@ setup(
             'moduleframework-cmd = moduleframework.bashhelper:main',
             'modulelint = moduleframework.modulelint:main',
             'mtf-generator = moduleframework.mtf_generator:main',
+            'mtf-env-set = moduleframework.mtf_environment:mtfenvset',
+            'mtf-env-clean = moduleframework.mtf_environment:mtfenvclean',
         ]
     },
     setup_requires=[],
