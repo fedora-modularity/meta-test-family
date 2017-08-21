@@ -18,7 +18,7 @@ module:
             description: "memcached is a high-performance, distributed memory"
             io.k8s.description: "memcached is a high-performance, distributed memory"
         source: https://github.com/container-images/memcached.git
-        container: docker.io/phracek/memcached
+        container: docker.io/modularitycontainers/memcached
     rpm:
         start: systemctl start memcached
         stop: systemctl stop memcached
