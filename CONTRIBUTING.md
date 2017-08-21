@@ -10,7 +10,7 @@ The following is a set of guidelines for contributing to MTF. These are not rule
 
 Before creating bug reports, please check a [list of known issues](https://github.com/fedora-modularity/meta-test-family/issues) to see if the problem has already been reported.
 
-If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/fedora-modularity/meta-test-family/issues/new). Be sure to include a **descriptive title and clear description** and please include **as many details as possible** to help maintainers reproduce the issue and resolve it faster. If possible, add a **code sample** or an **executable test case** demonstrating the expected behavior that is not occurring.
+If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/fedora-modularity/meta-test-family/issues/new). Be sure to include a **descriptive title, clear description and a package version** and please include **as many details as possible** to help maintainers reproduce the issue and resolve it faster. If possible, add a **code sample** or an **executable test case** demonstrating the expected behavior that is not occurring.
 
 > **Note:** If you find a **Closed** issue that seems like it is the same thing that you're experiencing, open a new issue and include a link to the original issue in the body of your new one.
 
@@ -20,7 +20,7 @@ Enhancement suggestions are tracked as [GitHub issues](https://guides.github.com
 
 ### Submitting changes
 
-To submitt changes, please send a [GitHub Pull Request](https://github.com/fedora-modularity/meta-test-family/pull/new/devel). Before submitting a PR, please read the [Styleguides](#styleguides) to know more about coding conventions used in this project. Also we will appreciate if you check your code with pylint and pyflakes. Always create a new branch for each pull request to avoid intertwingling different features or fixes on the same branch. Always do "git pull --rebase" and "git rebase" vs "git pull" or "git merge".
+To submitt changes, please send a [GitHub Pull Request](https://github.com/fedora-modularity/meta-test-family/pull/new/devel). Before submitting a PR, please **read the [Styleguides](#styleguides)** to know more about coding conventions used in this project. Also we will appreciate if you **check your code with pylint and pyflakes**. Always **create a new branch for each pull request** to avoid intertwingling different features or fixes on the same branch. Always **do "git pull --rebase" and "git rebase"** vs "git pull" or "git merge".
 
 > **Note:** We are aware of [current syntax and style code errors](https://github.com/fedora-modularity/meta-test-family/issues/21) and working on fixing them.
 
@@ -40,17 +40,23 @@ To submitt changes, please send a [GitHub Pull Request](https://github.com/fedor
 
   * Reference issues and pull requests liberally after the first line
   * When only changing documentation, include `[ci skip]` in the commit description
-  * Consider starting the commit message with an applicable emoji:
-      * :art: `:art:` when improving the format/structure of the code
-      * :racehorse: `:racehorse:` when improving performance
-      * :memo: `:memo:` when writing docs
-      * :bug: `:bug:` when fixing a bug
-      * :fire: `:fire:` when removing code or files
-      * :green_heart: `:green_heart:` when fixing the CI build
-      * :white_check_mark: `:white_check_mark:` when adding tests
-      * :arrow_up: `:arrow_up:` when upgrading dependencies
-      * :arrow_down: `:arrow_down:` when downgrading dependencies
-      * :shirt: `:shirt:` when removing linter warnings
+  * Consider ending the commit message with an applicable emoji:
+      * :tada: `:tada:` initial commit
+      * :bookmark: `:bookmark:` version tag
+      * :construction: `:construction:` work in progress (WIP)
+      * :package: `:package:` release
+      * :art: `:art:` improvement of the format/structure of the code
+      * :racehorse: `:racehorse:` performance improvement
+      * :hatched_chick: `:hatched_chick:` new feature
+      * :book: `:book:` docs update
+      * :bug: `:bug:` bugfix
+      * :pencil2: `:pencil2:` typo fix
+      * :recycle: `:recycle:` remove code or files
+      * :green_heart: `:green_heart:` CI build fix
+      * :white_check_mark: `:white_check_mark:` add tests
+      * :arrow_up: `:arrow_up:` dependencies upgrade
+      * :arrow_down: `:arrow_down:` dependencies downgrade
+      * :exclamation: `:exclamation:` important
 
 ### Codding guidelines
 
