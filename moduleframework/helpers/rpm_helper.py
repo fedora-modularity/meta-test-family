@@ -62,7 +62,7 @@ class RpmHelper(CommonFunctions):
             self.moduledeps = temprepositories
             print_info("Detected module dependencies:", self.moduledeps)
         else:
-            self.moduledeps = {"common": "%s/%s/os" %(URLBASECOMPOSE, ARCH)}
+            self.moduledeps = {"base-runtime": "master"}
             print_info("Remote repos on, set just one repo:", self.moduledeps)
 
     def getURL(self):
