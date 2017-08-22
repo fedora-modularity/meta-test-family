@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import os
 
 SPECFILEPATH = os.path.abspath(
