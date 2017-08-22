@@ -22,8 +22,8 @@ Rpm
  - Nothing special here for now
 
 Automated Setup
----------------
- - use **mtf-env-** commands like an code, for mtf-env commans you have to be in same directory where are tests to be
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ - use ``mtf-env-*`` commands like an code, for mtf-env commans you have to be in same directory where are tests to be
  able to read config.yaml file or you can use env variable ``CONFIG=`` to use other config location.
 .. code-block:: bash
     MODULE=docker mtf-env-set
