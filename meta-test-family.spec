@@ -1,8 +1,8 @@
 %global framework_name moduleframework
 
 Name:           meta-test-family
-Version:        0.5.18
-Release:        2%{?dist}
+Version:        0.6.0
+Release:        1%{?dist}
 Summary:        Tool to test components of a modular Fedora
 
 License:        GPLv2+
@@ -53,6 +53,9 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,mtf_
 %{_datadir}/moduleframework/
 
 %changelog
+* Tue Aug 22 2017 Petr Hracek <phracek@redhat.com> 0.6.0-1
+- Introducing mtf-env-set and mtf-env-clean
+
 * Mon Aug 07 2017 Nils Philippsen <nils@redhat.com> 0.5.19-1
 - obsolete modularity-testing-framework-0.5.18-1, too
 
