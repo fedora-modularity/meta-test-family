@@ -44,8 +44,8 @@ class EnvNspawn(CommonFunctions):
         # disable selinux by default if not turned off
         if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
             print_info("Disabling selinux")
-            # TODO: workaround because systemd nspawn is now working well in F-26
-            # (failing because of selinux)
+            # https://github.com/fedora-modularity/meta-test-family/issues/53
+            # workaround because systemd nspawn is now working well in F-26
             if not os.path.exists(selinux_state_file):
                 print_info("Disabling selinux")
                 actual_state = self.runHost("getenforce", ignore_status=True).stdout.strip()
@@ -72,4 +72,4 @@ class EnvNspawn(CommonFunctions):
                         self.runHost("setenforce %s" % stored_state, ignore_status=True, verbose=is_not_silent(), sudo=True)
                 os.remove(selinux_state_file)
             else:
-                print_info("Selinux state is not stored, doing nothing")
+                print_info("Selinux state is not stored, skipping.")
