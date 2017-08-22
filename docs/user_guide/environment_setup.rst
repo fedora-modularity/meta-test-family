@@ -23,10 +23,10 @@ Rpm
 
 Automated Setup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- - use ``mtf-env-*`` commands like an code, for mtf-env commans you have to be in same directory where are tests to be
+ - use ``mtf-env-*`` commands, for mtf-env commans you have to be in same directory where are tests to be
  able to read config.yaml file or you can use env variable ``CONFIG=`` to use other config location.
-.. code-block:: bash
-    MODULE=docker mtf-env-set
-    MODULE=docker avocado run your.test.py
-    MODULE=docker mtf-env-clean
+ - There is specific setup&cleanup for each module type
+  - Setup enviroment ``MODULE=docker mtf-env-set``
+  - Run tests: ``MODULE=docker avocado run your.test.py``
+  - Cleanup enviroment: ``MODULE=docker mtf-env-clean``
 
