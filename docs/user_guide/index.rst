@@ -24,8 +24,9 @@ User Guide
 
  .. code-block:: makefile
 
-    MODULE_LINT=/usr/share/moduleframework/tools/modulelint.py
-    CMD=python -m avocado run $(MODULE_LINT) *.py
+    MODULE_LINT=/usr/share/moduleframework/tools/modulelint/*.py
+    TESTS=*.py
+    CMD=avocado run $(MODULE_LINT) $(TESTS)
 
     #
     all:
@@ -52,7 +53,7 @@ User Guide
 
     test: build
         cd tests; MODULE=docker MODULEMD=$(MODULEMDURL) URL="docker=$(IMAGE_NAME)" make all
-        cd tests; MODULE=rpm MODULEMD=$(MODULEMDURL) URL="docker=$(IMAGE_NAME)" make all
+        cd tests; MODULE=nspawn MODULEMD=$(MODULEMDURL) make all
 
 7. Execute tests from the module root directory by running
 
