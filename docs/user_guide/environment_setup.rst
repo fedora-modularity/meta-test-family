@@ -1,32 +1,32 @@
 Enviroment setup
-===============
-After install of MTF, enviroment for MTF is not fully ready. each module has some dependencies&services what has to
-be enabled. There is possible to do it manually, or use prepared script what will take care about that.
+=================
+
+To test a particular component (docker, rpm or nspawn) the test environment should be configured accordingly, e.g. certain dependencies should be installed or some services should be started. There is an option to do it manually or by using MTF scripts.
 
 Manual Setup
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
-Docker
-------
+**Docker**
+
  - Install Docker if not installed
  - Add insecure registry to config if not added for your testing images
  - (Re)Start docker service
 
-Nspawn
-------
+**Nspawn**
+
  - Install systemd-nspawn
  - Disable selinux if enabled. It is an issue in selinux-policy
 
-Rpm
-----
- - Nothing special here for now
+**Rpm**
+
+ - No any configuration needed
 
 Automated Setup
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- - use ``mtf-env-*`` commands, for mtf-env commans you have to be in same directory where are tests to be
- able to read config.yaml file or you can use env variable ``CONFIG=`` to use other config location.
- - There is specific setup&cleanup for each module type
-  - Setup enviroment ``MODULE=docker mtf-env-set``
-  - Run tests: ``MODULE=docker avocado run your.test.py``
-  - Cleanup enviroment: ``MODULE=docker mtf-env-clean``
+~~~~~~~~~~~~~~~
+
+The environment configuration scripts should be executed in the same directory where the tests are, otherwise the environment variable **CONFIG** should be set.
+
+  - to setup environment run ``MODULE=docker mtf-env-set``
+  - to execute tests run ``MODULE=docker avocado run your.test.py``
+  - to cleanup environment ``MODULE=docker mtf-env-clean``
 
