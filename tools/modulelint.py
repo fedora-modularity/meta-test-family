@@ -25,6 +25,7 @@ import os
 
 from moduleframework import module_framework
 from moduleframework import dockerlinter
+from moduleframework.avocado_testers import container_avocado_test
 
 
 class DockerfileLinter(module_framework.AvocadoTest):
@@ -81,7 +82,7 @@ class DockerfileLinter(module_framework.AvocadoTest):
         self.assertTrue("io.openshift.tags" in label_list)
 
 
-class DockerLint(module_framework.ContainerAvocadoTest):
+class DockerLint(container_avocado_test.ContainerAvocadoTest):
     """
     :avocado: enable
     """
