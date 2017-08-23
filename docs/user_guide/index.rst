@@ -91,7 +91,6 @@ Contents:
    #general-reference
    glossary
    troubleshooting
-   development
 
 .. seealso::
 
