@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           meta-test-family
-Version:        0.6.0
+Version:        0.6.1
 Release:        1%{?dist}
 Summary:        Tool to test components of a modular Fedora
 
@@ -52,6 +52,9 @@ install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
 
 
 %changelog
+* Wed Aug 23 2017 Jan Scotka <jscotka@redhat.com> 0.6.1-1
+- new package built with tito
+
 * Tue Aug 22 2017 Petr Hracek <phracek@redhat.com> 0.6.0-1
 - Introducing mtf-env-set and mtf-env-clean
 
