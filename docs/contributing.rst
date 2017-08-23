@@ -34,3 +34,9 @@ Thank you!
 .. _style guide: https://github.com/fedora-modularity/meta-test-family/blob/devel/CONTRIBUTING.md#codding-guidelines
 .. _commit message guidelines: https://github.com/fedora-modularity/meta-test-family/blob/devel/CONTRIBUTING.md#git-commit-messages
 
+.. seealso::
+
+   :doc:`user_guide/index`
+       User Guide
+   `webchat.freenode.net  <https://webchat.freenode.net/?channels=fedora-modularity>`_
+       Questions? Help? Ideas? Stop by the #fedora-modularity chat channel on freenode IRC.
