@@ -94,6 +94,7 @@ function runselected(){
 
 function distgit_wrapper_rpm(){
     cd $MODULENAME/tests
+    eval $PARAMS mtf-env-set
     eval $PARAMS make
 }
 
@@ -103,6 +104,7 @@ function avocado_wrapper(){
     cd tests_$MODULENAME
     TESTS="`ls $MODULE_TESTS $MODULE_LINT`"
     echo "AVOCADO FOUND TESTS: $TESTS"
+    eval $PARAMS mtf-env-set
     eval $PARAMS $AVOCADOCMD $TESTS
     )
 }
@@ -111,14 +113,14 @@ function run_modulelint(){
 
     TESTS="`ls $MODULE_LINT`"
     echo "RUN AT LEAST MODULE LINTER: $TESTS"
+    eval $PARAMS CONFIG=$MINIMAL_CONFIG mtf-env-set
     eval $PARAMS CONFIG=$MINIMAL_CONFIG $AVOCADOCMD $TESTS
 }
 
 set -x
 inst_env
 RESULTTOOLS=$(($RESULTTOOLS+$?))
-MODULE=nspawn mtf-env-set
-RESULTTOOLS=$(($RESULTTOOLS+$?))
+
 PARAMS="`DEBUG=yes getparams_int`"
 RESULTTOOLS=$(($RESULTTOOLS+$?))
 export PARAMS
