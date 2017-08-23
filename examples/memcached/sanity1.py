@@ -51,7 +51,8 @@ class SanityCheck1(module_framework.AvocadoTest):
         self.run("ls / | grep bin")
 
     def test3GccSkipped(self):
-        module_framework.skipTestIf("gcc" not in self.getActualProfile())
+        if "gcc" not in self.getActualProfile():
+            self.cancel()
         self.start()
         self.run("gcc -v")
 
