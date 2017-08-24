@@ -91,12 +91,5 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
-    install_requires=['avocado-framework',
-                      'netifaces',
-                      'behave',
-                      'PyYAML',
-                      'dockerfile-parse',
-                      'pdc_client',
-                      'modulemd'
-                      ]
+    install_requires=open('requirements.txt').read().splitlines()
 )

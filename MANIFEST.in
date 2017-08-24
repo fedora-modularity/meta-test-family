@@ -4,6 +4,7 @@ include LICENSE
 include Vagrantfile
 include README.md
 include CONTRIBUTING.md
+include requirements.txt
 recursive-include moduleframework *
 recursive-include docs *
 recursive-include examples *

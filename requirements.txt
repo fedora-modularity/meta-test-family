@@ -1,0 +1,9 @@
+PyYAML
+avocado-framework
+avocado-framework-plugin-result-html
+behave
+docker
+dockerfile-parse
+modulemd
+netifaces
+pdc-client
