@@ -44,7 +44,7 @@ mkdir -p $AVDIR
 export XUFILE="$AVDIR/out.xunit"
 export AVOCADOCMD="avocado run --xunit $XUFILE --show-job-log"
 export RESULTTOOLS=0
-export MTF_RECURSIVE_DOWNLOAD=yes
+export MTF_RECURSIVE_DOWNLOAD=
 
 function getparams_int(){
     ADDIT="$1"
@@ -132,6 +132,7 @@ fi
 
 test "$MODULENAME" = "testmodule" && MODULENAME="testing-module"
 
+export MTF_REMOTE_REPOS=yes
 if is_selected; then
     runselected
 elif loaddistgittests; then

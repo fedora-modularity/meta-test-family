@@ -48,7 +48,7 @@ check-run-them-fedmsg-testmodule: prepare-nspawn
 	@true
 
 check-exceptions: prepare-nspawn
-	MODULEMDURL=XXX  MODULE=nspawn $(CMD) simpleTest.py  | grep 'raise ConfigExc' >/dev/null
+	MODULEMDURL=NO_VALID_URL_TO_MDFILE  MODULE=nspawn $(CMD) --show-job-log simpleTest.py | grep 'raise ConfigExc' >/dev/null
 	@true
 
 travis:
