@@ -44,7 +44,7 @@ mkdir -p $AVDIR
 export XUFILE="$AVDIR/out.xunit"
 export AVOCADOCMD="avocado run --xunit $XUFILE --show-job-log"
 export RESULTTOOLS=0
-export MTF_RECURSIVE_DOWNLOAD=
+#export MTF_RECURSIVE_DOWNLOAD=yes
 
 function getparams_int(){
     ADDIT="$1"
