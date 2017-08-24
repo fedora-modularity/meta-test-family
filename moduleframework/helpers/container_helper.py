@@ -36,7 +36,6 @@ class ContainerHelper(CommonFunctions):
         set basic object variables
         """
         super(ContainerHelper, self).__init__()
-        self.loadconfig()
         self.info = self.config['module']['docker']
         self.tarbased = None
         self.jmeno = None

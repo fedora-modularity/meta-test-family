@@ -38,21 +38,19 @@ class RpmHelper(CommonFunctions):
         Set basic variables for RPM based testing, based on modules.rpm section of config.yaml
         """
         super(RpmHelper, self).__init__()
-        self.loadconfig()
         self.yumrepo = os.path.join(
             "/etc", "yum.repos.d", "%s.repo" %
                                    self.moduleName)
-        self.info = self.config['module']['rpm']
+        self.info = self.config.get('module',{}).get('rpm')
+        if not self.info:
+            raise ConfigExc("There does not exist section module: rpm: in yaml")
         self.repos = []
         self.whattoinstallrpm = ""
         self.bootstrappackages = []
 
     def setModuleDependencies(self):
         if not get_if_remoterepos():
-            temprepositories = {}
-            if self.getModulemdYamlconfig()["data"].get("dependencies") and self.getModulemdYamlconfig()["data"][
-                "dependencies"].get("requires"):
-                temprepositories = self.getModulemdYamlconfig()["data"]["dependencies"]["requires"]
+            temprepositories = self.getModulemdYamlconfig().get("data",{}).get("dependencies",{}).get("requires",{})
             temprepositories_cycle = dict(temprepositories)
             for x in temprepositories_cycle:
                 pdc = pdc_data.PDCParser()
@@ -62,7 +60,7 @@ class RpmHelper(CommonFunctions):
             print_info("Detected module dependencies:", self.moduledeps)
         else:
             self.moduledeps = {"base-runtime": "master"}
-            print_info("Remote repos on, set just one repo:", self.moduledeps)
+            print_info("Remote repos on, set just offical compose:", self.moduledeps)
 
     def getURL(self):
         """
