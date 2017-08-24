@@ -1,6 +1,6 @@
 BASH Helper
 ===========
 
-.. automodule:: moduleframework.bashhelper
+.. automodule:: tools.bashhelper
    :members:
    :undoc-members:

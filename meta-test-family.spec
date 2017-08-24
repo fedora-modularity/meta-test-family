@@ -19,14 +19,13 @@ Requires:       python2-avocado
 Requires:       python2-avocado-plugins-output-html
 Requires:       python-netifaces
 Requires:       docker
-Requires:       python2-dockerfile-parse
 Requires:       python2-pdc-client
 Requires:       python2-modulemd
 Provides:       modularity-testing-framework = %{version}-%{release}
 Obsoletes:      modularity-testing-framework < 0.5.18-2
 
 %description
-%{summary}.
+Tool to test components of a modular Fedora.
 
 %prep
 %autosetup
@@ -39,7 +38,6 @@ rm -rf %{name}.egg-info
 %install
 %py2_install
 install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
-chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,mtf_generator,bashhelper,setup}.py
 
 %files
 %license LICENSE
@@ -51,6 +49,7 @@ chmod a+x %{buildroot}%{python_sitelib}/%{framework_name}/{module_framework,mtf_
 %{python2_sitelib}/moduleframework/
 %{python2_sitelib}/meta_test_family-*.egg-info/
 %{_datadir}/moduleframework/
+
 
 %changelog
 * Wed Aug 23 2017 Jan Scotka <jscotka@redhat.com> 0.6.1-1

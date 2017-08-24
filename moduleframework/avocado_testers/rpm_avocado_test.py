@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # This Modularity Testing Framework helps you to write tests for modules

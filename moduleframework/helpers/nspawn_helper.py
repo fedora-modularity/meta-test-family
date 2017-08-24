@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # This Modularity Testing Framework helps you to write tests for modules
@@ -29,7 +28,6 @@ import time
 from moduleframework.timeoutlib import Retry
 from moduleframework.common import *
 from moduleframework.exceptions import *
-from moduleframework.module_framework import get_if_do_cleanup
 from moduleframework.helpers.rpm_helper import RpmHelper
 
 
