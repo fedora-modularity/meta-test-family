@@ -55,8 +55,6 @@ class NspawnHelper(RpmHelper):
         else:
             self.jmeno = self.moduleName
         self.chrootpath = os.path.abspath(self.baseprefix + self.jmeno)
-        print_info("name of CHROOT directory:", self.chrootpath)
-        trans_dict["ROOT"] = self.chrootpath
 
     def setUp(self):
         """
@@ -68,6 +66,8 @@ class NspawnHelper(RpmHelper):
         :return: None
         """
 
+        trans_dict["ROOT"] = self.chrootpath
+        print_info("name of CHROOT directory:", self.chrootpath)
         self.setModuleDependencies()
         self.setRepositoriesAndWhatToInstall()
         self.installTestDependencies()
