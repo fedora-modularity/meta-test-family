@@ -54,7 +54,7 @@ class DockerfileLinter(module_framework.AvocadoTest):
         pkgs = self.backend.getPackageList()
         for pkg in installed_pkgs.split('\n'):
             if pkg in pkgs:
-                all_docs = self.run("rpm -qad %s" % pkg).stdout
+                all_docs = self.run("rpm -qd %s" % pkg).stdout
                 for doc in all_docs.strip().split('\n'):
                     self.assertNotEqual(0, self.run("test -e %s" % doc, ignore_status=True).exit_status)
 
@@ -62,8 +62,8 @@ class DockerfileLinter(module_framework.AvocadoTest):
         self.start()
         pkg_mgr = "yum"
         # Detect distro in image
-        distro = self.run("cat /etc/redhat-release").stdout
-        if 'Fedora' in distro:
+        distro = self.run("cat /etc/os-release").stdout
+        if 'NAME=Fedora' in distro:
             pkg_mgr = "dnf"
         # Look, whether we have solv files in /var/cache/<pkg_mgr>/*.solv
         # dnf|yum clean all deletes the file *.solv
