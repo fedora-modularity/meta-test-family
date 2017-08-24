@@ -2,7 +2,7 @@ document: meta-test
 version: 1
 name: memcached
 modulemd-url: https://src.fedoraproject.org/modules/memcached/raw/master/f/memcached.yaml
-sorry
+sorry_2
 service:
     port: 11211
 packages:
