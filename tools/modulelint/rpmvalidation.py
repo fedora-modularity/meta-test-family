@@ -96,6 +96,7 @@ class rpmvalidation(module_framework.AvocadoTest):
         return False
 
     def test(self):
+        self.start()
         allpackages = filter(bool, self.run("rpm -qa", verbose=False).stdout.split("\n"))
         common.print_debug(allpackages)
         for package in allpackages:

@@ -23,7 +23,7 @@
 #
 
 set -x
-test -e ./moduleframework-cmd -a -e "`readlink ./moduleframework-cmd`" && CMD=./moduleframework-cmd || CMD=moduleframework-cmd
+CMD=mtf-cmd
 EC=0
 echo "Initialize module"
 $CMD -v setUp

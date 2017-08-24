@@ -41,8 +41,7 @@ install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
 
 %files
 %license LICENSE
-%{_bindir}/moduleframework-cmd
-%{_bindir}/modulelint
+%{_bindir}/mtf-cmd
 %{_bindir}/mtf-generator
 %{_bindir}/mtf-env-set
 %{_bindir}/mtf-env-clean

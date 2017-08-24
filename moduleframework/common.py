@@ -51,7 +51,7 @@ if os.path.exists(__rh_release):
         hostpackager = "dnf -y"
 else:
     hostpackager = "apt-get -y"
-    guestpackager = "apt-get -y"
+    guestpackager = "dnf"
 ARCH = "x86_64"
 
 # translation table for {VARIABLE} in the config.yaml file
@@ -160,6 +160,14 @@ def get_if_do_cleanup():
     cleanup = os.environ.get('MTF_DO_NOT_CLEANUP')
     return not bool(cleanup)
 
+def get_if_reuse():
+    """
+        Return the **MTF_REUSE** envvar. Use previously prepared machine
+
+        :return: bool
+        """
+    reuse = os.environ.get('MTF_REUSE')
+    return bool(reuse)
 
 def get_if_remoterepos():
     """
@@ -281,7 +289,7 @@ def get_compose_url():
     return compose_url
 
 
-def get_modulemd():
+def get_moduleurl():
     """
     Read a moduleMD file.
 
@@ -292,18 +300,6 @@ def get_modulemd():
     :return: dict
     """
     mdf = os.environ.get('MODULEMDURL')
-    if not mdf:
-        readconfig = CommonFunctions()
-        readconfig.loadconfig()
-        try:
-            if readconfig.config.get("modulemd-url"):
-                mdf = readconfig.config.get("modulemd-url")
-            else:
-                a = ComposeParser(get_compose_url())
-                b = a.variableListForModule(readconfig.config.get("name"))
-                mdf = [x[12:] for x in b if 'MODULEMDURL=' in x][0]
-        except AttributeError:
-            return None
     return mdf
 
 
@@ -322,9 +318,28 @@ class CommonFunctions(object):
         self.arch = None
         self.dependencylist = {}
         self.moduledeps = None
+        self.is_it_module = False
         # general use case is to have forwarded services to host (so thats why it is same)
         self.ipaddr = trans_dict["HOSTIPADDR"]
         trans_dict["GUESTARCH"] = self.getArch()
+        self.loadconfig()
+
+    def loadconfig(self):
+        """
+        Load configuration from config.yaml file.
+
+        :return: None
+        """
+        self.config = get_config()
+        doc_name = ['modularity-testing', 'meta-test-family', 'meta-test']
+        if self.config.get('document') not in doc_name:
+            raise ConfigExc("bad yaml file, not contain any of document: item (%s)" % doc_name, self.config.get('document'))
+        if self.config.get('modulemd-url') and get_if_module():
+            self.is_it_module = True
+        self.moduleName = sanitize_text(self.config['name'])
+        self.source = self.config.get('source')
+        if not self.is_it_module:
+            trans_dict["GUESTPACKAGER"] = "yum -y"
 
     def getArch(self):
         """
@@ -353,6 +368,29 @@ class CommonFunctions(object):
                 % (trans_dict, command))
         return process.run("%s" % formattedcommand, **kwargs)
 
+
+    def get_test_dependencies(self):
+        """
+        get test dependencies from testdependencies
+
+        :return: list of test dependencies
+        """
+        packages = []
+        typo = 'testdependecies' in self.config
+        if typo:
+            warnings.warn("'testdependecies' is a typo, please fix",
+                          DeprecationWarning)
+
+        # try section without typo first
+        packages = self.config.get('testdependencies', {}).get('rpms', [])
+        if packages:
+            if typo:
+                warnings.warn("preferring section without typo")
+        else:
+            # fall back to mistyped test dependency section
+            packages = self.config.get('testdependecies', {}).get('rpms', [])
+        return packages
+
     def installTestDependencies(self, packages=None):
         """
         Install packages on a host machine to prepare a test environment.
@@ -362,39 +400,12 @@ class CommonFunctions(object):
         :return: None
         """
         if not packages:
-            typo = 'testdependecies' in self.config
-            if typo:
-                warnings.warn("'testdependecies' is a typo, please fix",
-                              DeprecationWarning)
-
-            # try section without typo first
-            packages = self.config.get('testdependencies', {}).get('rpms')
-            if packages:
-                if typo:
-                    warnings.warn("preferring section without typo")
-            else:
-                # fall back to mistyped test dependency section
-                packages = self.config.get('testdependecies', {}).get('rpms')
-
+            packages = self.get_test_dependencies()
         if packages:
             self.runHost(
                 "{HOSTPACKAGER} install " +
                 " ".join(packages),
                 ignore_status=True, verbose=is_debug())
-
-    def loadconfig(self):
-        """
-        Load configuration from config.yaml file.
-
-        :return: None
-        """
-        try:
-            self.config = get_config()
-            self.moduleName = sanitize_text(self.config['name'])
-            self.source = self.config.get('source') if self.config.get(
-                'source') else self.config['module']['rpm'].get('source')
-        except ValueError:
-            pass
 
     def getPackageList(self, profile=None):
         """
@@ -406,21 +417,11 @@ class CommonFunctions(object):
         package_list = []
         if not profile:
             if 'packages' in self.config:
-                packages_rpm = self.config['packages'].get('rpms') if self.config[
-                    'packages'].get('rpms') else []
+                packages_rpm = self.config.get('packages',{}).get('rpms', [])
                 packages_profiles = []
-                for x in self.config['packages'].get('profiles') if self.config[
-                    'packages'].get('profiles') else []:
-                    packages_profiles = packages_profiles + \
-                                        self.getModulemdYamlconfig()['data']['profiles'][x]['rpms']
+                for profile_in_conf in self.config.get('packages',{}).get('profiles',[]):
+                    packages_profiles += self.getModulemdYamlconfig()['data']['profiles'][profile_in_conf]['rpms']
                 package_list += packages_rpm + packages_profiles
-
-            elif self.getModulemdYamlconfig()['data'].get('profiles') and self.getModulemdYamlconfig()['data'][
-                'profiles'].get(get_profile()):
-                package_list += self.getModulemdYamlconfig()['data']['profiles'][get_profile()]['rpms']
-            else:
-                # fallback solution when it is not known what to install
-                package_list.append("bash")
         else:
             package_list += self.getModulemdYamlconfig()['data']['profiles'][profile]['rpms']
         print_info("PCKGs to install inside module:", package_list)
@@ -444,26 +445,28 @@ class CommonFunctions(object):
                       can be overridden by the **CONFIG** envvar.
         :return: dict
         """
-        try:
-            if urllink:
-                ymlfile = urllib.urlopen(urllink)
-                cconfig = yaml.load(ymlfile)
-                link = cconfig
-            elif not get_if_module():
-                trans_dict["GUESTPACKAGER"] = "yum -y"
-                link = {"data": {}}
+        link = {"data": {}}
+        if urllink:
+            modulemd = urllink
+        elif self.is_it_module:
+            if self.modulemdConf:
+                return self.modulemdConf
             else:
-                if self.config is None:
-                    self.loadconfig()
-                if not self.modulemdConf:
-                    modulemd = get_modulemd()
-                    if modulemd:
-                        ymlfile = urllib.urlopen(modulemd)
-                        self.modulemdConf = yaml.load(ymlfile)
-                link = self.modulemdConf
-            return link
+                modulemd = get_moduleurl()
+                if not modulemd:
+                    modulemd = self.config.get("modulemd-url")
+
+        try:
+            ymlfile = urllib.urlopen(modulemd)
+            link = yaml.load(ymlfile)
         except IOError as e:
             raise ConfigExc("Cannot load file: '%s'" % e)
+        except yaml.parser.ParserError as e:
+            raise ConfigExc("Module MD file contains errors: '%s'" % e, modulemd)
+        if not urllink:
+            self.modulemdConf = link
+        return link
+
 
     def getIPaddr(self):
         """
