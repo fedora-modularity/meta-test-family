@@ -19,6 +19,3 @@ def version_func():
 
 
 VERSION = version_func()
-
-if __name__ == '__main__':
-    print VERSION

@@ -292,15 +292,3 @@ class PDCParser():
                 "cd %s; createrepo -v %s" %
                 (absdir, absdir), shell=True, verbose=is_debug())
         return "file://%s" % absdir
-
-if __name__ == "__main__":
-    a = PDCParser()
-    a.setLatestPDC(name="memcached", stream="f26")
-    dependencies = a.generateDepModules()
-    get_if_remoterepos = (lambda: True)
-    assert dependencies == {'base-runtime': 'f26', 'shared-userspace': 'f26', 'perl': 'f26'}
-    assert "https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server/x86_64/os/" == a.generateRepoUrl()
-    assert "URL=https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server/x86_64/os/" in a.generateParams()
-    assert "MODULE=nspawn" in a.generateParams()
-    assert len(a.generateGitHash()) == 41
-    assert "Memcached is a high-performance, distributed" in a.getmoduleMD()['data']['description']
