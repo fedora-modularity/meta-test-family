@@ -21,7 +21,10 @@ Environment variables allow to overwrite some values of a module configuration f
 - **COMPOSEURL** overwrites the location of a compose Pungi build.
 - **MTF_SKIP_DISABLING_SELINUX=yes** does not disable SELinux. In nspawn type on Fedora 25 SELinux should be disabled, because it does not work well with SELinux enabled, this option allows to not do that.
 - **MTF_DO_NOT_CLEANUP=yes** does not clean up modules between tests. It speeds up test execution. Use only if there is no interference between tests.
+- **MTF_DO_NOT_CLEANUP=yes** does not clean up module after test, let machine running.
+- **MTF_REUSE** use same module between tests It speeds up test execution. Can cause side effects.
 - **MTF_REMOTE_REPOS=yes** disables downloading of Koji packages and creating a local repo, and speeds up test execution.
+
 
 .. seealso::
 
