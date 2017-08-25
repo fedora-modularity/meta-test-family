@@ -160,6 +160,14 @@ def get_if_do_cleanup():
     cleanup = os.environ.get('MTF_DO_NOT_CLEANUP')
     return not bool(cleanup)
 
+def get_if_reuse():
+    """
+        Return the **MTF_REUSE** envvar. Use previously prepared machine
+
+        :return: bool
+        """
+    reuse = os.environ.get('MTF_REUSE')
+    return bool(reuse)
 
 def get_if_remoterepos():
     """

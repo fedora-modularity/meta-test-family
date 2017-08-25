@@ -93,7 +93,7 @@ class RpmHelper(CommonFunctions):
         else:
             self.dependencylist[name] = {'urls':[url], 'stream':stream}
 
-    def setRepositoriesAndWhatToInstall(self, repos=None, whattooinstall=None):
+    def setRepositoriesAndWhatToInstall(self, repos=[], whattooinstall=None):
         """
         set repositories and packages what to install inside module
         It can override base usage of this framework to general purpose testing
@@ -102,36 +102,33 @@ class RpmHelper(CommonFunctions):
         :param whattooinstall: list of packages to install inside
         :return: None
         """
-        if repos is None:
-            repos = []
-        alldrepos = []
         if repos:
             self.repos = repos
             map(self.__addModuleDependency, repos)
         else:
-            if not self.repos:
+            alldrepos = []
+            if self.is_it_module:
                 for dep in self.moduledeps:
                     latesturl = pdc_data.get_repo_url(dep, self.moduledeps[dep])
                     alldrepos.append(latesturl)
                     self.__addModuleDependency(url=latesturl, name = dep, stream = self.moduledeps[dep])
-                if get_url():
-                    self.repos = [get_url()] + alldrepos
-                    self.__addModuleDependency(get_url())
-                elif self.info.get('repo'):
-                    self.repos = [self.info.get('repo')] + alldrepos
-                    self.__addModuleDependency(self.info.get('repo'))
-                elif self.info.get('repos'):
-                    self.repos = self.info.get('repos')
-                    map(self.__addModuleDependency,self.info.get('repos'))
-                else:
-                    raise RpmExc("no RPM given in file or via URL")
+            if get_url():
+                self.repos = [get_url()] + alldrepos
+                self.__addModuleDependency(get_url())
+            elif self.info.get('repo'):
+                self.repos = [self.info.get('repo')] + alldrepos
+                self.__addModuleDependency(self.info.get('repo'))
+            elif self.info.get('repos'):
+                self.repos = self.info.get('repos')
+                map(self.__addModuleDependency,self.info.get('repos'))
+            else:
+                raise RpmExc("no RPM given in file or via URL")
         if whattooinstall:
             self.whattoinstallrpm = " ".join(set(whattooinstall))
         else:
-            if not self.whattoinstallrpm:
-                self.bootstrappackages = pdc_data.getBasePackageSet(modulesDict=self.moduledeps,
-                                                                    isModule=get_if_module(), isContainer=False)
-                self.whattoinstallrpm = " ".join(set(self.getPackageList() + self.bootstrappackages))
+            self.bootstrappackages = pdc_data.getBasePackageSet(modulesDict=self.moduledeps,
+                                                                isModule=self.is_it_module, isContainer=False)
+            self.whattoinstallrpm = " ".join(set(self.getPackageList() + self.bootstrappackages))
 
     def tearDown(self):
         """
@@ -139,8 +136,11 @@ class RpmHelper(CommonFunctions):
 
         :return: None
         """
-        self.stop()
-        self.__callCleanupFromConfig()
+        if get_if_do_cleanup():
+            self.stop()
+            self.__callCleanupFromConfig()
+        else:
+            print_info("tearDown skipped, tests done on your machine, no special steps to connect")
 
     def __prepare(self):
         """
@@ -173,11 +173,7 @@ gpgcheck=0
             "%s --disablerepo=* --enablerepo=%s* --allowerasing install %s" %
             (trans_dict["HOSTPACKAGER"], self.moduleName, self.whattoinstallrpm), ignore_status=True,
             verbose=is_not_silent())
-        b = self.runHost(
-            "%s --disablerepo=* --enablerepo=%s* --allowerasing distro-sync" %
-            (trans_dict["HOSTPACKAGER"], self.moduleName), ignore_status=True, verbose=is_not_silent())
-
-        if a.exit_status != 0 and b.exit_status != 0:
+        if a.exit_status != 0:
             raise RpmExc("ERROR: Unable to install packages %s" % self.whattoinstallrpm,
                          "repositories are: ",
                          self.runHost("cat %s" % self.yumrepo, verbose=is_not_silent()).stdout)
@@ -212,6 +208,7 @@ gpgcheck=0
             self.runHost(self.info['start'], shell=True, ignore_bg_processes=True, verbose=is_not_silent())
         else:
             self.runHost("%s" % command, shell=True, ignore_bg_processes=True, verbose=is_not_silent())
+        self.status()
 
     def stop(self, command="/bin/true"):
         """

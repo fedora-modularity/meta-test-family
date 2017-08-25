@@ -36,6 +36,7 @@ class ContainerHelper(CommonFunctions):
         set basic object variables
         """
         super(ContainerHelper, self).__init__()
+        static_name="testcontainer"
         self.info = self.config['module']['docker']
         self.tarbased = None
         self.jmeno = None
@@ -43,7 +44,7 @@ class ContainerHelper(CommonFunctions):
         self.icontainer = get_url(
         ) if get_url() else self.info['container']
         if ".tar" in self.icontainer:
-            self.jmeno = "testcontainer"
+            self.jmeno = static_name
             self.tarbased = True
         if "docker=" in self.icontainer:
             self.jmeno = self.icontainer[7:]
@@ -56,6 +57,9 @@ class ContainerHelper(CommonFunctions):
             # untrusted source
             self.tarbased = False
             self.jmeno = self.icontainer
+        self.docker_static_name = ""
+        if get_if_reuse():
+            self.docker_static_name = "--name %s" % static_name
 
     def getURL(self):
         """
@@ -85,6 +89,7 @@ class ContainerHelper(CommonFunctions):
         """
         self.__callSetupFromConfig()
         self.__pullContainer()
+        self.containerInfo = self.__load_inspect_json()
 
     def tearDown(self):
         """
@@ -92,9 +97,12 @@ class ContainerHelper(CommonFunctions):
 
         :return: None
         """
-        self.stop()
-        self.__callCleanupFromConfig()
-
+        if get_if_do_cleanup():
+            self.stop()
+            self.__callCleanupFromConfig()
+        else:
+            print_info("tearDown skipped", "running container: %s" % self.docker_id)
+            print_info("Use command to run commnand inside:", "docker exec %s /bin/bash" % self.docker_id)
 
     def __pullContainer(self):
         """
@@ -111,7 +119,13 @@ class ContainerHelper(CommonFunctions):
         else:
             self.runHost("docker pull %s" % self.jmeno, verbose=is_not_silent())
 
-        self.containerInfo = json.loads(
+    def __load_inspect_json(self):
+        """
+        Load json data from docker inspect command
+
+        :return: dict
+        """
+        return json.loads(
             self.runHost(
                 "docker inspect %s" %
                 self.jmeno, verbose=is_not_silent()).stdout)[0]["Config"]
@@ -127,32 +141,25 @@ class ContainerHelper(CommonFunctions):
         if not self.status():
             if 'start' in self.info and self.info['start']:
                 self.docker_id = self.runHost(
-                    "%s -d %s" %
-                    (self.info['start'], self.jmeno), shell=True, ignore_bg_processes=True,
+                    "%s -d %s %s" %
+                    (self.info['start'], self.docker_static_name, self.jmeno), shell=True, ignore_bg_processes=True,
                     verbose=is_not_silent()).stdout
             else:
                 self.docker_id = self.runHost(
-                    "docker run %s %s %s" %
-                    (args, self.jmeno, command), shell=True, ignore_bg_processes=True, verbose=is_not_silent()).stdout
+                    "docker run %s %s %s %s" %
+                    (args, self.docker_static_name, self.jmeno, command), shell=True, ignore_bg_processes=True, verbose=is_not_silent()).stdout
             self.docker_id = self.docker_id.strip()
             if self.getPackageList():
                 a = self.run(
-                    "%s install %s" %
-                    (trans_dict["HOSTPACKAGER"], " ".join(
-                        self.getPackageList())),
-                    ignore_status=True, verbose=False)
-                b = self.run(
                     "%s install %s" %
                     (trans_dict["GUESTPACKAGER"], " ".join(
                         self.getPackageList())),
                     ignore_status=True, verbose=False)
                 if a.exit_status == 0:
-                    print_info("Packages installed via {HOSTPACKAGER}", a.stdout)
-                elif b.exit_status == 0:
-                    print_info("Packages installed via {GUESTPACKAGER}", b.stdout)
+                    print_info("Packages installed via {GUESTPACKAGER}", a.stdout)
                 else:
                     print_info(
-                        "Nothing installed (nor via {HOSTPACKAGER} nor {GUESTPACKAGER}), but package list is not empty",
+                        "Nothing installed via {GUESTPACKAGER}, but package list is not empty",
                         self.getPackageList())
         if self.status() is False:
             raise ContainerExc(
@@ -179,6 +186,13 @@ class ContainerHelper(CommonFunctions):
 
         :return: bool
         """
+        if not self.docker_id and get_if_reuse():
+            result = self.runHost("docker ps -q --filter %s" % self.docker_static_name[2:], ignore_status=True,
+                                  verbose=is_debug())
+            # len of string id is 12, so check if al least 10 chars is there as docker id
+            if result.exit_status == 0 and len(result.stdout) > 10:
+                self.docker_id = result.stdout.strip()
+                return True
         if self.docker_id and self.docker_id[
                               : 12] in self.runHost(
             "docker ps", shell=True, verbose=is_not_silent()).stdout:
@@ -194,7 +208,6 @@ class ContainerHelper(CommonFunctions):
         :param kwargs: dict
         :return: avocado.process.run
         """
-        self.start()
         return self.runHost(
             'docker exec %s bash -c "%s"' %
             (self.docker_id, sanitize_cmd(command)),
