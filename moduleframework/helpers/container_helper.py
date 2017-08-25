@@ -37,12 +37,16 @@ class ContainerHelper(CommonFunctions):
         """
         super(ContainerHelper, self).__init__()
         static_name="testcontainer"
-        self.info = self.config['module']['docker']
+        self.info = self.config.get('module',{}).get('docker')
+        if not self.info:
+            raise ConfigExc("Missing section for docker (module: -> docker:) in config file")
         self.tarbased = None
         self.jmeno = None
         self.docker_id = None
         self.icontainer = get_url(
-        ) if get_url() else self.info['container']
+        ) if get_url() else self.info.get('container')
+        if not self.icontainer:
+            raise ConfigExc("Missing cotainer image via config or via env variable")
         if ".tar" in self.icontainer:
             self.jmeno = static_name
             self.tarbased = True
@@ -139,7 +143,7 @@ class ContainerHelper(CommonFunctions):
         :return: None
         """
         if not self.status():
-            if 'start' in self.info and self.info['start']:
+            if self.info.get('start'):
                 self.docker_id = self.runHost(
                     "%s -d %s %s" %
                     (self.info['start'], self.docker_static_name, self.jmeno), shell=True, ignore_bg_processes=True,
