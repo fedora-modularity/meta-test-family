@@ -44,7 +44,7 @@ Vagrant.configure(2) do |config|
     config.vm.provision "shell", inline: <<-SHELL
         set -x
         dnf install -y make docker httpd git python2-avocado python2-avocado-plugins-output-html python-netifaces
-        cd /home/vagrant/meta-test-family
+        cd /opt/meta-test-family
         make install
         make check
         cp -r /root/avocado /var/www/html/
