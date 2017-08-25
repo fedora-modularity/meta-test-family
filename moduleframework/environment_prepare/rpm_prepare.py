@@ -31,7 +31,7 @@ from moduleframework.common import *
 class EnvRpm(CommonFunctions):
 
     def prepare_env(self):
-        pass
+        self.installTestDependencies()
 
     def cleanup_env(self):
         pass

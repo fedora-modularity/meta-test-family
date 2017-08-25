@@ -31,7 +31,7 @@ from moduleframework.common import *
 class EnvDocker(CommonFunctions):
 
     def prepare_env(self):
-        self.loadconfig()
+        self.installTestDependencies()
         self.__install_env()
         self.__start_service()
 

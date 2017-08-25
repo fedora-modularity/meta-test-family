@@ -70,7 +70,6 @@ class NspawnHelper(RpmHelper):
         print_info("name of CHROOT directory:", self.chrootpath)
         self.setModuleDependencies()
         self.setRepositoriesAndWhatToInstall()
-        self.installTestDependencies()
         self.__prepareSetup()
         self.__callSetupFromConfig()
         self.__bootMachine()

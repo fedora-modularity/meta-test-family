@@ -83,7 +83,6 @@ class ContainerHelper(CommonFunctions):
 
         :return: None
         """
-        self.installTestDependencies()
         self.__callSetupFromConfig()
         self.__pullContainer()
 

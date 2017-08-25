@@ -82,7 +82,6 @@ class RpmHelper(CommonFunctions):
         """
         self.setModuleDependencies()
         self.setRepositoriesAndWhatToInstall()
-        self.installTestDependencies()
         self.__callSetupFromConfig()
         self.__prepare()
         self.__prepareSetup()
