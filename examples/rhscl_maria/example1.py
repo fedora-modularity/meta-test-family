@@ -1,4 +1,3 @@
-
 from moduleframework import module_framework
 from moduleframework.helpers.container_helper import ContainerHelper
 from moduleframework import common
@@ -10,83 +9,77 @@ WAIT_TIME=10
 
 class OneMachine(module_framework.ContainerAvocadoTest):
     """
-    Basic, the most straightforward example how to use it with collections,
-    many configs, and similar tests
+    An example of collections testing.
 
     :avocado: enable
     """
 
     def testMariaDBDirExist(self):
         """
-        run command on host and test if directory inside container exist
-
-        :return:
+        Run a command on a host and test if a directory exists inside a container.
         """
         self.start()
         self.run("ls /var/lib/mysql")
 
     def testDefaultConfig(self):
         """
-        Test default container started based on config.yaml params
-
-        :return:
+        Test the default container defined in config.yaml starts.
         """
         self.start()
         time.sleep(WAIT_TIME)
-        self.assertIn("1", self.runHost("echo select 1 | mysql -h 127.0.0.1 -u root -p{PASSWORD}", shell=True).stdout)
+        command = "echo select 1 | mysql -h 127.0.0.1 -u root -p{PASSWORD}"
+        self.assertIn("1", self.runHost(command, shell=True).stdout)
 
     def testNonDefaultStartAction(self):
         """
-        Nontrivial case similart to testDefaultConfig.
-        Redefined start action to custom one (port forwarded to 3307)
-
-        :return:
+        Test connection to a port different from the one in config.yaml.
         """
-        self.getConfig()["module"]["docker"]["start"]="docker run -p 3307:3306 -e MYSQL_ROOT_PASSWORD={PASSWORD}"
+        docker_start = "docker run -p 3307:3306 -e MYSQL_ROOT_PASSWORD={PASSWORD}"
+        self.getConfig()["module"]["docker"]["start"] = docker_start
         self.start()
         time.sleep(WAIT_TIME)
-        self.assertIn("1", self.runHost("echo select 1 | mysql -P 3307 -h 127.0.0.1 -u root -p{PASSWORD}", shell=True).stdout)
+        command = "echo select 1 | mysql -P 3307 -h 127.0.0.1 -u root -p{PASSWORD}"
+        self.assertIn("1", self.runHost(command, shell=True).stdout)
 
     def testThisFail(self):
         """
-        Test if mysql is unable to connect to another port than defined
-
-        :return:
+        Test if mysql is unable to connect to another port than defined.
         """
-        self.getConfig()["module"]["docker"]["start"]="docker run -p 3308:3306 -e MYSQL_ROOT_PASSWORD={PASSWORD}"
+        docker_start = "docker run -p 3308:3306 -e MYSQL_ROOT_PASSWORD={PASSWORD}"
+        self.getConfig()["module"]["docker"]["start"] = docker_start
         self.start()
         time.sleep(WAIT_TIME)
-        self.assertIn("t connect to MySQL server", self.runHost("echo select 1 | mysql -P 3307 -h 127.0.0.1 -u root -p{PASSWORD}",
-                                        shell=True, ignore_status=True).stderr)
+        command = "echo select 1 | mysql -P 3307 -h 127.0.0.1 -u root -p{PASSWORD}"
+        self.assertIn("t connect to MySQL server", \
+                self.runHost(command, shell=True, ignore_status=True).stderr)
 
 
 class OneMachineInSetup(module_framework.ContainerAvocadoTest):
     """
-    Example of test for collections with custom action in own setUp() method.
-    It is cleaner, but it allow to have just one modificaion in one class
+    An example of collections tesing with a modified setUp() method.
+    Only one modificaion in a class is possible.
 
     :avocado: enable
     """
 
     def setUp(self):
         super(self.__class__,self).setUp()
-        self.getConfig()["module"]["docker"]["start"] = "docker run -p 3307:3306 -e MYSQL_ROOT_PASSWORD={PASSWORD}"
+        docker_start = "docker run -p 3307:3306 -e MYSQL_ROOT_PASSWORD={PASSWORD}"
+        self.getConfig()["module"]["docker"]["start"] = docker_start
         self.start()
         time.sleep(WAIT_TIME)
 
     def testDefaultConfig(self):
         """
-        simple test
-        :return:
+        Test modified setUp()
         """
-        self.assertIn("1", self.runHost("echo select 1 | mysql -h 127.0.0.1 -u root -p{PASSWORD} -P 3307", shell=True).stdout)
+        command = "echo select 1 | mysql -h 127.0.0.1 -u root -p{PASSWORD} -P 3307"
+        self.assertIn("1", self.runHost(command, shell=True).stdout)
 
 
 class MultipleMachines(Test):
     """
-    Test more container running in same time.
-    Low level, the most complex example.
-    Allow to define more than just one per class conotainers and test if both are running
+    Test two containers running at the same time.
 
     :avocado: enable
     """
@@ -99,21 +92,20 @@ class MultipleMachines(Test):
 
     def testMultipleInstance(self):
         """
-        start containers and connect to both of them, they are running on various ports
-
-        :return:
+        Start and connect to two containers running on different ports.
         """
         self.docker1.start()
-        self.docker2.config["module"]["docker"]["start"] = "docker run -p 3307:3306 -e MYSQL_ROOT_PASSWORD={PASSWORD}"
+        docker_start = "docker run -p 3307:3306 -e MYSQL_ROOT_PASSWORD={PASSWORD}"
+        self.docker2.config["module"]["docker"]["start"] = docker_start
         self.docker2.start()
-        time.sleep(10)
-        self.assertIn("1", process.run("echo select 1 | mysql -h 127.0.0.1 -u root -p{PASSWORD}".format(**common.trans_dict), shell=True).stdout)
-        self.assertIn("1", process.run("echo select 1 | mysql -h 127.0.0.1 -u root -p{PASSWORD} -P 3307".format(**common.trans_dict), shell=True).stdout)
+        time.sleep(WAIT_TIME)
+        command_one = "echo select 1 | mysql -h 127.0.0.1 -u root -p{PASSWORD}"
+        command_two = "echo select 1 | mysql -h 127.0.0.1 -u root -p{PASSWORD} -P 3307"
+        self.assertIn("1", process.run(command_pne.format(**common.trans_dict), \
+            shell=True).stdout)
+        self.assertIn("1", process.run(command_two.format(**common.trans_dict), \
+            shell=True).stdout)
 
     def tearDown(self):
         self.docker1.tearDown()
         self.docker2.tearDown()
-
-
-
-
