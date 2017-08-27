@@ -101,7 +101,7 @@ class MultipleMachines(Test):
         time.sleep(WAIT_TIME)
         command_one = "echo select 1 | mysql -h 127.0.0.1 -u root -p{PASSWORD}"
         command_two = "echo select 1 | mysql -h 127.0.0.1 -u root -p{PASSWORD} -P 3307"
-        self.assertIn("1", process.run(command_pne.format(**common.trans_dict), \
+        self.assertIn("1", process.run(command_one.format(**common.trans_dict), \
             shell=True).stdout)
         self.assertIn("1", process.run(command_two.format(**common.trans_dict), \
             shell=True).stdout)
