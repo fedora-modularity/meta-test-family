@@ -55,7 +55,11 @@ User Guide
         cd tests; MODULE=docker MODULEMD=$(MODULEMDURL) URL="docker=$(IMAGE_NAME)" make all
         cd tests; MODULE=nspawn MODULEMD=$(MODULEMDURL) make all
 
-7. Execute tests from the module root directory by running
+7. `Prepare the environment`_ to run tests in.
+
+.. _Prepare the environment: environment_setup.html
+
+8. Execute tests from the module root directory by running
 
  .. code-block:: shell
 
@@ -76,6 +80,10 @@ User Guide
     #run Bash tests from the tests/ directory
     $ sudo MODULE=docker avocado run ./*.sh
 
+
+9. `Clean up the environment`_ after test execution.
+
+.. _Clean up the environment: environment_setup.html#automated-setup
 
 Contents:
 
