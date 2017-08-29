@@ -23,7 +23,7 @@
 #
 
 """
-module for environment setup and cleanup, to be able to split action for ansible, more steps instead of one complex
+Module to setup and cleanup the test environment.
 """
 from moduleframework.module_framework import *
 from moduleframework.environment_prepare.docker_prepare import EnvDocker

@@ -24,8 +24,9 @@ User Guide
 
  .. code-block:: makefile
 
-    MODULE_LINT=/usr/share/moduleframework/tools/modulelint.py
-    CMD=python -m avocado run $(MODULE_LINT) *.py
+    MODULE_LINT=/usr/share/moduleframework/tools/modulelint/*.py
+    TESTS=*.py
+    CMD=avocado run $(MODULE_LINT) $(TESTS)
 
     #
     all:
@@ -52,9 +53,13 @@ User Guide
 
     test: build
         cd tests; MODULE=docker MODULEMD=$(MODULEMDURL) URL="docker=$(IMAGE_NAME)" make all
-        cd tests; MODULE=rpm MODULEMD=$(MODULEMDURL) URL="docker=$(IMAGE_NAME)" make all
+        cd tests; MODULE=nspawn MODULEMD=$(MODULEMDURL) make all
 
-7. Execute tests from the module root directory by running
+7. `Prepare the environment`_ to run tests in.
+
+.. _Prepare the environment: environment_setup.html
+
+8. Execute tests from the module root directory by running
 
  .. code-block:: shell
 
@@ -76,12 +81,17 @@ User Guide
     $ sudo MODULE=docker avocado run ./*.sh
 
 
+9. `Clean up the environment`_ after test execution.
+
+.. _Clean up the environment: environment_setup.html#automated-setup
+
 Contents:
 
 .. toctree::
    :maxdepth: 2
 
    how_to_write_conf_file
+   environment_setup
    environment_variables
    #bash_tests
    #python_tests

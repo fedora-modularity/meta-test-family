@@ -40,10 +40,9 @@ class EnvDocker(CommonFunctions):
 
     def add_insecure_registry(self, registry):
         """
-        TODO: This function is disabled, and not used anywhere.
-        We have to reconsider how to solve this.
+        https://github.com/fedora-modularity/meta-test-family/issues/52
 
-        Append registry into inserure registry.
+        Deprecated: Append registry into inserure registry.
 
 
         :param registry: string cotain value to add to insecure registry variable to config file
