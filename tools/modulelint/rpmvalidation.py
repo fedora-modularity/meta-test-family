@@ -96,11 +96,11 @@ class rpmvalidation(module_framework.AvocadoTest):
         return False
 
     def test(self):
-        allpackages = filter(bool, self.run("rpm -qa").stdout.split("\n"))
+        allpackages = filter(bool, self.run("rpm -qa", verbose=False).stdout.split("\n"))
         common.print_debug(allpackages)
         for package in allpackages:
             if 'filesystem' in package:
                 continue
-            for package_file in filter(bool, self.run("rpm -ql %s" % package).stdout.split("\n")):
+            for package_file in filter(bool, self.run("rpm -ql %s" % package, verbose=False).stdout.split("\n")):
                 if not self._compare_fhs(package_file):
                     self.fail("(%s): File [%s] violates the FHS." % (package, package_file))
