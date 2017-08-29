@@ -147,6 +147,7 @@ else
 fi
 TESTRESULT=$?
 
+MODULE=nspawn mtf-env-clean
 
 if [ "$RESULTTOOLS" -ne 0 ]; then
     exit 2

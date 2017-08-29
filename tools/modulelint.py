@@ -46,8 +46,30 @@ class DockerfileLinter(module_framework.AvocadoTest):
     def testDockerFromBaseruntime(self):
         self.assertTrue(self.dp.check_baseruntime())
 
-    def testDockerRunMicrodnf(self):
-        self.assertTrue(self.dp.check_microdnf())
+    def testDockerNodocs(self):
+        self.start()
+        installed_pkgs = self.run("rpm -qa --qf '%{{NAME}}\n'", ignore_status=True).stdout
+        # This returns a list of packages defined in config.yaml for testing
+        # e.g. ["bash", "rpm", "memcached"] in case of memcached
+        pkgs = self.backend.getPackageList()
+        for pkg in installed_pkgs.split('\n'):
+            if pkg in pkgs:
+                all_docs = self.run("rpm -qd %s" % pkg).stdout
+                for doc in all_docs.strip().split('\n'):
+                    self.assertNotEqual(0, self.run("test -e %s" % doc, ignore_status=True).exit_status)
+
+    def testDockerCleanAll(self):
+        self.start()
+        pkg_mgr = "yum"
+        # Detect distro in image
+        distro = self.run("cat /etc/os-release").stdout
+        if 'NAME=Fedora' in distro:
+            pkg_mgr = "dnf"
+        # Look, whether we have solv files in /var/cache/<pkg_mgr>/*.solv
+        # dnf|yum clean all deletes the file *.solv
+        ret = self.run("ls /var/cache/%s/*.solv" % pkg_mgr, ignore_status=True)
+        self.assertNotEqual(0, ret.exit_status)
+        self.assertEqual("", ret.stdout.strip())
 
     def testArchitectureInEnvAndLabelExists(self):
         self.assertTrue(self.dp.get_docker_specific_env("ARCH="))

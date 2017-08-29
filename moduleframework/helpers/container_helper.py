@@ -41,6 +41,7 @@ class ContainerHelper(CommonFunctions):
         self.tarbased = None
         self.jmeno = None
         self.docker_id = None
+        self.package_list = self.getPackageList()
         self.icontainer = get_url(
         ) if get_url() else self.info['container']
         if ".tar" in self.icontainer:
