@@ -80,13 +80,13 @@ class DockerfileLinterInContainer(container_avocado_test.ContainerAvocadoTest):
 
     def test_docker_nodocs(self):
         self.start()
-        installed_pkgs = self.run("rpm -qa --qf '%{{NAME}}\n'", ignore_status=True).stdout
+        installed_pkgs = self.run("rpm -qa --qf '%{{NAME}}\n'", verbose=False).stdout
         # This returns a list of packages defined in config.yaml for testing
         # e.g. ["bash", "rpm", "memcached"] in case of memcached
         pkgs = self.backend.getPackageList()
         list_pkg = [pkg for pkg in installed_pkgs.split('\n') if pkg in pkgs]
         for pkg in list_pkg:
-            all_docs = self.run("rpm -qd %s" % pkg).stdout
+            all_docs = self.run("rpm -qd %s" % pkg, verbose=False).stdout
             for doc in all_docs.strip().split('\n'):
                 self.assertNotEqual(0, self.run("test -e %s" % doc, ignore_status=True).exit_status)
 
