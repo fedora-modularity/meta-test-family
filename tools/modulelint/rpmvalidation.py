@@ -88,7 +88,9 @@ class rpmvalidation(module_framework.AvocadoTest):
             return True
         for path in self.fhs_base_paths:
             if filepath.startswith(path):
-                self.log.info("%s starts with FSH %s" % (filepath, path))
+                # Log is not needed I guess. It causes troubles in Travis CI.
+                # log is pretty huge.
+                # self.log.debug("%s starts with FSH %s" % (filepath, path))
                 return True
         self.log.info("%s not found in %s" % (filepath, self.fhs_base_paths))
         return False
