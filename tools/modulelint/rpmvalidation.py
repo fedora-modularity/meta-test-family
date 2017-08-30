@@ -88,17 +88,19 @@ class rpmvalidation(module_framework.AvocadoTest):
             return True
         for path in self.fhs_base_paths:
             if filepath.startswith(path):
-                self.log.info("%s starts with FSH %s" % (filepath, path))
+                # Log is not needed I guess. It causes troubles in Travis CI.
+                # log is pretty huge.
+                # self.log.debug("%s starts with FSH %s" % (filepath, path))
                 return True
         self.log.info("%s not found in %s" % (filepath, self.fhs_base_paths))
         return False
 
     def test(self):
-        allpackages = filter(bool, self.run("rpm -qa").stdout.split("\n"))
+        allpackages = filter(bool, self.run("rpm -qa", verbose=False).stdout.split("\n"))
         common.print_debug(allpackages)
         for package in allpackages:
             if 'filesystem' in package:
                 continue
-            for package_file in filter(bool, self.run("rpm -ql %s" % package).stdout.split("\n")):
+            for package_file in filter(bool, self.run("rpm -ql %s" % package, verbose=False).stdout.split("\n")):
                 if not self._compare_fhs(package_file):
                     self.fail("(%s): File [%s] violates the FHS." % (package, package_file))
