@@ -254,7 +254,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'MetaTestfamily', u'Meta Test family Documentation',
+  (master_doc, 'MetaTestFamily', u'MetaTestFamily Documentation',
    u'Petr Hracek@*Jan Scotka', 'MetaTestFamily', 'One line description of project.',
    'Miscellaneous'),
 ]
