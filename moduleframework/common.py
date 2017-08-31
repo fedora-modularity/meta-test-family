@@ -162,7 +162,7 @@ def get_if_do_cleanup():
 
 def get_if_reuse():
     """
-        Return the **MTF_REUSE** envvar. Use previously prepared machine
+        Return the **MTF_REUSE** envvar.
 
         :return: bool
         """
@@ -333,7 +333,8 @@ class CommonFunctions(object):
         self.config = get_config()
         doc_name = ['modularity-testing', 'meta-test-family', 'meta-test']
         if self.config.get('document') not in doc_name:
-            raise ConfigExc("bad yaml file, not contain any of document: item (%s)" % doc_name, self.config.get('document'))
+            raise ConfigExc("bad yaml file: item (%s)" %
+                            doc_name, self.config.get('document'))
         if self.config.get('modulemd-url') and get_if_module():
             self.is_it_module = True
         if self.is_it_module:
@@ -373,25 +374,11 @@ class CommonFunctions(object):
 
     def get_test_dependencies(self):
         """
-        get test dependencies from testdependencies
+        Get test dependencies from a configuration file
 
         :return: list of test dependencies
         """
-        packages = []
-        typo = 'testdependecies' in self.config
-        if typo:
-            warnings.warn("'testdependecies' is a typo, please fix",
-                          DeprecationWarning)
-
-        # try section without typo first
-        packages = self.config.get('testdependencies', {}).get('rpms', [])
-        if packages:
-            if typo:
-                warnings.warn("preferring section without typo")
-        else:
-            # fall back to mistyped test dependency section
-            packages = self.config.get('testdependecies', {}).get('rpms', [])
-        return packages
+        return self.config.get('testdependencies', {}).get('rpms', [])
 
     def installTestDependencies(self, packages=None):
         """

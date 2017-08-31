@@ -7,9 +7,9 @@ First test takes so long time
 It is expected behavior, because the first test run downloads all packages from Koji and creates a local
 repo. It is workaround because of missing composes for modules (on demand done by pungi). To make tests execute faster use environment variables:
 
-    - **MTF_REMOTE_REPOS=yes** - Help in case there are repos in koji https://kojipkgs.fedoraproject.org/repos/ (they are there just temporary, deleted after 2 weeks and probably it will not be created in near future anyhow)
-    - **MTF_DO_NOT_CLEANUP=yes** - Disable cleanup.
-    - **MTF_REUSE=yes** - Reuse previously created machine.
+    - **MTF_REMOTE_REPOS=yes** disables downloading of Koji packages and creating a local repo, and speeds up test execution.
+    - **MTF_DO_NOT_CLEANUP=yes** does not clean up module after test (machine running after test).
+    - **MTF_REUSE=yes** uses same module between tests It speeds up test execution. Can cause side effects.
 
 Unable to debug avocado output errors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -43,14 +43,15 @@ class RpmHelper(CommonFunctions):
                                    self.moduleName)
         self.info = self.config.get('module',{}).get('rpm')
         if not self.info:
-            raise ConfigExc("There does not exist section module: rpm: in yaml")
+            raise ConfigExc("Missing section module:rpm")
         self.repos = []
         self.whattoinstallrpm = ""
         self.bootstrappackages = []
 
     def setModuleDependencies(self):
         if not get_if_remoterepos():
-            temprepositories = self.getModulemdYamlconfig().get("data",{}).get("dependencies",{}).get("requires",{})
+            temprepositories = self.getModulemdYamlconfig()\
+                .get("data",{}).get("dependencies",{}).get("requires",{})
             temprepositories_cycle = dict(temprepositories)
             for x in temprepositories_cycle:
                 pdc = pdc_data.PDCParser()
@@ -60,7 +61,7 @@ class RpmHelper(CommonFunctions):
             print_info("Detected module dependencies:", self.moduledeps)
         else:
             self.moduledeps = {"base-runtime": "master"}
-            print_info("Remote repos on, set just offical compose:", self.moduledeps)
+            print_info("Remote repositories are enabled", self.moduledeps)
 
     def getURL(self):
         """
@@ -140,7 +141,7 @@ class RpmHelper(CommonFunctions):
             self.stop()
             self.__callCleanupFromConfig()
         else:
-            print_info("tearDown skipped, tests done on your machine, no special steps to connect")
+            print_info("TearDown phase skipped.")
 
     def __prepare(self):
         """

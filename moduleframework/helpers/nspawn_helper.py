@@ -130,7 +130,8 @@ class NspawnHelper(RpmHelper):
                     self.moduleName, counter, repo)
             try:
                 self.runHost(
-                    "%s install --nogpgcheck --setopt=install_weak_deps=False --installroot %s --allowerasing --disablerepo=* --enablerepo=%s* %s %s" %
+                    ("%s install --nogpgcheck --setopt=install_weak_deps=False "
+                    "--installroot %s --allowerasing --disablerepo=* --enablerepo=%s* %s %s") %
                     (trans_dict["HOSTPACKAGER"], self.chrootpath, self.moduleName, repos_to_use, self.whattoinstallrpm), verbose=is_not_silent())
             except Exception as e:
                 raise NspawnExc(
@@ -184,8 +185,8 @@ gpgcheck=0
 
     def __bootMachine(self):
         """
-        Internal function
-        Start machine via nspawn and wait untill booted
+        Internal function.
+        Start machine via nspawn and wait untill booted.
 
         :return: None
         """
@@ -330,7 +331,7 @@ gpgcheck=0
             try:
                 self.stop()
             except Exception as stopexception:
-                print_info("STOP caused exception this is bad, but have to continue to terminate machine!!!",
+                print_info("Stop action caused exception. It should not happen.",
                            stopexception)
                 pass
 
@@ -352,7 +353,7 @@ gpgcheck=0
                 shutil.rmtree(self.chrootpath, ignore_errors=True)
         else:
             print_info("tearDown skipped", "running nspawn: %s" % self.jmeno)
-            print_info("Use command to run commnand inside:", "machinectl shell root@{machine} /bin/bash" % self.jmeno)
+            print_info("Connection command to machine:", "machinectl shell root@{machine} /bin/bash" % self.jmeno)
 
 
     def __callSetupFromConfig(self):
