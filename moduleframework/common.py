@@ -336,6 +336,8 @@ class CommonFunctions(object):
             raise ConfigExc("bad yaml file, not contain any of document: item (%s)" % doc_name, self.config.get('document'))
         if self.config.get('modulemd-url') and get_if_module():
             self.is_it_module = True
+        if self.is_it_module:
+            self.getModulemdYamlconfig()
         self.moduleName = sanitize_text(self.config['name'])
         self.source = self.config.get('source')
         if not self.is_it_module:
@@ -455,12 +457,11 @@ class CommonFunctions(object):
                 modulemd = get_moduleurl()
                 if not modulemd:
                     modulemd = self.config.get("modulemd-url")
-
         try:
             ymlfile = urllib.urlopen(modulemd)
             link = yaml.load(ymlfile)
         except IOError as e:
-            raise ConfigExc("Cannot load file: '%s'" % e)
+            raise ConfigExc("Cannot load file: '%s'" % modulemd, e)
         except yaml.parser.ParserError as e:
             raise ConfigExc("Module MD file contains errors: '%s'" % e, modulemd)
         if not urllink:

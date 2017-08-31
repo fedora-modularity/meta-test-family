@@ -39,7 +39,7 @@ check-run-them-fedmsg-testmodule: prepare-nspawn
 	../../tools/run-them.sh testmodule ../../tools/example_message_module.yaml fedmsg
 
 check-exceptions: prepare-nspawn
-	MODULEMDURL=NOT_VALID_URL  MODULE=nspawn $(CMD) --show-job-log simpleTest.py | grep 'raise ConfigExc' >/dev/null
+	MODULEMDURL=NOT_VALID_URL  MODULE=docker $(CMD) --show-job-log simpleTest.py |& grep 'raise ConfigExc'
 
 check-pure-rpm:
 	CONFIG=config-pure-rpm.yaml MODULE=nspawn $(CMD) $(SIMPLE)
