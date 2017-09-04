@@ -43,15 +43,17 @@ Vagrant.configure(2) do |config|
 
     config.vm.provision "shell", inline: <<-SHELL
         set -x
+        TARGET=#{ENV['TARGET']}
+        test -z "$TARGET" && TARGET=check-docker
+
         dnf install -y make docker httpd git python2-avocado python2-avocado-plugins-output-html \
                        python-netifaces redhat-rpm-config python2-devel python-gssapi krb5-devel
         cd /opt/meta-test-family
         make install
-        make -C examples/testing-module check-docker
+        make -C examples/testing-module $TARGET
         cp -r /root/avocado /var/www/html/
         chmod -R a+x /var/www/html/
         restorecon -r /var/www/html/
         systemctl start httpd
-
     SHELL
 end
