@@ -35,7 +35,8 @@ export PARSEITEM=$2
 export PARSEITEMTYPE=$3
 export SELECTION=$4
 export MTF_PATH="/usr/share/moduleframework"
-export MODULE_LINT="$MTF_PATH/tools/modulelint/*.py"
+PYTHON_SITE_LIB=$(python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
+export MODULE_LINT="$PYTHON_SITE_LIB/moduleframework/tools/*.py"
 export MINIMAL_CONFIG="$MTF_PATH/docs/example-config-minimal.yaml"
 export MODULE_TESTS="*.py *.sh"
 
