@@ -50,13 +50,11 @@ class NspawnHelper(RpmHelper):
         self.__selinuxState = None
         time.time()
         actualtime = time.time()
-        if get_if_do_cleanup():
+        if not get_if_reuse():
             self.jmeno = "%s_%r" % (self.moduleName, actualtime)
         else:
             self.jmeno = self.moduleName
         self.chrootpath = os.path.abspath(self.baseprefix + self.jmeno)
-        print_info("name of CHROOT directory:", self.chrootpath)
-        trans_dict["ROOT"] = self.chrootpath
 
     def setUp(self):
         """
@@ -68,9 +66,10 @@ class NspawnHelper(RpmHelper):
         :return: None
         """
 
+        trans_dict["ROOT"] = self.chrootpath
+        print_info("name of CHROOT directory:", self.chrootpath)
         self.setModuleDependencies()
         self.setRepositoriesAndWhatToInstall()
-        self.installTestDependencies()
         self.__prepareSetup()
         self.__callSetupFromConfig()
         self.__bootMachine()
@@ -129,15 +128,10 @@ class NspawnHelper(RpmHelper):
                 repos_to_use += " --repofrompath %s%d,%s" % (
                     self.moduleName, counter, repo)
             try:
-                @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT * 60, delay=2 * 60,
-                       error=NspawnExc("RETRY: Unable to install packages"))
-                def tmpfunc():
-                    self.runHost(
-                        "%s install --nogpgcheck --setopt=install_weak_deps=False --installroot %s --allowerasing --disablerepo=* --enablerepo=%s* %s %s" %
-                        (trans_dict["HOSTPACKAGER"], self.chrootpath, self.moduleName, repos_to_use,
-                         self.whattoinstallrpm), verbose=is_not_silent())
-
-                tmpfunc()
+                self.runHost(
+                    ("%s install --nogpgcheck --setopt=install_weak_deps=False "
+                    "--installroot %s --allowerasing --disablerepo=* --enablerepo=%s* %s %s") %
+                    (trans_dict["HOSTPACKAGER"], self.chrootpath, self.moduleName, repos_to_use, self.whattoinstallrpm), verbose=is_not_silent())
             except Exception as e:
                 raise NspawnExc(
                     "ERROR: Unable to install packages %s\n original exeption:\n%s\n" %
@@ -189,19 +183,19 @@ gpgcheck=0
             print_info("repo prepared for microdnf:", insiderepopath, open(insiderepopath, 'r').read())
 
     def __bootMachine(self):
+        """
+        Internal function.
+        Start machine via nspawn and wait untill booted.
 
-        @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, delay=21,
-               error=NspawnExc("RETRY: Unable to start nspawn machine"))
-        def tempfnc():
-            print_debug("starting container via command:",
-                        "systemd-nspawn --machine=%s -bD %s" % (self.jmeno, self.chrootpath))
-            nspawncont = process.SubProcess(
-                "systemd-nspawn --machine=%s -bD %s" %
-                (self.jmeno, self.chrootpath), verbose=is_debug())
-            nspawncont.start()
-            self.__is_booted()
+        :return: None
+        """
 
-        tempfnc()
+        print_debug("starting NSPAWN")
+        nspawncont = process.SubProcess(
+            "systemd-nspawn --machine=%s -bD %s" %
+            (self.jmeno, self.chrootpath), verbose=is_debug())
+        nspawncont.start()
+        self.__is_booted()
         print_info("machine: %s started" % self.jmeno)
 
         trans_dict["GUESTIPADDR"] = trans_dict["HOSTIPADDR"]
@@ -332,36 +326,35 @@ gpgcheck=0
 
         :return: None
         """
-        try:
-            self.stop()
-        except Exception as stopexception:
-            print_info("STOP caused exception this is bad, but have to continue to terminate machine!!!", stopexception)
-            pass
-
-        try:
-            self.runHost("machinectl poweroff %s" % self.jmeno, verbose=is_not_silent())
-            self.__is_killed()
-        except Exception as poweroffex:
-            print_info("Unable to stop machine via poweroff, terminating", poweroffex)
+        if get_if_do_cleanup() and not get_if_reuse():
             try:
-                self.runHost("machinectl terminate %s" % self.jmeno, ignore_status=True)
-                self.__is_killed()
-            except Exception as poweroffexterm:
-                print_info("Unable to stop machine via terminate, STRANGE", poweroffexterm)
-                time.sleep(DEFAULTRETRYTIMEOUT)
+                self.stop()
+            except Exception as stopexception:
+                print_info("Stop action caused exception. It should not happen.",
+                           stopexception)
                 pass
-            pass
 
-        if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
-            # TODO: workaround because systemd nspawn is now working well in F-25
-            # (failing because of selinux)
-            self.runHost(
-                "setenforce %s" %
-                self.__selinuxState,
-                ignore_status=True, verbose=is_not_silent())
-        if get_if_do_cleanup() and os.path.exists(self.chrootpath):
-            shutil.rmtree(self.chrootpath, ignore_errors=True)
-        self.__callCleanupFromConfig()
+            try:
+                self.runHost("machinectl poweroff %s" % self.jmeno, verbose=is_not_silent())
+                self.__is_killed()
+            except Exception as poweroffex:
+                print_info("Unable to stop machine via poweroff, terminating", poweroffex)
+                try:
+                    self.runHost("machinectl terminate %s" % self.jmeno, ignore_status=True)
+                    self.__is_killed()
+                except Exception as poweroffexterm:
+                    print_info("Unable to stop machine via terminate, STRANGE", poweroffexterm)
+                    time.sleep(DEFAULTRETRYTIMEOUT)
+                    pass
+                pass
+            self.__callCleanupFromConfig()
+            if os.path.exists(self.chrootpath):
+                shutil.rmtree(self.chrootpath, ignore_errors=True)
+        else:
+            print_info("tearDown skipped", "running nspawn: %s" % self.jmeno)
+            print_info("To connect to a machine use:",
+                       "machinectl shell root@{machine} /bin/bash" % self.jmeno)
+
 
     def __callSetupFromConfig(self):
         """

@@ -38,12 +38,10 @@ class SanityCheck1(module_framework.AvocadoTest):
         self.assertIn("AHOJ", self.run("echo AHOJ").stdout)
         self.run(" nohup nc -l %d > %s 2>&1 &" % (PORT, TFILE), shell=True, ignore_bg_processes=True)
         time.sleep(2)
-        a = self.runHost("cat /etc/redhat-release").stdout.strip()
-        self.runHost("cat /etc/redhat-release | nc localhost %d" % PORT, shell=True)
+        self.runHost("echo Host | nc localhost %d" % PORT, shell=True)
         time.sleep(2)
-        b = self.run("cat %s" %TFILE).stdout.strip()
-        self.assertEqual(a,b)
-        self.assertIn("26", b)
+        b = self.run("cat %s" % TFILE).stdout.strip()
+        self.assertIn("Host", b)
 
 
 
@@ -53,12 +51,10 @@ class SanityCheck1(module_framework.AvocadoTest):
         self.assertIn("AHOJ", self.runHost("echo AHOJ").stdout)
         self.runHost("nohup nc -l %d > %s 2>&1 &" % (PORT, TFILE), shell=True, ignore_bg_processes=True)
         time.sleep(2)
-        a = self.run("cat /etc/redhat-release").stdout.strip()
-        self.run("cat /etc/redhat-release | nc localhost %d" % PORT, shell=True)
+        self.run("echo Inside | nc localhost %d" % PORT, shell=True)
         time.sleep(2)
         b = self.runHost("cat %s" %TFILE).stdout.strip()
-        self.assertEqual(a,b)
-        self.assertIn("26", b)
+        self.assertIn("Inside", b)
 
 if __name__ == '__main__':
     main()
