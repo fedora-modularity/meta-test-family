@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # This Modularity Testing Framework helps you to write tests for modules
@@ -29,7 +28,6 @@ import time
 from moduleframework.timeoutlib import Retry
 from moduleframework.common import *
 from moduleframework.exceptions import *
-from moduleframework.module_framework import get_if_do_cleanup
 from moduleframework.helpers.rpm_helper import RpmHelper
 
 
@@ -70,12 +68,6 @@ class NspawnHelper(RpmHelper):
         :return: None
         """
 
-        if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
-            # TODO: workaround because systemd nspawn is now working well in F-25
-            # (failing because of selinux)
-            self.__selinuxState = self.runHost(
-            "getenforce", ignore_status=True).stdout.strip()
-            self.runHost("setenforce Permissive", ignore_status=True, verbose=is_not_silent(), sudo=True)
         self.setModuleDependencies()
         self.setRepositoriesAndWhatToInstall()
         self.installTestDependencies()
@@ -129,9 +121,7 @@ class NspawnHelper(RpmHelper):
         """
         self.__do_smart_start_cleanup()
         if not os.path.exists(os.path.join(self.chrootpath, "usr")):
-            self.runHost("{HOSTPACKAGER} install systemd-container", verbose=is_not_silent(), sudo=True)
-            # workaround in case machined blocked by selinux, disabled for now
-            # self.runHost("sudo systemctl restart systemd-machined", verbose=is_not_silent(), sudo=True)
+
             repos_to_use = ""
             counter = 0
             for repo in self.repos:

@@ -44,7 +44,7 @@ mkdir -p $AVDIR
 export XUFILE="$AVDIR/out.xunit"
 export AVOCADOCMD="avocado run --xunit $XUFILE --show-job-log"
 export RESULTTOOLS=0
-export MTF_RECURSIVE_DOWNLOAD=yes
+#export MTF_RECURSIVE_DOWNLOAD=yes
 
 function getparams_int(){
     ADDIT="$1"
@@ -94,6 +94,7 @@ function runselected(){
 
 function distgit_wrapper_rpm(){
     cd $MODULENAME/tests
+    eval $PARAMS mtf-env-set
     eval $PARAMS make
 }
 
@@ -103,6 +104,7 @@ function avocado_wrapper(){
     cd tests_$MODULENAME
     TESTS="`ls $MODULE_TESTS $MODULE_LINT`"
     echo "AVOCADO FOUND TESTS: $TESTS"
+    eval $PARAMS mtf-env-set
     eval $PARAMS $AVOCADOCMD $TESTS
     )
 }
@@ -111,12 +113,14 @@ function run_modulelint(){
 
     TESTS="`ls $MODULE_LINT`"
     echo "RUN AT LEAST MODULE LINTER: $TESTS"
+    eval $PARAMS CONFIG=$MINIMAL_CONFIG mtf-env-set
     eval $PARAMS CONFIG=$MINIMAL_CONFIG $AVOCADOCMD $TESTS
 }
 
 set -x
 inst_env
 RESULTTOOLS=$(($RESULTTOOLS+$?))
+
 PARAMS="`DEBUG=yes getparams_int`"
 RESULTTOOLS=$(($RESULTTOOLS+$?))
 export PARAMS
@@ -128,6 +132,7 @@ fi
 
 test "$MODULENAME" = "testmodule" && MODULENAME="testing-module"
 
+export MTF_REMOTE_REPOS=yes
 if is_selected; then
     runselected
 elif loaddistgittests; then
@@ -140,8 +145,9 @@ else
     # return code what means SKIP results and do not interpret it
     exit 126
 fi
-
 TESTRESULT=$?
+
+MODULE=nspawn mtf-env-clean
 
 if [ "$RESULTTOOLS" -ne 0 ]; then
     exit 2
@@ -154,3 +160,4 @@ else
 # return code what means that some part of infra failed
     exit 125
 fi
+

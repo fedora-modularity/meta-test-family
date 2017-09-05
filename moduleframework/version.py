@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import os
 
 SPECFILEPATH = os.path.abspath(
@@ -7,8 +5,7 @@ SPECFILEPATH = os.path.abspath(
     os.path.join(
         os.path.dirname(__file__),
         "..",
-        "distro",
-        "modularity-testing-framework.spec"
+        "meta-test-family.spec"
     ))
 
 

@@ -63,7 +63,7 @@ for path in paths:
 
 setup(
     name='meta-test-family',
-    version="0.5.19",
+    version="0.6.1",
     description='Tool to test components fo a modular Fedora.',
     keywords='modules,containers,testing,framework',
     author='Jan Scotka',
@@ -78,6 +78,8 @@ setup(
             'moduleframework-cmd = moduleframework.bashhelper:main',
             'modulelint = moduleframework.modulelint:main',
             'mtf-generator = moduleframework.mtf_generator:main',
+            'mtf-env-set = moduleframework.mtf_environment:mtfenvset',
+            'mtf-env-clean = moduleframework.mtf_environment:mtfenvclean',
         ]
     },
     setup_requires=[],

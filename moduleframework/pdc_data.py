@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # Meta test family (MTF) is a tool to test components of a modular Fedora:
@@ -58,6 +57,7 @@ def getBasePackageSet(modulesDict=None, isModule=True, isContainer=False):
     basepackageset = []
     if isModule:
         if modulesDict.has_key(brmod):
+            print_info("Searching for packages base package set inside %s" % brmod)
             pdc = PDCParser()
             pdc.setLatestPDC(brmod, modulesDict[brmod])
             for pr in brmod_profiles:

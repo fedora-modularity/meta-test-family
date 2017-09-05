@@ -129,9 +129,10 @@ MTF scripts, examples and documentation will be installed into ``/usr/share/modu
 Source code
 -----------
 
-You may also wish to follow the `GitHub MTF repo`_ if you have a GitHub account. This stores the source code and the issue tracker for sharing bugs and feature ideas. The repository should be forked into your personal GitHub account where all work will be done. Any changes should be submitted through the pull request process.
+You may also wish to follow the `GitHub MTF repo`_ if you have a GitHub account. This stores the source code and the issue tracker for sharing bugs and feature ideas. The repository should be forked into your personal GitHub account where all work will be done. Any changes should be submitted through the pull request process. Please see `Contributing Guidelines`_ for more information.
 
 .. _GitHub MTF repo: https://github.com/fedora-modularity/meta-test-family
+.. _Contributing Guidelines: https://github.com/fedora-modularity/meta-test-family/blob/master/CONTRIBUTING.md
 
 .. seealso::
 

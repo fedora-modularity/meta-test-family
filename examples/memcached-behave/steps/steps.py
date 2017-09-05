@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # Meta test family (MTF) is a tool to test components of a modular Fedora:

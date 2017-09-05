@@ -21,24 +21,17 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
-from moduleframework import module_framework
+"""
+module for environment setup and cleanup, to be able to split action for ansible, more steps instead of one complex
+"""
+
+from moduleframework.common import *
 
 
-class microDNFTest(module_framework.AvocadoTest):
-    """
-    :avocado: enable
-    """
+class EnvRpm(CommonFunctions):
 
-    def setUp(self):
-        super(self.__class__, self).setUp()
-        if self.moduleType != "nspawn":
-            try:
-                self.tearDown()
-            except Exception as e:
-                print e
-                pass
-            self.skip("NSPAWN specific test (there is microdnf now)")
+    def prepare_env(self):
+        pass
 
-    def testInstallMicroDNFEmpty(self):
-        self.start()
-        self.run("microdnf install microdnf", ignore_status=True)
+    def cleanup_env(self):
+        pass

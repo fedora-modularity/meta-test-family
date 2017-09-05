@@ -60,7 +60,7 @@ module:
 # tag(gz) archive local path, or docker=cotainer_name for image already imported image
 # env var: URL
 # MANDATORY
-        container: docker.io/phracek/memcached
+        container: docker.io/modularitycontainers/memcached
 # rpm section (nspawn) There is similar meaning like docker seciton, but for rpm(nspawn)
 # MANDATORY
     rpm:

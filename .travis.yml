@@ -1,0 +1,20 @@
+language: python
+python:
+  - "2.7"
+
+sudo: required
+
+services:
+  - docker
+
+before_install:
+  - sudo apt-get -y install curl python-software-properties software-properties-common python-pip python-dev build-essential git make
+  - sudo apt-get install -y libkrb5-dev
+  - sudo pip install avocado-framework
+  - pip install avocado-framework
+
+install: sudo make install
+
+script: sudo make travis
+
+after_script: sudo cat ~/avocado/job-results/latest/job.log

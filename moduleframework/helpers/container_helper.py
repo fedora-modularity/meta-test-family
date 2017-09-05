@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # This Modularity Testing Framework helps you to write tests for modules
@@ -21,11 +20,7 @@
 # Authors: Petr Hracek <phracek@redhat.com>
 #
 
-import re
 import json
-
-from avocado.utils import service
-
 from moduleframework.common import *
 
 
@@ -46,6 +41,7 @@ class ContainerHelper(CommonFunctions):
         self.tarbased = None
         self.jmeno = None
         self.docker_id = None
+        self.package_list = self.getPackageList()
         self.icontainer = get_url(
         ) if get_url() else self.info['container']
         if ".tar" in self.icontainer:
@@ -91,8 +87,6 @@ class ContainerHelper(CommonFunctions):
         """
         self.installTestDependencies()
         self.__callSetupFromConfig()
-        self.__prepare()
-        self.__prepareContainer()
         self.__pullContainer()
 
     def tearDown(self):
@@ -104,31 +98,6 @@ class ContainerHelper(CommonFunctions):
         self.stop()
         self.__callCleanupFromConfig()
 
-    def __prepare(self):
-        """
-        Internal method, do not use it anyhow
-
-        :return: None
-        """
-        if not os.path.isfile('/usr/bin/docker-current'):
-            self.runHost("{HOSTPACKAGER} install docker", verbose=is_not_silent())
-
-    def __prepareContainer(self):
-        """
-        Internal method, do not use it anyhow
-
-        :return: None
-        """
-        if self.tarbased is False and self.jmeno == self.icontainer and "docker.io" not in self.info[
-            'container']:
-            registry = re.search("([^/]*)", self.icontainer).groups()[0]
-            if registry not in open('/etc/sysconfig/docker', 'rw').read():
-                with open("/etc/sysconfig/docker", "a") as myfile:
-                    myfile.write(
-                        "INSECURE_REGISTRY='--insecure-registry $REGISTRY %s'" %
-                        registry)
-        service_manager = service.ServiceManager()
-        service_manager.start('docker')
 
     def __pullContainer(self):
         """

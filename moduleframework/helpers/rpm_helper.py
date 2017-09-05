@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # This Modularity Testing Framework helps you to write tests for modules
@@ -49,17 +48,21 @@ class RpmHelper(CommonFunctions):
         self.bootstrappackages = []
 
     def setModuleDependencies(self):
-        temprepositories = {}
-        if self.getModulemdYamlconfig()["data"].get("dependencies") and self.getModulemdYamlconfig()["data"][
-            "dependencies"].get("requires"):
-            temprepositories = self.getModulemdYamlconfig()["data"]["dependencies"]["requires"]
-        temprepositories_cycle = dict(temprepositories)
-        for x in temprepositories_cycle:
-            pdc = pdc_data.PDCParser()
-            pdc.setLatestPDC(x, temprepositories_cycle[x])
-            temprepositories.update(pdc.generateDepModules())
-        self.moduledeps = temprepositories
-        print_info("Detected module dependencies:", self.moduledeps)
+        if not get_if_remoterepos():
+            temprepositories = {}
+            if self.getModulemdYamlconfig()["data"].get("dependencies") and self.getModulemdYamlconfig()["data"][
+                "dependencies"].get("requires"):
+                temprepositories = self.getModulemdYamlconfig()["data"]["dependencies"]["requires"]
+            temprepositories_cycle = dict(temprepositories)
+            for x in temprepositories_cycle:
+                pdc = pdc_data.PDCParser()
+                pdc.setLatestPDC(x, temprepositories_cycle[x])
+                temprepositories.update(pdc.generateDepModules())
+            self.moduledeps = temprepositories
+            print_info("Detected module dependencies:", self.moduledeps)
+        else:
+            self.moduledeps = {"base-runtime": "master"}
+            print_info("Remote repos on, set just one repo:", self.moduledeps)
 
     def getURL(self):
         """

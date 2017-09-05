@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Meta test family (MTF) is a tool to test components of a modular Fedora:
 # https://docs.pagure.org/modularity/
@@ -45,10 +43,15 @@ hostname = socket.gethostname()
 dusername = "test"
 dpassword = "test"
 ddatabase = "basic"
-hostpackager = "yum -y"
-guestpackager = "microdnf"
-if os.path.exists('/usr/bin/dnf'):
-    hostpackager = "dnf -y"
+__rh_release = '/etc/redhat-release'
+if os.path.exists(__rh_release):
+    hostpackager = "yum -y"
+    guestpackager = "microdnf"
+    if os.path.exists('/usr/bin/dnf'):
+        hostpackager = "dnf -y"
+else:
+    hostpackager = "apt-get -y"
+    guestpackager = "apt-get -y"
 ARCH = "x86_64"
 
 # translation table for {VARIABLE} in the config.yaml file
@@ -95,7 +98,7 @@ def is_not_silent():
 
     :return: bool
     """
-    return not is_debug()
+    return is_debug()
 
 
 def print_info(*args):
@@ -202,6 +205,7 @@ def sanitize_cmd(cmd):
     :param (str): command to sanitize
     :return: str
     """
+
     if '"' in cmd:
         cmd = cmd.replace('"', r'\"')
     return cmd
@@ -376,7 +380,7 @@ class CommonFunctions(object):
             self.runHost(
                 "{HOSTPACKAGER} install " +
                 " ".join(packages),
-                ignore_status=True, verbose=is_not_silent())
+                ignore_status=True, verbose=is_debug())
 
     def loadconfig(self):
         """

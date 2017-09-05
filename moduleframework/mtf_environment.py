@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # Meta test family (MTF) is a tool to test components of a modular Fedora:
@@ -21,24 +22,26 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
-from moduleframework import module_framework
+"""
+Module to setup and cleanup the test environment.
+"""
+from moduleframework.module_framework import *
+from moduleframework.environment_prepare.docker_prepare import EnvDocker
+from moduleframework.environment_prepare.rpm_prepare import EnvRpm
+from moduleframework.environment_prepare.nspawn_prepare import EnvNspawn
 
+(module_object, module_name) = get_backend()
 
-class microDNFTest(module_framework.AvocadoTest):
-    """
-    :avocado: enable
-    """
+if module_name == "docker":
+    env = EnvDocker()
+elif module_name == "rpm":
+    env = EnvRpm()
+elif module_name == "nspawn":
+    env = EnvNspawn()
 
-    def setUp(self):
-        super(self.__class__, self).setUp()
-        if self.moduleType != "nspawn":
-            try:
-                self.tearDown()
-            except Exception as e:
-                print e
-                pass
-            self.skip("NSPAWN specific test (there is microdnf now)")
+def mtfenvset():
+    env.prepare_env()
 
-    def testInstallMicroDNFEmpty(self):
-        self.start()
-        self.run("microdnf install microdnf", ignore_status=True)
+def mtfenvclean():
+    env.cleanup_env()
+

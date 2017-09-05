@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#  -*- coding: utf-8 -*-
 
 # This file is part of Cockpit.
 #
@@ -148,7 +147,6 @@ class Retry(object):
                 delay = self.handle_failure(start_time, "")
 
         return __wrap
-
 
 if __name__ == '__main__':
     class IFailedError(Exception):
