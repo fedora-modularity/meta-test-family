@@ -44,7 +44,6 @@ class EnvNspawn(CommonFunctions):
     def __prepare_selinux(self):
         # disable selinux by default if not turned off
         if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
-            print_info("Disabling selinux")
             # https://github.com/fedora-modularity/meta-test-family/issues/53
             # workaround because systemd nspawn is now working well in F-26
             if not os.path.exists(selinux_state_file):

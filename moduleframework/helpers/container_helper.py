@@ -39,7 +39,7 @@ class ContainerHelper(CommonFunctions):
         static_name="testcontainer"
         self.info = self.config.get('module',{}).get('docker')
         if not self.info:
-            raise ConfigExc("Missing section for docker (module: -> docker:) in config file")
+            raise ConfigExc("There is no section for docker (module: -> docker:) in the configuration file.")
         self.tarbased = None
         self.jmeno = None
         self.docker_id = None
@@ -173,7 +173,8 @@ class ContainerHelper(CommonFunctions):
             else:
                 self.docker_id = self.runHost(
                     "docker run %s %s %s %s" %
-                    (args, self.docker_static_name, self.jmeno, command), shell=True, ignore_bg_processes=True, verbose=is_not_silent()).stdout
+                    (args, self.docker_static_name, self.jmeno, command),
+                    shell=True, ignore_bg_processes=True, verbose=is_not_silent()).stdout
             self.docker_id = self.docker_id.strip()
             # It installs packages in container is removed by default, in future maybe reconciled.
             # self.install_packages_in_container()

@@ -68,8 +68,7 @@ class NspawnHelper(RpmHelper):
 
         trans_dict["ROOT"] = self.chrootpath
         print_info("name of CHROOT directory:", self.chrootpath)
-        if self.is_it_module:
-            self.setModuleDependencies()
+        self.setModuleDependencies()
         self.setRepositoriesAndWhatToInstall()
         self.__prepareSetup()
         self.__callSetupFromConfig()
@@ -353,7 +352,8 @@ gpgcheck=0
                 shutil.rmtree(self.chrootpath, ignore_errors=True)
         else:
             print_info("tearDown skipped", "running nspawn: %s" % self.jmeno)
-            print_info("Connection command to machine:", "machinectl shell root@{machine} /bin/bash" % self.jmeno)
+            print_info("To connect to a machine use:",
+                       "machinectl shell root@{machine} /bin/bash" % self.jmeno)
 
 
     def __callSetupFromConfig(self):

@@ -35,9 +35,9 @@ class SanityRealMultihost(module_framework.AvocadoTest):
         self.machineF25 = module_framework.get_backend()[0]
         self.machineF26 = module_framework.get_backend()[0]
         self.machineRawhide = module_framework.get_backend()[0]
-        self.machineF25.setRepositoriesAndWhatToInstall(repos = ["http://ftp.fi.muni.cz/pub/linux/fedora/linux/releases/25/Everything/x86_64/os/"])
-        self.machineF26.setRepositoriesAndWhatToInstall(repos = ["http://ftp.fi.muni.cz/pub/linux/fedora/linux/development/26/Everything/x86_64/os/"])
-        self.machineRawhide.setRepositoriesAndWhatToInstall(repos = ["http://ftp.fi.muni.cz/pub/linux/fedora/linux/development/rawhide/Everything/x86_64/os/"])
+        self.machineF25.info["repo"] = "http://ftp.fi.muni.cz/pub/linux/fedora/linux/releases/25/Everything/x86_64/os/"
+        self.machineF26.info["repo"] = "http://ftp.fi.muni.cz/pub/linux/fedora/linux/releases/26/Everything/x86_64/os/"
+        self.machineRawhide.info["repo"] = "http://ftp.fi.muni.cz/pub/linux/fedora/linux/development/rawhide/Everything/x86_64/os/"
         self.machineF25.setUp()
         self.machineF26.setUp()
         self.machineRawhide.setUp()

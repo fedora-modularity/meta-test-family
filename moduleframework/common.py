@@ -289,7 +289,7 @@ def get_compose_url():
     return compose_url
 
 
-def get_moduleurl():
+def get_modulemdurl():
     """
     Read a moduleMD file.
 
@@ -297,7 +297,7 @@ def get_moduleurl():
     the ``config.yaml`` file is checked. If none of them is set, then
     the ***COMPOSE_URL* envvar is checked.
 
-    :return: dict
+    :return: string
     """
     mdf = os.environ.get('MODULEMDURL')
     return mdf
@@ -388,9 +388,11 @@ class CommonFunctions(object):
                        will be installed.
         :return: None
         """
+
         if not packages:
             packages = self.get_test_dependencies()
         if packages:
+            print_info("Installs test dependencies: ", packages)
             self.runHost(
                 "{HOSTPACKAGER} install " +
                 " ".join(packages),
@@ -441,14 +443,16 @@ class CommonFunctions(object):
             if self.modulemdConf:
                 return self.modulemdConf
             else:
-                modulemd = get_moduleurl()
+                modulemd = get_modulemdurl()
                 if not modulemd:
                     modulemd = self.config.get("modulemd-url")
+        else:
+            return link
         try:
             ymlfile = urllib.urlopen(modulemd)
             link = yaml.load(ymlfile)
         except IOError as e:
-            raise ConfigExc("Cannot load file: '%s'" % modulemd, e)
+            raise ConfigExc("File '%s' cannot be load" % modulemd, e)
         except yaml.parser.ParserError as e:
             raise ConfigExc("Module MD file contains errors: '%s'" % e, modulemd)
         if not urllink:

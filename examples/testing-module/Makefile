@@ -26,7 +26,8 @@ check-minimal-config-rpm: prepare-nspawn
 check-behave-docker: prepare-docker
 	cd ../memcached-behave; MODULE=docker behave
 
-check-multihost-testing: prepare-nspawn
+check-multihost-testing:
+	cd ../multios_testing; MODULE=nspawn mtf-env-set
 	cd ../multios_testing; MTF_DISABLE_MODULE=yes $(CMD) *.py
 
 check-run-them-pdc-baseruntime: prepare-nspawn

@@ -77,7 +77,7 @@ After preparing the libvirt prerequisites using the instructions above:
 
       # Provision the Vagrant environment:
       $ sudo vagrant up --provider=libvirt # or just `sudo vagrant up` as libvirt is a default one
-      # Alternatively set env variable TARGET to test another target defined in examples/testing-module/Makefile
+      # Alternatively, set the TARGET envvar to test another target defined in examples/testing-module/Makefile
       $ sudo TARGET=check-pure-docker vagrant up
       # The above will run for a while while it provisions your development environment.
       $ sudo vagrant reload  # Reboot the machine at the end to apply kernel updates, etc.

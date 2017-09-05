@@ -43,25 +43,26 @@ class RpmHelper(CommonFunctions):
                                    self.moduleName)
         self.info = self.config.get('module',{}).get('rpm')
         if not self.info:
-            raise ConfigExc("Missing section module:rpm")
+            raise ConfigExc("There is no section module:rpm")
         self.repos = []
         self.whattoinstallrpm = ""
         self.bootstrappackages = []
 
     def setModuleDependencies(self):
-        if not get_if_remoterepos():
-            temprepositories = self.getModulemdYamlconfig()\
-                .get("data",{}).get("dependencies",{}).get("requires",{})
-            temprepositories_cycle = dict(temprepositories)
-            for x in temprepositories_cycle:
-                pdc = pdc_data.PDCParser()
-                pdc.setLatestPDC(x, temprepositories_cycle[x])
-                temprepositories.update(pdc.generateDepModules())
-            self.moduledeps = temprepositories
-            print_info("Detected module dependencies:", self.moduledeps)
-        else:
-            self.moduledeps = {"base-runtime": "master"}
-            print_info("Remote repositories are enabled", self.moduledeps)
+        if self.is_it_module:
+            if not get_if_remoterepos():
+                temprepositories = self.getModulemdYamlconfig()\
+                    .get("data",{}).get("dependencies",{}).get("requires",{})
+                temprepositories_cycle = dict(temprepositories)
+                for x in temprepositories_cycle:
+                    pdc = pdc_data.PDCParser()
+                    pdc.setLatestPDC(x, temprepositories_cycle[x])
+                    temprepositories.update(pdc.generateDepModules())
+                self.moduledeps = temprepositories
+                print_info("Detected module dependencies:", self.moduledeps)
+            else:
+                self.moduledeps = {"base-runtime": "master"}
+                print_info("Remote repositories are enabled", self.moduledeps)
 
     def getURL(self):
         """
