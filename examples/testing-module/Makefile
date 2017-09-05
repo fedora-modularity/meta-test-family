@@ -1,5 +1,5 @@
 CMD=avocado run
-TESTS=$(shell ls *.py *.sh ../../tools/modulelint/*.py)
+TESTS=$(shell ls *.py *.sh ../../moduleframework/tools/*.py)
 SIMPLE=simpleTest.py
 export MTF_REMOTE_REPOS=yes
 export DEBUG=yes
