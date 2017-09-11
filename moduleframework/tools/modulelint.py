@@ -43,9 +43,6 @@ class DockerfileLinter(module_framework.AvocadoTest):
         if self.dp.dockerfile is None:
             self.skip()
 
-    def testDockerFromBaseruntime(self):
-        self.assertTrue(self.dp.check_baseruntime())
-
     def testArchitectureInEnvAndLabelExists(self):
         self.assertTrue(self.dp.get_docker_specific_env("ARCH="))
         self.assertTrue(self.dp.get_specific_label("architecture"))
