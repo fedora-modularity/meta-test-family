@@ -1,0 +1,5 @@
+#!/bin/bash
+
+SITE_LIB=$(python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
+MTF_TOOLS="moduleframework/tools"
+avocado run $SITE_LIB/$MTF_TOOLS/*.py

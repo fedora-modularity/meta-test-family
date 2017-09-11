@@ -91,6 +91,7 @@ class GeneratedTestsConfig(module_framework.AvocadoTest):
                     method, line, method == "runHost")
         print("Added test (runmethod: %s): %s" % (method, testname))
 
+
 def main():
     """
     Creates ``tests/generated.py`` file .
@@ -99,6 +100,3 @@ def main():
     configout = open('generated.py', 'w')
     configout.write(config.output)
     configout.close()
-
-if __name__ == '__main__':
-    main()

@@ -73,6 +73,7 @@ setup(
     packages=find_packages(exclude=['docs', 'examples', 'tools']),
     include_package_data=True,
     data_files=data_files.items(),
+    scripts=['tools/mtf'],
     entry_points={
         'console_scripts': [
             'mtf-cmd = moduleframework.bashhelper:main',
@@ -91,12 +92,5 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
-    install_requires=['avocado-framework',
-                      'netifaces',
-                      'behave',
-                      'PyYAML',
-                      'dockerfile-parse',
-                      'pdc_client',
-                      'modulemd'
-                      ]
+    install_requires=open('requirements.txt').read().splitlines()
 )

@@ -28,38 +28,45 @@ from moduleframework import dockerlinter
 from moduleframework.avocado_testers import container_avocado_test
 
 
-class DockerfileSanitize(container_avocado_test.ContainerAvocadoTest):
+class DockerfileLinter(module_framework.AvocadoTest):
     """
     :avocado: enable
 
     """
 
-    dp = dockerlinter.DockerfileLinter(os.path.join(os.getcwd(), ".."))
+    dp = None
 
-    def test_docker_from_baseruntime(self):
+    def setUp(self):
+        # it is not intended just for docker, but just docker packages are
+        # actually properly signed
+        self.dp = dockerlinter.DockerfileLinter(os.path.join(os.getcwd(), ".."))
+        if self.dp.dockerfile is None:
+            self.skip()
+
+    def testDockerFromBaseruntime(self):
         self.assertTrue(self.dp.check_baseruntime())
 
-    def test_architecture_in_env_and_label_exists(self):
+    def testArchitectureInEnvAndLabelExists(self):
         self.assertTrue(self.dp.get_docker_specific_env("ARCH="))
         self.assertTrue(self.dp.get_specific_label("architecture"))
 
-    def test_name_in_env_and_label_exists(self):
+    def testNameInEnvAndLabelExists(self):
         self.assertTrue(self.dp.get_docker_specific_env("NAME="))
         self.assertTrue(self.dp.get_specific_label("name"))
 
-    def test_release_label_exists(self):
+    def testReleaseLabelExists(self):
         self.assertTrue(self.dp.get_specific_label("release"))
 
-    def test_version_label_exists(self):
+    def testVersionLabelExists(self):
         self.assertTrue(self.dp.get_specific_label("version"))
 
-    def test_com_red_hat_component_label_exists(self):
+    def testComRedHatComponentLabelExists(self):
         self.assertTrue(self.dp.get_specific_label("com.redhat.component"))
 
-    def test_iok8s_description_exists(self):
+    def testIok8sDescriptionExists(self):
         self.assertTrue(self.dp.get_specific_label("io.k8s.description"))
 
-    def test_io_openshift_expose_services_exists(self):
+    def testIoOpenshiftExposeServicesExists(self):
         label_io_openshift = "io.openshift.expose-services"
         exposes = self.dp.get_docker_expose()
         label_list = self.dp.get_docker_labels()
@@ -67,41 +74,9 @@ class DockerfileSanitize(container_avocado_test.ContainerAvocadoTest):
         for exp in exposes:
             self.assertTrue("%s" % exp in label_list[label_io_openshift])
 
-    def test_io_openshift_tags_exists(self):
+    def testIoOpenShiftTagsExists(self):
         label_list = self.dp.get_docker_labels()
         self.assertTrue("io.openshift.tags" in label_list)
-
-
-class DockerfileLinterInContainer(container_avocado_test.ContainerAvocadoTest):
-    """
-    :avocado: enable
-
-    """
-
-    def test_docker_nodocs(self):
-        self.start()
-        installed_pkgs = self.run("rpm -qa --qf '%{{NAME}}\n'", verbose=False).stdout
-        # This returns a list of packages defined in config.yaml for testing
-        # e.g. ["bash", "rpm", "memcached"] in case of memcached
-        pkgs = self.backend.getPackageList()
-        list_pkg = [pkg for pkg in installed_pkgs.split('\n') if pkg in pkgs]
-        for pkg in list_pkg:
-            all_docs = self.run("rpm -qd %s" % pkg, verbose=False).stdout
-            for doc in all_docs.strip().split('\n'):
-                self.assertNotEqual(0, self.run("test -e %s" % doc, ignore_status=True).exit_status)
-
-    def test_docker_clean_all(self):
-        self.start()
-        pkg_mgr = "yum"
-        # Detect distro in image
-        distro = self.run("cat /etc/os-release").stdout
-        if 'NAME=Fedora' in distro:
-            pkg_mgr = "dnf"
-        # Look, whether we have solv files in /var/cache/<pkg_mgr>/*.solv
-        # dnf|yum clean all deletes the file *.solv
-        ret = self.run("ls /var/cache/%s/*.solv" % pkg_mgr, ignore_status=True)
-        self.assertNotEqual(0, ret.exit_status)
-        self.assertEqual("", ret.stdout.strip())
 
 
 class DockerLint(container_avocado_test.ContainerAvocadoTest):
