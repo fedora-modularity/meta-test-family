@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           meta-test-family
-Version:        0.7.0
+Version:        0.7.1
 Release:        1%{?dist}
 Summary:        Tool to test components of a modular Fedora
 
@@ -51,6 +51,12 @@ install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
 
 
 %changelog
+* Wed Sep 13 2017 Petr Hracek <phracek@redhat.com> 0.7.1-1
+- Fix Proper handling Dockerfile #95
+- Fix Remove baseruntime check #73
+- Fix packaging issues #22
+- Provide mtf binary #79
+
 * Tue Sep 05 2017 Petr Hracek <phracek@redhat.com> 0.7.0-1
 - new package built with tito
 
