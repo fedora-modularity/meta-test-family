@@ -2,7 +2,7 @@
 
 Name:           meta-test-family
 Version:        0.7.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Tool to test components of a modular Fedora
 
 License:        GPLv2+
@@ -21,6 +21,7 @@ Requires:       python-netifaces
 Requires:       docker
 Requires:       python2-pdc-client
 Requires:       python2-modulemd
+Requires:       python2-dockerfile-parse
 Provides:       modularity-testing-framework = %{version}-%{release}
 Obsoletes:      modularity-testing-framework < 0.5.18-2
 
@@ -52,6 +53,9 @@ install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
 
 
 %changelog
+* Wed Sep 13 2017 Petr Hracek <phracek@redhat.com> 0.7.1-2
+- Fix missing dependency to dockerfile-parse
+
 * Wed Sep 13 2017 Petr Hracek <phracek@redhat.com> 0.7.1-1
 - Fix Proper handling Dockerfile #95
 - Fix Remove baseruntime check #73
