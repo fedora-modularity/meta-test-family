@@ -20,13 +20,17 @@ RUN = "RUN"
 def get_string(value):
     return ast.literal_eval(value)
 
-def getDockerFile(dir_name):
+
+def get_docker_file(dir_name):
     fromenv = os.environ.get("DOCKERFILE")
     if fromenv:
         dockerfile = fromenv
-        dir_name = os.path.dirname(dockerfile)
+        dir_name = os.getcwd()
     else:
-        dockerfile = os.path.join(dir_name, DOCKERFILE)
+        dir_name = os.path.abspath(dir_name)
+        dockerfile = DOCKERFILE
+    dockerfile = os.path.join(dir_name, dockerfile)
+
     if not os.path.exists(dockerfile):
         dockerfile = None
         common.print_debug("Dockerfile should exists in the %s directory." % dir_name)
@@ -45,10 +49,10 @@ class DockerfileLinter(object):
     docker_dict = {}
 
     def __init__(self, dir_name=None):
-        dockerfile = getDockerFile(dir_name)
+        dockerfile = get_docker_file(dir_name)
         if dockerfile:
             self.dfp = DockerfileParser(path=os.path.dirname(dockerfile))
-            self.dockerfile  = dockerfile
+            self.dockerfile = dockerfile
             self._get_structure_as_dict()
         else:
             self.dfp = None
