@@ -32,6 +32,7 @@ class EnvDocker(CommonFunctions):
 
     def prepare_env(self):
         self.installTestDependencies()
+        print_info('Loaded config for: {}'.format(self.config['module']['docker']['container']))
         self.__install_env()
         self.__start_service()
 

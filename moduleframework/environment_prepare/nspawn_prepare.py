@@ -57,7 +57,7 @@ class EnvNspawn(CommonFunctions):
     def __install_machined(self):
         # install systemd-nspawn in case not installed
         if self.runHost("machinectl --version", ignore_status=True).exit_status != 0:
-            print_info("Installing systemd-cotaniner")
+            print_info("Installing systemd-container")
             self.runHost("{HOSTPACKAGER} install systemd-container", verbose=is_not_silent(), sudo=True)
 
     def __cleanup(self):
