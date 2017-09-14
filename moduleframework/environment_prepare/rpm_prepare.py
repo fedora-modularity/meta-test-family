@@ -36,5 +36,5 @@ class EnvRpm(CommonFunctions):
         pass
 
     def cleanup_env(self):
-        print_info("WARNING: Testing is going to be performed on this machine")
+        print_info("WARNING: No cleanup as it can destroy this machine")
         pass

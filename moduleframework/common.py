@@ -388,15 +388,20 @@ class CommonFunctions(object):
                        will be installed.
         :return: None
         """
-
         if not packages:
             packages = self.get_test_dependencies()
+
         if packages:
             print_info("Installs test dependencies: ", packages)
-            self.runHost(
-                "{HOSTPACKAGER} install " +
-                " ".join(packages),
-                ignore_status=True, verbose=is_debug())
+            # you has to be root to install some packages:
+            try:
+                self.runHost(
+                    "{HOSTPACKAGER} install " +
+                    " ".join(packages),
+                    ignore_status=False, verbose=is_debug())
+            except process.CmdError as e:
+                raise CmdExc("Command failed, are you root?", e)
+
 
     def getPackageList(self, profile=None):
         """

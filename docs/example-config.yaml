@@ -33,6 +33,7 @@ packages:
 # provides service on port exported to host)
 testdependencies:
     rpms:
+        - zsh
         - nc
 # default module type for testing if not set by env variable
 # env var: MODULE   (docker, nspawn, rpm)
