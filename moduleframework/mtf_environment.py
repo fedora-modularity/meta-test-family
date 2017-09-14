@@ -49,3 +49,4 @@ def mtfenvclean():
     # cleanup_env exists in more forms for backend: EnvDocker/EnvRpm/EnvNspawn
     env.cleanup_env()
     print_info("All clean")
+
