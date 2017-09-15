@@ -1,8 +1,8 @@
 %global framework_name moduleframework
 
 Name:           meta-test-family
-Version:        0.7.1
-Release:        2%{?dist}
+Version:        0.7.2
+Release:        1%{?dist}
 Summary:        Tool to test components of a modular Fedora
 
 License:        GPLv2+
@@ -53,6 +53,64 @@ install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
 
 
 %changelog
+* Fri Sep 15 2017 Petr "Stone" Hracek <phracek@redhat.com> 0.7.2-1
+- better permission info messages (psklenar@redhat.com)
+- Improve  executable: (bkabrda@redhat.com)
+- fixing No newline at the eof (psklenar@redhat.com)
+- typos (psklenar@redhat.com)
+- adding more user messages (psklenar@redhat.com)
+- added more messages to users whats going on (psklenar@redhat.com)
+- Fix missing dependency to python2-dockerfile-parse (phracek@redhat.com)
+- Update meta-test-family.spec with mtf binary (phracek@redhat.com)
+- Bump release (phracek@redhat.com)
+- Fixes #95: Proper handling Dockerfile (phracek@redhat.com)
+- Remove BaseRuntime test (jkosciel@redhat.com)
+- Fix path for modulelint in run-them.sh (phracek@redhat.com)
+- Fixes #79. Provide mtf binary which calls avocado run (phracek@redhat.com)
+- Remove behave from requirements (phracek@redhat.com)
+- Add requirements.txt for Python packages (phracek@redhat.com)
+- Remove __main__ from python files which does not need it.
+  (phracek@redhat.com)
+- Build version (phracek@redhat.com)
+- add fixes mentioned in PR, fix multihost test suite (jscotka@redhat.com)
+- parse TARGET env var inside vagrant file (jscotka@redhat.com)
+- add setup targets to ceck-pure* targets (jscotka@redhat.com)
+- repair mariadb scl example (jscotka@redhat.com)
+- changes according to PR review (jscotka@redhat.com)
+- load modulemd file for each test (jscotka@redhat.com)
+- module type not dependent, able to use them separately. Remove workarounds
+  (jscotka@redhat.com)
+- Verbose mode is turn off in rpmvalidation.py (phracek@redhat.com)
+- Don't log if file is correct by FHS. (phracek@redhat.com)
+- Fixing CI tests caused by branch testing_new_dnf_approach
+  (phracek@redhat.com)
+- example of tests for collections (#48) (scottyh@post.cz)
+- Remove obsolete imports (phracek@redhat.com)
+- Check /etc/os-release and docs for package (phracek@redhat.com)
+- Use check against real packages present in docker image (phracek@redhat.com)
+- Let's check only right packages and not whole image (phracek@redhat.com)
+- Checking docs over rpm -qad. Remove obsolete fnc (phracek@redhat.com)
+- Update checks for nodocs and clean all. Clean all detects metadata in
+  /var/cache/<pkg_mgr/*.solv (phracek@redhat.com)
+- Tests whether dnf contains --nodocs and clean all (phracek@redhat.com)
+- Documentation for env split & some smaller fixes (#54) (scottyh@post.cz)
+- better name for nonvalid url and recursive download comment out
+  (jscotka@redhat.com)
+- remove cleanup of environment not important for automation
+  (jscotka@redhat.com)
+- repair exception test, add remote repos for all dependencies  * fix issue
+  with exception test, by mistake removed --show-job-log, so unable to see
+  exception  * added remote repos for every dependency, it will fix issue on
+  taskotron (jscotka@redhat.com)
+- Update docu with bashhelper (phracek@redhat.com)
+- Fix wrong import NspawnAvocadoTest (phracek@redhat.com)
+- self.cancel() has to be used otherwise it has traceback (#57)
+  (psklenar@gmail.com)
+- Fix wrong import ContainerAvocadoTest (phracek@redhat.com)
+- Fix wrong import. get_if_do_cleanup (phracek@redhat.com)
+- Fix symbolic link to bashhelper.py (phracek@redhat.com)
+- Fixes #30 Remove shebags (phracek@redhat.com)
+
 * Wed Sep 13 2017 Petr Hracek <phracek@redhat.com> 0.7.1-2
 - Fix missing dependency to dockerfile-parse
 

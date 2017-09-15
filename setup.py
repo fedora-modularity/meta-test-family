@@ -63,7 +63,7 @@ for path in paths:
 
 setup(
     name='meta-test-family',
-    version="0.7.1",
+    version="0.7.2",
     description='Tool to test components fo a modular Fedora.',
     keywords='modules,containers,testing,framework',
     author='Jan Scotka',
