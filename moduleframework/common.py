@@ -393,14 +393,14 @@ class CommonFunctions(object):
 
         if packages:
             print_info("Installs test dependencies: ", packages)
-            # you has to be root to install some packages:
+            # you have to have root permission to install packages:
             try:
                 self.runHost(
                     "{HOSTPACKAGER} install " +
                     " ".join(packages),
                     ignore_status=False, verbose=is_debug())
             except process.CmdError as e:
-                raise CmdExc("Command failed, are you root?", e)
+                raise CmdExc("Installation failed; Do you have permission to do that?", e)
 
 
     def getPackageList(self, profile=None):
