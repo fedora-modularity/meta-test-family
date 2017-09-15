@@ -260,7 +260,7 @@ def get_backend():
     elif amodule == 'nspawn':
         return NspawnHelper(), amodule
     else:
-        raise ModuleFrameworkException("Unsupported MODULE={0}".format(amodule), "supproted are: docker, rpm, nspawn")
+        raise ModuleFrameworkException("Unsupported MODULE={0}".format(amodule), "supported are: docker, rpm, nspawn")
 
 # To keep backward compatibility. This method could be used by pure avocado tests and is already used
 get_correct_backend = get_backend

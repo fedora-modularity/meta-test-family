@@ -30,8 +30,9 @@ from moduleframework.environment_prepare.docker_prepare import EnvDocker
 from moduleframework.environment_prepare.rpm_prepare import EnvRpm
 from moduleframework.environment_prepare.nspawn_prepare import EnvNspawn
 
-(module_object, module_name) = get_backend()
+print_info("Setting environment for module: {} ".format(os.environ.get('MODULE')))
 
+(module_object, module_name) = get_backend()
 if module_name == "docker":
     env = EnvDocker()
 elif module_name == "rpm":
@@ -40,8 +41,12 @@ elif module_name == "nspawn":
     env = EnvNspawn()
 
 def mtfenvset():
+    print_info("Preparing environment ...")
+    # cleanup_env exists in more forms for backend : EnvDocker/EnvRpm/EnvNspawn
     env.prepare_env()
 
 def mtfenvclean():
+    # cleanup_env exists in more forms for backend: EnvDocker/EnvRpm/EnvNspawn
     env.cleanup_env()
+    print_info("All clean")
 
