@@ -29,6 +29,8 @@ import socket
 import os
 import urllib
 import yaml
+import subprocess
+import copy
 import warnings
 
 from avocado.utils import process
@@ -43,14 +45,16 @@ hostname = socket.gethostname()
 dusername = "test"
 dpassword = "test"
 ddatabase = "basic"
-guestpackager = "dnf"
-hostpackager = "yum -y"
-__rh_release = '/etc/redhat-release'
-if os.path.exists(__rh_release) and os.path.exists('/usr/bin/dnf'):
-    hostpackager = "dnf -y"
-else:
-    hostpackager = "apt-get -y"
+PACKAGER_COMMAND = "test -e /usr/bin/dnf && echo 'dnf -y'   ||" \
+                   "( test -e /usr/bin/microdnf && echo 'microdnf' ||" \
+                   "( test -e /usr/bin/yum && echo 'yum -y'        ||" \
+                   "echo 'apt-get -y' " \
+                   ") )"
+hostpackager = subprocess.check_output([PACKAGER_COMMAND], shell=True).strip()
+guestpackager = hostpackager
 ARCH = "x86_64"
+
+__persistent_config = None
 
 # translation table for {VARIABLE} in the config.yaml file
 trans_dict = {"HOSTIPADDR": hostipaddr,
@@ -211,7 +215,6 @@ def sanitize_cmd(cmd):
     :param (str): command to sanitize
     :return: str
     """
-
     if '"' in cmd:
         cmd = cmd.replace('"', r'\"')
     return cmd
@@ -240,48 +243,6 @@ def get_url():
     """
     url = os.environ.get('URL')
     return url
-
-
-def get_config():
-    """
-    Read the module's configuration file.
-
-    :default: ``./config.yaml`` in the ``tests`` directory of the module's root
-     directory
-    :envvar: **CONFIG=path/to/file** overrides default value.
-    :return: str
-    """
-    cfgfile = os.environ.get('CONFIG')
-    if cfgfile:
-        if os.path.exists(cfgfile):
-            print_debug("Config file defined via envvar: %s" % cfgfile)
-        else:
-            raise ("File does not exist although defined CONFIG envvar: %s" % cfgfile)
-    else:
-        cfgfile = "./config.yaml"
-        if os.path.exists(cfgfile):
-            print_debug("Using module config file: %s" % cfgfile)
-        else:
-            cfgfile = "/usr/share/moduleframework/docs/example-config-minimal.yaml"
-            print_debug("Using default minimal config, you have to use URL envvar for testing "
-                        "your images or repos: %s" % cfgfile)
-
-    try:
-        with open(cfgfile, 'r') as ymlfile:
-            xcfg = yaml.load(ymlfile.read())
-        doc_name = ['modularity-testing', 'meta-test-family', 'meta-test']
-        if xcfg.get('document') not in doc_name:
-            raise ConfigExc("bad yaml file: item (%s)" %
-                            doc_name, xcfg.get('document'))
-        if not xcfg.get('name'):
-            raise ConfigExc("Missing (name:) in config file")
-        return xcfg
-    except IOError:
-        raise ConfigExc(
-            "Error: File '%s' doesn't appear to exist or it's not a YAML file. "
-            "Tip: If the CONFIG envvar is not set, mtf-generator looks for './config'."
-            % cfgfile)
-    return None
 
 
 def get_compose_url():
@@ -339,6 +300,7 @@ class CommonFunctions(object):
         self.dependencylist = {}
         self.moduledeps = None
         self.is_it_module = False
+        self.packager = None
         # general use case is to have forwarded services to host (so thats why it is same)
         self.ipaddr = trans_dict["HOSTIPADDR"]
         trans_dict["GUESTARCH"] = self.getArch()
@@ -350,19 +312,19 @@ class CommonFunctions(object):
 
         :return: None
         """
-        self.config = get_config()
-        self.info = self.config.get("module",{}).get(get_backend_parent_config_module())
+        # we have to copy object. because there is just one global object, to improve performance
+        self.config = copy.deepcopy(get_config())
+        self.info = self.config.get("module",{}).get(get_module_type_base())
         # if there is inheritance join both dictionary
         self.info.update(self.config.get("module",{}).get(get_module_type()))
         if not self.info:
             raise ConfigExc("There is no section for (module: -> %s:) in the configuration file." %
-                            get_base_module())
+                            get_module_type_base())
 
         if self.config.get('modulemd-url') and get_if_module():
             self.is_it_module = True
-            self.getModulemdYamlconfig()
         else:
-            trans_dict["GUESTPACKAGER"] = "yum -y"
+            pass
 
         self.moduleName = sanitize_text(self.config['name'])
         self.source = self.config.get('source')
@@ -378,16 +340,17 @@ class CommonFunctions(object):
         :param force:
         :return:
         """
-        url = url or get_url()
-        if url and (not self.info.get("url") or force):
+        url = url or get_url() or self.info.get("url")
+        if url and ((not self.info.get("url")) or force):
                 self.info["url"] = url
-        else:
-            if get_backend_parent_config_module() == "docker":
+
+        if not self.info.get("url"):
+            if get_module_type_base() in ["docker"]:
                 self.info["url"]=self.info.get("container")
-            elif get_backend_parent_config_module() == "rpm":
+            elif get_module_type_base() in ["rpm", "nspawn"]:
                 self.info["url"] = self.info.get("repo") or self.info.get("repos")
         # url has to be dict in case of rpm/nspanw (it is allowed to use ; as separator for more repositories)
-        if get_backend_parent_config_module() == "rpm" and isinstance(self.info["url"], str):
+        if get_module_type_base() in ["rpm", "nspawn"] and isinstance(self.info["url"], str):
             self.info["url"] = self.info["url"].split(";")
 
     def get_url(self):
@@ -561,6 +524,11 @@ class CommonFunctions(object):
 
         return self.runHost('bash -c "%s"' % sanitize_cmd(command), **kwargs)
 
+    def get_packager(self):
+        if not self.packager:
+            self.packager = self.run(PACKAGER_COMMAND, verbose=False).stdout.strip()
+        return self.packager
+
     def status(self, command="/bin/true"):
         """
         Return status of module
@@ -584,8 +552,9 @@ class CommonFunctions(object):
         :return: None
         """
         command = self.info.get('start') or command
-        self.run(command, shell=True, ignore_bg_processes=True, verbose=is_not_silent())
+        self.run(command, shell=True, ignore_bg_processes=True, verbose=is_debug())
         self.status()
+        trans_dict["GUESTPACKAGER"] = self.get_packager()
 
     def stop(self, command="/bin/true"):
         """
@@ -608,14 +577,14 @@ class CommonFunctions(object):
         if not packages:
             packages = self.getPackageList()
         if packages:
-            a = self.run("%s install %s" % (trans_dict["GUESTPACKAGER"]," ".join(packages)),
+            a = self.run("%s install %s" % (self.get_packager()," ".join(packages)),
                          ignore_status=True,
                          verbose=False)
             if a.exit_status == 0:
-                print_info("Packages installed via {GUESTPACKAGER}", a.stdout)
+                print_info("Packages installed via %s" % self.get_packager(), a.stdout)
             else:
                 print_info(
-                    "Nothing installed via {GUESTPACKAGER}, but package list is not empty",
+                    "Nothing installed via %s, but package list is not empty" % self.get_packager(),
                     packages)
                 raise CmdExc("ERROR: Unable to install packages inside: %s" % packages)
 
@@ -631,40 +600,80 @@ class CommonFunctions(object):
         else:
             print_info("TearDown phase skipped.")
 
+def get_config():
+    """
+    Read the module's configuration file.
+
+    :default: ``./config.yaml`` in the ``tests`` directory of the module's root
+     directory
+    :envvar: **CONFIG=path/to/file** overrides default value.
+    :return: str
+    """
+    global __persistent_config
+    if not __persistent_config:
+        cfgfile = os.environ.get('CONFIG')
+        if cfgfile:
+            if os.path.exists(cfgfile):
+                print_debug("Config file defined via envvar: %s" % cfgfile)
+            else:
+                raise ConfigExc("File does not exist although defined CONFIG envvar: %s" % cfgfile)
+        else:
+            cfgfile = "./config.yaml"
+            if os.path.exists(cfgfile):
+                print_debug("Using module config file: %s" % cfgfile)
+            else:
+                cfgfile = "/usr/share/moduleframework/docs/example-config-minimal.yaml"
+                print_debug("Using default minimal config: %s" % cfgfile)
+                if not get_url():
+                    raise ModuleFrameworkException("You have to use URL envvar for testing your images or repos")
+
+        try:
+            with open(cfgfile, 'r') as ymlfile:
+                xcfg = yaml.load(ymlfile.read())
+            doc_name = ['modularity-testing', 'meta-test-family', 'meta-test']
+            if xcfg.get('document') not in doc_name:
+                raise ConfigExc("bad yaml file: item (%s)" %
+                                doc_name, xcfg.get('document'))
+            if not xcfg.get('name'):
+                raise ConfigExc("Missing (name:) in config file")
+            if not xcfg.get("module"):
+                raise ConfigExc("No module in yaml config defined")
+            # copy rpm section to nspawn, in case not defined explicitly
+            # make it backward compatible
+            if xcfg.get("module",{}).get("rpm") and not xcfg.get("module",{}).get("nspawn"):
+                xcfg["module"]["nspawn"] = copy.deepcopy(xcfg.get("module",{}).get("rpm"))
+            __persistent_config = xcfg
+            return xcfg
+        except IOError:
+            raise ConfigExc(
+                "Error: File '%s' doesn't appear to exist or it's not a YAML file. "
+                "Tip: If the CONFIG envvar is not set, mtf-generator looks for './config'."
+                % cfgfile)
+    else:
+        return __persistent_config
+
 
 def list_modules_from_config():
+    """
+    Get all possible modules based on config file
+
+    :return: list
+    """
     modulelist = get_config().get("module").keys()
-    if "rpm" in modulelist and "nspawn" not in modulelist:
-        modulelist.append("nspawn")
     return modulelist
 
-
-def get_base_module():
-    module_type = get_module_type()
-    parent = module_type
-    if module_type not in get_backend_list():
-        parent = get_config().get("module",{}).get(module_type, {}).get("parent")
-        if not parent:
-            raise ModuleFrameworkException("Module (%s) does not provide parent backend parameter (there are: %s)" %
-                                           (module_type, get_backend_list()))
-    return parent
-
-
 def get_backend_list():
+    """
+    Get backends
+
+    :return: list
+    """
     base_module_list = ["rpm", "nspawn", "docker"]
     return base_module_list
 
-
-def get_backend_parent_config_module():
-    module = get_base_module()
-    if module == "nspawn":
-        module = "rpm"
-    return module
-
-
 def get_module_type():
     """
-    Return which module are you actually using.
+    Get which module are you actually using.
 
     :return: str
     """
@@ -678,3 +687,21 @@ def get_module_type():
     else:
         raise ModuleFrameworkException("Unsupported MODULE={0}".format(amodule),
                                        "supported are: %s" % list_modules_from_config())
+
+
+def get_module_type_base():
+    """
+    Get which BASE module (parent) are you using
+
+    :return: str
+    """
+    module_type = get_module_type()
+    parent = module_type
+    if module_type not in get_backend_list():
+        parent = get_config().get("module",{}).get(module_type, {}).get("parent")
+        if not parent:
+            raise ModuleFrameworkException("Module (%s) does not provide parent backend parameter (there are: %s)" %
+                                           (module_type, get_backend_list()))
+    if parent not in get_backend_list():
+        raise ModuleFrameworkException("As parent is allowed just base type: %s" % get_backend_list)
+    return parent

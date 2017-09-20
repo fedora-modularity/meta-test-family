@@ -55,11 +55,12 @@ class AvocadoTest(Test):
         super(AvocadoTest, self).__init__(*args, **kwargs)
 
         self.backend = get_backend()
-        self.moduleType = get_base_module()
+        self.moduleType = get_module_type()
+        self.moduleType_base = get_module_type_base()
         self.moduleProfile = get_profile()
         print_info(
-            "Module Type: %s; Profile: %s" %
-            (self.moduleType, self.moduleProfile))
+            "Module Type: %s - Backend: %s - Profile: %s" %
+            (self.moduleType, self.moduleType_base, self.moduleProfile))
 
     def cancel(self, *args, **kwargs):
         try:
@@ -242,13 +243,12 @@ class AvocadoTest(Test):
 
 def get_backend():
     """
-    Return proper module type, set by config by default_module section, or defined via
+    Return proper module backend, set by config by default_module section, or defined via
     env variable "MODULE"
 
-    :return: tuple (specific module object, str)
+    :return: module object
     """
-    amodule = get_module_type()
-    parent = get_base_module()
+    parent = get_module_type_base()
 
     if parent == 'docker':
         return ContainerHelper()

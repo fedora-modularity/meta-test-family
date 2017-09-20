@@ -28,7 +28,7 @@ from moduleframework import dockerlinter
 from moduleframework.avocado_testers import container_avocado_test
 
 
-class DockerfileLinter(module_framework.AvocadoTest):
+class DockerFileLinter(module_framework.AvocadoTest):
     """
     :avocado: enable
 

@@ -38,9 +38,11 @@ class RpmHelper(CommonFunctions):
         Set basic variables for RPM based testing, based on modules.rpm section of config.yaml
         """
         super(RpmHelper, self).__init__()
-        self.yumrepo = os.path.join(
-            "/etc", "yum.repos.d", "%s.repo" %
-                                   self.moduleName)
+        baserepodir=os.path.join("/etc", "yum.repos.d")
+        # allow to fake environment in ubuntu (for Travis)
+        if not os.path.exists(baserepodir):
+            baserepodir="/var/tmp"
+        self.yumrepo = os.path.join(baserepodir, "%s.repo" % self.moduleName)
         self.whattoinstallrpm = ""
         self.bootstrappackages = []
 
@@ -78,12 +80,10 @@ class RpmHelper(CommonFunctions):
 
         :return: None
         """
-        self.repos = self.get_url()
         self.setModuleDependencies()
         self.setRepositoriesAndWhatToInstall()
         self._callSetupFromConfig()
         self.__prepare()
-        trans_dict["GUESTPACKAGER"] = trans_dict["HOSTPACKAGER"]
 
     def __addModuleDependency(self, url, name=None, stream="master"):
         name = name if name else self.moduleName
@@ -104,6 +104,7 @@ class RpmHelper(CommonFunctions):
         if repos:
             self.repos = repos
         else:
+            self.repos = self.get_url()
             # add also all dependent modules repositories if it is module
             if self.is_it_module:
                 depend_repos = []
@@ -112,7 +113,6 @@ class RpmHelper(CommonFunctions):
                     depend_repos.append(latesturl)
                     self.__addModuleDependency(url=latesturl, name = dep, stream = self.moduledeps[dep])
                 map(self.__addModuleDependency, depend_repos)
-
         map(self.__addModuleDependency, self.repos)
         if whattooinstall:
             self.whattoinstallrpm = " ".join(set(whattooinstall))

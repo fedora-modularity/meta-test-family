@@ -32,7 +32,7 @@ from moduleframework.environment_prepare.nspawn_prepare import EnvNspawn
 
 
 
-module_name = get_base_module()
+module_name = get_module_type_base()
 print_info("Setting environment for module: {} ".format(module_name))
 
 if module_name == "docker":

@@ -52,7 +52,7 @@ def getBasePackageSet(modulesDict=None, isModule=True, isContainer=False):
     brmod = "base-runtime"
     brmod_profiles = ["container", "baseimage"]
     BASEPACKAGESET_WORKAROUND = ["systemd"]
-    BASEPACKAGESET_WORKAROUND_NOMODULE = ["systemd", "yum"]
+    BASEPACKAGESET_WORKAROUND_NOMODULE = BASEPACKAGESET_WORKAROUND + ["dnf"]
     pdc = None
     basepackageset = []
     if isModule:

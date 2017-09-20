@@ -24,11 +24,11 @@
 #          Jan Scotka <jscotka@redhat.com>
 #
 
-from moduleframework.avocado_testers import nspawn_avocado_test
+from moduleframework import module_framework
 from moduleframework import common
 
 
-class ComposeTest(nspawn_avocado_test.NspawnAvocadoTest):
+class ComposeTest(module_framework.NspawnAvocadoTest):
     """
     Validate overall module compose.
 

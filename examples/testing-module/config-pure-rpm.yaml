@@ -6,4 +6,4 @@ packages:
         - bash
 module:
     rpm:
-        repo: http://ftp.fi.muni.cz/pub/linux/fedora/linux/development/26/Everything/x86_64/os/
+        repo: http://ftp.fi.muni.cz/pub/linux/fedora/linux/releases/26/Everything/x86_64/os/

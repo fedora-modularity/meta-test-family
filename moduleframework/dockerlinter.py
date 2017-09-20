@@ -48,7 +48,7 @@ class DockerfileLinter(object):
     dfp = {}
     docker_dict = {}
 
-    def __init__(self, dir_name=None):
+    def __init__(self, dir_name="../"):
         dockerfile = get_docker_file(dir_name)
         if dockerfile:
             self.dfp = DockerfileParser(path=os.path.dirname(dockerfile))

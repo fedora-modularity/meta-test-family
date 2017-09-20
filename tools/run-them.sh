@@ -96,7 +96,7 @@ function runselected(){
 function distgit_wrapper_rpm(){
     cd $MODULENAME/tests
     eval $PARAMS mtf-env-set
-    eval $PARAMS make
+    eval $PARAMS make || eval $PARAMS make all
 }
 
 function avocado_wrapper(){
