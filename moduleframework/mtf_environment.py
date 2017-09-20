@@ -30,9 +30,11 @@ from moduleframework.environment_prepare.docker_prepare import EnvDocker
 from moduleframework.environment_prepare.rpm_prepare import EnvRpm
 from moduleframework.environment_prepare.nspawn_prepare import EnvNspawn
 
-print_info("Setting environment for module: {} ".format(os.environ.get('MODULE')))
 
-(module_object, module_name) = get_backend()
+
+module_name = get_base_module()
+print_info("Setting environment for module: {} ".format(module_name))
+
 if module_name == "docker":
     env = EnvDocker()
 elif module_name == "rpm":

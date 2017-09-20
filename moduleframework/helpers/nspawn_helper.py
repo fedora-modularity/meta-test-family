@@ -68,10 +68,11 @@ class NspawnHelper(RpmHelper):
 
         trans_dict["ROOT"] = self.chrootpath
         print_info("name of CHROOT directory:", self.chrootpath)
+        self.repos = self.get_url()
         self.setModuleDependencies()
         self.setRepositoriesAndWhatToInstall()
         self.__prepareSetup()
-        self.__callSetupFromConfig()
+        self._callSetupFromConfig()
         self.__bootMachine()
 
     def __is_killed(self):
@@ -201,47 +202,6 @@ gpgcheck=0
         trans_dict["GUESTIPADDR"] = trans_dict["HOSTIPADDR"]
         self.ipaddr = trans_dict["GUESTIPADDR"]
 
-    def status(self, command="/bin/true"):
-        """
-        Return status of module
-
-        :param command: which command used for do that. it could be defined inside config
-        :return: bool
-        """
-        try:
-            if 'status' in self.info and self.info['status']:
-                a = self.run(self.info['status'], shell=True, verbose=False, ignore_bg_processes=True)
-            else:
-                a = self.run("%s" % command, shell=True, verbose=False, ignore_bg_processes=True)
-            print_debug("command:", a.command, "stdout:", a.stdout, "stderr:", a.stderr)
-            return True
-        except BaseException:
-            return False
-
-    def start(self, command="/bin/true"):
-        """
-        start the RPM based module (like systemctl start service)
-
-        :param command: Do not use it directly (It is defined in config.yaml)
-        :return: None
-        """
-        if 'start' in self.info and self.info['start']:
-            self.run(self.info['start'], shell=True, ignore_bg_processes=True)
-        else:
-            self.run("%s" % command, shell=True, ignore_bg_processes=True)
-
-    def stop(self, command="/bin/true"):
-        """
-        stop the RPM based module (like systemctl stop service)
-
-        :param args: Do not use it directly (It is defined in config.yaml)
-        :param command: Do not use it directly (It is defined in config.yaml)
-        :return: None
-        """
-        if 'stop' in self.info and self.info['stop']:
-            self.run(self.info['stop'], shell=True, ignore_bg_processes=True)
-        else:
-            self.run("%s" % command, shell=True, ignore_bg_processes=True)
 
     def run(self, command="ls /", **kwargs):
         """
@@ -347,30 +307,10 @@ gpgcheck=0
                     time.sleep(DEFAULTRETRYTIMEOUT)
                     pass
                 pass
-            self.__callCleanupFromConfig()
+            self._callCleanupFromConfig()
             if os.path.exists(self.chrootpath):
                 shutil.rmtree(self.chrootpath, ignore_errors=True)
         else:
             print_info("tearDown skipped", "running nspawn: %s" % self.jmeno)
             print_info("To connect to a machine use:",
                        "machinectl shell root@{machine} /bin/bash" % self.jmeno)
-
-
-    def __callSetupFromConfig(self):
-        """
-        Internal method, do not use it anyhow
-
-        :return: None
-        """
-        if self.info.get("setup"):
-            self.runHost(self.info.get("setup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
-
-    def __callCleanupFromConfig(self):
-        """
-        Internal method, do not use it anyhow
-
-        :return: None
-        """
-        if self.info.get("cleanup"):
-            self.runHost(self.info.get("cleanup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
-

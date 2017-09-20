@@ -48,6 +48,14 @@ check-pure-rpm: prepare-nspawn
 check-pure-docker: prepare-docker
 	CONFIG=config-pure-docker.yaml MODULE=docker $(CMD) $(SIMPLE)
 
+check-default-config:
+	cd ..; MODULE=docker mtf-env-set
+	cd ..; MODULE=docker $(CMD) testing-module/$(SIMPLE)
+
+check-inheritance:
+	CONFIG=config-inheritance-docker.yaml MODULE=dockerinherited $(CMD) $(SIMPLE)
+
+
 travis:
 	MODULE=docker $(CMD) $(TESTS)
 

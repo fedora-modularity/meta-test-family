@@ -54,7 +54,8 @@ class AvocadoTest(Test):
     def __init__(self, *args, **kwargs):
         super(AvocadoTest, self).__init__(*args, **kwargs)
 
-        (self.backend, self.moduleType) = get_backend()
+        self.backend = get_backend()
+        self.moduleType = get_base_module()
         self.moduleProfile = get_profile()
         print_info(
             "Module Type: %s; Profile: %s" %
@@ -239,7 +240,6 @@ class AvocadoTest(Test):
         """
         return self.backend.getModuleDependencies()
 
-
 def get_backend():
     """
     Return proper module type, set by config by default_module section, or defined via
@@ -247,20 +247,15 @@ def get_backend():
 
     :return: tuple (specific module object, str)
     """
-    amodule = os.environ.get('MODULE')
-    readconfig = CommonFunctions()
-    readconfig.loadconfig()
-    if "default_module" in readconfig.config and readconfig.config[
-        "default_module"] is not None and amodule is None:
-        amodule = readconfig.config["default_module"]
-    if amodule == 'docker':
-        return ContainerHelper(), amodule
-    elif amodule == 'rpm':
-        return RpmHelper(), amodule
-    elif amodule == 'nspawn':
-        return NspawnHelper(), amodule
-    else:
-        raise ModuleFrameworkException("Unsupported MODULE={0}".format(amodule), "supported are: docker, rpm, nspawn")
+    amodule = get_module_type()
+    parent = get_base_module()
+
+    if parent == 'docker':
+        return ContainerHelper()
+    elif parent == 'rpm':
+        return RpmHelper()
+    elif parent == 'nspawn':
+        return NspawnHelper()
 
 # To keep backward compatibility. This method could be used by pure avocado tests and is already used
 get_correct_backend = get_backend

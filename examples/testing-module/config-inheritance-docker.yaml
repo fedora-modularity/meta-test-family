@@ -3,4 +3,7 @@ version: 1
 name: fedora
 module:
     docker:
+        container: docker.io/memcached
+    dockerinherited:
+        parent: docker
         container: fedora

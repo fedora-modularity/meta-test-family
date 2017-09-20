@@ -74,7 +74,7 @@ def main():
              for a in inspect.getmembers(
                 module_framework.get_backend(),
                 predicate=inspect.ismethod)
-             if '__' not in a[0]])
+             if '__' not in a])
     method = args[0]
 
     def printIfVerbose(*sargs):
@@ -88,7 +88,7 @@ def main():
         printIfVerbose("reading from pickled object", helper)
         pkl_file.close()
     else:
-        (helper, moduletype) = module_framework.get_backend()
+        helper = module_framework.get_backend()
         printIfVerbose("created new instance for module")
 
     pkl_file = open(picklefile, 'wb')

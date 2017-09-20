@@ -31,7 +31,7 @@ from moduleframework.environment_prepare.rpm_prepare import EnvRpm
 from moduleframework.environment_prepare.nspawn_prepare import EnvNspawn
 from optparse import OptionParser
 
-(module_object, module_name) = get_backend()
+module_name = get_base_module()
 
 parser = OptionParser()
 parser.add_option(
