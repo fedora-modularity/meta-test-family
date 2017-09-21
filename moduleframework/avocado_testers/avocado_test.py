@@ -62,6 +62,9 @@ class AvocadoTest(Test):
             "Module Type: %s - Backend: %s - Profile: %s" %
             (self.moduleType, self.moduleType_base, self.moduleProfile))
 
+        self.delimiterStart = '\n\n::::::::::::::::::::::::'
+        self.delimiterEnd   = '::::::::::::::::::::::::\n'
+
     def cancel(self, *args, **kwargs):
         try:
             super(AvocadoTest, self).cancel(*args, **kwargs)
@@ -77,6 +80,11 @@ class AvocadoTest(Test):
 
         :return: None
         """
+        self.log.debug(" ")
+        self.log.debug(" ")
+        self.log.debug("{0} START {1}".format(self.delimiterStart, self.delimiterEnd))
+        self.log.debug(" ")
+        self.log.debug(" ")
         return self.backend.setUp()
 
     def tearDown(self, *args, **kwargs):
@@ -88,6 +96,7 @@ class AvocadoTest(Test):
 
         :return: None
         """
+        self.log.debug("{0} TEARDOWN {1}".format(self.delimiterStart, self.delimiterEnd))
         return self.backend.tearDown(*args, **kwargs)
 
     def start(self, *args, **kwargs):
@@ -99,6 +108,7 @@ class AvocadoTest(Test):
         :param kwargs: Do not use it directly (It is defined in config.yaml)
         :return: None
         """
+        self.log.debug("{0} START MODULE {1}".format(self.delimiterStart, self.delimiterEnd))
         return self.backend.start(*args, **kwargs)
 
     def stop(self, *args, **kwargs):
@@ -111,6 +121,7 @@ class AvocadoTest(Test):
         :param kwargs: Do not use it directly (It is defined in config.yaml)
         :return: None
         """
+        self.log.debug("{0} STOP {1}".format(self.delimiterStart, self.delimiterEnd))
         return self.backend.stop(*args, **kwargs)
 
     def run(self, *args, **kwargs):
@@ -121,6 +132,7 @@ class AvocadoTest(Test):
         :param kwargs: shell, ignore_status, verbose
         :return: object avocado.process.run
         """
+        self.log.debug("{0} COMMAND IN MODULE <-> {1}".format(self.delimiterStart, self.delimiterEnd))
         return self.backend.run(*args, **kwargs)
 
     def runCheckState(self, command="ls /", expected_state=0,
@@ -171,6 +183,7 @@ class AvocadoTest(Test):
         :param kwargs: pass thru
         :return: object of avocado.process.run
         """
+        self.log.debug("{0} COMMAND ON HOST <!> {1}".format(self.delimiterStart, self.delimiterEnd))
         return self.backend.runHost(*args, **kwargs)
 
     def getModulemdYamlconfig(self, *args, **kwargs):
