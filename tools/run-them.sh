@@ -35,8 +35,6 @@ export PARSEITEM=$2
 export PARSEITEMTYPE=$3
 export SELECTION=$4
 export MTF_PATH="/usr/share/moduleframework"
-PYTHON_SITE_LIB=$(python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
-export MODULE_LINT="$PYTHON_SITE_LIB/moduleframework/tools/*.py"
 export MINIMAL_CONFIG="$MTF_PATH/docs/example-config-minimal.yaml"
 export MODULE_TESTS="*.py *.sh"
 
@@ -112,10 +110,9 @@ function avocado_wrapper(){
 
 function run_modulelint(){
 
-    TESTS="`ls $MODULE_LINT`"
-    echo "RUN AT LEAST MODULE LINTER: $TESTS"
+    echo "RUN MODULE LINTER"
     eval $PARAMS CONFIG=$MINIMAL_CONFIG mtf-env-set
-    eval $PARAMS CONFIG=$MINIMAL_CONFIG $AVOCADOCMD $TESTS
+    eval $PARAMS CONFIG=$MINIMAL_CONFIG mtf -l
 }
 
 set -x
