@@ -74,7 +74,6 @@ trans_dict = {"HOSTIPADDR": hostipaddr,
 
 BASEPATHDIR = "/opt"
 PDCURL = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
-URLBASECOMPOSE = "https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server"
 REPOMD = "repodata/repomd.xml"
 MODULEFILE = 'tempmodule.yaml'
 # default value of process timeout in seconds
@@ -84,6 +83,14 @@ DEFAULTRETRYCOUNT = 3
 DEFAULTRETRYTIMEOUT = 30
 DEFAULTNSPAWNTIMEOUT = 10
 
+def get_compose_url_modular_release():
+    release = os.environ.get("MTF_FEDORA_RELEASE") or "26"
+    if release == "master":
+        release = "26"
+    compose_url = os.environ.get("MTF_BASE_COMPOSE_URL") or \
+                  "https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-%s/compose/Server/%s/os" \
+                  % (release, ARCH)
+    return compose_url
 
 def is_debug():
     """
@@ -298,7 +305,7 @@ class CommonFunctions(object):
         self.arch = None
         self.sys_arch = None
         self.dependencylist = {}
-        self.moduledeps = None
+        self.moduledeps = {}
         self.is_it_module = False
         self.packager = None
         # general use case is to have forwarded services to host (so thats why it is same)

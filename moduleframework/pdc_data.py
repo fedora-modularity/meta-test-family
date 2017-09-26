@@ -56,7 +56,10 @@ def getBasePackageSet(modulesDict=None, isModule=True, isContainer=False):
     pdc = None
     basepackageset = []
     if isModule:
-        if modulesDict.has_key(brmod):
+        # TODO: workaround, when disabled local compose repos
+        if not modulesDict:
+            modulesDict[brmod] = "master"
+        if modulesDict.get(brmod):
             print_info("Searching for packages base package set inside %s" % brmod)
             pdc = PDCParser()
             pdc.setLatestPDC(brmod, modulesDict[brmod])
@@ -172,7 +175,7 @@ class PDCParser():
         # rpmrepo = "http://kojipkgs.fedoraproject.org/repos/%s/latest/%s" % (
         #    self.pdcdata["koji_tag"] + "-build", ARCH)
         if get_if_remoterepos():
-            rpmrepo = "%s/%s/os/" % (URLBASECOMPOSE, ARCH)
+            rpmrepo = get_compose_url_modular_release()
             return rpmrepo
         else:
             return self.createLocalRepoFromKoji()
