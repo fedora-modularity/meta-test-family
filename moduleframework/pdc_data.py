@@ -107,17 +107,17 @@ class PDCParser():
 
         :return: None
         """
-        # Using develop=True to not authenticate to the server
-        pdc_session = PDCClient(PDC_SERVER, ssl_verify=True, develop=True)
         pdc_query = { 'variant_id' : self.name, 'active': True }
         if self.stream:
             pdc_query['variant_version'] = self.stream
         if self.version:
             pdc_query['variant_release'] = self.version
-        try:
-            mod_info = pdc_session(**pdc_query)
-        except Exception as ex:
-            raise PDCExc("Could not query PDC server", ex)
+        @Retry(attempts=DEFAULTRETRYCOUNT,timeout=DEFAULTRETRYTIMEOUT,error=PDCExc("Could not query PDC server"))
+        def retry_tmpfunc():
+            # Using develop=True to not authenticate to the server
+            pdc_session = PDCClient(PDC_SERVER, ssl_verify=True, develop=True)
+            return pdc_session(**pdc_query)
+        mod_info = retry_tmpfunc()
         if not mod_info or "results" not in mod_info.keys() or not mod_info["results"]:
             raise PDCExc("QUERY: %s is not available on PDC" % pdc_query)
         self.pdcdata = mod_info["results"][-1]
