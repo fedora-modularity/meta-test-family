@@ -39,7 +39,6 @@ check-run-them-pdc-testmodule: prepare-nspawn
 check-run-them-pdc-testmodule-taskotron: prepare-nspawn
 	MTF_REMOTE_REPOS= DOCKERFILE= /usr/share/moduleframework/tools/run-them.sh testmodule testmodule-master-20170926102903 pdc
 
-
 check-run-them-fedmsg-testmodule: prepare-nspawn
 	../../tools/run-them.sh testmodule ../../tools/example_message_module.yaml fedmsg
 

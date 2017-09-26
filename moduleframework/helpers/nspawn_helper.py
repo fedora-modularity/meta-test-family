@@ -81,7 +81,6 @@ class NspawnHelper(RpmHelper):
 
         trans_dict["ROOT"] = self.chrootpath
         print_info("name of CHROOT directory:", self.chrootpath)
-        self.setModuleDependencies()
         self.setRepositoriesAndWhatToInstall()
         self.__prepareSetup()
         self._callSetupFromConfig()
