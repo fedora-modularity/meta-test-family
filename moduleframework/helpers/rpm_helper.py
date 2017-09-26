@@ -45,8 +45,9 @@ class RpmHelper(CommonFunctions):
         self.yumrepo = os.path.join(baserepodir, "%s.repo" % self.moduleName)
         self.whattoinstallrpm = ""
         self.bootstrappackages = []
+        self.repos = []
 
-    def setModuleDependencies(self):
+    def __setModuleDependencies(self):
         if self.is_it_module:
             if not get_if_remoterepos():
                 temprepositories = self.getModulemdYamlconfig()\
@@ -80,7 +81,7 @@ class RpmHelper(CommonFunctions):
 
         :return: None
         """
-        self.setModuleDependencies()
+        #self.setModuleDependencies()
         self.setRepositoriesAndWhatToInstall()
         self._callSetupFromConfig()
         self.__prepare()
@@ -104,16 +105,18 @@ class RpmHelper(CommonFunctions):
         if repos:
             self.repos = repos
         else:
-            self.repos = self.get_url()
+            self.repos += self.get_url()
             # add also all dependent modules repositories if it is module
+            # TODO: removed this dependency search
             if self.is_it_module:
-                depend_repos = []
-                for dep in self.moduledeps:
-                    latesturl = pdc_data.get_repo_url(dep, self.moduledeps[dep])
-                    depend_repos.append(latesturl)
-                    self.__addModuleDependency(url=latesturl, name = dep, stream = self.moduledeps[dep])
-                map(self.__addModuleDependency, depend_repos)
-        map(self.__addModuleDependency, self.repos)
+                depend_repos = [get_compose_url_modular_release()]
+                #for dep in self.moduledeps:
+                #    latesturl = pdc_data.get_repo_url(dep, self.moduledeps[dep])
+                #    depend_repos.append(latesturl)
+                #    self.__addModuleDependency(url=latesturl, name = dep, stream = self.moduledeps[dep])
+                #map(self.__addModuleDependency, depend_repos)
+                self.repos += depend_repos
+        #map(self.__addModuleDependency, self.repos)
         if whattooinstall:
             self.whattoinstallrpm = " ".join(set(whattooinstall))
         else:

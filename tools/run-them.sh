@@ -101,7 +101,7 @@ function avocado_wrapper(){
     (
     cp -rf $MTF_PATH/examples/$MODULENAME tests_$MODULENAME
     cd tests_$MODULENAME
-    TESTS="`ls $MODULE_TESTS $MODULE_LINT`"
+    TESTS="`ls $MODULE_TESTS`"
     echo "AVOCADO FOUND TESTS: $TESTS"
     eval $PARAMS mtf-env-set
     eval $PARAMS $AVOCADOCMD $TESTS
