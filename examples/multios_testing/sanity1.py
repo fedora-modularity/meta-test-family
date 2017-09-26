@@ -36,7 +36,7 @@ class SanityCheck1(module_framework.AvocadoTest):
         PORT = 3333
         self.start()
         self.assertIn("AHOJ", self.run("echo AHOJ").stdout)
-        self.run(" nohup nc -l %d > %s 2>&1 &" % (PORT, TFILE), shell=True, ignore_bg_processes=True)
+        self.run(" nohup nc -l %d > %s 2>&1 &" % (PORT, TFILE), internal_background=True, shell=True, ignore_bg_processes=True)
         time.sleep(2)
         self.runHost("echo Host | nc localhost %d" % PORT, shell=True)
         time.sleep(2)

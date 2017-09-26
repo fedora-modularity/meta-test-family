@@ -54,11 +54,13 @@ class AvocadoTest(Test):
     def __init__(self, *args, **kwargs):
         super(AvocadoTest, self).__init__(*args, **kwargs)
 
-        (self.backend, self.moduleType) = get_backend()
+        self.backend = get_backend()
+        self.moduleType = get_module_type()
+        self.moduleType_base = get_module_type_base()
         self.moduleProfile = get_profile()
         print_info(
-            "Module Type: %s; Profile: %s" %
-            (self.moduleType, self.moduleProfile))
+            "Module Type: %s - Backend: %s - Profile: %s" %
+            (self.moduleType, self.moduleType_base, self.moduleProfile))
 
     def cancel(self, *args, **kwargs):
         try:
@@ -239,28 +241,21 @@ class AvocadoTest(Test):
         """
         return self.backend.getModuleDependencies()
 
-
 def get_backend():
     """
-    Return proper module type, set by config by default_module section, or defined via
+    Return proper module backend, set by config by default_module section, or defined via
     env variable "MODULE"
 
-    :return: tuple (specific module object, str)
+    :return: module object
     """
-    amodule = os.environ.get('MODULE')
-    readconfig = CommonFunctions()
-    readconfig.loadconfig()
-    if "default_module" in readconfig.config and readconfig.config[
-        "default_module"] is not None and amodule is None:
-        amodule = readconfig.config["default_module"]
-    if amodule == 'docker':
-        return ContainerHelper(), amodule
-    elif amodule == 'rpm':
-        return RpmHelper(), amodule
-    elif amodule == 'nspawn':
-        return NspawnHelper(), amodule
-    else:
-        raise ModuleFrameworkException("Unsupported MODULE={0}".format(amodule), "supported are: docker, rpm, nspawn")
+    parent = get_module_type_base()
+
+    if parent == 'docker':
+        return ContainerHelper()
+    elif parent == 'rpm':
+        return RpmHelper()
+    elif parent == 'nspawn':
+        return NspawnHelper()
 
 # To keep backward compatibility. This method could be used by pure avocado tests and is already used
 get_correct_backend = get_backend

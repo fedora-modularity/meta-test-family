@@ -7,6 +7,6 @@ packages:
         - bash
 module:
     docker:
-        container: docker.io/modularitycontainers/memcached
+        container: fedora
     rpm:
         repo: https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server/x86_64/os/

@@ -50,17 +50,17 @@ An example of module types specification:
                 description: "memcached is a high-performance, distributed memory"
                 io.k8s.description: "memcached is a high-performance, distributed memory"
             source: https://github.com/container-images/memcached.git
-            container: docker.io/phracek/memcached
+            url: docker.io/phracek/memcached
         rpm:
             setup: /usr/bin/memcached -p 11211
             cleanup: echo Cleanup magic
             start: systemctl start memcached
             stop: systemctl stop memcached
             status: systemctl status memcached
-            repo:
-                - http://download.englab.brq.redhat.com/pub/fedora/releases/25/Everything/x86_64/os/
-                - https://phracek.fedorapeople.org/memcached-module-repo/
-
+            url: http://download.englab.brq.redhat.com/pub/fedora/releases/25/Everything/x86_64/os/
+        inheriteddocker:
+            parent: docker
+            start: "docker run -it -p 11211:11211"
 * **default_module**, if specified, sets the default tested module type
 * **setup** runs setup commands on a host machine, not in container, and prepares the environemt for tests, for example changes selinux policy or hostname
 * **cleanup**: similar to setup but done after test finished
@@ -68,8 +68,10 @@ An example of module types specification:
 * **stop**  defines how to stop module service if there is any
 * **status** defines how to check the status of module service if there is any
 * **labels** contains docker labels to check if there is any
-* **container** contains a link to a container (docker.io or local tar.gz file)
-* **repo** is used when **compose-url** is not set and contains a repo to be used for rpm module type testing
+* **url** contains link to a container or repo (same meaning as container or repo)
+* **container** contains a link to a container (docker.io or local tar.gz file) (obsolote)
+* **repo** is used when **compose-url** is not set and contains a repo to be used for rpm module type testing (obsolote)
+* **parent** if you would like to have more configs for same module type, it is possible to do it via inheritance. There will be used parent module + overwritten values with this one, you can rewrite whatever you want. You have to set parent (base) module type allowed are just **rpm/docker**
 
 Multiline Bash snippet tests
 -----------------------------

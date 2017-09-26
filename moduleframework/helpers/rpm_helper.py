@@ -38,13 +38,11 @@ class RpmHelper(CommonFunctions):
         Set basic variables for RPM based testing, based on modules.rpm section of config.yaml
         """
         super(RpmHelper, self).__init__()
-        self.yumrepo = os.path.join(
-            "/etc", "yum.repos.d", "%s.repo" %
-                                   self.moduleName)
-        self.info = self.config.get('module',{}).get('rpm')
-        if not self.info:
-            raise ConfigExc("There is no section module:rpm")
-        self.repos = []
+        baserepodir=os.path.join("/etc", "yum.repos.d")
+        # allow to fake environment in ubuntu (for Travis)
+        if not os.path.exists(baserepodir):
+            baserepodir="/var/tmp"
+        self.yumrepo = os.path.join(baserepodir, "%s.repo" % self.moduleName)
         self.whattoinstallrpm = ""
         self.bootstrappackages = []
 
@@ -84,9 +82,8 @@ class RpmHelper(CommonFunctions):
         """
         self.setModuleDependencies()
         self.setRepositoriesAndWhatToInstall()
-        self.__callSetupFromConfig()
+        self._callSetupFromConfig()
         self.__prepare()
-        self.__prepareSetup()
 
     def __addModuleDependency(self, url, name=None, stream="master"):
         name = name if name else self.moduleName
@@ -106,43 +103,23 @@ class RpmHelper(CommonFunctions):
         """
         if repos:
             self.repos = repos
-            map(self.__addModuleDependency, repos)
         else:
-            alldrepos = []
+            self.repos = self.get_url()
+            # add also all dependent modules repositories if it is module
             if self.is_it_module:
+                depend_repos = []
                 for dep in self.moduledeps:
                     latesturl = pdc_data.get_repo_url(dep, self.moduledeps[dep])
-                    alldrepos.append(latesturl)
+                    depend_repos.append(latesturl)
                     self.__addModuleDependency(url=latesturl, name = dep, stream = self.moduledeps[dep])
-            if get_url():
-                self.repos = [get_url()] + alldrepos
-                self.__addModuleDependency(get_url())
-            elif self.info.get('repo'):
-                self.repos = [self.info.get('repo')] + alldrepos
-                self.__addModuleDependency(self.info.get('repo'))
-            elif self.info.get('repos'):
-                self.repos = self.info.get('repos')
-                map(self.__addModuleDependency,self.info.get('repos'))
-            else:
-                raise RpmExc("no RPM given in file or via URL")
+                map(self.__addModuleDependency, depend_repos)
+        map(self.__addModuleDependency, self.repos)
         if whattooinstall:
             self.whattoinstallrpm = " ".join(set(whattooinstall))
         else:
             self.bootstrappackages = pdc_data.getBasePackageSet(modulesDict=self.moduledeps,
                                                                 isModule=self.is_it_module, isContainer=False)
             self.whattoinstallrpm = " ".join(set(self.getPackageList() + self.bootstrappackages))
-
-    def tearDown(self):
-        """
-        cleanup enviroment and call cleanup from config
-
-        :return: None
-        """
-        if get_if_do_cleanup():
-            self.stop()
-            self.__callCleanupFromConfig()
-        else:
-            print_info("TearDown phase skipped.")
 
     def __prepare(self):
         """
@@ -163,77 +140,8 @@ gpgcheck=0
 """ % (self.moduleName, counter, self.moduleName, counter, repo)
             f.write(add)
         f.close()
-
-    def __prepareSetup(self):
-        """
-        Internal method, do not use it anyhow
-
-        :return: None
-        """
-
-        a = self.runHost(
-            "%s --disablerepo=* --enablerepo=%s* --allowerasing install %s" %
-            (trans_dict["HOSTPACKAGER"], self.moduleName, self.whattoinstallrpm), ignore_status=True,
-            verbose=is_not_silent())
-        if a.exit_status != 0:
-            raise RpmExc("ERROR: Unable to install packages %s" % self.whattoinstallrpm,
-                         "repositories are: ",
-                         self.runHost("cat %s" % self.yumrepo, verbose=is_not_silent()).stdout)
-
+        self.install_packages()
         self.ipaddr = trans_dict["GUESTIPADDR"]
-
-    def status(self, command="/bin/true"):
-        """
-        Return status of module
-
-        :param command: which command used for do that. it could be defined inside config
-        :return: bool
-        """
-        try:
-            if 'status' in self.info and self.info['status']:
-                a = self.runHost(self.info['status'], shell=True, ignore_bg_processes=True, verbose=is_not_silent())
-            else:
-                a = self.runHost("%s" % command, shell=True, ignore_bg_processes=True, verbose=is_not_silent())
-            print_debug("command:", a.command, "stdout:", a.stdout, "stderr:", a.stderr)
-            return True
-        except BaseException:
-            return False
-
-    def start(self, command="/bin/true"):
-        """
-        start the RPM based module (like systemctl start service)
-
-        :param command: Do not use it directly (It is defined in config.yaml)
-        :return: None
-        """
-        if 'start' in self.info and self.info['start']:
-            self.runHost(self.info['start'], shell=True, ignore_bg_processes=True, verbose=is_not_silent())
-        else:
-            self.runHost("%s" % command, shell=True, ignore_bg_processes=True, verbose=is_not_silent())
-        self.status()
-
-    def stop(self, command="/bin/true"):
-        """
-        stop the RPM based module (like systemctl stop service)
-
-        :param command: Do not use it directly (It is defined in config.yaml)
-        :return: None
-        """
-        if 'stop' in self.info and self.info['stop']:
-            self.runHost(self.info['stop'], shell=True, ignore_bg_processes=True, verbose=is_not_silent())
-        else:
-            self.runHost("%s" % command, shell=True, ignore_bg_processes=True, verbose=is_not_silent())
-
-    def run(self, command="ls /", **kwargs):
-        """
-        Run command inside module, for RPM based it is same as runHost
-
-        :param command: str of command to execute
-        :param kwargs: dict from avocado.process.run
-        :return: avocado.process.run
-        """
-        return self.runHost('bash -c "%s"' %
-                            sanitize_cmd(command), **kwargs)
 
     def copyTo(self, src, dest):
         """
@@ -255,20 +163,3 @@ gpgcheck=0
         """
         self.runHost("cp -r %s %s" % (src, dest), verbose=is_not_silent())
 
-    def __callSetupFromConfig(self):
-        """
-        Internal method, do not use it anyhow
-
-        :return: None
-        """
-        if self.info.get("setup"):
-            self.runHost(self.info.get("setup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
-
-    def __callCleanupFromConfig(self):
-        """
-        Internal method, do not use it anyhow
-
-        :return: None
-        """
-        if self.info.get("cleanup"):
-            self.runHost(self.info.get("cleanup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())

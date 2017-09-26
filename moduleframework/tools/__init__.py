@@ -1,4 +1,3 @@
-#!/bin/bash
 # -*- coding: utf-8 -*-
 #
 # Meta test family (MTF) is a tool to test components of a modular Fedora:
@@ -19,25 +18,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
+# Copied from: https://github.com/fedora-modularity/check_compose/blob/master/check_compose.py
+#
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
-set -x
-EC=0
-echo "Initialize module"
-moduleframework-cmd -v setUp
-moduleframework-cmd -v start
+from moduleframework import module_framework
 
-echo "Start testing"
-
-echo "Test what run bash command inside module"
-moduleframework-cmd -v -p run ls / | grep sbin
-EC=$(($EC+$?))
-
-echo "Test what run bash command outside, host"
-echo errr | nc localhost 11211
-EC=$(($EC+$?))
-
-echo "Destroy module"
-moduleframework-cmd -v tearDown
-exit $EC
+class ModulelintSanity(module_framework.AvocadoTest):
+    """
+    :avocado: enable
+    """
+    def testPass(self):
+        pass

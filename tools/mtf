@@ -1,7 +1,7 @@
 #!/bin/bash
 
-SITE_LIB=$(python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
-MTF_TOOLS="moduleframework/tools"
+SITE_LIB=$(python -c "import moduleframework, os; print os.path.dirname(moduleframework.__file__)")
+MTF_TOOLS="tools"
 AVOCADO_ARGS=""
 
 function print_help {

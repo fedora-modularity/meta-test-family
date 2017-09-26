@@ -37,14 +37,10 @@ class ContainerHelper(CommonFunctions):
         """
         super(ContainerHelper, self).__init__()
         static_name="testcontainer"
-        self.info = self.config.get('module',{}).get('docker')
-        if not self.info:
-            raise ConfigExc("There is no section for docker (module: -> docker:) in the configuration file.")
         self.tarbased = None
         self.jmeno = None
         self.docker_id = None
-        self.icontainer = get_url(
-        ) if get_url() else self.info.get('container')
+        self.icontainer = self.get_url()
         if not self.icontainer:
             raise ConfigExc("No container image specified in the configuration file or environment variable.")
         if ".tar" in self.icontainer:
@@ -91,7 +87,8 @@ class ContainerHelper(CommonFunctions):
 
         :return: None
         """
-        self.__callSetupFromConfig()
+        self.icontainer = self.get_url()
+        self._callSetupFromConfig()
         self.__pullContainer()
         self.containerInfo = self.__load_inspect_json()
 
@@ -101,13 +98,10 @@ class ContainerHelper(CommonFunctions):
 
         :return: None
         """
+        super(ContainerHelper,self).tearDown()
         if get_if_do_cleanup():
-            self.stop()
-            self.__callCleanupFromConfig()
-        else:
-            print_info("tearDown skipped", "running container: %s" % self.docker_id)
             print_info("To run a command inside a container execute: ",
-                       "docker exec %s /bin/bash" % self.docker_id)
+                        "docker exec %s /bin/bash" % self.docker_id)
 
     def __pullContainer(self):
         """
@@ -135,26 +129,6 @@ class ContainerHelper(CommonFunctions):
                 "docker inspect %s" %
                 self.jmeno, verbose=is_not_silent()).stdout)[0]["Config"]
 
-    def install_packages_in_container(self, packages=None):
-        """
-        Install packages in container (by config or via parameter)
-
-        :param packages:
-        :return:
-        """
-        if not packages and self.getPackageList():
-            packages = self.getPackageList()
-        a = self.run(
-            "%s install %s" %
-            (trans_dict["GUESTPACKAGER"], " ".join(
-                packages)),
-            ignore_status=True, verbose=False)
-        if a.exit_status == 0:
-            print_info("Packages installed via {GUESTPACKAGER}", a.stdout)
-        else:
-            print_info(
-                "Nothing installed via {GUESTPACKAGER}, but package list is not empty",
-                packages)
 
     def start(self, args="-it -d", command="/bin/bash"):
         """
@@ -177,11 +151,12 @@ class ContainerHelper(CommonFunctions):
                     shell=True, ignore_bg_processes=True, verbose=is_not_silent()).stdout
             self.docker_id = self.docker_id.strip()
             # It installs packages in container is removed by default, in future maybe reconciled.
-            # self.install_packages_in_container()
+            # self.install_packages()
         if self.status() is False:
             raise ContainerExc(
                 "Container %s (for module %s) is not running, probably DEAD immediately after start (ID: %s)" % (
                     self.jmeno, self.moduleName, self.docker_id))
+            trans_dict["GUESTPACKAGER"] = self.get_packager()
 
     def stop(self):
         """
@@ -252,22 +227,4 @@ class ContainerHelper(CommonFunctions):
         """
         self.start()
         self.runHost("docker cp %s:%s %s" % (self.docker_id, src, dest), verbose=is_not_silent())
-
-    def __callSetupFromConfig(self):
-        """
-        Internal method, do not use it anyhow
-
-        :return: None
-        """
-        if self.info.get("setup"):
-            self.runHost(self.info.get("setup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
-
-    def __callCleanupFromConfig(self):
-        """
-        Internal method, do not use it anyhow
-
-        :return: None
-        """
-        if self.info.get("cleanup"):
-            self.runHost(self.info.get("cleanup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
 
