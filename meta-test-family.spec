@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           meta-test-family
-Version:        0.7.2
+Version:        0.7.3
 Release:        1%{?dist}
 Summary:        Tool to test components of a modular Fedora
 
@@ -53,6 +53,17 @@ install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
 
 
 %changelog
+* Tue Sep 26 2017 Jan Scotka <jscotka@redhat.com> 0.7.3-1
+- remove old test and update template according to changes (jscotka@redhat.com)
+- fix PDC trouble (Bad response code: 502) with Retry (jscotka@redhat.com)
+- use mtf command as modulelinter scheduler instead of own solution
+  (jscotka@redhat.com)
+- base rework, more function to common class, add features to use parent in
+  config and use mtf without config.yaml (jscotka@redhat.com)
+- adding info about name of the module from loaded config (psklenar@redhat.com)
+- add examples for pytest, unittest, nosetest. simple example
+  (jscotka@redhat.com)
+
 * Fri Sep 15 2017 Petr "Stone" Hracek <phracek@redhat.com> 0.7.2-1
 - better permission info messages (psklenar@redhat.com)
 - Improve  executable: (bkabrda@redhat.com)
