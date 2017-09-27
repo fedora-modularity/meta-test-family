@@ -43,37 +43,33 @@ class DockerFileLinter(module_framework.AvocadoTest):
         if self.dp.dockerfile is None:
             self.skip()
 
-    def testArchitectureInEnvAndLabelExists(self):
+    def test_architecture_in_env_and_label_exists(self):
         self.assertTrue(self.dp.get_docker_specific_env("ARCH="))
         self.assertTrue(self.dp.get_specific_label("architecture"))
 
-    def testNameInEnvAndLabelExists(self):
+    def test_name_in_env_and_label_exists(self):
         self.assertTrue(self.dp.get_docker_specific_env("NAME="))
         self.assertTrue(self.dp.get_specific_label("name"))
 
-    def testReleaseLabelExists(self):
+    def test_release_label_exists(self):
         self.assertTrue(self.dp.get_specific_label("release"))
 
-    def testVersionLabelExists(self):
+    def test_version_label_exists(self):
         self.assertTrue(self.dp.get_specific_label("version"))
 
-    def testComRedHatComponentLabelExists(self):
+    def test_com_redhat_component_label_exists(self):
         self.assertTrue(self.dp.get_specific_label("com.redhat.component"))
 
-    def testIok8sDescriptionExists(self):
-        self.assertTrue(self.dp.get_specific_label("io.k8s.description"))
+    def test_summary_label_exists(self):
+        self.assertTrue(self.dp.get_specific_label("summary"))
 
-    def testIoOpenshiftExposeServicesExists(self):
-        label_io_openshift = "io.openshift.expose-services"
-        exposes = self.dp.get_docker_expose()
-        label_list = self.dp.get_docker_labels()
-        self.assertTrue(label_list[label_io_openshift])
-        for exp in exposes:
-            self.assertTrue("%s" % exp in label_list[label_io_openshift])
+    def test_run_or_usage_label_exists(self):
+        label_found = True
+        run = self.dp.get_specific_label("run")
+        if not run:
+            label_found = self.dp.get_specific_label("usage")
+        self.assertTrue(label_found)
 
-    def testIoOpenShiftTagsExists(self):
-        label_list = self.dp.get_docker_labels()
-        self.assertTrue("io.openshift.tags" in label_list)
 
 
 class DockerLint(container_avocado_test.ContainerAvocadoTest):
