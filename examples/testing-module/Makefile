@@ -30,9 +30,6 @@ check-multihost-testing:
 	cd ../multios_testing; MODULE=nspawn mtf-env-set
 	cd ../multios_testing; MTF_DISABLE_MODULE=yes $(CMD) *.py
 
-check-run-them-pdc-baseruntime: prepare-nspawn
-	../../tools/run-them.sh base-runtime base-runtime-f26-20170504201340 pdc
-
 check-run-them-pdc-testmodule: prepare-nspawn
 	../../tools/run-them.sh testmodule testmodule-master-20170413142055 pdc
 
