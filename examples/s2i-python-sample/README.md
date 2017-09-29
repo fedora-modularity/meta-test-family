@@ -19,8 +19,10 @@ There has to be installed some prerequisties like (`source-to-image`, `curl`). E
  - run test manually: `mtf simpleTest.py` or for `python-3.5` use `MODULE=docker-python-35 mtf simpleTest.py`
  - or dicrectly via avocado: `avocado run simpleTest.py`
 
-### Run Usage check
- - run it via Makefile: `make-usage`
+### Run Simple usage check
+ - This test is litle bit hackish, but ilustrates how it can be used with minimal config
+ - Please use `usage` tests from `simpleTest.py` file
+ - run it via Makefile: `make check-usage-minimal`
  - run test manually: `CONFIG=/usr/share/moduleframework/docs/example-config-minimal.yaml URL=docker=centos/python-35-centos7 MODULE=docker mtf usageTest.py`
  - Why there is used minimal config instead of default one? Answer is that it does not contain any setup  or start action, what are not important for this usage testing. It tests original container, what is not expected to provide any service.
 

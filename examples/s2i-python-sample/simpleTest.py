@@ -42,17 +42,29 @@ class simpleTests(module_framework.ContainerAvocadoTest):
         self.assertIn(textcheck, urlfd.read())
         urlfd.close()
 
-    def test_via_curl(self):
-        self.start()
-        time.sleep(3)
-        output = self.runHost("curl http://%s:%s" % (self.ipaddr, self.port))
-        self.assertIn("Hello from gunicorn WSGI application!", output.stdout)
-
     def test_basic(self):
         self.start()
         self.life_check()
+
+    def test_via_curl(self):
+        self.start()
+        self.life_check()
+        output = self.runHost("curl http://%s:%s" % (self.ipaddr, self.port))
+        self.assertIn("Hello from gunicorn WSGI application!", output.stdout)
 
     def test_another_port(self):
         self.backend.info["start"]="docker run -p 9999:8080"
         self.start()
         self.life_check(port="9999")
+
+
+class UsageTest(module_framework.ContainerAvocadoTest):
+    """
+    :avocado: enable
+    """
+    messages = ["This is a S2I python-", "To use it, install S2I: https://github.com/openshift/source-to-image"]
+
+    def test_usage(self):
+        usage_com = self.runHost("s2i usage %s" % self.backend.getDockerInstanceName())
+        for message in self.messages:
+            self.assertIn(message, usage_com.stdout)
