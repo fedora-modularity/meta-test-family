@@ -1,0 +1,3 @@
+[submodule "tools/check_modulemd"]
+	path = tools/check_modulemd
+	url = https://github.com/fedora-modularity/check_modulemd
