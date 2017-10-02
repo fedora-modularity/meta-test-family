@@ -26,7 +26,7 @@ import time
 import urllib
 
 
-class simpleTests(module_framework.ContainerAvocadoTest):
+class SimpleTests(module_framework.ContainerAvocadoTest):
     """
     :avocado: enable
     """

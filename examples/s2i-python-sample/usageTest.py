@@ -23,7 +23,7 @@
 
 from moduleframework import module_framework
 
-class usageTest(module_framework.ContainerAvocadoTest):
+class UsageTest(module_framework.ContainerAvocadoTest):
     """
     :avocado: enable
     """
