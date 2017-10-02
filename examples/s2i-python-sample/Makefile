@@ -2,14 +2,17 @@ TESTS=simpleTest.py
 TESTS_GENERAL=usageTest.py
 MINIMAL_CONFIG=/usr/share/moduleframework/docs/example-config-minimal.yaml
 
+prepare:
+	mtf-env-set
+
 check: check-python-2.7
 
-check-python-2.7:
+check-python-2.7: prepare
 	# run modulelint explicitly in examples if you want
 	# mtf -l
 	mtf $(TESTS)
 
-check-python-3.5:
+check-python-3.5: prepare
 	MODULE=docker-python-35 mtf $(TESTS)
 
 check-usage-minimal:

@@ -1,7 +1,7 @@
 document: modularity-testing
 version: 1
 name: s2i-python-container
-testdependecies:
+testdependencies:
     rpms:
         - curl
         - source-to-image

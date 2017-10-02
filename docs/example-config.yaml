@@ -34,7 +34,8 @@ packages:
 testdependencies:
     rpms:
         - nc
-# default module type for testing if not set by env variable
+# default module type for testing if not set by env variable.
+# This dependencies are installed by mtf-set-env script
 # env var: MODULE   (docker, nspawn, rpm)
 default_module: docker
 # various module types setup and configuration (nspawn = rpm)
