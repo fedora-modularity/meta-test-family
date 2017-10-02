@@ -2,7 +2,8 @@
 
 SITE_LIB=$(python -c "import moduleframework, os; print os.path.dirname(moduleframework.__file__)")
 MTF_TOOLS="tools"
-AVOCADO_ARGS=""
+JSON_LOG=$(mktemp)
+AVOCADO_ARGS="--json $JSON_LOG"
 
 function print_help {
   cat <<EOF
@@ -34,3 +35,5 @@ while [[ $# -gt 0 ]]; do
 done
 
 avocado run $AVOCADO_ARGS
+mtf-log-parser $JSON_LOG
+rm -f $JSON_LOG
