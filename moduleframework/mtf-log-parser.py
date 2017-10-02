@@ -49,5 +49,3 @@ def main():
             print("LOG:    {0}".format(i.get('logfile')))
             delimiter = "-------------------------"
 
-if __name__ == '__main__':
-    main()

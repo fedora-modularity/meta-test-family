@@ -80,6 +80,7 @@ setup(
             'mtf-generator = moduleframework.mtf_generator:main',
             'mtf-env-set = moduleframework.mtf_environment:mtfenvset',
             'mtf-env-clean = moduleframework.mtf_environment:mtfenvclean',
+            'mtf-log-parser = moduleframework.mtf-log-parser:main',
         ]
     },
     setup_requires=[],
