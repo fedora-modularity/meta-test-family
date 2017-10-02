@@ -1,0 +1,23 @@
+document: modularity-testing
+version: 1
+name: s2i-python-container
+testdependencies:
+    rpms:
+        - curl
+        - source-to-image
+default_module: docker
+module:
+    docker:
+        setup: IMAGE=centos/python-27-centos7;
+            APP_CONTAINER=s2i-python-sample-27;
+            docker inspect $APP_CONTAINER || s2i build https://github.com/sclorg/s2i-python-container.git --context-dir=2.7/test/setup-test-app/ $IMAGE $APP_CONTAINER
+        start: docker run -p 8080:8080
+        url: docker=s2i-python-sample-27
+    docker-python-27:
+        parent: docker
+    docker-python-35:
+        parent: docker
+        setup: IMAGE=centos/python-35-centos7;
+            APP_CONTAINER=s2i-python-sample-35;
+            docker inspect $APP_CONTAINER || s2i build https://github.com/sclorg/s2i-python-container.git --context-dir=3.5/test/setup-test-app/ $IMAGE $APP_CONTAINER
+        url: docker=s2i-python-sample-35

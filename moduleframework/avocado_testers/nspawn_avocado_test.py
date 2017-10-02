@@ -20,7 +20,7 @@
 # Authors: Petr Hracek <phracek@redhat.com>
 #
 from moduleframework.module_framework import AvocadoTest
-
+from moduleframework.common import get_module_type_base
 
 class NspawnAvocadoTest(AvocadoTest):
     """
@@ -31,7 +31,7 @@ class NspawnAvocadoTest(AvocadoTest):
     """
 
     def setUp(self):
-        if self.moduleType != "nspawn":
+        if get_module_type_base() != "nspawn":
             self.skip("Nspawn specific test")
         super(NspawnAvocadoTest, self).setUp()
 

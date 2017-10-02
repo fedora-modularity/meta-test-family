@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# This Modularity Testing Framework helps you to write tests for modules
+# Meta test family (MTF) is a tool to test components of a modular Fedora:
+# https://docs.pagure.org/modularity/
 # Copyright (C) 2017 Red Hat, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -17,24 +18,19 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# Authors: Petr Hracek <phracek@redhat.com>
+# Authors: Jan Scotka <jscotka@redhat.com>
 #
 
-from moduleframework.module_framework import AvocadoTest
-from moduleframework.common import get_module_type_base
+from moduleframework import module_framework
 
-
-class RpmAvocadoTest(AvocadoTest):
+class UsageTest(module_framework.ContainerAvocadoTest):
     """
-    Class for writing tests specific just for LOCAL (system) RPM testing
-    derived from AvocadoTest class.
-
-    :avocado: disable
+    :avocado: enable
     """
+    messages = ["This is a S2I python-", "To use it, install S2I: https://github.com/openshift/source-to-image"]
 
-    def setUp(self):
-        if get_module_type_base() != "rpm":
-            self.skip("Rpm specific test")
-        super(RpmAvocadoTest, self).setUp()
-
+    def test_usage_message(self):
+        usage_com = self.runHost("docker run %s" % self.backend.getDockerInstanceName())
+        for message in self.messages:
+            self.assertIn(message, usage_com.stdout)
 

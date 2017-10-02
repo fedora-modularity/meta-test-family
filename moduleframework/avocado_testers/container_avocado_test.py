@@ -21,6 +21,7 @@
 #
 
 from moduleframework.module_framework import AvocadoTest
+from moduleframework.common import get_module_type_base
 
 
 # INTERFACE CLASSES FOR SPECIFIC MODULE TESTS
@@ -33,7 +34,7 @@ class ContainerAvocadoTest(AvocadoTest):
     """
 
     def setUp(self):
-        if self.moduleType != "docker":
+        if get_module_type_base() != "docker":
             self.skip("Docker specific test")
         super(ContainerAvocadoTest, self).setUp()
 
