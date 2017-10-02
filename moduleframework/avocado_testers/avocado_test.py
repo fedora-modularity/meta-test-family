@@ -63,9 +63,9 @@ class AvocadoTest(Test):
             (self.moduleType, self.moduleType_base, self.moduleProfile))
 
     def __print_breaks(self, message):
-        delimiterStart = '\n\n::::::::::::::::::::::::'
+        delimiterStart = '\n::::::::::::::::::::::::'
         delimiterEnd = '::::::::::::::::::::::::\n'
-        self.log.debug("{0} {1} {2}".format(delimiterStart, message, delimiterEnd))
+        self.log.debug("\n{0} {1} {2}".format(delimiterStart, message, delimiterEnd))
 
     def cancel(self, *args, **kwargs):
         try:
