@@ -42,10 +42,10 @@ def main():
         exit(3)
     delimiter=""
     for i in data['tests']:
-        if i.get('status') == 'ERROR':
+        if i.get('status') in ['ERROR','FAIL']:
             print(delimiter)
             print("TEST:   {0}".format(i.get('id')))
             print("ERROR:  {0}".format(i.get('fail_reason')))
-            print("LOG:    {0}".format(i.get('logfile')))
+            print("        {0}".format(i.get('logfile')))
             delimiter = "-------------------------"
 
