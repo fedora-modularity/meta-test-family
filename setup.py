@@ -63,7 +63,7 @@ for path in paths:
 
 setup(
     name='meta-test-family',
-    version="0.6.1",
+    version="0.7.3",
     description='Tool to test components fo a modular Fedora.',
     keywords='modules,containers,testing,framework',
     author='Jan Scotka',
@@ -73,13 +73,14 @@ setup(
     packages=find_packages(exclude=['docs', 'examples', 'tools']),
     include_package_data=True,
     data_files=data_files.items(),
+    scripts=['tools/mtf'],
     entry_points={
         'console_scripts': [
-            'moduleframework-cmd = moduleframework.bashhelper:main',
-            'modulelint = moduleframework.modulelint:main',
+            'mtf-cmd = moduleframework.bashhelper:main',
             'mtf-generator = moduleframework.mtf_generator:main',
             'mtf-env-set = moduleframework.mtf_environment:mtfenvset',
             'mtf-env-clean = moduleframework.mtf_environment:mtfenvclean',
+            'mtf-log-parser = moduleframework.mtf_log_parser:main',
         ]
     },
     setup_requires=[],
@@ -92,12 +93,5 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
-    install_requires=['avocado-framework',
-                      'netifaces',
-                      'behave',
-                      'PyYAML',
-                      'dockerfile-parse',
-                      'pdc_client',
-                      'modulemd'
-                      ]
+    install_requires=open('requirements.txt').read().splitlines()
 )

@@ -1,0 +1,9 @@
+document: meta-test
+version: 1
+name: pure-rpms
+packages:
+    rpms:
+        - bash
+module:
+    rpm:
+        repo: http://ftp.fi.muni.cz/pub/linux/fedora/linux/releases/26/Everything/x86_64/os/

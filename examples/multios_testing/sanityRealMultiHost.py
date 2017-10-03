@@ -32,27 +32,27 @@ class SanityRealMultihost(module_framework.AvocadoTest):
     :avocado: enable
     """
     def setUp(self):
-        self.machineF25 = module_framework.get_backend()[0]
-        self.machineF26 = module_framework.get_backend()[0]
-        self.machineRawhide = module_framework.get_backend()[0]
-        self.machineF25.setRepositoriesAndWhatToInstall(repos = ["http://ftp.fi.muni.cz/pub/linux/fedora/linux/releases/25/Everything/x86_64/os/"])
-        self.machineF26.setRepositoriesAndWhatToInstall(repos = ["http://ftp.fi.muni.cz/pub/linux/fedora/linux/development/26/Everything/x86_64/os/"])
-        self.machineRawhide.setRepositoriesAndWhatToInstall(repos = ["http://ftp.fi.muni.cz/pub/linux/fedora/linux/development/rawhide/Everything/x86_64/os/"])
-        self.machineF25.setUp()
+        #self.machineF25 = module_framework.get_backend()
+        self.machineF26 = module_framework.get_backend()
+        self.machineRawhide = module_framework.get_backend()
+        #self.machineF25.info["url"] = ["http://ftp.fi.muni.cz/pub/linux/fedora/linux/releases/25/Everything/x86_64/os/"]
+        self.machineF26.info["url"] = ["http://ftp.fi.muni.cz/pub/linux/fedora/linux/releases/26/Everything/x86_64/os/"]
+        self.machineRawhide.info["url"] = ["http://ftp.fi.muni.cz/pub/linux/fedora/linux/development/rawhide/Everything/x86_64/os/"]
+        #self.machineF25.setUp()
         self.machineF26.setUp()
         self.machineRawhide.setUp()
 
     def tearDown(self):
-        self.machineF25.tearDown()
+        #self.machineF25.tearDown()
         self.machineF26.tearDown()
         self.machineRawhide.tearDown()
 
 
     def testVersionsInside(self):
-        self.machineF25.start()
+        #self.machineF25.start()
         self.machineF26.start()
         self.machineRawhide.start()
-        self.assertIn("25", self.machineF25.run("cat /etc/redhat-release").stdout)
+        #self.assertIn("25", self.machineF25.run("cat /etc/redhat-release").stdout)
         self.assertIn("26", self.machineF26.run("cat /etc/redhat-release").stdout)
         self.assertIn("awhide", self.machineRawhide.run("cat /etc/redhat-release").stdout)
 

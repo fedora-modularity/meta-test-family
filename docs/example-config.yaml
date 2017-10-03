@@ -34,7 +34,8 @@ packages:
 testdependencies:
     rpms:
         - nc
-# default module type for testing if not set by env variable
+# default module type for testing if not set by env variable.
+# This dependencies are installed by mtf-set-env script
 # env var: MODULE   (docker, nspawn, rpm)
 default_module: docker
 # various module types setup and configuration (nspawn = rpm)
@@ -60,6 +61,9 @@ module:
 # tag(gz) archive local path, or docker=cotainer_name for image already imported image
 # env var: URL
 # MANDATORY
+        url: docker.io/modularitycontainers/memcached
+# same meaning as url
+# OBSOLOTE
         container: docker.io/modularitycontainers/memcached
 # rpm section (nspawn) There is similar meaning like docker seciton, but for rpm(nspawn)
 # MANDATORY
@@ -74,6 +78,9 @@ module:
 # use "compose", this will be ignored
 # env var: URL
 # MANDATORY
+        url: https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server/x86_64/os/
+# same meaing as url
+# OBSOLOTE
         repo: https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server/x86_64/os/
 # if you will not use "compose" nor repo, you can use repos, which caused that just mentioned
 # repos will be used, not additional repos from moduleMD file
@@ -82,3 +89,11 @@ module:
         repos:
             - https://kojipkgs.stg.fedoraproject.org/compose/branched/jkaluza/latest-Fedora-Modular-26/compose/Server/x86_64/os/
             - https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server/x86_64/os/
+# If you would like to have more configs for same module type, it is possible to do it via inheritance
+# There will be used parent module + overwritten values with this one, you can rewrite whatever you want.
+# you have to set parent (base) module type allowed are just
+# rpm/docker
+    inheriteddocker:
+# you have to set parent value for these inherited configs
+        parent: docker
+        start: "docker run -it -p 11211:11211"

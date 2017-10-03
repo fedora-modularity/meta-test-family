@@ -1,0 +1,6 @@
+document: meta-test
+version: 1
+name: fedora
+module:
+    docker:
+        container: fedora

@@ -1,7 +1,7 @@
 document: meta-test
 version: 1
 name: memcached
-modulemd-url: http://raw.githubusercontent.com/container-images/memcached/master/memcached.yaml
+modulemd-url: https://src.fedoraproject.org/modules/memcached/raw/master/f/memcached.yaml
 service:
     port: 11211
 packages:
@@ -23,9 +23,7 @@ module:
         start: systemctl start memcached
         stop: systemctl stop memcached
         status: systemctl status memcached
-        repos:
-            - http://mirror.vutbr.cz/fedora/releases/25/Everything/x86_64/os/
-            - https://phracek.fedorapeople.org/memcached-module-repo/
+        url: https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server/x86_64/os/
 test:
     processrunning:
         - 'ls  /proc/*/exe -alh | grep memcached'

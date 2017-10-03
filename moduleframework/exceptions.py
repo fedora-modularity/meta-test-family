@@ -98,3 +98,10 @@ class KojiExc(ModuleFrameworkException):
     """
     def __init__(self, *args, **kwargs):
         super(KojiExc, self).__init__('TYPE Koji', *args, **kwargs)
+
+class CmdExc(ModuleFrameworkException):
+    """
+    Indicates Command line error: Command fails on testing machine.
+    """
+    def __init__(self, *args, **kwargs):
+        super(CmdExc, self).__init__('TYPE Command', *args, **kwargs)

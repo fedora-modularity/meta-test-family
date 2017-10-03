@@ -29,6 +29,8 @@ import socket
 import os
 import urllib
 import yaml
+import subprocess
+import copy
 import warnings
 
 from avocado.utils import process
@@ -43,16 +45,16 @@ hostname = socket.gethostname()
 dusername = "test"
 dpassword = "test"
 ddatabase = "basic"
-__rh_release = '/etc/redhat-release'
-if os.path.exists(__rh_release):
-    hostpackager = "yum -y"
-    guestpackager = "microdnf"
-    if os.path.exists('/usr/bin/dnf'):
-        hostpackager = "dnf -y"
-else:
-    hostpackager = "apt-get -y"
-    guestpackager = "apt-get -y"
+PACKAGER_COMMAND = "test -e /usr/bin/dnf && echo 'dnf -y'   ||" \
+                   "( test -e /usr/bin/microdnf && echo 'microdnf' ||" \
+                   "( test -e /usr/bin/yum && echo 'yum -y'        ||" \
+                   "echo 'apt-get -y' " \
+                   ") )"
+hostpackager = subprocess.check_output([PACKAGER_COMMAND], shell=True).strip()
+guestpackager = hostpackager
 ARCH = "x86_64"
+
+__persistent_config = None
 
 # translation table for {VARIABLE} in the config.yaml file
 trans_dict = {"HOSTIPADDR": hostipaddr,
@@ -72,7 +74,6 @@ trans_dict = {"HOSTIPADDR": hostipaddr,
 
 BASEPATHDIR = "/opt"
 PDCURL = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
-URLBASECOMPOSE = "https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server"
 REPOMD = "repodata/repomd.xml"
 MODULEFILE = 'tempmodule.yaml'
 # default value of process timeout in seconds
@@ -82,6 +83,14 @@ DEFAULTRETRYCOUNT = 3
 DEFAULTRETRYTIMEOUT = 30
 DEFAULTNSPAWNTIMEOUT = 10
 
+def get_compose_url_modular_release():
+    release = os.environ.get("MTF_FEDORA_RELEASE") or "26"
+    if release == "master":
+        release = "26"
+    compose_url = os.environ.get("MTF_BASE_COMPOSE_URL") or \
+                  "https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-%s/compose/Server/%s/os" \
+                  % (release, ARCH)
+    return compose_url
 
 def is_debug():
     """
@@ -160,6 +169,14 @@ def get_if_do_cleanup():
     cleanup = os.environ.get('MTF_DO_NOT_CLEANUP')
     return not bool(cleanup)
 
+def get_if_reuse():
+    """
+        Return the **MTF_REUSE** envvar.
+
+        :return: bool
+        """
+    reuse = os.environ.get('MTF_REUSE')
+    return bool(reuse)
 
 def get_if_remoterepos():
     """
@@ -205,7 +222,6 @@ def sanitize_cmd(cmd):
     :param (str): command to sanitize
     :return: str
     """
-
     if '"' in cmd:
         cmd = cmd.replace('"', r'\"')
     return cmd
@@ -236,27 +252,6 @@ def get_url():
     return url
 
 
-def get_config():
-    """
-    Read the module's configuration file.
-
-    :default: ``./config.yaml`` in the ``tests`` directory of the module's root
-     directory
-    :envvar: **CONFIG=path/to/file** overrides default value.
-    :return: str
-    """
-    cfgfile = os.environ.get('CONFIG') or './config.yaml'
-    try:
-        with open(cfgfile, 'r') as ymlfile:
-            xcfg = yaml.load(ymlfile.read())
-            return xcfg
-    except IOError:
-        raise ConfigExc(
-            "Error: File '%s' doesn't appear to exist or it's not a YAML file. "
-            "Tip: If the CONFIG envvar is not set, mtf-generator looks for './config'."
-            % cfgfile)
-
-
 def get_compose_url():
     """
     Return Compose URL.
@@ -281,7 +276,7 @@ def get_compose_url():
     return compose_url
 
 
-def get_modulemd():
+def get_modulemdurl():
     """
     Read a moduleMD file.
 
@@ -289,21 +284,9 @@ def get_modulemd():
     the ``config.yaml`` file is checked. If none of them is set, then
     the ***COMPOSE_URL* envvar is checked.
 
-    :return: dict
+    :return: string
     """
     mdf = os.environ.get('MODULEMDURL')
-    if not mdf:
-        readconfig = CommonFunctions()
-        readconfig.loadconfig()
-        try:
-            if readconfig.config.get("modulemd-url"):
-                mdf = readconfig.config.get("modulemd-url")
-            else:
-                a = ComposeParser(get_compose_url())
-                b = a.variableListForModule(readconfig.config.get("name"))
-                mdf = [x[12:] for x in b if 'MODULEMDURL=' in x][0]
-        except AttributeError:
-            return None
     return mdf
 
 
@@ -320,11 +303,71 @@ class CommonFunctions(object):
         self.moduleName = None
         self.source = None
         self.arch = None
+        self.sys_arch = None
         self.dependencylist = {}
-        self.moduledeps = None
+        self.moduledeps = {}
+        self.is_it_module = False
+        self.packager = None
         # general use case is to have forwarded services to host (so thats why it is same)
         self.ipaddr = trans_dict["HOSTIPADDR"]
         trans_dict["GUESTARCH"] = self.getArch()
+        self.loadconfig()
+
+    def loadconfig(self):
+        """
+        Load configuration from config.yaml file.
+
+        :return: None
+        """
+        # we have to copy object. because there is just one global object, to improve performance
+        self.config = copy.deepcopy(get_config())
+        self.info = self.config.get("module",{}).get(get_module_type_base())
+        # if there is inheritance join both dictionary
+        self.info.update(self.config.get("module",{}).get(get_module_type()))
+        if not self.info:
+            raise ConfigExc("There is no section for (module: -> %s:) in the configuration file." %
+                            get_module_type_base())
+
+        if self.config.get('modulemd-url') and get_if_module():
+            self.is_it_module = True
+        else:
+            pass
+
+        self.moduleName = sanitize_text(self.config['name'])
+        self.source = self.config.get('source')
+        self.set_url()
+
+    def set_url(self, url=None, force=False):
+        """
+        Set url via parameter or via URL envvar
+        It is repo or image name.
+
+        :envvar: **URL=url://localtor or docker url locator** overrides default value.
+        :param url:
+        :param force:
+        :return:
+        """
+        url = url or get_url() or self.info.get("url")
+        if url and ((not self.info.get("url")) or force):
+                self.info["url"] = url
+
+        if not self.info.get("url"):
+            if get_module_type_base() in ["docker"]:
+                self.info["url"]=self.info.get("container")
+            elif get_module_type_base() in ["rpm", "nspawn"]:
+                self.info["url"] = self.info.get("repo") or self.info.get("repos")
+        # url has to be dict in case of rpm/nspanw (it is allowed to use ; as separator for more repositories)
+        if get_module_type_base() in ["rpm", "nspawn"] and isinstance(self.info["url"], str):
+            self.info["url"] = self.info["url"].split(";")
+
+    def get_url(self):
+        """
+        get location of repo(s) or image
+
+        :return:
+        """
+        return self.info.get("url")
+
 
     def getArch(self):
         """
@@ -332,8 +375,9 @@ class CommonFunctions(object):
 
         :return: str
         """
-        sys_arch = self.runHost(command='uname -m', verbose=False).stdout.strip()
-        return sys_arch
+        if not self.sys_arch:
+            self.sys_arch = self.runHost(command='uname -m', verbose=False).stdout.strip()
+        return self.sys_arch
 
     def runHost(self, command="ls /", **kwargs):
         """
@@ -353,6 +397,15 @@ class CommonFunctions(object):
                 % (trans_dict, command))
         return process.run("%s" % formattedcommand, **kwargs)
 
+
+    def get_test_dependencies(self):
+        """
+        Get test dependencies from a configuration file
+
+        :return: list of test dependencies
+        """
+        return self.config.get('testdependencies', {}).get('rpms', [])
+
     def installTestDependencies(self, packages=None):
         """
         Install packages on a host machine to prepare a test environment.
@@ -362,39 +415,19 @@ class CommonFunctions(object):
         :return: None
         """
         if not packages:
-            typo = 'testdependecies' in self.config
-            if typo:
-                warnings.warn("'testdependecies' is a typo, please fix",
-                              DeprecationWarning)
-
-            # try section without typo first
-            packages = self.config.get('testdependencies', {}).get('rpms')
-            if packages:
-                if typo:
-                    warnings.warn("preferring section without typo")
-            else:
-                # fall back to mistyped test dependency section
-                packages = self.config.get('testdependecies', {}).get('rpms')
+            packages = self.get_test_dependencies()
 
         if packages:
-            self.runHost(
-                "{HOSTPACKAGER} install " +
-                " ".join(packages),
-                ignore_status=True, verbose=is_debug())
+            print_info("Installs test dependencies: ", packages)
+            # you have to have root permission to install packages:
+            try:
+                self.runHost(
+                    "{HOSTPACKAGER} install " +
+                    " ".join(packages),
+                    ignore_status=False, verbose=is_debug())
+            except process.CmdError as e:
+                raise CmdExc("Installation failed; Do you have permission to do that?", e)
 
-    def loadconfig(self):
-        """
-        Load configuration from config.yaml file.
-
-        :return: None
-        """
-        try:
-            self.config = get_config()
-            self.moduleName = sanitize_text(self.config['name'])
-            self.source = self.config.get('source') if self.config.get(
-                'source') else self.config['module']['rpm'].get('source')
-        except ValueError:
-            pass
 
     def getPackageList(self, profile=None):
         """
@@ -406,21 +439,11 @@ class CommonFunctions(object):
         package_list = []
         if not profile:
             if 'packages' in self.config:
-                packages_rpm = self.config['packages'].get('rpms') if self.config[
-                    'packages'].get('rpms') else []
+                packages_rpm = self.config.get('packages',{}).get('rpms', [])
                 packages_profiles = []
-                for x in self.config['packages'].get('profiles') if self.config[
-                    'packages'].get('profiles') else []:
-                    packages_profiles = packages_profiles + \
-                                        self.getModulemdYamlconfig()['data']['profiles'][x]['rpms']
+                for profile_in_conf in self.config.get('packages',{}).get('profiles',[]):
+                    packages_profiles += self.getModulemdYamlconfig()['data']['profiles'][profile_in_conf]['rpms']
                 package_list += packages_rpm + packages_profiles
-
-            elif self.getModulemdYamlconfig()['data'].get('profiles') and self.getModulemdYamlconfig()['data'][
-                'profiles'].get(get_profile()):
-                package_list += self.getModulemdYamlconfig()['data']['profiles'][get_profile()]['rpms']
-            else:
-                # fallback solution when it is not known what to install
-                package_list.append("bash")
         else:
             package_list += self.getModulemdYamlconfig()['data']['profiles'][profile]['rpms']
         print_info("PCKGs to install inside module:", package_list)
@@ -444,26 +467,29 @@ class CommonFunctions(object):
                       can be overridden by the **CONFIG** envvar.
         :return: dict
         """
-        try:
-            if urllink:
-                ymlfile = urllib.urlopen(urllink)
-                cconfig = yaml.load(ymlfile)
-                link = cconfig
-            elif not get_if_module():
-                trans_dict["GUESTPACKAGER"] = "yum -y"
-                link = {"data": {}}
+        link = {"data": {}}
+        if urllink:
+            modulemd = urllink
+        elif self.is_it_module:
+            if self.modulemdConf:
+                return self.modulemdConf
             else:
-                if self.config is None:
-                    self.loadconfig()
-                if not self.modulemdConf:
-                    modulemd = get_modulemd()
-                    if modulemd:
-                        ymlfile = urllib.urlopen(modulemd)
-                        self.modulemdConf = yaml.load(ymlfile)
-                link = self.modulemdConf
+                modulemd = get_modulemdurl()
+                if not modulemd:
+                    modulemd = self.config.get("modulemd-url")
+        else:
             return link
+        try:
+            ymlfile = urllib.urlopen(modulemd)
+            link = yaml.load(ymlfile)
         except IOError as e:
-            raise ConfigExc("Cannot load file: '%s'" % e)
+            raise ConfigExc("File '%s' cannot be load" % modulemd, e)
+        except yaml.parser.ParserError as e:
+            raise ConfigExc("Module MD file contains errors: '%s'" % e, modulemd)
+        if not urllink:
+            self.modulemdConf = link
+        return link
+
 
     def getIPaddr(self):
         """
@@ -475,3 +501,214 @@ class CommonFunctions(object):
         :return: str
         """
         return self.ipaddr
+
+    def _callSetupFromConfig(self):
+        """
+        Internal method, do not use it anyhow
+
+        :return: None
+        """
+        if self.info.get("setup"):
+            self.runHost(self.info.get("setup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
+
+    def _callCleanupFromConfig(self):
+        """
+        Internal method, do not use it anyhow
+
+        :return: None
+        """
+        if self.info.get("cleanup"):
+            self.runHost(self.info.get("cleanup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
+
+    def run(self, command, **kwargs):
+        """
+        Run command inside module, for local based it is same as runHost
+
+        :param command: str of command to execute
+        :param kwargs: dict from avocado.process.run
+        :return: avocado.process.run
+        """
+
+        return self.runHost('bash -c "%s"' % sanitize_cmd(command), **kwargs)
+
+    def get_packager(self):
+        if not self.packager:
+            self.packager = self.run(PACKAGER_COMMAND, verbose=False).stdout.strip()
+        return self.packager
+
+    def status(self, command="/bin/true"):
+        """
+        Return status of module
+
+        :param command: which command used for do that. it could be defined inside config
+        :return: bool
+        """
+        try:
+            command = self.info.get('status') or command
+            a = self.run(command, shell=True, ignore_bg_processes=True, verbose=is_not_silent())
+            print_debug("command:", a.command, "stdout:", a.stdout, "stderr:", a.stderr)
+            return True
+        except BaseException:
+            return False
+
+    def start(self, command="/bin/true"):
+        """
+        start the RPM based module (like systemctl start service)
+
+        :param command: Do not use it directly (It is defined in config.yaml)
+        :return: None
+        """
+        command = self.info.get('start') or command
+        self.run(command, shell=True, ignore_bg_processes=True, verbose=is_debug())
+        self.status()
+        trans_dict["GUESTPACKAGER"] = self.get_packager()
+
+    def stop(self, command="/bin/true"):
+        """
+        stop the RPM based module (like systemctl stop service)
+
+        :param command: Do not use it directly (It is defined in config.yaml)
+        :return: None
+        """
+        command = self.info.get('stop') or command
+        self.run(command, shell=True, ignore_bg_processes=True, verbose=is_not_silent())
+
+
+    def install_packages(self, packages=None):
+        """
+        Install packages in config (by config or via parameter)
+
+        :param packages:
+        :return:
+        """
+        if not packages:
+            packages = self.getPackageList()
+        if packages:
+            a = self.run("%s install %s" % (self.get_packager()," ".join(packages)),
+                         ignore_status=True,
+                         verbose=False)
+            if a.exit_status == 0:
+                print_info("Packages installed via %s" % self.get_packager(), a.stdout)
+            else:
+                print_info(
+                    "Nothing installed via %s, but package list is not empty" % self.get_packager(),
+                    packages)
+                raise CmdExc("ERROR: Unable to install packages inside: %s" % packages)
+
+    def tearDown(self):
+        """
+        cleanup enviroment and call cleanup from config
+
+        :return: None
+        """
+        if get_if_do_cleanup():
+            self.stop()
+            self._callCleanupFromConfig()
+        else:
+            print_info("TearDown phase skipped.")
+
+def get_config():
+    """
+    Read the module's configuration file.
+
+    :default: ``./config.yaml`` in the ``tests`` directory of the module's root
+     directory
+    :envvar: **CONFIG=path/to/file** overrides default value.
+    :return: str
+    """
+    global __persistent_config
+    if not __persistent_config:
+        cfgfile = os.environ.get('CONFIG')
+        if cfgfile:
+            if os.path.exists(cfgfile):
+                print_debug("Config file defined via envvar: %s" % cfgfile)
+            else:
+                raise ConfigExc("File does not exist although defined CONFIG envvar: %s" % cfgfile)
+        else:
+            cfgfile = "./config.yaml"
+            if os.path.exists(cfgfile):
+                print_debug("Using module config file: %s" % cfgfile)
+            else:
+                cfgfile = "/usr/share/moduleframework/docs/example-config-minimal.yaml"
+                print_debug("Using default minimal config: %s" % cfgfile)
+                if not get_url():
+                    raise ModuleFrameworkException("You have to use URL envvar for testing your images or repos")
+
+        try:
+            with open(cfgfile, 'r') as ymlfile:
+                xcfg = yaml.load(ymlfile.read())
+            doc_name = ['modularity-testing', 'meta-test-family', 'meta-test']
+            if xcfg.get('document') not in doc_name:
+                raise ConfigExc("bad yaml file: item (%s)" %
+                                doc_name, xcfg.get('document'))
+            if not xcfg.get('name'):
+                raise ConfigExc("Missing (name:) in config file")
+            if not xcfg.get("module"):
+                raise ConfigExc("No module in yaml config defined")
+            # copy rpm section to nspawn, in case not defined explicitly
+            # make it backward compatible
+            if xcfg.get("module",{}).get("rpm") and not xcfg.get("module",{}).get("nspawn"):
+                xcfg["module"]["nspawn"] = copy.deepcopy(xcfg.get("module",{}).get("rpm"))
+            __persistent_config = xcfg
+            return xcfg
+        except IOError:
+            raise ConfigExc(
+                "Error: File '%s' doesn't appear to exist or it's not a YAML file. "
+                "Tip: If the CONFIG envvar is not set, mtf-generator looks for './config'."
+                % cfgfile)
+    else:
+        return __persistent_config
+
+
+def list_modules_from_config():
+    """
+    Get all possible modules based on config file
+
+    :return: list
+    """
+    modulelist = get_config().get("module").keys()
+    return modulelist
+
+def get_backend_list():
+    """
+    Get backends
+
+    :return: list
+    """
+    base_module_list = ["rpm", "nspawn", "docker"]
+    return base_module_list
+
+def get_module_type():
+    """
+    Get which module are you actually using.
+
+    :return: str
+    """
+    amodule = os.environ.get('MODULE')
+    readconfig = get_config()
+    if "default_module" in readconfig and readconfig[
+        "default_module"] is not None and amodule is None:
+        amodule = readconfig["default_module"]
+    if amodule in list_modules_from_config():
+        return amodule
+    else:
+        raise ModuleFrameworkException("Unsupported MODULE={0}".format(amodule),
+                                       "supported are: %s" % list_modules_from_config())
+
+
+def get_module_type_base():
+    """
+    Get which BASE module (parent) are you using
+
+    :return: str
+    """
+    module_type = get_module_type()
+    parent = module_type
+    if module_type not in get_backend_list():
+        parent = get_config().get("module",{}).get(module_type, {}).get("parent")
+        if not parent:
+            raise ModuleFrameworkException("Module (%s) does not provide parent backend parameter (there are: %s)" %
+                                           (module_type, get_backend_list()))
+    if parent not in get_backend_list():
+        raise ModuleFrameworkException("As parent is allowed just base type: %s" % get_backend_list)
+    return parent

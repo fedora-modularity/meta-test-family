@@ -6,7 +6,7 @@ service:
     port: Specify port if needed
 packages:
     rpms:
-        - Specify packages which are needed
+        - Specify packages which are needed inside (disabled for containers)
 testdependencies:
     rpms:
         - nc
@@ -16,11 +16,10 @@ module:
         labels:
             description:
             io.k8s.description:
-        source: path to git repo
-        container: URL to docker.io.
+        url: URL to docker.io.
     rpm:
         start: systemctl start <service name>
         stop: systemctl stop <service name>
         status: systemctl status <service name>
-        repo: Path to module-build repo from koji
+        url: Path to module-build repo from koji
 

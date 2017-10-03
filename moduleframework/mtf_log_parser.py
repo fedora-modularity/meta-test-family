@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # Meta test family (MTF) is a tool to test components of a modular Fedora:
@@ -18,51 +19,33 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# Authors: Jan Scotka <jscotka@redhat.com>
+# Authors: Petr Sklenar <psklenar@redhat.com>
 #
 
-from avocado import main
-from moduleframework import module_framework
+"""
+Utility for reading avocado json files.
+"""
 
+import sys
+import json
 
-class RpmValidation(module_framework.AvocadoTest):
-    """
-    :avocado: enable
-    """
-    fhs_base_paths = [
-        '/bin',
-        '/boot',
-        '/dev',
-        '/etc',
-        '/home',
-        '/lib',
-        '/lib64',
-        '/media',
-        '/mnt',
-        '/opt',
-        '/proc',
-        '/root',
-        '/run',
-        '/sbin',
-        '/sys',
-        '/srv',
-        '/tmp',
-        '/usr/bin',
-        '/usr/include',
-        '/usr/lib',
-        '/usr/libexec',
-        '/usr/lib64',
-        '/usr/local',
-        '/usr/sbin',
-        '/usr/share',
-        '/var/tmp'
-    ]
+def main():
+    try:
+        json_data=open(sys.argv[1]).read()
+        data = json.loads(json_data)
+    except (IOError, ValueError) as e:
+        # file is not readable as json: No JSON object could be decoded
+        print(e)
+        exit(1)
+    except:
+        print("no file: specify 1 argument as existing json file")
+        exit(3)
+    delimiter=""
+    for i in data['tests']:
+        if i.get('status') in ['ERROR','FAIL']:
+            print(delimiter)
+            print("TEST:   {0}".format(i.get('id')))
+            print("ERROR:  {0}".format(i.get('fail_reason')))
+            print("        {0}".format(i.get('logfile')))
+            delimiter = "-------------------------"
 
-    def testPaths(self):
-        self.start()
-        for directory in self.fhs_base_paths:
-            self.run("test -d %s" % directory)
-
-
-if __name__ == '__main__':
-    main()

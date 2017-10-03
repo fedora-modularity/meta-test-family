@@ -21,6 +21,7 @@
 #
 
 from moduleframework.module_framework import AvocadoTest
+from moduleframework.common import get_module_type_base
 
 
 class RpmAvocadoTest(AvocadoTest):
@@ -32,7 +33,7 @@ class RpmAvocadoTest(AvocadoTest):
     """
 
     def setUp(self):
-        if self.moduleType != "rpm":
+        if get_module_type_base() != "rpm":
             self.skip("Rpm specific test")
         super(RpmAvocadoTest, self).setUp()
 

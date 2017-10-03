@@ -18,26 +18,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
+# Copied from: https://github.com/fedora-modularity/check_compose/blob/master/check_compose.py
+#
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
 from moduleframework import module_framework
-import time
-import urllib
 
-
-class SanityCheck1(module_framework.AvocadoTest):
+class ModulelintSanity(module_framework.AvocadoTest):
     """
     :avocado: enable
     """
-
-    def testGetCurl(self):
-        self.start()
-        time.sleep(2)
-        self.runHost("curl http://localhost:80")
-
-    def testGetUrllib(self):
-        self.start()
-        time.sleep(2)
-        fh = urllib.urlopen("http://localhost:80")
-        print fh.readlines()
+    def testPass(self):
+        pass

@@ -33,6 +33,8 @@ setseto = "Permissive"
 class EnvNspawn(CommonFunctions):
 
     def prepare_env(self):
+        print_info('Loaded config for name: {}'.format(self.config['name']))
+        self.installTestDependencies()
         self.__prepare_selinux()
         self.__install_machined()
 
@@ -43,7 +45,6 @@ class EnvNspawn(CommonFunctions):
     def __prepare_selinux(self):
         # disable selinux by default if not turned off
         if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
-            print_info("Disabling selinux")
             # https://github.com/fedora-modularity/meta-test-family/issues/53
             # workaround because systemd nspawn is now working well in F-26
             if not os.path.exists(selinux_state_file):
@@ -57,8 +58,7 @@ class EnvNspawn(CommonFunctions):
     def __install_machined(self):
         # install systemd-nspawn in case not installed
         if self.runHost("machinectl --version", ignore_status=True).exit_status != 0:
-            print_info("Installing systemd-cotaniner")
-            self.runHost("{HOSTPACKAGER} install systemd-container", verbose=is_not_silent(), sudo=True)
+            self.installTestDependencies(['systemd-container'])
 
     def __cleanup(self):
         if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):

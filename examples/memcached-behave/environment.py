@@ -37,4 +37,4 @@ def after_scenario(context, scenario):
 
 
 def before_all(context):
-    context.backend, context.moduletype = module_framework.get_correct_backend()
+    context.backend = module_framework.get_correct_backend()

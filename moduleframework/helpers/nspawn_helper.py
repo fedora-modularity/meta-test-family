@@ -24,6 +24,7 @@ import shutil
 import re
 import glob
 import time
+import hashlib
 
 from moduleframework.timeoutlib import Retry
 from moduleframework.common import *
@@ -50,13 +51,23 @@ class NspawnHelper(RpmHelper):
         self.__selinuxState = None
         time.time()
         actualtime = time.time()
-        if get_if_do_cleanup():
+        self.chrootpath_baseimage = ""
+        if not get_if_reuse():
             self.jmeno = "%s_%r" % (self.moduleName, actualtime)
         else:
             self.jmeno = self.moduleName
         self.chrootpath = os.path.abspath(self.baseprefix + self.jmeno)
-        print_info("name of CHROOT directory:", self.chrootpath)
-        trans_dict["ROOT"] = self.chrootpath
+        self.__default_command_sleep = 2
+
+    def __machined_restart(self):
+        """
+        Machined is not reliable well, restart it whenever you want.
+
+        :return: None
+        """
+        #return self.runHost("systemctl restart systemd-machined", verbose=is_debug(), ignore_status=True)
+        # remove restarting when used systemd-run
+        pass
 
     def setUp(self):
         """
@@ -68,11 +79,11 @@ class NspawnHelper(RpmHelper):
         :return: None
         """
 
-        self.setModuleDependencies()
+        trans_dict["ROOT"] = self.chrootpath
+        print_info("name of CHROOT directory:", self.chrootpath)
         self.setRepositoriesAndWhatToInstall()
-        self.installTestDependencies()
         self.__prepareSetup()
-        self.__callSetupFromConfig()
+        self._callSetupFromConfig()
         self.__bootMachine()
 
     def __is_killed(self):
@@ -94,7 +105,7 @@ class NspawnHelper(RpmHelper):
                 return True
         raise NspawnExc("Unable to start machine %s within %d" % (self.jmeno, DEFAULTRETRYTIMEOUT))
 
-    def __do_smart_start_cleanup(self):
+    def __create_snaphot(self):
         """
         Internal method, do not use it anyhow
 
@@ -105,13 +116,10 @@ class NspawnHelper(RpmHelper):
             # delete directory with same same (in case used option DO NOT CLEANUP)
             if os.path.exists(self.chrootpath):
                 shutil.rmtree(self.chrootpath, ignore_errors=True)
-            # DELETE every chroot dir in case any exists
-            # Commented out, because it had side effect for multihost testing. Has to be improved
-            #dirstodelete = glob.glob(self.baseprefix + "*")
-            #if get_if_module() and dirstodelete:
-            #    for dtd in dirstodelete:
-            #        shutil.rmtree(dtd, ignore_errors=True)
-            os.mkdir(self.chrootpath)
+        # copy files from base image directory to working copy (instead of overlay)
+        if self.chrootpath_baseimage != self.chrootpath and \
+                not os.path.exists(os.path.join(self.chrootpath, "usr")):
+            self.runHost("cp -rf %s %s" % (self.chrootpath_baseimage, self.chrootpath))
 
     def __prepareSetup(self):
         """
@@ -119,9 +127,11 @@ class NspawnHelper(RpmHelper):
 
         :return: None
         """
-        self.__do_smart_start_cleanup()
-        if not os.path.exists(os.path.join(self.chrootpath, "usr")):
-
+        self.chrootpath_baseimage = os.path.abspath(self.baseprefix +
+                                                    self.moduleName +
+                                                    "_image_" +
+                                                    hashlib.md5(" ".join(self.repos)).hexdigest())
+        if not os.path.exists(os.path.join(self.chrootpath_baseimage, "usr")):
             repos_to_use = ""
             counter = 0
             for repo in self.repos:
@@ -129,21 +139,16 @@ class NspawnHelper(RpmHelper):
                 repos_to_use += " --repofrompath %s%d,%s" % (
                     self.moduleName, counter, repo)
             try:
-                @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT * 60, delay=2 * 60,
-                       error=NspawnExc("RETRY: Unable to install packages"))
-                def tmpfunc():
-                    self.runHost(
-                        "%s install --nogpgcheck --setopt=install_weak_deps=False --installroot %s --allowerasing --disablerepo=* --enablerepo=%s* %s %s" %
-                        (trans_dict["HOSTPACKAGER"], self.chrootpath, self.moduleName, repos_to_use,
-                         self.whattoinstallrpm), verbose=is_not_silent())
-
-                tmpfunc()
+                self.runHost(
+                    ("%s install --nogpgcheck --setopt=install_weak_deps=False "
+                    "--installroot %s --allowerasing --disablerepo=* --enablerepo=%s* %s %s") %
+                    (trans_dict["HOSTPACKAGER"], self.chrootpath_baseimage, self.moduleName, repos_to_use, self.whattoinstallrpm), verbose=is_not_silent())
             except Exception as e:
                 raise NspawnExc(
                     "ERROR: Unable to install packages %s\n original exeption:\n%s\n" %
                     (self.whattoinstallrpm, str(e)))
             # COPY yum repository inside NSPAW, to be able to do installations
-            insiderepopath = os.path.join(self.chrootpath, self.yumrepo[1:])
+            insiderepopath = os.path.join(self.chrootpath_baseimage, self.yumrepo[1:])
             try:
                 os.makedirs(os.path.dirname(insiderepopath))
             except:
@@ -167,7 +172,7 @@ gpgcheck=0
             for repo in self.repos:
                 if "file:///" in repo:
                     src = repo[7:]
-                    srcto = os.path.join(self.chrootpath, src[1:])
+                    srcto = os.path.join(self.chrootpath_baseimage, src[1:])
                     try:
                         os.makedirs(os.path.dirname(srcto))
                     except Exception as e:
@@ -179,77 +184,88 @@ gpgcheck=0
                         print_debug(e, "Unable to copy files from:", src, "to:", srcto)
                         pass
             pkipath = "/etc/pki/rpm-gpg"
-            pkipath_ch = os.path.join(self.chrootpath, pkipath[1:])
+            pkipath_ch = os.path.join(self.chrootpath_baseimage, pkipath[1:])
             try:
                 os.makedirs(pkipath_ch)
             except BaseException:
                 pass
             for filename in glob.glob(os.path.join(pkipath, '*')):
                 shutil.copy(filename, pkipath_ch)
-            print_info("repo prepared for microdnf:", insiderepopath, open(insiderepopath, 'r').read())
+            print_info("repo prepared:", insiderepopath, open(insiderepopath, 'r').read())
+        else:
+            print_info("Base image for NSPAWN already exist: %s" % self.chrootpath_baseimage)
 
     def __bootMachine(self):
+        """
+        Internal function.
+        Start machine via nspawn and wait untill booted.
 
-        @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, delay=21,
-               error=NspawnExc("RETRY: Unable to start nspawn machine"))
-        def tempfnc():
-            print_debug("starting container via command:",
-                        "systemd-nspawn --machine=%s -bD %s" % (self.jmeno, self.chrootpath))
-            nspawncont = process.SubProcess(
-                "systemd-nspawn --machine=%s -bD %s" %
-                (self.jmeno, self.chrootpath), verbose=is_debug())
-            nspawncont.start()
-            self.__is_booted()
-
-        tempfnc()
+        :return: None
+        """
+        self.__create_snaphot()
+        print_debug("starting NSPAWN")
+        nspawncont = process.SubProcess(
+            "systemd-nspawn --machine=%s -bD %s" %
+            (self.jmeno, self.chrootpath), verbose=is_debug())
+        nspawncont.start()
+        self.__is_booted()
         print_info("machine: %s started" % self.jmeno)
 
         trans_dict["GUESTIPADDR"] = trans_dict["HOSTIPADDR"]
         self.ipaddr = trans_dict["GUESTIPADDR"]
 
-    def status(self, command="/bin/true"):
-        """
-        Return status of module
-
-        :param command: which command used for do that. it could be defined inside config
-        :return: bool
-        """
-        try:
-            if 'status' in self.info and self.info['status']:
-                a = self.run(self.info['status'], shell=True, verbose=False, ignore_bg_processes=True)
-            else:
-                a = self.run("%s" % command, shell=True, verbose=False, ignore_bg_processes=True)
-            print_debug("command:", a.command, "stdout:", a.stdout, "stderr:", a.stderr)
-            return True
-        except BaseException:
-            return False
+    def run (self, command, **kwargs):
+        return self.__run_systemdrun(command, **kwargs)
 
     def start(self, command="/bin/true"):
         """
-        start the RPM based module (like systemctl start service)
+        Start 'service' inside NSPAWN container
+        Keep it running with sleep infinity, systemd-run needs to have it running
 
         :param command: Do not use it directly (It is defined in config.yaml)
         :return: None
         """
-        if 'start' in self.info and self.info['start']:
-            self.run(self.info['start'], shell=True, ignore_bg_processes=True)
-        else:
-            self.run("%s" % command, shell=True, ignore_bg_processes=True)
+        command = self.info.get('start') or command
+        self.__run_systemdrun(command, internal_background=False, ignore_bg_processes=True, verbose=is_debug())
+        self.status()
+        trans_dict["GUESTPACKAGER"] = self.get_packager()
 
-    def stop(self, command="/bin/true"):
+    def __run_systemdrun(self, command, internal_background=False, **kwargs):
         """
-        stop the RPM based module (like systemctl stop service)
+        Run command inside nspawn module type. It uses systemd-run.
+        since Fedora 26 there is important --wait option
 
-        :param args: Do not use it directly (It is defined in config.yaml)
-        :param command: Do not use it directly (It is defined in config.yaml)
-        :return: None
+        :param command: str command to be executed
+        :param kwargs: dict parameters passed to avocado.process.run
+        :return: avocado.process.run
         """
-        if 'stop' in self.info and self.info['stop']:
-            self.run(self.info['stop'], shell=True, ignore_bg_processes=True)
-        else:
-            self.run("%s" % command, shell=True, ignore_bg_processes=True)
+        self.__machined_restart()
+        lpath = "/var/tmp"
+        add_wait_var = "--wait"
+        add_sleep_infinite = ""
+        if internal_background:
+            add_wait_var=""
+            add_sleep_infinite = "&& sleep infinity"
+        try:
+            comout = self.runHost("""systemd-run {wait} -M {machine} /bin/bash -c "({comm})>{pin}/stdout 2>{pin}/stderr {sleep}" """.format(
+                    wait=add_wait_var,
+                    machine=self.jmeno,
+                    comm=sanitize_cmd(command),
+                    pin=lpath,
+                    sleep=add_sleep_infinite),
+                **kwargs)
+            if not internal_background:
+                with open("{chroot}{pin}/stdout".format(chroot=self.chrootpath, pin=lpath), 'r') as content_file:
+                    comout.stdout = content_file.read()
+                with open("{chroot}{pin}/stderr".format(chroot=self.chrootpath, pin=lpath), 'r') as content_file:
+                    comout.stderr = content_file.read()
+                comout.command = command
+                print_debug(comout)
+            return comout
+        except process.CmdError as e:
+            raise CmdExc("Command in SYSTEMD-RUN failed: %s" % command, e)
 
-    def run(self, command="ls /", **kwargs):
+    def __run_machinectl(self, command, **kwargs):
         """
         Run command inside nspawn module type. It uses machinectl shell command.
          It need few workarounds, that's why it the code seems so strange
@@ -261,16 +277,17 @@ gpgcheck=0
         :param kwargs: dict parameters passed to avocado.process.run
         :return: avocado.process.run
         """
+        self.__machined_restart()
         lpath = "/var/tmp"
         if not kwargs:
             kwargs = {}
         should_ignore = kwargs.get("ignore_status")
         kwargs["ignore_status"] = True
-
-        comout = self.runHost("""machinectl shell root@{machine} /bin/bash -c "({comm})>{pin}/stdout 2>{pin}/stderr; echo $?>{pin}/retcode; sleep 1" """.format(
+        comout = self.runHost("""machinectl shell root@{machine} /bin/bash -c "({comm})>{pin}/stdout 2>{pin}/stderr; echo $?>{pin}/retcode; sleep {defaultsleep}" """.format(
                 machine=self.jmeno,
                 comm=sanitize_cmd(command),
-                pin=lpath),
+                pin=lpath,
+                defaultsleep=self.__default_command_sleep ),
             **kwargs)
         if comout.exit_status != 0:
             raise NspawnExc("This command should not fail anyhow inside NSPAWN:", sanitize_cmd(command))
@@ -332,52 +349,31 @@ gpgcheck=0
 
         :return: None
         """
-        try:
-            self.stop()
-        except Exception as stopexception:
-            print_info("STOP caused exception this is bad, but have to continue to terminate machine!!!", stopexception)
-            pass
-
-        try:
-            self.runHost("machinectl poweroff %s" % self.jmeno, verbose=is_not_silent())
-            self.__is_killed()
-        except Exception as poweroffex:
-            print_info("Unable to stop machine via poweroff, terminating", poweroffex)
+        if get_if_do_cleanup() and not get_if_reuse():
             try:
-                self.runHost("machinectl terminate %s" % self.jmeno, ignore_status=True)
-                self.__is_killed()
-            except Exception as poweroffexterm:
-                print_info("Unable to stop machine via terminate, STRANGE", poweroffexterm)
-                time.sleep(DEFAULTRETRYTIMEOUT)
+                self.stop()
+            except Exception as stopexception:
+                print_info("Stop action caused exception. It should not happen.",
+                           stopexception)
                 pass
-            pass
-
-        if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
-            # TODO: workaround because systemd nspawn is now working well in F-25
-            # (failing because of selinux)
-            self.runHost(
-                "setenforce %s" %
-                self.__selinuxState,
-                ignore_status=True, verbose=is_not_silent())
-        if get_if_do_cleanup() and os.path.exists(self.chrootpath):
-            shutil.rmtree(self.chrootpath, ignore_errors=True)
-        self.__callCleanupFromConfig()
-
-    def __callSetupFromConfig(self):
-        """
-        Internal method, do not use it anyhow
-
-        :return: None
-        """
-        if self.info.get("setup"):
-            self.runHost(self.info.get("setup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
-
-    def __callCleanupFromConfig(self):
-        """
-        Internal method, do not use it anyhow
-
-        :return: None
-        """
-        if self.info.get("cleanup"):
-            self.runHost(self.info.get("cleanup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
-
+            self.__machined_restart()
+            try:
+                self.runHost("machinectl poweroff %s" % self.jmeno, verbose=is_not_silent())
+                self.__is_killed()
+            except Exception as poweroffex:
+                print_info("Unable to stop machine via poweroff, terminating", poweroffex)
+                try:
+                    self.runHost("machinectl terminate %s" % self.jmeno, ignore_status=True)
+                    self.__is_killed()
+                except Exception as poweroffexterm:
+                    print_info("Unable to stop machine via terminate, STRANGE", poweroffexterm)
+                    time.sleep(DEFAULTRETRYTIMEOUT)
+                    pass
+                pass
+            self._callCleanupFromConfig()
+            if os.path.exists(self.chrootpath):
+                shutil.rmtree(self.chrootpath, ignore_errors=True)
+        else:
+            print_info("tearDown skipped", "running nspawn: %s" % self.jmeno)
+            print_info("To connect to a machine use:",
+                       "machinectl shell root@%s /bin/bash" % self.jmeno)

@@ -52,11 +52,14 @@ def getBasePackageSet(modulesDict=None, isModule=True, isContainer=False):
     brmod = "base-runtime"
     brmod_profiles = ["container", "baseimage"]
     BASEPACKAGESET_WORKAROUND = ["systemd"]
-    BASEPACKAGESET_WORKAROUND_NOMODULE = ["systemd", "yum"]
+    BASEPACKAGESET_WORKAROUND_NOMODULE = BASEPACKAGESET_WORKAROUND + ["dnf"]
     pdc = None
     basepackageset = []
     if isModule:
-        if modulesDict.has_key(brmod):
+        # TODO: workaround, when disabled local compose repos
+        if not modulesDict:
+            modulesDict[brmod] = "master"
+        if modulesDict.get(brmod):
             print_info("Searching for packages base package set inside %s" % brmod)
             pdc = PDCParser()
             pdc.setLatestPDC(brmod, modulesDict[brmod])
@@ -107,17 +110,17 @@ class PDCParser():
 
         :return: None
         """
-        # Using develop=True to not authenticate to the server
-        pdc_session = PDCClient(PDC_SERVER, ssl_verify=True, develop=True)
         pdc_query = { 'variant_id' : self.name, 'active': True }
         if self.stream:
             pdc_query['variant_version'] = self.stream
         if self.version:
             pdc_query['variant_release'] = self.version
-        try:
-            mod_info = pdc_session(**pdc_query)
-        except Exception as ex:
-            raise PDCExc("Could not query PDC server", ex)
+        @Retry(attempts=DEFAULTRETRYCOUNT,timeout=DEFAULTRETRYTIMEOUT,error=PDCExc("Could not query PDC server"))
+        def retry_tmpfunc():
+            # Using develop=True to not authenticate to the server
+            pdc_session = PDCClient(PDC_SERVER, ssl_verify=True, develop=True)
+            return pdc_session(**pdc_query)
+        mod_info = retry_tmpfunc()
         if not mod_info or "results" not in mod_info.keys() or not mod_info["results"]:
             raise PDCExc("QUERY: %s is not available on PDC" % pdc_query)
         self.pdcdata = mod_info["results"][-1]
@@ -172,7 +175,7 @@ class PDCParser():
         # rpmrepo = "http://kojipkgs.fedoraproject.org/repos/%s/latest/%s" % (
         #    self.pdcdata["koji_tag"] + "-build", ARCH)
         if get_if_remoterepos():
-            rpmrepo = "%s/%s/os/" % (URLBASECOMPOSE, ARCH)
+            rpmrepo = get_compose_url_modular_release()
             return rpmrepo
         else:
             return self.createLocalRepoFromKoji()
@@ -292,15 +295,3 @@ class PDCParser():
                 "cd %s; createrepo -v %s" %
                 (absdir, absdir), shell=True, verbose=is_debug())
         return "file://%s" % absdir
-
-if __name__ == "__main__":
-    a = PDCParser()
-    a.setLatestPDC(name="memcached", stream="f26")
-    dependencies = a.generateDepModules()
-    get_if_remoterepos = (lambda: True)
-    assert dependencies == {'base-runtime': 'f26', 'shared-userspace': 'f26', 'perl': 'f26'}
-    assert "https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server/x86_64/os/" == a.generateRepoUrl()
-    assert "URL=https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server/x86_64/os/" in a.generateParams()
-    assert "MODULE=nspawn" in a.generateParams()
-    assert len(a.generateGitHash()) == 41
-    assert "Memcached is a high-performance, distributed" in a.getmoduleMD()['data']['description']

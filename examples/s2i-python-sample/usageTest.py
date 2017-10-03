@@ -1,4 +1,3 @@
-#!/bin/bash
 # -*- coding: utf-8 -*-
 #
 # Meta test family (MTF) is a tool to test components of a modular Fedora:
@@ -22,22 +21,16 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
-set -x
-EC=0
-echo "Initialize module"
-moduleframework-cmd -v setUp
-moduleframework-cmd -v start
+from moduleframework import module_framework
 
-echo "Start testing"
+class UsageTest(module_framework.ContainerAvocadoTest):
+    """
+    :avocado: enable
+    """
+    messages = ["This is a S2I python-", "To use it, install S2I: https://github.com/openshift/source-to-image"]
 
-echo "Test what run bash command inside module"
-moduleframework-cmd -v -p run ls / | grep sbin
-EC=$(($EC+$?))
+    def test_usage_message(self):
+        usage_com = self.runHost("docker run %s" % self.backend.getDockerInstanceName())
+        for message in self.messages:
+            self.assertIn(message, usage_com.stdout)
 
-echo "Test what run bash command outside, host"
-echo errr | nc localhost 11211
-EC=$(($EC+$?))
-
-echo "Destroy module"
-moduleframework-cmd -v tearDown
-exit $EC

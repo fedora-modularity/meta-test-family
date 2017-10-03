@@ -35,7 +35,6 @@ export PARSEITEM=$2
 export PARSEITEMTYPE=$3
 export SELECTION=$4
 export MTF_PATH="/usr/share/moduleframework"
-export MODULE_LINT="$MTF_PATH/tools/modulelint/*.py"
 export MINIMAL_CONFIG="$MTF_PATH/docs/example-config-minimal.yaml"
 export MODULE_TESTS="*.py *.sh"
 
@@ -95,14 +94,14 @@ function runselected(){
 function distgit_wrapper_rpm(){
     cd $MODULENAME/tests
     eval $PARAMS mtf-env-set
-    eval $PARAMS make
+    eval $PARAMS make || eval $PARAMS make all
 }
 
 function avocado_wrapper(){
     (
     cp -rf $MTF_PATH/examples/$MODULENAME tests_$MODULENAME
     cd tests_$MODULENAME
-    TESTS="`ls $MODULE_TESTS $MODULE_LINT`"
+    TESTS="`ls $MODULE_TESTS`"
     echo "AVOCADO FOUND TESTS: $TESTS"
     eval $PARAMS mtf-env-set
     eval $PARAMS $AVOCADOCMD $TESTS
@@ -111,10 +110,9 @@ function avocado_wrapper(){
 
 function run_modulelint(){
 
-    TESTS="`ls $MODULE_LINT`"
-    echo "RUN AT LEAST MODULE LINTER: $TESTS"
+    echo "RUN MODULE LINTER"
     eval $PARAMS CONFIG=$MINIMAL_CONFIG mtf-env-set
-    eval $PARAMS CONFIG=$MINIMAL_CONFIG $AVOCADOCMD $TESTS
+    eval $PARAMS CONFIG=$MINIMAL_CONFIG mtf -l
 }
 
 set -x

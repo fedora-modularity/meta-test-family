@@ -54,11 +54,18 @@ class AvocadoTest(Test):
     def __init__(self, *args, **kwargs):
         super(AvocadoTest, self).__init__(*args, **kwargs)
 
-        (self.backend, self.moduleType) = get_backend()
+        self.backend = get_backend()
+        self.moduleType = get_module_type()
+        self.moduleType_base = get_module_type_base()
         self.moduleProfile = get_profile()
         print_info(
-            "Module Type: %s; Profile: %s" %
-            (self.moduleType, self.moduleProfile))
+            "Module Type: %s - Backend: %s - Profile: %s" %
+            (self.moduleType, self.moduleType_base, self.moduleProfile))
+
+    def __print_breaks(self, message):
+        delimiterStart = '\n::::::::::::::::::::::::'
+        delimiterEnd = '::::::::::::::::::::::::\n'
+        self.log.debug("\n{0} {1} {2}".format(delimiterStart, message, delimiterEnd))
 
     def cancel(self, *args, **kwargs):
         try:
@@ -75,6 +82,7 @@ class AvocadoTest(Test):
 
         :return: None
         """
+        self.__print_breaks("SETUP")
         return self.backend.setUp()
 
     def tearDown(self, *args, **kwargs):
@@ -86,6 +94,7 @@ class AvocadoTest(Test):
 
         :return: None
         """
+        self.__print_breaks("TEARDOWN")
         return self.backend.tearDown(*args, **kwargs)
 
     def start(self, *args, **kwargs):
@@ -97,6 +106,7 @@ class AvocadoTest(Test):
         :param kwargs: Do not use it directly (It is defined in config.yaml)
         :return: None
         """
+        self.__print_breaks("START MODULE")
         return self.backend.start(*args, **kwargs)
 
     def stop(self, *args, **kwargs):
@@ -109,6 +119,7 @@ class AvocadoTest(Test):
         :param kwargs: Do not use it directly (It is defined in config.yaml)
         :return: None
         """
+        self.__print_breaks("STOP")
         return self.backend.stop(*args, **kwargs)
 
     def run(self, *args, **kwargs):
@@ -119,6 +130,7 @@ class AvocadoTest(Test):
         :param kwargs: shell, ignore_status, verbose
         :return: object avocado.process.run
         """
+        self.__print_breaks("COMMAND IN MODULE <->")
         return self.backend.run(*args, **kwargs)
 
     def runCheckState(self, command="ls /", expected_state=0,
@@ -169,6 +181,7 @@ class AvocadoTest(Test):
         :param kwargs: pass thru
         :return: object of avocado.process.run
         """
+        self.__print_breaks("COMMAND ON HOST <!>")
         return self.backend.runHost(*args, **kwargs)
 
     def getModulemdYamlconfig(self, *args, **kwargs):
@@ -239,28 +252,21 @@ class AvocadoTest(Test):
         """
         return self.backend.getModuleDependencies()
 
-
 def get_backend():
     """
-    Return proper module type, set by config by default_module section, or defined via
+    Return proper module backend, set by config by default_module section, or defined via
     env variable "MODULE"
 
-    :return: tuple (specific module object, str)
+    :return: module object
     """
-    amodule = os.environ.get('MODULE')
-    readconfig = CommonFunctions()
-    readconfig.loadconfig()
-    if "default_module" in readconfig.config and readconfig.config[
-        "default_module"] is not None and amodule is None:
-        amodule = readconfig.config["default_module"]
-    if amodule == 'docker':
-        return ContainerHelper(), amodule
-    elif amodule == 'rpm':
-        return RpmHelper(), amodule
-    elif amodule == 'nspawn':
-        return NspawnHelper(), amodule
-    else:
-        raise ModuleFrameworkException("Unsupported MODULE={0}".format(amodule), "supproted are: docker, rpm, nspawn")
+    parent = get_module_type_base()
+
+    if parent == 'docker':
+        return ContainerHelper()
+    elif parent == 'rpm':
+        return RpmHelper()
+    elif parent == 'nspawn':
+        return NspawnHelper()
 
 # To keep backward compatibility. This method could be used by pure avocado tests and is already used
 get_correct_backend = get_backend

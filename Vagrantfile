@@ -24,8 +24,8 @@
 
 Vagrant.configure(2) do |config|
 
-    config.vm.box = "fedora/25-cloud-base"
-    config.vm.synced_folder ".", "/home/vagrant/meta-test-family"
+    config.vm.box = "fedora/26-cloud-base"
+    config.vm.synced_folder ".", "/opt/meta-test-family"
     config.vm.network "private_network", ip: "192.168.50.10"
     config.vm.network "forwarded_port", guest: 80, host: 8888
     config.vm.hostname = "moduletesting"
@@ -43,14 +43,17 @@ Vagrant.configure(2) do |config|
 
     config.vm.provision "shell", inline: <<-SHELL
         set -x
-        dnf install -y make docker httpd git python2-avocado python2-avocado-plugins-output-html python-netifaces
-        cd /home/vagrant/meta-test-family
+        TARGET=#{ENV['TARGET']}
+        test -z "$TARGET" && TARGET=check-docker
+
+        dnf install -y make docker httpd git python2-avocado python2-avocado-plugins-output-html \
+                       python-netifaces redhat-rpm-config python2-devel python-gssapi krb5-devel
+        cd /opt/meta-test-family
         make install
-        make check
+        make -C examples/testing-module $TARGET
         cp -r /root/avocado /var/www/html/
         chmod -R a+x /var/www/html/
         restorecon -r /var/www/html/
         systemctl start httpd
-
     SHELL
 end

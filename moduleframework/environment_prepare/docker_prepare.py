@@ -31,7 +31,8 @@ from moduleframework.common import *
 class EnvDocker(CommonFunctions):
 
     def prepare_env(self):
-        self.loadconfig()
+        print_info('Loaded config for name: {}'.format(self.config['name']))
+        self.installTestDependencies()
         self.__install_env()
         self.__start_service()
 
@@ -63,8 +64,7 @@ class EnvDocker(CommonFunctions):
         """
 
         if not os.path.exists('/usr/bin/docker'):
-            print_info("Installing docker")
-            self.runHost("{HOSTPACKAGER} install docker".format(**trans_dict), verbose=is_not_silent())
+            self.installTestDependencies(['docker'])
 
     def __start_service(self):
         """

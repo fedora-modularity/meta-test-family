@@ -1,7 +1,7 @@
 User Guide
 ==========
 
-1. In a module's root directory create a directory ``tests`` and place there a module configuration file ``config.yaml`` described in detail in section `Configuration file`_.
+1. In a module's root directory create a directory ``tests`` and place there a module configuration file ``config.yaml`` described in detail in section `Configuration file`_. If you would like to use MTF without your own ``config.yaml``.  It is possible. It uses default minimal config. Then you have to set ``URL`` envvar to set `test subject`, otherwise it causes traceback. It is usefull for example for module what does not provide any service (no own ``start/stop/status/etc`` action defined.) or for testing with modulelint.
 
 .. _Configuration file: how_to_write_conf_file.html
 

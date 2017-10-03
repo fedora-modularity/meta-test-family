@@ -25,6 +25,7 @@ import socket
 from avocado import main
 from avocado.core import exceptions
 from moduleframework import module_framework
+import time
 
 
 class SanityCheck1(module_framework.AvocadoTest):
@@ -34,6 +35,7 @@ class SanityCheck1(module_framework.AvocadoTest):
 
     def test1(self):
         self.start()
+        time.sleep(5)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect(('localhost', self.getConfig()['service']['port']))
         s.sendall('set Test 0 100 4\r\n\n')
@@ -48,13 +50,6 @@ class SanityCheck1(module_framework.AvocadoTest):
     def test2(self):
         self.start()
         self.run("ls / | grep bin")
-
-    def test3GccSkipped(self):
-        if "gcc" not in self.getActualProfile():
-            self.cancel()
-        self.start()
-        self.run("gcc -v")
-
 
 if __name__ == '__main__':
     main()
