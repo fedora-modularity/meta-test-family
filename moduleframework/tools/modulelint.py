@@ -70,6 +70,8 @@ class DockerFileLinter(module_framework.AvocadoTest):
             label_found = self.dp.get_specific_label("usage")
         self.assertTrue(label_found)
 
+    def test_from_is_first_directive(self):
+        self.assertTrue(self.dp.check_from_is_first())
 
 
 class DockerLint(container_avocado_test.ContainerAvocadoTest):

@@ -163,9 +163,14 @@ class DockerfileLinter(object):
         label_list = self.get_docker_labels()
         return [label_name in label_list]
 
-    def check_baseruntime(self):
+    def check_from_is_first(self):
         """
-        Function returns docker labels
-        :return: label dictionary
+        Function checks if FROM directive is really first directive.
+        Function ignores whitespaces and comments.
+        :return: True if FROM is first, False if FROM is not first directive
         """
-        return [x for x in self.docker_dict.get(FROM,[]) if "baseruntime/baseruntime" in x]
+        with open(self.dockerfile) as f:
+            lines = f.readlines()
+        lines = [x for x in lines if x.isspace()]
+        lines = [x for x in lines if x.strip().startswith("#")]
+        return lines
