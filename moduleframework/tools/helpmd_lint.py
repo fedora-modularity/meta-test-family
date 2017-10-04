@@ -18,16 +18,31 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# Copied from: https://github.com/fedora-modularity/check_compose/blob/master/check_compose.py
-#
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
+from __future__ import print_function
+import os
 
 from moduleframework import module_framework
+from moduleframework import helpfile_linter
+from moduleframework import dockerlinter
 
-class ModulelintSanity(module_framework.AvocadoTest):
+
+class DockerFileLinter(module_framework.AvocadoTest):
     """
     :avocado: enable
+
     """
-    def testPass(self):
-        pass
+
+    dp = None
+
+    def setUp(self):
+        # it is not intended just for docker, but just docker packages are
+        # actually properly signed
+        self.dp = dockerlinter.DockerfileLinter()
+        self.helpmd = helpfile_linter.HelpMDLinter()
+        if self.dp.dockerfile is None:
+            self.skip()
+
+    def test_helpmd_exists(self):
+        self.assertTrue(self.helpmd)

@@ -170,7 +170,6 @@ class DockerfileLinter(object):
         :return: True if FROM is first, False if FROM is not first directive
         """
         with open(self.dockerfile) as f:
-            lines = f.readlines()
-        lines = [x for x in lines if x.isspace()]
-        lines = [x for x in lines if x.strip().startswith("#")]
+            lines = [x for x in f.readlines() if not x.isspace()]
+        lines = [x for x in lines if not x.strip().startswith("#")]
         return lines
