@@ -2,7 +2,7 @@
 
 Name:           meta-test-family
 Version:        0.7.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Tool to test components of a modular Fedora
 
 License:        GPLv2+
@@ -54,6 +54,9 @@ install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
 
 
 %changelog
+* Wed Oct 04 2017 Petr Hracek <phracek@redhat.com> 0.7.4-2
+- fix shebang from two python files
+
 * Wed Oct 04 2017 Petr Hracek <phracek@redhat.com> 0.7.4-1
 - fix some packaging stuff
 
