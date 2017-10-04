@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # Meta test family (MTF) is a tool to test components of a modular Fedora:
@@ -31,7 +30,6 @@ from moduleframework.environment_prepare.rpm_prepare import EnvRpm
 from moduleframework.environment_prepare.nspawn_prepare import EnvNspawn
 
 
-
 module_name = get_module_type_base()
 print_info("Setting environment for module: {} ".format(module_name))
 
@@ -42,10 +40,12 @@ elif module_name == "rpm":
 elif module_name == "nspawn":
     env = EnvNspawn()
 
+
 def mtfenvset():
     print_info("Preparing environment ...")
     # cleanup_env exists in more forms for backend : EnvDocker/EnvRpm/EnvNspawn
     env.prepare_env()
+
 
 def mtfenvclean():
     # cleanup_env exists in more forms for backend: EnvDocker/EnvRpm/EnvNspawn
