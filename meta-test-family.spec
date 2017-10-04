@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           meta-test-family
-Version:        0.7.3
+Version:        0.7.4
 Release:        1%{?dist}
 Summary:        Tool to test components of a modular Fedora
 
@@ -54,6 +54,9 @@ install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
 
 
 %changelog
+* Wed Oct 04 2017 Petr Hracek <phracek@redhat.com> 0.7.4-1
+- fix some packaging stuff
+
 * Tue Sep 26 2017 Jan Scotka <jscotka@redhat.com> 0.7.3-1
 - remove old test and update template according to changes (jscotka@redhat.com)
 - fix PDC trouble (Bad response code: 502) with Retry (jscotka@redhat.com)

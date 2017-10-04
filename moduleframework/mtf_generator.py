@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # Meta test family (MTF) is a tool to test components of a modular Fedora:
@@ -36,6 +35,7 @@ See `Multiline Bash snippet tests`_ for more information.
 
 from __future__ import print_function
 from moduleframework.common import CommonFunctions
+
 
 class TestGenerator(CommonFunctions):
     def __init__(self):
