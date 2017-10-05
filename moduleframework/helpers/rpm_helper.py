@@ -105,10 +105,10 @@ class RpmHelper(CommonFunctions):
         if repos:
             self.repos = repos
         else:
-            self.repos += self.get_url()
+            self.repos += get_compose_url() or self.get_url()
             # add also all dependent modules repositories if it is module
             # TODO: removed this dependency search
-            if self.is_it_module:
+            if not get_compose_url() and self.is_it_module:
                 depend_repos = [get_compose_url_modular_release()]
                 #for dep in self.moduledeps:
                 #    latesturl = pdc_data.get_repo_url(dep, self.moduledeps[dep])
@@ -117,6 +117,8 @@ class RpmHelper(CommonFunctions):
                 #map(self.__addModuleDependency, depend_repos)
                 self.repos += depend_repos
         #map(self.__addModuleDependency, self.repos)
+        # make self.repos unique in case there is more repos (faster dnf operations)
+        self.repos = list(set(self.repos))
         if whattooinstall:
             self.whattoinstallrpm = " ".join(set(whattooinstall))
         else:

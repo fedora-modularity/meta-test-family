@@ -49,10 +49,6 @@ class ContainerHelper(CommonFunctions):
         if "docker=" in self.icontainer:
             self.jmeno = self.icontainer[7:]
             self.tarbased = False
-        elif "docker.io" in self.info['container']:
-            # Trusted source
-            self.tarbased = False
-            self.jmeno = self.icontainer
         else:
             # untrusted source
             self.tarbased = False
