@@ -122,8 +122,7 @@ class DockerfileLinter(object):
                     print("Dockerfile tag %s is not parsed by MTF" % key)
 
     def get_docker_env(self):
-        if ENV in self.docker_dict and self.docker_dict[ENV]:
-            return self.docker_dict[ENV]
+        return self.docker_dict.get(ENV)
 
     def get_docker_specific_env(self, env_name=None):
         """
@@ -142,9 +141,8 @@ class DockerfileLinter(object):
         :return: list of PORTS
         """
         ports_list = []
-        if EXPOSE in self.docker_dict and self.docker_dict[EXPOSE]:
-            for p in self.docker_dict[EXPOSE]:
-                ports_list.append(int(p))
+        for p in self.docker_dict.get(EXPOSE,[]):
+            ports_list.append(int(p))
         return ports_list
 
     def get_docker_labels(self):
@@ -152,9 +150,7 @@ class DockerfileLinter(object):
         Function returns docker labels
         :return: label dictionary
         """
-        if LABEL in self.docker_dict and self.docker_dict[LABEL]:
-            return self.docker_dict[LABEL]
-        return None
+        return self.docker_dict.get(LABEL,{})
 
     def get_specific_label(self, label_name=None):
         """
@@ -172,5 +168,4 @@ class DockerfileLinter(object):
         Function returns docker labels
         :return: label dictionary
         """
-        if FROM in self.docker_dict:
-            return [x for x in self.docker_dict[FROM] if "baseruntime/baseruntime" in x]
+        return [x for x in self.docker_dict.get(FROM,[]) if "baseruntime/baseruntime" in x]

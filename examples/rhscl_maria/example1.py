@@ -5,7 +5,7 @@ from avocado.utils import process
 from avocado import Test
 import time
 
-WAIT_TIME=10
+WAIT_TIME=15
 
 class OneMachine(module_framework.ContainerAvocadoTest):
     """
