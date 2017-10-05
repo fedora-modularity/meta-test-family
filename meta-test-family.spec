@@ -7,7 +7,7 @@ Summary:        Tool to test components of a modular Fedora
 
 License:        GPLv2+
 URL:            https://github.com/fedora-modularity/meta-test-family
-Source0:        https://github.com/fedora-modularity/%{name}/archive/%{version}.tar.gz
+Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 # Exlcude ppc64: there is no docker package on ppc64
 # https://bugzilla.redhat.com/show_bug.cgi?id=1465176
