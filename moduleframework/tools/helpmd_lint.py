@@ -28,7 +28,7 @@ from moduleframework import helpfile_linter
 from moduleframework import dockerlinter
 
 
-class DockerFileLinter(module_framework.AvocadoTest):
+class HelpMDLinter(module_framework.AvocadoTest):
     """
     :avocado: enable
 
@@ -46,3 +46,28 @@ class DockerFileLinter(module_framework.AvocadoTest):
 
     def test_helpmd_exists(self):
         self.assertTrue(self.helpmd)
+
+    def test_helpmd_image_name(self):
+        container_name = self.dp.get_docker_specific_env("NAME")
+        if container_name:
+            self.assertTrue(self.helpmd.get_image_maintainer_name(container_name.split('=')[1]))
+
+    def test_helpmd_maintainer_name(self):
+        maintainer_name = self.dp.get_specific_label("maintainer")
+        if maintainer_name:
+            self.assertTrue(self.helpmd.get_image_maintainer_name(maintainer_name))
+
+    def test_helpmd_name(self):
+        self.assertTrue(self.helpmd.get_tag("NAME"))
+
+    def test_helpmd_description(self):
+        self.assertTrue(self.helpmd.get_tag("DESCRIPTION"))
+
+    def test_helpmd_usage(self):
+        self.assertTrue(self.helpmd.get_tag("USAGE"))
+
+    def test_helpmd_environment_variables(self):
+        self.assertTrue(self.helpmd.get_tag("ENVIRONMENT VARIABLES"))
+
+    def test_helpmd_security_implications(self):
+        self.assertTrue(self.helpmd.get_tag("SECURITY IMPLICATIONS"))

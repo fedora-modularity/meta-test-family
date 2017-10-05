@@ -51,8 +51,8 @@ class DockerfileLinter(object):
     def __init__(self, dir_name="../"):
         dockerfile = get_docker_file(dir_name)
         if dockerfile:
-            self.dfp = DockerfileParser(path=os.path.dirname(dockerfile))
             self.dockerfile = dockerfile
+            self.dfp = DockerfileParser(path=os.path.dirname(dockerfile))
             self._get_structure_as_dict()
         else:
             self.dfp = None
@@ -133,7 +133,7 @@ class DockerfileLinter(object):
         if env_name is None:
             return []
         env_list = self.get_docker_env()
-        return [env_name in env_list]
+        return env_name in env_list
 
     def get_docker_expose(self):
         """
