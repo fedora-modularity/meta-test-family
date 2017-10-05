@@ -43,9 +43,18 @@ class DockerFileLinter(module_framework.AvocadoTest):
         if self.dp.dockerfile is None:
             self.skip()
 
+    def _test_for_env_and_label(self, docker_env, docker_label, env=True):
+        label_found = True
+        if env:
+            label = self.dp.get_specific_env(docker_env)
+        else:
+            label = self.dp.get_specific_label(docker_env)
+        if not label:
+            label_found = self.dp.get_specific_label(docker_label)
+        return label_found
+
     def test_architecture_in_env_and_label_exists(self):
-        self.assertTrue(self.dp.get_docker_specific_env("ARCH="))
-        self.assertTrue(self.dp.get_specific_label("architecture"))
+        self.assertTrue(self._test_for_env_and_label("ARCH=", "architecture"))
 
     def test_name_in_env_and_label_exists(self):
         self.assertTrue(self.dp.get_docker_specific_env("NAME="))
@@ -67,11 +76,7 @@ class DockerFileLinter(module_framework.AvocadoTest):
         self.assertTrue(self.dp.get_specific_label("summary"))
 
     def test_run_or_usage_label_exists(self):
-        label_found = True
-        run = self.dp.get_specific_label("run")
-        if not run:
-            label_found = self.dp.get_specific_label("usage")
-        self.assertTrue(label_found)
+        self.assertTrue(self._test_for_env_and_label("run", "usage", env=False))
 
     def test_from_is_first_directive(self):
         self.assertTrue(self.dp.check_from_is_first())

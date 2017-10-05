@@ -141,7 +141,7 @@ class DockerfileLinter(object):
         :return: list of PORTS
         """
         ports_list = []
-        for p in self.docker_dict.get(EXPOSE,[]):
+        for p in self.docker_dict.get(EXPOSE, []):
             ports_list.append(int(p))
         return ports_list
 
