@@ -23,7 +23,7 @@
 
 from moduleframework import module_framework
 import os
-
+import warnings
 
 class simpleTests(module_framework.AvocadoTest):
     """
