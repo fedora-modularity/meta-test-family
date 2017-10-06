@@ -41,6 +41,7 @@ class Timeout(object):
         signal.alarm(0)
         signal.signal(signal.SIGALRM, self.orig_sighand)
 
+
 class NOPTimeout(object):
     def __init__(self, *args, **kwargs):
         pass
@@ -51,8 +52,9 @@ class NOPTimeout(object):
     def __exit__(self, *args, **kwargs):
         pass
 
+
 class Retry(object):
-    def __init__(self, attempts = 1, timeout = None, exceptions = (Exception,), error = None, inverse = False, delay = None):
+    def __init__(self, attempts=1, timeout=None, exceptions=(Exception,), error=None, inverse=False, delay=None):
         """
         Try to run things ATTEMPTS times, at max, each attempt must not exceed TIMEOUT seconds.
         Restart only when one of EXCEPTIONS is raised, all other exceptions will just bubble up.
