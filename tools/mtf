@@ -34,6 +34,9 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
+# preserve exist status, mtf command should finish same as testing.
 avocado run $AVOCADO_ARGS
+EXIT_STATUS=$?
 mtf-log-parser $JSON_LOG
 rm -f $JSON_LOG
+exit $EXIT_STATUS

@@ -41,7 +41,7 @@ export MODULE_TESTS="*.py *.sh"
 export AVDIR=~/avocado
 mkdir -p $AVDIR
 export XUFILE="$AVDIR/out.xunit"
-export AVOCADOCMD="avocado run --xunit $XUFILE --show-job-log"
+export AVOCADOCMD="mtf --xunit $XUFILE --show-job-log"
 export RESULTTOOLS=0
 #export MTF_RECURSIVE_DOWNLOAD=yes
 

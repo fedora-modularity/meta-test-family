@@ -77,6 +77,8 @@ check-memcached-both: prepare-docker prepare-nspawn
 	cd ../memcached; MODULE=docker $(CMD) sanity1.py
 	cd ../memcached; MODULE=nspawn $(CMD) sanity1.py
 
+check-minimal-config-rpm-noenvvar: prepare-nspawn
+	MTF_REMOTE_REPOS= DOCKERFILE= MODULE=nspawn $(CMD) $(TESTS)
 
 
 check: check-docker
