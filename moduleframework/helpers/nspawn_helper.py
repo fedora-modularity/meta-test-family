@@ -25,6 +25,8 @@ import re
 import glob
 import time
 import hashlib
+import string
+import random
 
 from moduleframework.common import *
 from moduleframework.exceptions import *
@@ -57,6 +59,7 @@ class NspawnHelper(RpmHelper):
             self.jmeno = self.moduleName
         self.chrootpath = os.path.abspath(self.baseprefix + self.jmeno)
         self.__default_command_sleep = 2
+        self.__systemd_wait_support = False
 
     def __machined_restart(self):
         """
@@ -84,6 +87,7 @@ class NspawnHelper(RpmHelper):
         self.__prepareSetup()
         self._callSetupFromConfig()
         self.__bootMachine()
+        self.__systemd_wait_support = self.__run_systemdrun_decide()
 
     def __is_killed(self):
         for foo in range(DEFAULTRETRYTIMEOUT):
@@ -229,6 +233,37 @@ gpgcheck=0
         self.status()
         trans_dict["GUESTPACKAGER"] = self.get_packager()
 
+    def __run_systemdrun_decide(self):
+        return "--wait" in self.runHost("systemd-run --help",verbose=is_debug()).stdout
+
+    def __systemctl_wait_until_finish(self, machine, unit):
+        """
+        Wait until service is finished and return exit state
+
+        :param machine:
+        :param unit:
+        :return:
+        """
+        retcode = 0
+        while True:
+            output = [x.strip() for x in
+                      self.runHost("systemctl show -M {} {}".format(machine, unit),
+                                   verbose=False).stdout.split("\n")]
+            if is_debug():
+                print_debug(output)
+            retcode = int([x[-1] for x in output if "ExecMainStatus=" in x][0])
+            if not ("SubState=exited" in output or "SubState=failed" in output):
+                time.sleep(0.1)
+            else:
+                break
+        self.runHost("systemctl -M {} stop {}".format(machine, unit),
+                     verbose=is_debug(),
+                     ignore_status=True)
+        return retcode
+
+    def __systemd_generate_unit_name(self):
+        return ''.join(random.choice(string.ascii_lowercase) for _ in range(10))
+
     def __run_systemdrun(self, command, internal_background=False, **kwargs):
         """
         Run command inside nspawn module type. It uses systemd-run.
@@ -239,26 +274,39 @@ gpgcheck=0
         :return: avocado.process.run
         """
         self.__machined_restart()
-        lpath = "/var/tmp"
-        add_wait_var = "--wait"
         add_sleep_infinite = ""
+        unit_name = self.__systemd_generate_unit_name()
+        lpath = "/var/tmp/{}".format(unit_name)
+        if self.__systemd_wait_support:
+            add_wait_var = "--wait"
+        else:
+            # keep service exist after it finish, to be able to read exit code
+            add_wait_var = "-r"
         if internal_background:
-            add_wait_var=""
+            add_wait_var = ""
             add_sleep_infinite = "&& sleep infinity"
+        opts = " --unit {unitname} {wait} -M {machine}".format(wait=add_wait_var,
+                                                              machine=self.jmeno,
+                                                              unitname=unit_name
+                                                              )
         try:
-            comout = self.runHost("""systemd-run {wait} -M {machine} /bin/bash -c "({comm})>{pin}/stdout 2>{pin}/stderr {sleep}" """.format(
-                    wait=add_wait_var,
-                    machine=self.jmeno,
+            comout = self.runHost("""systemd-run {opts} /bin/bash -c "({comm})>{pin}.stdout 2>{pin}.stderr {sleep}" """.format(
+                    opts=opts,
                     comm=sanitize_cmd(command),
                     pin=lpath,
-                    sleep=add_sleep_infinite),
+                    sleep=add_sleep_infinite,
+                    ),
                 **kwargs)
             if not internal_background:
-                with open("{chroot}{pin}/stdout".format(chroot=self.chrootpath, pin=lpath), 'r') as content_file:
+                if not self.__systemd_wait_support:
+                    comout.exit_status = self.__systemctl_wait_until_finish(self.jmeno,unit_name)
+                with open("{chroot}{pin}.stdout".format(chroot=self.chrootpath, pin=lpath), 'r') as content_file:
                     comout.stdout = content_file.read()
-                with open("{chroot}{pin}/stderr".format(chroot=self.chrootpath, pin=lpath), 'r') as content_file:
+                with open("{chroot}{pin}.stderr".format(chroot=self.chrootpath, pin=lpath), 'r') as content_file:
                     comout.stderr = content_file.read()
                 comout.command = command
+                os.remove("{chroot}{pin}.stdout".format(chroot=self.chrootpath, pin=lpath))
+                os.remove("{chroot}{pin}.stderr".format(chroot=self.chrootpath, pin=lpath))
                 print_debug(comout)
             return comout
         except process.CmdError as e:
