@@ -26,7 +26,6 @@ import glob
 import time
 import hashlib
 
-from moduleframework.timeoutlib import Retry
 from moduleframework.common import *
 from moduleframework.exceptions import *
 from moduleframework.helpers.rpm_helper import RpmHelper
