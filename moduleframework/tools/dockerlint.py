@@ -54,7 +54,7 @@ class DockerFileLinter(module_framework.AvocadoTest):
         return label_found
 
     def test_architecture_in_env_and_label_exists(self):
-        self.assertTrue(self._test_for_env_and_label("ARCH=", "architecture"))
+        self.assertTrue(self.dp.get_specific_label("architecture"))
 
     def test_name_in_env_and_label_exists(self):
         self.assertTrue(self.dp.get_docker_specific_env("NAME="))
@@ -81,18 +81,20 @@ class DockerFileLinter(module_framework.AvocadoTest):
     def test_from_is_first_directive(self):
         self.assertTrue(self.dp.check_from_is_first())
 
-    #def test_from_correct_format(self):
-    #    self.assertTrue(self.dp.check_from_format())
+    def test_from_directive_is_valid(self):
+        self.assertTrue(self.dp.check_from_directive_is_valid())
+
+    def test_user_format(self):
+        self.assertTrue(self.dp.check_user_number())
+
+    def test_two_run_instructions(self):
+        self.assertTrue(self.dp.check_two_dnf_run_sections())
 
 
 class DockerLint(container_avocado_test.ContainerAvocadoTest):
     """
     :avocado: enable
     """
-
-    def testBasic(self):
-        self.start()
-        self.assertTrue("bin" in self.run("ls /").stdout)
 
     def testLabels(self):
         """
@@ -105,5 +107,4 @@ class DockerLint(container_avocado_test.ContainerAvocadoTest):
             self.cancel()
         for key in self.getConfigModule()['labels']:
             aaa = self.checkLabel(key, self.getConfigModule()['labels'][key])
-            print(">>>>>> ", aaa, key)
             self.assertTrue(aaa)

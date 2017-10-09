@@ -15,7 +15,8 @@ ENV = "ENV"
 PORTS = "PORTS"
 FROM = "FROM"
 RUN = "RUN"
-
+USER = "USER"
+INSTRUCT = "instruction"
 
 def get_string(value):
     return ast.literal_eval(value)
@@ -45,7 +46,7 @@ class DockerfileLinter(object):
 
     dockerfile = None
     oc_template = None
-    dfp = {}
+    dfp_structure = {}
     docker_dict = {}
 
     def __init__(self, dir_name="../"):
@@ -54,6 +55,7 @@ class DockerfileLinter(object):
             self.dockerfile = dockerfile
             with open(self.dockerfile, "r") as f:
                 self.dfp = DockerfileParser(fileobj=f)
+                self.dfp_structure = self.dfp.structure
                 self._get_structure_as_dict()
         else:
             self.dfp = None
@@ -100,13 +102,15 @@ class DockerfileLinter(object):
                      VOLUME: self._get_volume,
                      LABEL: self._get_label,
                      FROM: self._get_general,
-                     RUN: self._get_general}
+                     RUN: self._get_general,
+                     USER: self._get_general,
+                     }
 
         self.docker_dict[LABEL] = {}
         for label in self.dfp.labels:
             self.docker_dict[LABEL][label] = self.dfp.labels[label]
         for struct in self.dfp.structure:
-            key = struct["instruction"]
+            key = struct[INSTRUCT]
             val = struct["value"]
             if key != LABEL:
                 if key not in self.docker_dict:
@@ -114,8 +118,7 @@ class DockerfileLinter(object):
                 try:
                     ret_val = functions[key](val)
                     for v in ret_val:
-                        if v not in self.docker_dict[key]:
-                            self.docker_dict[key].append(v)
+                        self.docker_dict[key].append(v)
                 except KeyError:
                     print("Dockerfile tag %s is not parsed by MTF" % key)
 
@@ -164,10 +167,57 @@ class DockerfileLinter(object):
     def check_from_is_first(self):
         """
         Function checks if FROM directive is really first directive.
-        Function ignores whitespaces and comments.
         :return: True if FROM is first, False if FROM is not first directive
         """
-        with open(self.dockerfile) as f:
-            lines = [x for x in f.readlines() if not x.isspace()]
-        lines = [x for x in lines if not x.strip().startswith("#")]
-        return lines
+        if self.dfp_structure[0].get('instruction') == 'FROM':
+            return True
+        else:
+            return False
+
+    def check_from_directive_is_valid(self):
+        """
+        Function checks if FROM directive contains valid format like is specified here
+        http://docs.projectatomic.io/container-best-practices/#_line_rule_section
+        Regular expression is: ^[a-z0-9.]+(\/[a-z0-9\D.]+)+$
+        Example registry:
+            registry.fedoraproject.org/f26/etcd
+            registry.fedoraproject.org/f26/flannel
+            registry.access.redhat.com/rhscl/nginx-18-rhel7
+            registry.access.redhat.com/rhel7/rhel-tools
+            registry.access.redhat.com/rhscl/postgresql-95-rhel7
+
+        :return:
+        """
+        correct_format = False
+        struct = self.dfp_structure[0]
+        if struct.get(INSTRUCT) == 'FROM':
+            p = re.compile("^[a-z0-9.]+(\/[a-z0-9\D.]+)+$")
+            if p.search(struct.get('value')) is not None:
+                correct_format = True
+        return correct_format
+
+    def check_two_dnf_run_sections(self):
+        value = 0
+        for struct in self.dfp_structure:
+            if struct.get(INSTRUCT) == RUN:
+                value += 1
+        if int(value) > 1:
+            return False
+        return True
+
+    def check_user_number(self):
+        """
+        Function checks if user contains valid number, not string
+        :return: True if contains valid number and if it does not exit
+                 False if contains not valid number
+        """
+        try:
+            user = self.docker_dict[USER]
+        except KeyError:
+            return True
+        try:
+            for u in user:
+                int(u)
+        except ValueError:
+            return False
+        return True
