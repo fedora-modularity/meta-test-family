@@ -239,6 +239,8 @@ gpgcheck=0
     def __systemctl_wait_until_finish(self, machine, unit):
         """
         Wait until service is finished and return exit state
+        It workarounds issue: https://bugzilla.redhat.com/show_bug.cgi?id=1499877
+        After it will be fixed, this can be removed
 
         :param machine:
         :param unit:
