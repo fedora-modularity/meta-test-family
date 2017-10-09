@@ -21,7 +21,6 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 from __future__ import print_function
-import os
 
 from moduleframework import module_framework
 from moduleframework import helpfile_linter
@@ -40,7 +39,7 @@ class HelpMDLinter(module_framework.AvocadoTest):
         # it is not intended just for docker, but just docker packages are
         # actually properly signed
         self.dp = dockerlinter.DockerfileLinter()
-        self.helpmd = helpfile_linter.HelpMDLinter()
+        self.helpmd = helpfile_linter.HelpMDLinter(dockerfile=self.dp.dockerfile)
         if self.dp.dockerfile is None:
             self.skip()
 
@@ -48,14 +47,14 @@ class HelpMDLinter(module_framework.AvocadoTest):
         self.assertTrue(self.helpmd)
 
     def test_helpmd_image_name(self):
-        container_name = self.dp.get_docker_specific_env("NAME")
+        container_name = self.dp.get_docker_specific_env("NAME=")
         if container_name:
-            self.assertTrue(self.helpmd.get_image_maintainer_name(container_name.split('=')[1]))
+            self.assertTrue(self.helpmd.get_image_name(container_name[0].split('=')[1]))
 
     def test_helpmd_maintainer_name(self):
         maintainer_name = self.dp.get_specific_label("maintainer")
         if maintainer_name:
-            self.assertTrue(self.helpmd.get_image_maintainer_name(maintainer_name))
+            self.assertTrue(self.helpmd.get_maintainer_name(maintainer_name[0]))
 
     def test_helpmd_name(self):
         self.assertTrue(self.helpmd.get_tag("NAME"))

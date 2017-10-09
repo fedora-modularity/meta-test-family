@@ -46,7 +46,7 @@ class DockerFileLinter(module_framework.AvocadoTest):
     def _test_for_env_and_label(self, docker_env, docker_label, env=True):
         label_found = True
         if env:
-            label = self.dp.get_specific_env(docker_env)
+            label = self.dp.get_docker_specific_env(docker_env)
         else:
             label = self.dp.get_specific_label(docker_env)
         if not label:
@@ -81,8 +81,8 @@ class DockerFileLinter(module_framework.AvocadoTest):
     def test_from_is_first_directive(self):
         self.assertTrue(self.dp.check_from_is_first())
 
-    def test_from_correct_format(self):
-        self.assertTrue(self.dp.check_from_format())
+    #def test_from_correct_format(self):
+    #    self.assertTrue(self.dp.check_from_format())
 
 
 class DockerLint(container_avocado_test.ContainerAvocadoTest):
@@ -93,14 +93,6 @@ class DockerLint(container_avocado_test.ContainerAvocadoTest):
     def testBasic(self):
         self.start()
         self.assertTrue("bin" in self.run("ls /").stdout)
-
-    def testContainerIsRunning(self):
-        """
-        Function tests whether container is running
-        :return:
-        """
-        self.start()
-        self.assertIn(self.backend.jmeno.rsplit("/")[-1], self.runHost("docker ps").stdout)
 
     def testLabels(self):
         """

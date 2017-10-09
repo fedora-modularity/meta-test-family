@@ -52,8 +52,9 @@ class DockerfileLinter(object):
         dockerfile = get_docker_file(dir_name)
         if dockerfile:
             self.dockerfile = dockerfile
-            self.dfp = DockerfileParser(path=os.path.dirname(dockerfile))
-            self._get_structure_as_dict()
+            with open(self.dockerfile, "r") as f:
+                self.dfp = DockerfileParser(fileobj=f)
+                self._get_structure_as_dict()
         else:
             self.dfp = None
             self.dockerfile = None
@@ -101,16 +102,13 @@ class DockerfileLinter(object):
                      FROM: self._get_general,
                      RUN: self._get_general}
 
+        self.docker_dict[LABEL] = {}
+        for label in self.dfp.labels:
+            self.docker_dict[LABEL][label] = self.dfp.labels[label]
         for struct in self.dfp.structure:
             key = struct["instruction"]
             val = struct["value"]
-            if key == LABEL:
-                if key not in self.docker_dict:
-                    self.docker_dict[key] = {}
-                value = functions[key](val)
-                if value is not None:
-                    self.docker_dict[key].update(value)
-            else:
+            if key != LABEL:
                 if key not in self.docker_dict:
                     self.docker_dict[key] = []
                 try:
@@ -133,7 +131,7 @@ class DockerfileLinter(object):
         if env_name is None:
             return []
         env_list = self.get_docker_env()
-        return env_name in env_list
+        return [x for x in env_list if env_name in x]
 
     def get_docker_expose(self):
         """
@@ -150,7 +148,7 @@ class DockerfileLinter(object):
         Function returns docker labels
         :return: label dictionary
         """
-        return self.docker_dict.get(LABEL,{})
+        return self.docker_dict.get(LABEL, {})
 
     def get_specific_label(self, label_name=None):
         """
@@ -161,7 +159,7 @@ class DockerfileLinter(object):
         if label_name is None:
             return []
         label_list = self.get_docker_labels()
-        return [label_name in label_list]
+        return [label_list[key] for key in label_list.keys() if label_name == key]
 
     def check_from_is_first(self):
         """
