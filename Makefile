@@ -7,8 +7,17 @@ all: install check
 check:
 	make -C examples/testing-module check
 
+check-linter:
+	@# don't use $(shell ) -- it messes out output
+	cd examples/linter/tools && PYTHONPATH=${PWD} MODULE=docker ${PWD}/tools/mtf -l
+	cd examples/linter/rhscl-postgresql && PYTHONPATH=${PWD} MODULE=docker ${PWD}/tools/mtf -l
+	cd examples/linter/rhscl-nginx && PYTHONPATH=${PWD} MODULE=docker ${PWD}/tools/mtf -l
+	cd examples/linter/f26-etcd && PYTHONPATH=${PWD} MODULE=docker ${PWD}/tools/mtf -l
+	cd examples/linter/f26-flannel && PYTHONPATH=${PWD} MODULE=docker ${PWD}/tools/mtf -l
+
 travis:
 	make -C examples/testing-module travis
+	cd examples/linter/tools && PYTHONPATH=${PWD} MODULE=docker ${PWD}/tools/mtf -l
 
 .PHONY: clean
 
