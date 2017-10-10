@@ -1,0 +1,7 @@
+document: meta-test
+version: 1
+name: flannel
+module:
+    docker:
+        start: "docker run -it -d"
+        container: registry.fedoraproject.org/f26/flannel
