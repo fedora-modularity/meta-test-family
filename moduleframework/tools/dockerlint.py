@@ -84,11 +84,11 @@ class DockerFileLinter(module_framework.AvocadoTest):
     def test_from_directive_is_valid(self):
         self.assertTrue(self.dp.check_from_directive_is_valid())
 
-    def test_user_format(self):
-        self.assertTrue(self.dp.check_user_number())
+    def test_chained_run_command(self):
+        self.assertTrue(self.dp.check_chained_run_command())
 
-    def test_two_run_instructions(self):
-        self.assertTrue(self.dp.check_two_dnf_run_sections())
+    def test_helpmd_is_present(self):
+        self.assertTrue(self.dp.check_helpmd_is_present())
 
 
 class DockerLint(container_avocado_test.ContainerAvocadoTest):

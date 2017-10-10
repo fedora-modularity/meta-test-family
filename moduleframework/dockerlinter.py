@@ -16,6 +16,8 @@ PORTS = "PORTS"
 FROM = "FROM"
 RUN = "RUN"
 USER = "USER"
+COPY = "COPY"
+ADD = "ADD"
 INSTRUCT = "instruction"
 
 def get_string(value):
@@ -64,7 +66,7 @@ class DockerfileLinter(object):
     def _get_general(self, value):
         """
         Function returns exposes as field.
-        It is used for RUN, EXPOSE and FROM
+        It is used for RUN, EXPOSE, USER, COPY, ADD and FROM
         :param value:
         :return:
         """
@@ -104,6 +106,8 @@ class DockerfileLinter(object):
                      FROM: self._get_general,
                      RUN: self._get_general,
                      USER: self._get_general,
+                     COPY: self._get_general,
+                     ADD: self._get_general,
                      }
 
         self.docker_dict[LABEL] = {}
@@ -196,7 +200,19 @@ class DockerfileLinter(object):
                 correct_format = True
         return correct_format
 
-    def check_two_dnf_run_sections(self):
+    def check_chained_run_command(self):
+        """
+        Function checks if Dockerfile does not contain more RUN commands in two or more rows.
+        BAD examples:
+             FROM fedora
+             RUN ls /
+             RUN cd /
+        GOOD example:
+             FROM fedora
+             RUN ls / && cd /
+        :return: True if Dockerfile does not contain RUN instructions in rows
+                False if Dockerfile contains more RUN instructions in rows
+        """
         value = 0
         for struct in self.dfp_structure:
             if struct.get(INSTRUCT) == RUN:
@@ -205,19 +221,17 @@ class DockerfileLinter(object):
             return False
         return True
 
-    def check_user_number(self):
+    def check_helpmd_is_present(self):
         """
-        Function checks if user contains valid number, not string
-        :return: True if contains valid number and if it does not exit
-                 False if contains not valid number
+        Function checks if helpmd. is present in COPY or ADD directives
+        :return: True if help.md is present
+                 False if help.md is not specified in Dockerfile
         """
-        try:
-            user = self.docker_dict[USER]
-        except KeyError:
-            return True
-        try:
-            for u in user:
-                int(u)
-        except ValueError:
-            return False
-        return True
+        helpmd_present = False
+        for c in self.docker_dict[COPY]:
+            if "help.md" in c:
+                helpmd_present = True
+        for a in self.docker_dict[ADD]:
+            if "help.md" in a:
+                helpmd_present = True
+        return helpmd_present
