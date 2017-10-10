@@ -22,9 +22,9 @@
 #
 from __future__ import print_function
 
-from moduleframework import module_framework
 from moduleframework import helpfile_linter
 from moduleframework import dockerlinter
+from moduleframework import module_framework
 
 
 class HelpMDLinter(module_framework.AvocadoTest):
@@ -65,9 +65,12 @@ class HelpMDLinter(module_framework.AvocadoTest):
     def test_helpmd_usage(self):
         self.assertTrue(self.helpmd.get_tag("USAGE"))
 
-    # TODO enable once we have implementation of result WARN
-    #def test_helpmd_environment_variables(self):
-    #    self.assertTrue(self.helpmd.get_tag("ENVIRONMENT VARIABLES"))
+    def test_helpmd_environment_variables(self):
+        env_variables = self.helpmd.get_tag("ENVIRONMENT VARIABLES")
+        if not env_variables:
+            self.log.warn("help.md file does not contain section ENVIRONMENT VARIABLES")
+        # In order to report warning, test has to report with True always
+        self.assertTrue(True)
 
     def test_helpmd_security_implications(self):
         if self.dp.get_docker_expose():
