@@ -116,6 +116,75 @@ class DockerLabelsTests(module_framework.AvocadoTest):
         self.assertTrue(self._test_for_env_and_label("run", "usage", env=False))
 
 
+class DockerfileLinterInContainer(container_avocado_test.ContainerAvocadoTest):
+    """
+    :avocado: enable
+
+    """
+
+    def _file_to_check(self, doc_file_list):
+        test_failed = False
+        for doc in doc_file_list.split('\n'):
+            exit_status = self.run("test -e %s" % doc, ignore_status=True).exit_status
+            if int(exit_status) == 0:
+                self.log.debug("%s doc file exists in container" % doc)
+                test_failed = True
+        return test_failed
+
+    def test_all_nodocs(self):
+        self.start()
+        all_docs = self.run("rpm -qad", verbose=False).stdout
+        test_failed = self._file_to_check(all_docs)
+        if test_failed:
+            self.log.warn("Documentation files exist in container. They are installed by Platform or by RUN commands.")
+        self.assertTrue(True)
+
+    def test_installed_docs(self):
+        """
+        This test checks whether no docs are installed by RUN dnf command
+        :return: FAILED in case we found some docs
+                 PASS in case there is no doc file found
+        """
+        self.start()
+        # Double brackets has to by used because of trans_dict.
+        # 'EXCEPTION MTF: ', 'Command is formatted by using trans_dict.
+        # If you want to use brackets { } in your code, please use {{ }}.
+        installed_pkgs = self.run("rpm -qa --qf '%{{NAME}}\n'", verbose=False).stdout
+        defined_pkgs = self.backend.getPackageList()
+        list_pkg = set(installed_pkgs).intersection(set(defined_pkgs))
+        test_failed = False
+        for pkg in list_pkg:
+            pkg_doc = self.run("rpm -qd %s" % pkg, verbose=False).stdout
+            if self._file_to_check(pkg_doc):
+                test_failed = True
+        self.assertFalse(test_failed)
+
+    def test_docker_clean_all(self):
+        """
+        This test checks if size of /var/cache/<pkg_manager> is bigger then
+        150000 taken by command du -hsb /var/cache/<pkg_manager>
+
+        :return: return True if size is less then 150000
+                 return False is size is bigger then 150000
+        """
+        self.start()
+        pkg_mgr = "yum"
+        # Detect distro in image
+        distro = self.run("cat /etc/os-release").stdout
+
+        if 'NAME=Fedora' in distro:
+            pkg_mgr = "dnf"
+        # Look, whether we have solv files in /var/cache/<pkg_mgr>/*.solv
+        # dnf|yum clean all deletes the file *.solv
+        ret = self.run("du -shb /var/cache/%s/" % pkg_mgr, ignore_status=True)
+        (size, directory) = ret.stdout.strip().split()
+        if int(size) < 10000:
+            correct_size = True
+        else:
+            correct_size = False
+        self.assertTrue(correct_size)
+
+
 class DockerLint(container_avocado_test.ContainerAvocadoTest):
     """
     :avocado: enable
