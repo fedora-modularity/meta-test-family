@@ -84,12 +84,13 @@ DEFAULTRETRYTIMEOUT = 30
 DEFAULTNSPAWNTIMEOUT = 10
 
 def get_compose_url_modular_release():
-    release = os.environ.get("MTF_FEDORA_RELEASE") or "26"
+    default_release = "27"
+    release = os.environ.get("MTF_FEDORA_RELEASE") or default_release
     if release == "master":
-        release = "26"
-    compose_url = os.environ.get("MTF_BASE_COMPOSE_URL") or \
-                  "https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-%s/compose/Server/%s/os" \
-                  % (release, ARCH)
+        release = default_release
+
+    base_url = "https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-{}/compose/Server/{}/os"
+    compose_url = os.environ.get("MTF_COMPOSE_BASE") or base_url.format(release, ARCH)
     return compose_url
 
 def is_debug():
@@ -260,20 +261,9 @@ def get_compose_url():
 
     :return: str
     """
-    compose_url = os.environ.get('COMPOSEURL')
-    if not compose_url:
-        readconfig = CommonFunctions()
-        readconfig.loadconfig()
-        try:
-            if readconfig.config.get("compose-url"):
-                compose_url = readconfig.config.get("compose-url")
-            elif readconfig.config['module']['rpm'].get("repo"):
-                compose_url = readconfig.config['module']['rpm'].get("repo")
-            else:
-                compose_url = readconfig.config['module']['rpm'].get("repos")[0]
-        except AttributeError:
-            return None
-    return compose_url
+    readconfig = get_config()
+    compose_url = os.environ.get('COMPOSEURL') or readconfig.get("compose-url")
+    return [compose_url] if compose_url else []
 
 
 def get_modulemdurl():
