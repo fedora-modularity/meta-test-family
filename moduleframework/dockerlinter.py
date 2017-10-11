@@ -20,6 +20,7 @@ COPY = "COPY"
 ADD = "ADD"
 INSTRUCT = "instruction"
 
+
 def get_string(value):
     return ast.literal_eval(value)
 
@@ -200,9 +201,32 @@ class DockerfileLinter(object):
                 correct_format = True
         return correct_format
 
-    def check_chained_run_command(self):
+    def check_chained_run_dnf_commands(self):
         """
-        Function checks if Dockerfile does not contain more RUN commands in two or more rows.
+        Function checks if Dockerfile does not contain more `RUN dnf` commands
+        in more then one row.
+        BAD examples:
+             FROM fedora
+             RUN dnf install foobar1
+             RUN dnf clean all
+        GOOD example:
+             FROM fedora
+             RUN dnf install foobar1 && dnf clean all
+        :return: True if Dockerfile contains RUN dnf instructions in one row
+                False if Dockerfile contains RUN dnf instructions in more rows
+        """
+        value = 0
+        for struct in self.dfp_structure:
+            if struct.get(INSTRUCT) == RUN and "dnf" in struct.get("value"):
+                value += 1
+        if int(value) > 1:
+            return False
+        return True
+
+    def check_chained_run_rest_commands(self):
+        """
+        Function checks if Dockerfile does not contain more `RUN` commands,
+        except RUN dnf, in more then one row.
         BAD examples:
              FROM fedora
              RUN ls /
@@ -210,12 +234,12 @@ class DockerfileLinter(object):
         GOOD example:
              FROM fedora
              RUN ls / && cd /
-        :return: True if Dockerfile does not contain RUN instructions in rows
-                False if Dockerfile contains more RUN instructions in rows
+        :return: True if Dockerfile contains RUN instructions, except dnf, in one row
+                False if Dockerfile contains RUN instructions, except dnf, in more rows
         """
         value = 0
         for struct in self.dfp_structure:
-            if struct.get(INSTRUCT) == RUN:
+            if struct.get(INSTRUCT) == RUN and "dnf" not in struct.get("value"):
                 value += 1
         if int(value) > 1:
             return False
