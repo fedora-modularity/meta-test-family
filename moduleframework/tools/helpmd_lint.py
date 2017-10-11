@@ -42,6 +42,8 @@ class HelpMDLinter(module_framework.AvocadoTest):
         self.helpmd = helpfile_linter.HelpMDLinter(dockerfile=self.dp.dockerfile)
         if self.dp.dockerfile is None:
             self.skip()
+        if self.helpmd is None:
+            self.skip()
 
     def test_helpmd_exists(self):
         self.assertTrue(self.helpmd)

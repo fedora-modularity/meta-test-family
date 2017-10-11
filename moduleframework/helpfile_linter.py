@@ -16,7 +16,11 @@ class HelpMDLinter(object):
     help_md = None
 
     def __init__(self, dockerfile=None):
-        help_md_file = os.path.join(os.path.dirname(dockerfile), HELP_MD)
+        if dockerfile is None:
+            dir_name = os.getcwd()
+        else:
+            dir_name = os.path.dirname(dockerfile)
+        help_md_file = os.path.join(dir_name, HELP_MD)
         common.print_debug("help.md path is %s." % help_md_file)
         if os.path.exists(help_md_file):
             with open(help_md_file, 'r') as f:
@@ -26,7 +30,7 @@ class HelpMDLinter(object):
                 # Count with all lines which begins with %
                 self.help_md.extend([x.strip() for x in lines if x.startswith('%')])
         else:
-            common.print_debug("help.md should exists in the %s directory." % os.path.dirname(dockerfile))
+            common.print_debug("help.md should exists in the %s directory." % dir_name)
             self.help_md = None
 
     def get_image_name(self, name):
