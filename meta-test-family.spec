@@ -22,6 +22,7 @@ Requires:       docker
 Requires:       python2-pdc-client
 Requires:       python2-modulemd
 Requires:       python2-dockerfile-parse
+Requires:       python-mistune
 Provides:       modularity-testing-framework = %{version}-%{release}
 Obsoletes:      modularity-testing-framework < 0.5.18-2
 
