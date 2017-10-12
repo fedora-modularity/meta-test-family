@@ -251,8 +251,8 @@ gpgcheck=0
             output = [x.strip() for x in
                       self.runHost("systemctl show -M {} {}".format(machine, unit),
                                    verbose=False).stdout.split("\n")]
-            if is_debug():
-                print_debug(output)
+            #if is_debug():
+            #    print_debug(output)
             retcode = int([x[-1] for x in output if "ExecMainStatus=" in x][0])
             if not ("SubState=exited" in output or "SubState=failed" in output):
                 time.sleep(0.1)
@@ -275,6 +275,8 @@ gpgcheck=0
         :param kwargs: dict parameters passed to avocado.process.run
         :return: avocado.process.run
         """
+        if not kwargs:
+            kwargs = {}
         self.__machined_restart()
         add_sleep_infinite = ""
         unit_name = self.__systemd_generate_unit_name()
@@ -310,6 +312,8 @@ gpgcheck=0
                 os.remove("{chroot}{pin}.stdout".format(chroot=self.chrootpath, pin=lpath))
                 os.remove("{chroot}{pin}.stderr".format(chroot=self.chrootpath, pin=lpath))
                 print_debug(comout)
+                if not self.__systemd_wait_support and kwargs.get("ignore_status") and comout.exit_status != 0:
+                    raise process.CmdError(comout.command, comout)
             return comout
         except process.CmdError as e:
             raise CmdExc("Command in SYSTEMD-RUN failed: %s" % command, e)
