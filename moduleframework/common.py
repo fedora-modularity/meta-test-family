@@ -53,6 +53,7 @@ PACKAGER_COMMAND = "test -e /usr/bin/dnf && echo 'dnf -y'   ||" \
 hostpackager = subprocess.check_output([PACKAGER_COMMAND], shell=True).strip()
 guestpackager = hostpackager
 ARCH = "x86_64"
+DOCKERFILE = "Dockerfile"
 
 __persistent_config = None
 
@@ -370,7 +371,6 @@ class CommonFunctions(object):
         """
         return self.info.get("url")
 
-
     def getArch(self):
         """
         Get system architecture.
@@ -398,7 +398,6 @@ class CommonFunctions(object):
                 "in trans_dict are: %s. \nBAD COMMAND: %s"
                 % (trans_dict, command))
         return process.run("%s" % formattedcommand, **kwargs)
-
 
     def get_test_dependencies(self):
         """
@@ -429,7 +428,6 @@ class CommonFunctions(object):
                     ignore_status=False, verbose=is_debug())
             except process.CmdError as e:
                 raise CmdExc("Installation failed; Do you have permission to do that?", e)
-
 
     def getPackageList(self, profile=None):
         """
@@ -496,7 +494,6 @@ class CommonFunctions(object):
         if not urllink:
             self.modulemdConf = link
         return link
-
 
     def getIPaddr(self):
         """
@@ -580,7 +577,6 @@ class CommonFunctions(object):
         command = self.info.get('stop') or command
         self.run(command, shell=True, ignore_bg_processes=True, verbose=is_not_silent())
 
-
     def install_packages(self, packages=None):
         """
         Install packages in config (by config or via parameter)
@@ -613,6 +609,7 @@ class CommonFunctions(object):
             self._callCleanupFromConfig()
         else:
             print_info("TearDown phase skipped.")
+
 
 def get_config():
     """
@@ -676,6 +673,7 @@ def list_modules_from_config():
     modulelist = get_config().get("module").keys()
     return modulelist
 
+
 def get_backend_list():
     """
     Get backends
@@ -684,6 +682,7 @@ def get_backend_list():
     """
     base_module_list = ["rpm", "nspawn", "docker"]
     return base_module_list
+
 
 def get_module_type():
     """
@@ -719,3 +718,24 @@ def get_module_type_base():
     if parent not in get_backend_list():
         raise ModuleFrameworkException("As parent is allowed just base type: %s" % get_backend_list)
     return parent
+
+
+def get_docker_file(dir_name="../"):
+    """
+    Function returns full path to dockerfile.
+    :param dir_name: dir_name, where should be Dockerfile located
+    :return: full_path to Dockerfile
+    """
+    fromenv = os.environ.get("DOCKERFILE")
+    if fromenv:
+        dockerfile = fromenv
+        dir_name = os.getcwd()
+    else:
+        dir_name = os.path.abspath(dir_name)
+        dockerfile = DOCKERFILE
+    dockerfile = os.path.join(dir_name, dockerfile)
+
+    if not os.path.exists(dockerfile):
+        dockerfile = None
+        print_debug("Dockerfile should exists in the %s directory." % dir_name)
+    return dockerfile

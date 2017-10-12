@@ -22,9 +22,11 @@
 #
 from __future__ import print_function
 
+import os
 from moduleframework import helpfile_linter
 from moduleframework import dockerlinter
 from moduleframework import module_framework
+from moduleframework.common import get_docker_file
 
 
 class HelpMDLinter(module_framework.AvocadoTest):
@@ -39,10 +41,13 @@ class HelpMDLinter(module_framework.AvocadoTest):
         # it is not intended just for docker, but just docker packages are
         # actually properly signed
         self.dp = dockerlinter.DockerfileLinter()
-        self.helpmd = helpfile_linter.HelpMDLinter(dockerfile=self.dp.dockerfile)
         if self.dp.dockerfile is None:
+            dir_name = os.getcwd()
+            self.log.info("Dockerfile was not found in %s directory." % dir_name)
             self.skip()
+        self.helpmd = helpfile_linter.HelpMDLinter(dockerfile=self.dp.dockerfile)
         if self.helpmd is None:
+            self.log.info("help.md file was not found in Dockerfile directory")
             self.skip()
 
     def test_helpmd_exists(self):

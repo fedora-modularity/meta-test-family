@@ -21,11 +21,12 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 from __future__ import print_function
-import os
 
+import os
 from moduleframework import module_framework
 from moduleframework import dockerlinter
 from moduleframework.avocado_testers import container_avocado_test
+from moduleframework.common import get_docker_file
 
 
 class DockerFileLinter(module_framework.AvocadoTest):
@@ -41,6 +42,8 @@ class DockerFileLinter(module_framework.AvocadoTest):
         # actually properly signed
         self.dp = dockerlinter.DockerfileLinter()
         if self.dp.dockerfile is None:
+            dir_name = os.getcwd()
+            self.log.info("Dockerfile was not found in %s directory." % dir_name)
             self.skip()
 
     def _test_for_env_and_label(self, docker_env, docker_label, env=True):
@@ -106,7 +109,7 @@ class DockerLint(container_avocado_test.ContainerAvocadoTest):
         """
         llabels = self.getConfigModule().get('labels')
         if llabels is None or len(llabels) == 0:
-            print("No labels defined in config to check")
+            self.log.info("No labels defined in config to check")
             self.cancel()
         for key in self.getConfigModule()['labels']:
             aaa = self.checkLabel(key, self.getConfigModule()['labels'][key])
