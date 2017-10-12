@@ -82,6 +82,7 @@ class NspawnHelper(RpmHelper):
         print_info("name of CHROOT directory:", self.chrootpath)
         self.setRepositoriesAndWhatToInstall()
         self.__prepareSetup()
+        self.__create_snaphot()
         self._callSetupFromConfig()
         self.__bootMachine()
 
@@ -201,7 +202,6 @@ gpgcheck=0
 
         :return: None
         """
-        self.__create_snaphot()
         print_debug("starting NSPAWN")
         nspawncont = process.SubProcess(
             "systemd-nspawn --machine=%s -bD %s" %
