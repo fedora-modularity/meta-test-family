@@ -81,6 +81,7 @@ setup(
             'mtf-env-set = moduleframework.mtf_environment:mtfenvset',
             'mtf-env-clean = moduleframework.mtf_environment:mtfenvclean',
             'mtf-log-parser = moduleframework.mtf_log_parser:main',
+            'mtf-init = moduleframework.mtf_init:main',
         ]
     },
     setup_requires=[],
