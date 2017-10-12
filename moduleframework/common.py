@@ -82,6 +82,7 @@ DEFAULTRETRYCOUNT = 3
 # time in seconds
 DEFAULTRETRYTIMEOUT = 30
 DEFAULTNSPAWNTIMEOUT = 10
+MODULE_DEFAULT_PROFILE="default"
 
 def get_compose_url_modular_release():
     default_release = "27"
@@ -152,6 +153,17 @@ def print_debug(*args):
     """
     if is_debug():
         print_info(*args)
+
+
+def get_if_install_default_profile():
+    """
+        Return the **MTF_INSTALL_DEFAULT** envvar.
+
+        :return: bool
+        """
+    reuse = os.environ.get('MTF_INSTALL_DEFAULT')
+    return bool(reuse)
+
 
 def is_recursive_download():
     """
@@ -427,15 +439,20 @@ class CommonFunctions(object):
         :return: list of packages (rpms)
         """
         package_list = []
+        mddata = self.getModulemdYamlconfig()
         if not profile:
             if 'packages' in self.config:
                 packages_rpm = self.config.get('packages',{}).get('rpms', [])
                 packages_profiles = []
                 for profile_in_conf in self.config.get('packages',{}).get('profiles',[]):
-                    packages_profiles += self.getModulemdYamlconfig()['data']['profiles'][profile_in_conf]['rpms']
+                    packages_profiles += mddata['data']['profiles'][profile_in_conf]['rpms']
                 package_list += packages_rpm + packages_profiles
+            if get_if_install_default_profile():
+                profile_append = mddata.get('data',{})\
+                    .get('profiles',{}).get(MODULE_DEFAULT_PROFILE,{}).get('rpms',[])
+                package_list += profile_append
         else:
-            package_list += self.getModulemdYamlconfig()['data']['profiles'][profile]['rpms']
+            package_list += mddata['data']['profiles'][profile].get('rpms',[])
         print_info("PCKGs to install inside module:", package_list)
         return package_list
 
