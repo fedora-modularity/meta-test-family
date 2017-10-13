@@ -27,8 +27,6 @@ MODULE for reading data from compose. There are stored:
   module files
 """
 
-import yaml
-import urllib
 import xml.etree.ElementTree
 import gzip
 import tempfile

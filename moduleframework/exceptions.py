@@ -24,7 +24,7 @@
 Custom exceptions library.
 """
 
-from __future__ import print_function
+import common
 import sys
 import linecache
 
@@ -44,7 +44,8 @@ class ModuleFrameworkException(Exception):
             filename = f.f_code.co_filename
             linecache.checkcache(filename)
             line = linecache.getline(filename, lineno, f.f_globals)
-            print("-----------\n| EXCEPTION IN: {} \n| LINE: {}, {} \n| ERROR: {}\n-----------".format(filename, lineno, line.strip(), exc_obj))
+            common.print_info("-----------\n| EXCEPTION IN: {} \n| LINE: {}, {} \n| ERROR: {}\n-----------".
+                       format(filename, lineno, line.strip(), exc_obj))
 
 
 class NspawnExc(ModuleFrameworkException):

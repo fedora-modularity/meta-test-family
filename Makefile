@@ -22,12 +22,12 @@ travis:
 .PHONY: clean
 
 clean:
-	@python setup.py clean
+	pip uninstall .
 	git clean -fd
 	rm -rf build/html
 
 install: clean
-	@python setup.py install
+	pip install -U .
 
 source: clean
 	@python setup.py sdist

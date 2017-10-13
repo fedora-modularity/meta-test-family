@@ -18,24 +18,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
+# Copied from: https://github.com/fedora-modularity/check_compose/blob/master/check_compose.py
+#
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
-"""
-module for environment setup and cleanup, to be able to split action for ansible, more steps instead of one complex
-"""
+from moduleframework import module_framework
 
-from moduleframework.common import CommonFunctions, print_info
+class Basic(module_framework.AvocadoTest):
+    """
+    :avocado: enable
+    """
 
-
-class EnvRpm(CommonFunctions):
-
-    def prepare_env(self):
-        print_info('Loaded config for name: {}'.format(self.config['name']))
-        self.installTestDependencies()
-        print_info("WARNING: Testing is going to be performed on this machine")
-        pass
-
-    def cleanup_env(self):
-        print_info("WARNING: No cleanup as it can destroy this machine")
-        pass
+    def test(self):
+        self.start()
