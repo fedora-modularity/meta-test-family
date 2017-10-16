@@ -737,5 +737,5 @@ def get_docker_file(dir_name="../"):
 
     if not os.path.exists(dockerfile):
         dockerfile = None
-        print_debug("Dockerfile should exists in the %s directory." % dir_name)
+        print_debug("Dockerfile should exists in the %s directory." % os.path.abspath(dir_name))
     return dockerfile
