@@ -46,9 +46,9 @@ class HelpMDLinter(module_framework.AvocadoTest):
             self.log.info("Dockerfile was not found in %s directory." % dir_name)
             self.skip()
         self.helpmd = helpfile_linter.HelpMDLinter(dockerfile=self.dp.dockerfile)
-        if self.helpmd is None:
+        if self.helpmd.help_md is None:
             self.log.info("help.md file was not found in Dockerfile directory")
-            self.skip()
+            self.skip("help.md file was not found in Dockerfile directory")
 
     def test_helpmd_exists(self):
         self.assertTrue(self.helpmd)
