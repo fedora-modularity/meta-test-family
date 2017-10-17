@@ -1,5 +1,6 @@
 import re
 import ast
+
 from dockerfile_parse import DockerfileParser
 from moduleframework.common import get_docker_file, print_info
 
@@ -234,16 +235,11 @@ class DockerfileLinter(object):
                  False if help.md is not specified in Dockerfile
         """
         helpmd_present = False
-        try:
-            for c in self.docker_dict[COPY]:
-                if "help.md" in c:
+        for instruction in [COPY, ADD]:
+            try:
+                helpmd = [help for help in self.docker_dict[instruction] if "help.md" in help]
+                if helpmd:
                     helpmd_present = True
-        except KeyError:
-            print("Tag COPY is not present in Dockerfile")
-        try:
-            for a in self.docker_dict[ADD]:
-                if "help.md" in a:
-                    helpmd_present = True
-        except KeyError:
-            print("Tag ADD is not present in Dockerfile")
+            except KeyError:
+                print_info("Instruction %s is not present in Dockerfile", instruction)
         return helpmd_present
