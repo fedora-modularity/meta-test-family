@@ -49,6 +49,7 @@ install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
 %{_bindir}/mtf-env-set
 %{_bindir}/mtf-env-clean
 %{_bindir}/mtf-log-parser
+%{_bindir}/mtf-init
 %{python2_sitelib}/moduleframework/
 %{python2_sitelib}/meta_test_family-*.egg-info/
 %{_datadir}/moduleframework/
