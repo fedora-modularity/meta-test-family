@@ -234,10 +234,16 @@ class DockerfileLinter(object):
                  False if help.md is not specified in Dockerfile
         """
         helpmd_present = False
-        for c in self.docker_dict[COPY]:
-            if "help.md" in c:
-                helpmd_present = True
-        for a in self.docker_dict[ADD]:
-            if "help.md" in a:
-                helpmd_present = True
+        try:
+            for c in self.docker_dict[COPY]:
+                if "help.md" in c:
+                    helpmd_present = True
+        except KeyError:
+            print("Tag COPY is not present in Dockerfile")
+        try:
+            for a in self.docker_dict[ADD]:
+                if "help.md" in a:
+                    helpmd_present = True
+        except KeyError:
+            print("Tag ADD is not present in Dockerfile")
         return helpmd_present
