@@ -22,24 +22,50 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
-from optparse import OptionParser
+import argparse
 import os.path
+import logging
+import sys
+import yaml
 
-def get_options():
-    parser = OptionParser(usage="usage: %prog [options]",
-                          version="%prog 1.0")
-    parser.add_option("-n", "--name",
-                      default="name",
-                      dest="name",
-                      help="Name of module for testing")
-    parser.add_option("-c", "--container",
-                      dest="container",
-                      default="docker.io/modularitycontainers/memcached",
-                      action="store",
-                      help="Specify container path, example: docker.io/modularitycontainers/memcached")
-    (options, args) = parser.parse_args()
+logger = logging.getLogger("mtf-init")
 
-    return options
+# path fot templates test.py:
+TEMPLATE_TEST = '/usr/share/moduleframework/examples/template/test.py'
+
+
+def set_logging(level=logging.INFO):
+    global logger
+    logger.setLevel(level)
+
+    handler = logging.StreamHandler(sys.stderr)
+    handler.setLevel(logging.DEBUG)
+
+    formatter = logging.Formatter(
+        '%(asctime)s %(levelname)-6s %(message)s', '%H:%M:%S')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+    mekk_logger = logging.getLogger("mekk.xmind")
+    null_handler = logging.NullHandler()
+    mekk_logger.addHandler(null_handler)
+
+
+def cli():
+    parser = argparse.ArgumentParser(
+        description="Create template of your first test!",
+    )
+    parser.add_argument('--verbose', '-v', action='store_true',   default=False)
+    parser.add_argument("--name", "-n", action="store", default="name not given", help='Name of module for testing')
+    parser.add_argument("--container", "-c", action="store", required=True,
+                        help='Specify container path, example: docker.io/modularitycontainers/memcached')
+
+    args = parser.parse_args()
+
+    set_logging(level=logging.DEBUG if args.verbose else logging.INFO)
+
+    return args
+
 
 class Template(object):
     def __init__(self, name, container):
@@ -48,54 +74,32 @@ class Template(object):
 
     def set_content_config_yaml(self):
         self.filePathConfig = 'config.yaml'
-        configYaml = """# this is generated config.yaml with minimum stuff
----
-document: meta-test
-version: 1
-name: {name}
-default_module: docker
-module:
-    docker:
-        container: {container}
-""".format(name=self.name, container=self.container)
-        self.configYaml = configYaml
+        data = {"document" : "meta-test",
+                "version" : "1",
+                "name" : "xxx",
+                "default_module" : "docker",
+                "module" : {"docker" : {"container" : "xxx"}}}
+        data['name'] = self.name
+        data['module']['docker']['container'] = self.container
+        self.configYaml = yaml.dump(data)
+        logger.debug("{0}\n{1}".format(self.filePathConfig, self.configYaml))
 
     def set_content_test_py(self):
+        # local name of the file:
         self.filePathTest = 'test.py'
-        test = '''#!/usr/bin/python
+        # use it from examples/template directory
+        with open(TEMPLATE_TEST,'r') as file:
+            self.test = file.read()
+            file.close()
 
-# test example
-# start test: "sudo mtf"
-
-from avocado import main
-from avocado.core import exceptions
-from moduleframework import module_framework
-
-class Smoke1(module_framework.AvocadoTest):
-    """
-    :avocado: enable
-    """
-
-    def test_uname(self):
-        self.start()
-        self.run("uname | grep Linux")
-
-    def test_echo(self):
-        self.start()
-        self.runHost("echo test | grep test")
-
-if __name__ == '__main__':
-    main()
-
-'''
-        self.test = test
+        logger.debug("{0}\n{1}".format(self.filePathTest, self.test))
 
     def confirm(self):
         gogo = raw_input("Continue? yes/no\n")
-        if gogo == 'yes':
+        if gogo.lower() == 'yes':
             exit_condition = 0
             return exit_condition
-        elif gogo == "no":
+        elif gogo.lower() == "no":
             exit_condition = 1
             exit(1)
             return exit_condition
@@ -114,17 +118,21 @@ if __name__ == '__main__':
         return True
 
     def save(self):
-        f1 = open(self.filePathConfig,'w')
-        f1.write(self.configYaml)
-        f1.close()
+        with open(self.filePathConfig,'w') as f1:
+            f1.write(self.configYaml)
+            logger.debug("{0} was changed".format(self.filePathConfig))
+            f1.close()
 
-        f2 = open(self.filePathTest,'w')
-        f2.write(self.test)
-        f2.close()
+        with open(self.filePathTest,'w') as f2:
+            f2.write(self.test)
+            logger.debug("{0} was changed".format(self.filePathTest))
+            f2.close()
+
 
 def main():
-    options=get_options()
-    resobj = Template(options.name, options.container)
+    args = cli()
+    logger.debug("Options: name={0}, container={1}".format(args.name, args.container))
+    resobj = Template(args.name, args.container)
     resobj.set_content_config_yaml()
     resobj.set_content_test_py()
     if not resobj.check_file():
