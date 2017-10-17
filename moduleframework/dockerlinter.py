@@ -1,13 +1,11 @@
 from __future__ import print_function
 
-import os
 import re
 import ast
 from dockerfile_parse import DockerfileParser
-import common
+from moduleframework.common import get_docker_file
 
 # Dockerfile path
-DOCKERFILE = "Dockerfile"
 EXPOSE = "EXPOSE"
 VOLUME = "VOLUME"
 LABEL = "LABEL"
@@ -23,22 +21,6 @@ INSTRUCT = "instruction"
 
 def get_string(value):
     return ast.literal_eval(value)
-
-
-def get_docker_file(dir_name):
-    fromenv = os.environ.get("DOCKERFILE")
-    if fromenv:
-        dockerfile = fromenv
-        dir_name = os.getcwd()
-    else:
-        dir_name = os.path.abspath(dir_name)
-        dockerfile = DOCKERFILE
-    dockerfile = os.path.join(dir_name, dockerfile)
-
-    if not os.path.exists(dockerfile):
-        dockerfile = None
-        common.print_debug("Dockerfile should exists in the %s directory." % dir_name)
-    return dockerfile
 
 
 class DockerfileLinter(object):
@@ -203,7 +185,7 @@ class DockerfileLinter(object):
 
     def check_chained_run_dnf_commands(self):
         """
-        Function checks if Dockerfile does not contain more `RUN dnf` commands
+        Function checks if Dockerfile does not contain more `RUN dnf/yum` commands
         in more then one row.
         BAD examples:
              FROM fedora
@@ -217,8 +199,9 @@ class DockerfileLinter(object):
         """
         value = 0
         for struct in self.dfp_structure:
-            if struct.get(INSTRUCT) == RUN and "dnf" in struct.get("value"):
-                value += 1
+            if struct.get(INSTRUCT) == RUN:
+                if "dnf" in struct.get("value") or "yum" in struct.get("value"):
+                    value += 1
         if int(value) > 1:
             return False
         return True
@@ -239,8 +222,9 @@ class DockerfileLinter(object):
         """
         value = 0
         for struct in self.dfp_structure:
-            if struct.get(INSTRUCT) == RUN and "dnf" not in struct.get("value"):
-                value += 1
+            if struct.get(INSTRUCT) == RUN:
+                if "dnf" not in struct.get("value") and "yum" not in struct.get("value"):
+                    value += 1
         if int(value) > 1:
             return False
         return True

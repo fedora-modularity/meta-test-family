@@ -24,6 +24,7 @@ Environment variables allow to overwrite some values of a module configuration f
 - **MTF_REUSE=yes** uses the same module between tests. It speeds up test execution. It can cause side effects.
 - **MTF_REMOTE_REPOS=yes** disables downloading of Koji packages and creating a local repo, and speeds up test execution.
 - **MTF_DISABLE_MODULE=yes** disables module handling to use nonmodular test mode (see `multihost tests`_ as an example).
+- **DOCKERFILE="<path_to_dockerfile"** overwrites the location of a Dockerfile.
 
 .. _multihost tests: https://github.com/fedora-modularity/meta-test-family/tree/devel/examples/multios_testing
 
