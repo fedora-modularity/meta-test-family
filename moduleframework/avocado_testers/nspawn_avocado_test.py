@@ -32,7 +32,7 @@ class NspawnAvocadoTest(AvocadoTest):
 
     def setUp(self):
         if get_module_type_base() != "nspawn":
-            self.skip("Nspawn specific test")
+            self.cancel("Nspawn specific test")
         super(NspawnAvocadoTest, self).setUp()
 
 

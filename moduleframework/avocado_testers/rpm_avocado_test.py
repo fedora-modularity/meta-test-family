@@ -34,7 +34,7 @@ class RpmAvocadoTest(AvocadoTest):
 
     def setUp(self):
         if get_module_type_base() != "rpm":
-            self.skip("Rpm specific test")
+            self.cancel("Rpm specific test")
         super(RpmAvocadoTest, self).setUp()
 
 
