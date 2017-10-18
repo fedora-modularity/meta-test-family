@@ -131,7 +131,7 @@ class Image(object):
                 if "file:///" in repo:
                     src = repo[7:]
                     srcto = os.path.join(self.location, src[1:])
-                    if not os.path.exists(os.makedirs(os.path.dirname(srcto))):
+                    if not os.path.exists(os.path.dirname(srcto)):
                         os.makedirs(os.path.dirname(srcto))
                     shutil.copytree(src, srcto)
             pkipath = "/etc/pki/rpm-gpg"
