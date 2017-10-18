@@ -24,6 +24,8 @@
 Custom configuration and debugging library.
 """
 
+from __future__ import print_function
+
 import netifaces
 import socket
 import os
@@ -31,12 +33,12 @@ import urllib
 import yaml
 import subprocess
 import copy
-import warnings
-
+import sys
+import random
+import string
+import time
 from avocado.utils import process
-
-from moduleframework.exceptions import *
-from moduleframework.compose_info import ComposeParser
+from moduleframework.exceptions import ModuleFrameworkException, ConfigExc, CmdExc
 
 defroutedev = netifaces.gateways().get('default').values(
 )[0][1] if netifaces.gateways().get('default') else "lo"
@@ -84,6 +86,9 @@ DEFAULTRETRYCOUNT = 3
 DEFAULTRETRYTIMEOUT = 30
 DEFAULTNSPAWNTIMEOUT = 10
 MODULE_DEFAULT_PROFILE="default"
+
+def generate_unique_name(size=10):
+    return ''.join(random.choice(string.ascii_lowercase) for _ in range(size))
 
 def get_compose_url_modular_release():
     default_release = "27"
@@ -136,7 +141,7 @@ def print_info(*args):
                     "brackets { } in your code, please use double brackets {{  }}."
                     "Possible values in trans_dict are: %s"
                     % trans_dict)
-        print >> sys.stderr, result
+        print(result, file=sys.stderr)
 
 
 def print_debug(*args):
@@ -240,6 +245,19 @@ def sanitize_cmd(cmd):
         cmd = cmd.replace('"', r'\"')
     return cmd
 
+
+def translate_cmd(cmd, translation_dict=None):
+    if not translation_dict:
+        return cmd
+    try:
+        formattedcommand = cmd.format(**translation_dict)
+    except KeyError:
+        raise ModuleFrameworkException(
+            "Command is formatted by using trans_dict. If you want to use "
+            "brackets { } in your code, please use {{ }}. Possible values "
+            "in trans_dict are: %s. \nBAD COMMAND: %s"
+            % (translation_dict, cmd))
+    return formattedcommand
 
 def get_profile():
     """
@@ -389,15 +407,8 @@ class CommonFunctions(object):
         ** kwargs: avocado process.run params like: shell, ignore_status, verbose
         :return: avocado.process.run
         """
-        try:
-            formattedcommand = command.format(**trans_dict)
-        except KeyError:
-            raise ModuleFrameworkException(
-                "Command is formatted by using trans_dict. If you want to use "
-                "brackets { } in your code, please use {{ }}. Possible values "
-                "in trans_dict are: %s. \nBAD COMMAND: %s"
-                % (trans_dict, command))
-        return process.run("%s" % formattedcommand, **kwargs)
+
+        return process.run("%s" % translate_cmd(command, translation_dict=trans_dict), **kwargs)
 
     def get_test_dependencies(self):
         """
@@ -610,6 +621,43 @@ class CommonFunctions(object):
         else:
             print_info("TearDown phase skipped.")
 
+    def copyTo(self, src, dest):
+        """
+        Copy file to module from host
+
+        :param src: source file on host
+        :param dest: destination file on module
+        :return: None
+        """
+        if  src is not dest:
+            self.run("cp -rf %s %s" % (src, dest))
+
+    def copyFrom(self, src, dest):
+        """
+        Copy file from module to host
+
+        :param src: source file on module
+        :param dest: destination file on host
+        :return: None
+        """
+        if src is not dest:
+            self.run("cp -rf %s %s" % (src, dest))
+
+    def run_script(self,filename, *args, **kwargs):
+        """
+        run script or binary inside module
+        :param filename: filename to copy to module
+        :param args: pass this args as cmdline args to run binary
+        :param kwargs: pass thru to avocado process.run
+        :return: avocado process.run object
+        """
+        dest = "/tmp/%s" % generate_unique_name()
+        self.copyTo(filename, dest)
+        #self.run("bash %s" % dest)
+        parameters = ""
+        if args:
+            parameters = " " + " ".join(args)
+        return self.run("bash " + dest + parameters, **kwargs)
 
 def get_config():
     """

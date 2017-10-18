@@ -25,7 +25,7 @@
 module for environment setup and cleanup, to be able to split action for ansible, more steps instead of one complex
 """
 
-from moduleframework.common import *
+from moduleframework.common import CommonFunctions, print_info
 
 
 class EnvRpm(CommonFunctions):

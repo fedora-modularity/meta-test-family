@@ -1,9 +1,7 @@
-from __future__ import print_function
-
 import re
 import ast
 from dockerfile_parse import DockerfileParser
-from moduleframework.common import get_docker_file
+from moduleframework.common import get_docker_file, print_info
 
 # Dockerfile path
 EXPOSE = "EXPOSE"
@@ -107,7 +105,7 @@ class DockerfileLinter(object):
                     for v in ret_val:
                         self.docker_dict[key].append(v)
                 except KeyError:
-                    print("Dockerfile tag %s is not parsed by MTF" % key)
+                    print_info("Dockerfile tag %s is not parsed by MTF" % key)
 
     def get_docker_env(self):
         return self.docker_dict.get(ENV)

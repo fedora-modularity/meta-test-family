@@ -35,7 +35,7 @@ class ContainerAvocadoTest(AvocadoTest):
 
     def setUp(self):
         if get_module_type_base() != "docker":
-            self.skip("Docker specific test")
+            self.cancel("Docker specific test")
         super(ContainerAvocadoTest, self).setUp()
 
     def checkLabel(self, key, value):

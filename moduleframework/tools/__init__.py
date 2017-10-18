@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# This Modularity Testing Framework helps you to write tests for modules
+# Meta test family (MTF) is a tool to test components of a modular Fedora:
+# https://docs.pagure.org/modularity/
 # Copyright (C) 2017 Red Hat, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -17,24 +18,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# Authors: Petr Hracek <phracek@redhat.com>
+# Copied from: https://github.com/fedora-modularity/check_compose/blob/master/check_compose.py
+#
+# Authors: Jan Scotka <jscotka@redhat.com>
 #
 
-from moduleframework.module_framework import AvocadoTest
-from moduleframework.common import get_module_type_base
+from moduleframework import module_framework
 
-
-class RpmAvocadoTest(AvocadoTest):
+class Basic(module_framework.AvocadoTest):
     """
-    Class for writing tests specific just for LOCAL (system) RPM testing
-    derived from AvocadoTest class.
-
-    :avocado: disable
+    :avocado: enable
     """
 
-    def setUp(self):
-        if get_module_type_base() != "rpm":
-            self.cancel("Rpm specific test")
-        super(RpmAvocadoTest, self).setUp()
-
-
+    def test(self):
+        self.start()

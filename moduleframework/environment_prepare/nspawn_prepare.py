@@ -25,7 +25,8 @@
 module for environment setup and cleanup, to be able to split action for ansible, more steps instead of one complex
 """
 
-from moduleframework.common import *
+import os
+from moduleframework.common import CommonFunctions, print_info, is_not_silent
 
 selinux_state_file="/var/tmp/mtf_selinux_state"
 setseto = "Permissive"

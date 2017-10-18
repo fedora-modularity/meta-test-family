@@ -24,7 +24,7 @@
 """
 Module to setup and cleanup the test environment.
 """
-from moduleframework.common import *
+from moduleframework.common import get_module_type_base, print_info
 from moduleframework.environment_prepare.docker_prepare import EnvDocker
 from moduleframework.environment_prepare.rpm_prepare import EnvRpm
 from moduleframework.environment_prepare.nspawn_prepare import EnvNspawn

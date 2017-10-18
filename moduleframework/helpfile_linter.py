@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 import os
-from moduleframework import common
+import common
 
 HELP_MD = "help.md"
 

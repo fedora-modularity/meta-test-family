@@ -28,10 +28,15 @@ Download and create local repos
 Construct parameters for automatization (CIs)
 """
 
-import yaml
 import re
+import yaml
+import os
 from avocado import utils
-from common import *
+
+from common import print_info, DEFAULTRETRYCOUNT, DEFAULTRETRYTIMEOUT, \
+    get_if_remoterepos, get_compose_url_modular_release, MODULEFILE, print_debug,\
+    is_debug, ARCH, is_recursive_download, trans_dict, BASEPATHDIR
+from moduleframework import exceptions
 from pdc_client import PDCClient
 from timeoutlib import Retry
 
@@ -115,14 +120,14 @@ class PDCParser():
             pdc_query['variant_version'] = self.stream
         if self.version:
             pdc_query['variant_release'] = self.version
-        @Retry(attempts=DEFAULTRETRYCOUNT,timeout=DEFAULTRETRYTIMEOUT,error=PDCExc("Could not query PDC server"))
+        @Retry(attempts=DEFAULTRETRYCOUNT,timeout=DEFAULTRETRYTIMEOUT,error=exceptions.PDCExc("Could not query PDC server"))
         def retry_tmpfunc():
             # Using develop=True to not authenticate to the server
             pdc_session = PDCClient(PDC_SERVER, ssl_verify=True, develop=True)
             return pdc_session(**pdc_query)
         mod_info = retry_tmpfunc()
         if not mod_info or "results" not in mod_info.keys() or not mod_info["results"]:
-            raise PDCExc("QUERY: %s is not available on PDC" % pdc_query)
+            raise exceptions.PDCExc("QUERY: %s is not available on PDC" % pdc_query)
         self.pdcdata = mod_info["results"][-1]
         self.modulemd = yaml.load(self.pdcdata["modulemd"])
 
@@ -246,7 +251,7 @@ class PDCParser():
                 print_debug("DOWNLOADING: %s" % foo)
 
                 @Retry(attempts=DEFAULTRETRYCOUNT * 10, timeout=DEFAULTRETRYTIMEOUT * 60, delay=DEFAULTRETRYTIMEOUT,
-                       error=KojiExc(
+                       error=exceptions.KojiExc(
                            "RETRY: Unbale to fetch package from koji after %d attempts" % (DEFAULTRETRYCOUNT * 10)))
                 def tmpfunc():
                     a = utils.process.run(
@@ -257,7 +262,7 @@ class PDCParser():
                             print_debug(
                                 'UNABLE TO DOWNLOAD package (intended for other architectures, GOOD):', a.command)
                         else:
-                            raise KojiExc(
+                            raise exceptions.KojiExc(
                                 'UNABLE TO DOWNLOAD package (KOJI issue, BAD):', a.command)
 
                 tmpfunc()

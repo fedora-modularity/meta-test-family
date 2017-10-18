@@ -35,17 +35,17 @@ class SkipTest(module_framework.AvocadoTest):
     def testGccSkippedInsideTest(self):
         # rewrite it to calling cancell, it was not in production of avocado,
         # but it is fixed.
-        if "gcc" not in self.getActualProfile():
+        if True:
             self.cancel()
         self.start()
         self.run("gcc -v")
 
-    @skipIf(common.get_profile() == "default")
+    @skipIf(False)
     def testDecoratorNotSkippedForDefault(self):
         self.start()
         self.run("echo for default profile")
 
-    @skipUnless(common.get_profile() == "gcc")
+    @skipUnless(False)
     def testDecoratorSkip(self):
         self.start()
         self.run("gcc -v")
