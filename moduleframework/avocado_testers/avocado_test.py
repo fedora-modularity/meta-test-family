@@ -252,6 +252,18 @@ class AvocadoTest(Test):
         """
         return self.backend.getModuleDependencies()
 
+    def run_file(self, *args, **kwargs):
+        """
+        run script or binary inside module
+
+        :param filename: filename to copy to module
+        :param args: pass this args as cmdline args to run binary
+        :param kwargs: pass thru to avocado process.run
+        :return: avocado process.run object
+        """
+        return self.backend.run_file(*args, **kwargs)
+
+
 def get_backend():
     """
     Return proper module backend, set by config by default_module section, or defined via

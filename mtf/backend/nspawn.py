@@ -28,8 +28,6 @@ import os
 import logging
 import shutil
 import glob
-import random
-import string
 import time
 import re
 
@@ -45,10 +43,6 @@ base_package_set = ["systemd"]
 is_debug_low = common.is_debug
 if is_debug_low():
     logging.basicConfig(level=logging.DEBUG)
-
-
-def generate_unique_name(size=10):
-    return ''.join(random.choice(string.ascii_lowercase) for _ in range(size))
 
 class Image(object):
     """
@@ -178,7 +172,7 @@ class Container(object):
         :param name: optional, use unique name for generating containers in case not given, some name is generated
         """
         self.image = image
-        self.name = name or generate_unique_name()
+        self.name = name or common.generate_unique_name()
         self.location = self.image.get_location()
         self.__systemd_wait_support = self._run_systemdrun_decide()
 
@@ -296,7 +290,7 @@ class Container(object):
             kwargs = {}
         self.__machined_restart()
         add_sleep_infinite = ""
-        unit_name = generate_unique_name()
+        unit_name = common.generate_unique_name()
         lpath = "/var/tmp/{}".format(unit_name)
         if self.__systemd_wait_support:
             add_wait_var = "--wait"

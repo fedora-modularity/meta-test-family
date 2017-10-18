@@ -34,6 +34,8 @@ import yaml
 import subprocess
 import copy
 import sys
+import random
+import string
 from avocado.utils import process
 from moduleframework.exceptions import ModuleFrameworkException, ConfigExc, CmdExc
 
@@ -83,6 +85,9 @@ DEFAULTRETRYCOUNT = 3
 DEFAULTRETRYTIMEOUT = 30
 DEFAULTNSPAWNTIMEOUT = 10
 MODULE_DEFAULT_PROFILE="default"
+
+def generate_unique_name(size=10):
+    return ''.join(random.choice(string.ascii_lowercase) for _ in range(size))
 
 def get_compose_url_modular_release():
     default_release = "27"
@@ -615,6 +620,43 @@ class CommonFunctions(object):
         else:
             print_info("TearDown phase skipped.")
 
+    def copyTo(self, src, dest):
+        """
+        Copy file to module from host
+
+        :param src: source file on host
+        :param dest: destination file on module
+        :return: None
+        """
+        if  src is not dest:
+            self.run("cp -rf %s %s" % (src, dest))
+
+    def copyFrom(self, src, dest):
+        """
+        Copy file from module to host
+
+        :param src: source file on module
+        :param dest: destination file on host
+        :return: None
+        """
+        if src is not dest:
+            self.run("cp -rf %s %s" % (src, dest))
+
+    def run_file(self,filename, *args, **kwargs):
+        """
+        run script or binary inside module
+        :param filename: filename to copy to module
+        :param args: pass this args as cmdline args to run binary
+        :param kwargs: pass thru to avocado process.run
+        :return: avocado process.run object
+        """
+        dest = "/tmp/%s" % generate_unique_name()
+        self.copyTo(filename, dest)
+        self.run("chmod a+x %s" % dest)
+        parameters = ""
+        if args:
+            parameters = " " + " ".join(args)
+        return self.run(dest + parameters, **kwargs)
 
 def get_config():
     """
