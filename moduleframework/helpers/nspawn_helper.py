@@ -48,10 +48,7 @@ class NspawnHelper(RpmHelper):
         self.baseprefix = os.path.join(BASEPATHDIR, "chroot_")
         time.time()
         actualtime = time.time()
-        self.chrootpath_baseimage = os.path.abspath(self.baseprefix +
-                                                    self.moduleName +
-                                                    "_image_" +
-                                                    hashlib.md5(" ".join(self.repos)).hexdigest())
+        self.chrootpath_baseimage = ""
         if not get_if_reuse():
             self.jmeno = "%s_%r" % (self.moduleName, actualtime)
         else:
@@ -73,6 +70,11 @@ class NspawnHelper(RpmHelper):
         trans_dict["ROOT"] = self.chrootpath
         print_info("name of CHROOT directory:", self.chrootpath)
         self.setRepositoriesAndWhatToInstall()
+        # never move this line to __init__ this localtion can change before setUp (set repositories)
+        self.chrootpath_baseimage = os.path.abspath(self.baseprefix +
+                                                    self.moduleName +
+                                                    "_image_" +
+                                                    hashlib.md5(" ".join(self.repos)).hexdigest())
         self.__image_base = Image(location=self.chrootpath_baseimage, packageset=self.getPackageList(),repos=self.repos, ignore_installed=True)
         self.__image = self.__image_base.create_snapshot(self.chrootpath)
         self.__container = Container(image=self.__image, name=self.jmeno)
