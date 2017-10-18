@@ -319,7 +319,7 @@ class Container(object):
                 os.remove("{chroot}{pin}.stdout".format(chroot=self.location, pin=lpath))
                 os.remove("{chroot}{pin}.stderr".format(chroot=self.location, pin=lpath))
                 self.logger.debug(comout)
-                if not self.__systemd_wait_support and kwargs.get("ignore_status") and comout.exit_status != 0:
+                if not self.__systemd_wait_support and not kwargs.get("ignore_status") and comout.exit_status != 0:
                     raise process.CmdError(comout.command, comout)
             return comout
         except process.CmdError as e:

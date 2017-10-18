@@ -252,7 +252,7 @@ class AvocadoTest(Test):
         """
         return self.backend.getModuleDependencies()
 
-    def run_file(self, *args, **kwargs):
+    def run_script(self, *args, **kwargs):
         """
         run script or binary inside module
 
@@ -261,7 +261,7 @@ class AvocadoTest(Test):
         :param kwargs: pass thru to avocado process.run
         :return: avocado process.run object
         """
-        return self.backend.run_file(*args, **kwargs)
+        return self.backend.run_script(*args, **kwargs)
 
 
 def get_backend():

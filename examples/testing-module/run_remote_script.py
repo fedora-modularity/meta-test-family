@@ -41,10 +41,10 @@ echo $@
         """
         with open(scriptfile, "w") as text_file:
             text_file.write(script)
-        outputprocess = self.run_file(scriptfile)
+        outputprocess = self.run_script(scriptfile)
         self.assertIn("stdoutput", outputprocess.stdout)
         self.assertIn("erroutput", outputprocess.stderr)
-        outputprocess = self.run_file(scriptfile, "Hallo", "World")
+        outputprocess = self.run_script(scriptfile, "Hallo", "World")
         self.assertIn("stdoutput", outputprocess.stdout)
         self.assertIn("Hallo World", outputprocess.stdout)
         os.remove(scriptfile)
@@ -58,8 +58,8 @@ exit {}
 """.format(ecode)
         with open(scriptfile, "w") as text_file:
             text_file.write(script)
-        outputprocess = self.run_file(scriptfile, ignore_status=True)
+        outputprocess = self.run_script(scriptfile, ignore_status=True)
         self.assertEqual(ecode, outputprocess.exit_status)
-        
-        self.assertRaises(process.CmdError, self.run_file, scriptfile)
+
+        self.assertRaises(process.CmdError, self.run_script, scriptfile)
         os.remove(scriptfile)

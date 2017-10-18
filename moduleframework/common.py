@@ -36,6 +36,7 @@ import copy
 import sys
 import random
 import string
+import time
 from avocado.utils import process
 from moduleframework.exceptions import ModuleFrameworkException, ConfigExc, CmdExc
 
@@ -642,7 +643,7 @@ class CommonFunctions(object):
         if src is not dest:
             self.run("cp -rf %s %s" % (src, dest))
 
-    def run_file(self,filename, *args, **kwargs):
+    def run_script(self,filename, *args, **kwargs):
         """
         run script or binary inside module
         :param filename: filename to copy to module
@@ -652,11 +653,11 @@ class CommonFunctions(object):
         """
         dest = "/tmp/%s" % generate_unique_name()
         self.copyTo(filename, dest)
-        self.run("chmod a+x %s" % dest)
+        #self.run("bash %s" % dest)
         parameters = ""
         if args:
             parameters = " " + " ".join(args)
-        return self.run(dest + parameters, **kwargs)
+        return self.run("bash " + dest + parameters, **kwargs)
 
 def get_config():
     """
