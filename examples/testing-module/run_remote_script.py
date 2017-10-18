@@ -22,6 +22,7 @@
 #
 
 from moduleframework import module_framework
+from avocado.utils import process
 from tempfile import mktemp
 import os
 
@@ -30,7 +31,7 @@ class remoteBinary(module_framework.AvocadoTest):
     :avocado: enable
     """
 
-    def testInsideModule(self):
+    def test_outputs(self):
         self.start()
         scriptfile = mktemp()
         script="""#!/bin/bash
@@ -46,4 +47,19 @@ echo $@
         outputprocess = self.run_file(scriptfile, "Hallo", "World")
         self.assertIn("stdoutput", outputprocess.stdout)
         self.assertIn("Hallo World", outputprocess.stdout)
+        os.remove(scriptfile)
+
+    def test_exit_code(self):
+        self.start()
+        scriptfile = mktemp()
+        ecode = 15
+        script = """#!/bin/bash
+exit {}
+""".format(ecode)
+        with open(scriptfile, "w") as text_file:
+            text_file.write(script)
+        outputprocess = self.run_file(scriptfile, ignore_status=True)
+        self.assertEqual(ecode, outputprocess.exit_status)
+        
+        self.assertRaises(process.CmdError, self.run_file, scriptfile)
         os.remove(scriptfile)
