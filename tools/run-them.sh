@@ -48,11 +48,11 @@ export RESULTTOOLS=0
 function getparams_int(){
     ADDIT="$1"
     if [ "$PARSEITEMTYPE" = "" -o "$PARSEITEMTYPE" = "fedmsg" ]; then
-        python $MTF_PATH/tools/taskotron-msg-reader.py -f $PARSEITEM $ADDIT
+        mtf-pdc-module-info-reader -f $PARSEITEM $ADDIT
     elif [ "$PARSEITEMTYPE" = "taskotron" -o "$PARSEITEMTYPE" = "pdc" ]; then
-        python $MTF_PATH/tools/taskotron-msg-reader.py -r $PARSEITEM $ADDIT
+        mtf-pdc-module-info-reader -r $PARSEITEM $ADDIT
     elif [ -z $ADDIT -a "$PARSEITEMTYPE" = "compose" ]; then
-        python $MTF_PATH/tools/compose_info_parser.py -c $PARSEITEM -m $MODULENAME
+        mtf-pdc-module-info-reader -c $PARSEITEM -m $MODULENAME
     fi
 }
 

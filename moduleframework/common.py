@@ -91,17 +91,6 @@ def generate_unique_name(size=10):
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(size))
 
 
-def get_compose_url_modular_release():
-    default_release = "27"
-    release = os.environ.get("MTF_FEDORA_RELEASE") or default_release
-    if release == "master":
-        release = default_release
-
-    base_url = "https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-{}/compose/Server/{}/os"
-    compose_url = os.environ.get("MTF_COMPOSE_BASE") or base_url.format(release, ARCH)
-    return compose_url
-
-
 def is_debug():
     """
     Return the **DEBUG** envvar.
@@ -242,6 +231,10 @@ def get_if_remoterepos():
     remote_repos = os.environ.get('MTF_REMOTE_REPOS')
     return bool(remote_repos)
 
+def get_odcs_auth():
+    odcstoken = os.environ.get('MTF_ODCS')
+    return odcstoken
+
 
 def get_if_module():
     """
@@ -352,19 +345,17 @@ class CommonFunctions(object):
     """
     config = None
     modulemdConf = None
+    component_name = None
+    source = None
+    arch = None
+    sys_arch = None
+    dependencylist = {}
+    is_it_module = False
+    packager = None
+    # general use case is to have forwarded services to host (so thats why it is same)
+    ipaddr = trans_dict["HOSTIPADDR"]
 
     def __init__(self, *args, **kwargs):
-        self.config = None
-        self.modulemdConf = None
-        self.moduleName = None
-        self.source = None
-        self.arch = None
-        self.sys_arch = None
-        self.dependencylist = {}
-        self.is_it_module = False
-        self.packager = None
-        # general use case is to have forwarded services to host (so thats why it is same)
-        self.ipaddr = trans_dict["HOSTIPADDR"]
         trans_dict["GUESTARCH"] = self.getArch()
         self.loadconfig()
 
@@ -388,7 +379,7 @@ class CommonFunctions(object):
         else:
             pass
 
-        self.moduleName = sanitize_text(self.config['name'])
+        self.component_name = sanitize_text(self.config['name'])
         self.source = self.config.get('source')
         self.set_url()
 
