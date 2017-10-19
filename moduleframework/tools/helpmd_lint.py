@@ -32,6 +32,7 @@ from moduleframework.common import get_docker_file
 class HelpMDLinter(module_framework.AvocadoTest):
     """
     :avocado: enable
+    :avocado: tags=docker,fedora,rhel,optional
 
     """
 
@@ -57,11 +58,15 @@ class HelpMDLinter(module_framework.AvocadoTest):
         container_name = self.dp.get_docker_specific_env("NAME=")
         if container_name:
             self.assertTrue(self.helpmd.get_image_name(container_name[0].split('=')[1]))
+        else:
+            self.cancel()
 
     def test_helpmd_maintainer_name(self):
         maintainer_name = self.dp.get_specific_label("maintainer")
         if maintainer_name:
             self.assertTrue(self.helpmd.get_maintainer_name(maintainer_name[0]))
+        else:
+            self.cancel()
 
     def test_helpmd_name(self):
         self.assertTrue(self.helpmd.get_tag("NAME"))
@@ -82,3 +87,5 @@ class HelpMDLinter(module_framework.AvocadoTest):
     def test_helpmd_security_implications(self):
         if self.dp.get_docker_expose():
             self.assertTrue(self.helpmd.get_tag("SECURITY IMPLICATIONS"))
+        else:
+            self.cancel()

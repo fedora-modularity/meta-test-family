@@ -1,9 +1,11 @@
 #!/bin/bash
 
+AVOCADO_CMD="avocado"
 SITE_LIB=$(python -c "import moduleframework, os; print os.path.dirname(moduleframework.__file__)")
 MTF_TOOLS="tools"
-JSON_LOG=$(mktemp)
-AVOCADO_ARGS="--json $JSON_LOG"
+AVOCADO_ARGS=""
+ACTION="run"
+TAGS="--filter-by-tags-include-empty"
 
 function print_help {
   cat <<EOF
@@ -13,8 +15,39 @@ positional arguments:
   AVOCADO_ARGS        test files and any arguments that "avocado run" accepts
 
 optional arguments:
+  -a, --action        run selected avocado command (DEFAULT: run)
   -h, --help          show this help message and exit
   -l, --linters       also run default linter tests included in MTF
+  -t, --tags T1,-T2   set test filtering based on tags, use --taglist for help ()
+  --taglist           oficially supported tag list (you can use whatever you want, this is list oficially used)
+                      for more info look at:
+                      http://avocado-framework.readthedocs.io/en/55.0/Loaders.html#filtering-tests-by-tags
+
+EOF
+}
+
+function print_tags {
+  cat <<EOF
+list of well known tags:
+  test environments:
+    rhel     - working on RedHat Enterprise Linux and CentOs
+    fedora   - working on Fedora
+    docker   - working on Docker
+
+  test categorization:
+    tier1    - basic qualification tests
+    tier2    - extended qualification tests
+    optional - could fail on some variants (not everything is supported)
+    slow     - slow testcases, longer than expected (hrs, or days)
+    WIP      - work in progress tests, could be bad, failing or under developlment
+
+In tests use docs string like (to allow run test on fedora, rhel and docker env and it is tier1 test).
+It is possible to use tags in doc string in class or in class method.
+Methods tags are ingerited from class tags
+Like:
+      """
+      :avocado: tags=fedora,rhel,docker,tier1
+      """
 EOF
 }
 
@@ -27,6 +60,18 @@ while [[ $# -gt 0 ]]; do
       -l|--linters)
         AVOCADO_ARGS="$AVOCADO_ARGS $SITE_LIB/$MTF_TOOLS/*.py"
       ;;
+      --taglist)
+        print_tags
+        exit 0
+      ;;
+      -a|--action)
+        shift
+        ACTION="$1"
+      ;;
+      -t|--tags)
+        shift
+        TAGS="$TAGS --filter-by-tags=$1"
+      ;;
       *)
         AVOCADO_ARGS="$AVOCADO_ARGS $1"
       ;;
@@ -34,9 +79,17 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
+# used by mtf-log-parser
+test "$ACTION" = "run" && JSON_LOG=$(mktemp)
+test "$ACTION" = "run" && AVOCADO_ARGS="$AVOCADO_ARGS --json $JSON_LOG"
+
+# append filtering
+test -n "$TAGS"        && AVOCADO_ARGS="$AVOCADO_ARGS $TAGS"
+
 # preserve exist status, mtf command should finish same as testing.
-avocado run $AVOCADO_ARGS
+echo "RUNNING: $AVOCADO_CMD $ACTION $AVOCADO_ARGS"
+$AVOCADO_CMD "$ACTION" $AVOCADO_ARGS
 EXIT_STATUS=$?
-mtf-log-parser $JSON_LOG
-rm -f $JSON_LOG
+test "$ACTION" = "run" && mtf-log-parser $JSON_LOG
+test "$ACTION" = "run" && rm -f $JSON_LOG
 exit $EXIT_STATUS

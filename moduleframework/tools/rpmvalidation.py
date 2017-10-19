@@ -35,6 +35,7 @@ class rpmvalidation(module_framework.AvocadoTest):
     http://refspecs.linuxfoundation.org/FHS_3.0/fhs/index.html
     
     :avocado: enable
+    :avocado: tags=docker,fedora,rhel,tier1
     """
     fhs_base_paths_workaound = [
         '/var/kerberos',
