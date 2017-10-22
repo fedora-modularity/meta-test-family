@@ -35,15 +35,21 @@ class HelpMDLinter(object):
 
     def get_image_name(self, name):
         name = '%% %s' % name
+        if not self.help_md:
+            return False
         tag_exists = [x for x in self.help_md if name.upper() in x]
         return tag_exists
 
     def get_maintainer_name(self, name):
         name = '%% %s' % name
+        if not self.help_md:
+            return False
         tag_exists = [x for x in self.help_md if name.startswith(x)]
         return tag_exists
 
     def get_tag(self, name):
         name = '# %s' % name
+        if not self.help_md:
+            return False
         tag_exists = [x for x in self.help_md if name.upper() in x]
         return tag_exists
