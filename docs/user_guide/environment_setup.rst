@@ -30,3 +30,10 @@ The environment configuration scripts should be executed in the same directory w
   - to execute tests run ``MODULE=docker avocado run your.test.py``
   - to cleanup environment ``MODULE=docker mtf-env-clean``
 
+Test Creation
+~~~~~~~~~~~~~~~
+
+There is script which generates easy template of test for module docker as example.
+
+  -  to create template for module docker ``mtf-init --name your_name --container path_to_your_container``
+
