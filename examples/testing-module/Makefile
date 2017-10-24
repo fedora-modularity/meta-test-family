@@ -66,7 +66,6 @@ check-docker-scl-multi:
 	cd ../rhscl_maria; MODULE=docker mtf-env-set
 	cd ../rhscl_maria; MODULE=docker $(CMD) *.py
 
-
 travis:
 	MODULE=docker $(CMD) $(TESTS)
 
@@ -80,6 +79,11 @@ check-memcached-both: prepare-docker prepare-nspawn
 check-minimal-config-rpm-noenvvar: prepare-nspawn
 	MTF_REMOTE_REPOS= DOCKERFILE= MODULE=nspawn $(CMD) $(TESTS)
 
+check-mtf-init:
+	$(eval TEMPDIR := $(shell mktemp -d))
+	cd $(TEMPDIR); mtf-init --name NAME1 --container docker.io/modularitycontainers/memcached
+	cd $(TEMPDIR); grep 'class Smoke1' test.py ; grep 'default_module' config.yaml; sudo mtf test.py
+	rm -rf "$(TEMPDIR)"
 
 check: check-docker
 
