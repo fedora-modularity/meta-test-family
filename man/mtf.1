@@ -1,0 +1,27 @@
+.\" Copyright Petr Hracek, 2017
+.\"
+.\" This page is distributed under GPL.
+.\"
+.TH mtf 1 2017-11-01 "" "Linux User's Manual"
+.SH NAME
+mtf \- Meta-Test-Family tests container images and modules with user defined tests written in Python and/or linters
+provided by meta-test-family package.
+
+.SH SYNOPSIS
+\fBmtf runs tests for container images
+
+\fBmtf [-l, --linters]
+
+.SH DESCRIPTION
+\fBmtf\fP is the main binary file of Meta-Test-Family.
+
+.SH OPTIONS
+.TP
+.B \-l, --linters
+Executes linters provided by Meta-Test-Family package.
+
+.SH NOTES
+Once \fBmtf\fP finishes it shows logs from failed tests.
+
+.SH AUTHORS
+Petr Hracek, <phracek@redhat.com> (man page)
