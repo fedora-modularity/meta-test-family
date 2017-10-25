@@ -33,7 +33,7 @@ The environment configuration scripts should be executed in the same directory w
 Test Creation
 ~~~~~~~~~~~~~~~
 
-There is script which generates easy template of test for module docker as example.
+There is a script called mtf-init which generates easy template of test for module docker as example.
 
   -  to create template for module docker ``mtf-init --name your_name --container path_to_your_container``
 
