@@ -24,14 +24,10 @@ User Guide
 
  .. code-block:: makefile
 
-    MODULE_LINT=/usr/share/moduleframework/tools/modulelint/*.py
-    TESTS=*.py
-    CMD=avocado run $(MODULE_LINT) $(TESTS)
-
     #
     all:
         mtf-generator
-        $(CMD)
+        mtf
 
 6. In a module's root directory create a ``Makefile``, which contains a secton **test**. For example:
 
@@ -71,7 +67,7 @@ User Guide
  .. code-block:: shell
 
     #run Python tests from the tests/ directory
-    $ sudo MODULE=docker avocado run ./*.py
+    $ sudo MODULE=docker mtf
 
  or
 
@@ -99,6 +95,7 @@ Contents:
    #general-reference
    glossary
    troubleshooting
+   real_examples
 
 .. seealso::
 
