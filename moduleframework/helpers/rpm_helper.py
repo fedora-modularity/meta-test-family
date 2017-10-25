@@ -22,8 +22,6 @@
 
 from moduleframework import pdc_data
 from moduleframework.common import *
-from moduleframework.exceptions import *
-
 
 class RpmHelper(CommonFunctions):
     """
@@ -43,25 +41,9 @@ class RpmHelper(CommonFunctions):
         if not os.path.exists(baserepodir):
             baserepodir="/var/tmp"
         self.yumrepo = os.path.join(baserepodir, "%s.repo" % self.moduleName)
-        self.whattoinstallrpm = ""
+        self.whattoinstallrpm = []
         self.bootstrappackages = []
         self.repos = []
-
-    def __setModuleDependencies(self):
-        if self.is_it_module:
-            if not get_if_remoterepos():
-                temprepositories = self.getModulemdYamlconfig()\
-                    .get("data",{}).get("dependencies",{}).get("requires",{})
-                temprepositories_cycle = dict(temprepositories)
-                for x in temprepositories_cycle:
-                    pdc = pdc_data.PDCParser()
-                    pdc.setLatestPDC(x, temprepositories_cycle[x])
-                    temprepositories.update(pdc.generateDepModules())
-                self.moduledeps = temprepositories
-                print_info("Detected module dependencies:", self.moduledeps)
-            else:
-                self.moduledeps = {"base-runtime": "master"}
-                print_info("Remote repositories are enabled", self.moduledeps)
 
     def getURL(self):
         """
@@ -81,7 +63,6 @@ class RpmHelper(CommonFunctions):
 
         :return: None
         """
-        #self.setModuleDependencies()
         self.setRepositoriesAndWhatToInstall()
         self._callSetupFromConfig()
         self.__prepare()
@@ -110,21 +91,14 @@ class RpmHelper(CommonFunctions):
             # TODO: removed this dependency search
             if not get_compose_url() and self.is_it_module:
                 depend_repos = [get_compose_url_modular_release()]
-                #for dep in self.moduledeps:
-                #    latesturl = pdc_data.get_repo_url(dep, self.moduledeps[dep])
-                #    depend_repos.append(latesturl)
-                #    self.__addModuleDependency(url=latesturl, name = dep, stream = self.moduledeps[dep])
-                #map(self.__addModuleDependency, depend_repos)
                 self.repos += depend_repos
-        #map(self.__addModuleDependency, self.repos)
-        # make self.repos unique in case there is more repos (faster dnf operations)
         self.repos = list(set(self.repos))
         if whattooinstall:
-            self.whattoinstallrpm = " ".join(set(whattooinstall))
+            self.whattoinstallrpm = list(set(whattooinstall))
         else:
-            self.bootstrappackages = pdc_data.getBasePackageSet(modulesDict=self.moduledeps,
+            self.bootstrappackages = pdc_data.getBasePackageSet(modulesDict=None,
                                                                 isModule=self.is_it_module, isContainer=False)
-            self.whattoinstallrpm = " ".join(set(self.getPackageList() + self.bootstrappackages))
+            self.whattoinstallrpm = list(set(self.getPackageList() + self.bootstrappackages))
 
     def __prepare(self):
         """

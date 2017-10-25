@@ -34,7 +34,7 @@ import re
 from avocado import Test
 from avocado.utils import process
 from mtf import common
-from mtf import exceptions
+from mtf import mtfexceptions
 
 DEFAULT_RETRYTIMEOUT = 30
 DEFAULT_SLEEP = 1
@@ -67,7 +67,7 @@ class Image(object):
         else:
             try:
                 self.__install()
-            except exceptions.NspawnExc as e:
+            except mtfexceptions.NspawnExc as e:
                 if ignore_installed:
                     pass
                 else:
@@ -141,7 +141,7 @@ class Image(object):
             for filename in glob.glob(os.path.join(pkipath, '*')):
                 shutil.copy(filename, pkipath_ch)
         else:
-            raise exceptions.NspawnExc("Directory %s already in use" % self.location)
+            raise mtfexceptions.NspawnExc("Directory %s already in use" % self.location)
 
     def get_location(self):
         """
@@ -188,7 +188,7 @@ class Container(object):
             out = process.run("machinectl status %s" % self.name, ignore_status=True, verbose=is_debug_low())
             if out.exit_status != 0:
                 return True
-        raise exceptions.NspawnExc("Unable to stop machine %s within %d" % (self.name, DEFAULT_RETRYTIMEOUT))
+        raise mtfexceptions.NspawnExc("Unable to stop machine %s within %d" % (self.name, DEFAULT_RETRYTIMEOUT))
 
     def __is_booted(self):
         for foo in range(DEFAULT_RETRYTIMEOUT):
@@ -202,7 +202,7 @@ class Container(object):
                 if "Unit: machine" in out.stdout:
                     time.sleep(DEFAULT_SLEEP)
                     return True
-        raise exceptions.NspawnExc("Unable to start machine %s within %d" % (self.name, DEFAULT_RETRYTIMEOUT))
+        raise mtfexceptions.NspawnExc("Unable to start machine %s within %d" % (self.name, DEFAULT_RETRYTIMEOUT))
 
     def boot_machine(self, nspawn_add_option_list=[], boot_cmd="", wait_finish=False):
         """
@@ -343,7 +343,7 @@ class Container(object):
                 machine=self.name, comm=common.sanitize_cmd(command), pin=lpath,
                 defaultsleep=self.__default_command_sleep ), **kwargs)
         if comout.exit_status != 0:
-            raise exceptions.NspawnExc("This command should not fail anyhow inside NSPAWN:", command)
+            raise mtfexceptions.NspawnExc("This command should not fail anyhow inside NSPAWN:", command)
         try:
             kwargs["verbose"] = False
             b = process.run(

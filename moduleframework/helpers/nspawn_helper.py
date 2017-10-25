@@ -75,7 +75,7 @@ class NspawnHelper(RpmHelper):
                                                     self.moduleName +
                                                     "_image_" +
                                                     hashlib.md5(" ".join(self.repos)).hexdigest())
-        self.__image_base = Image(location=self.chrootpath_baseimage, packageset=self.getPackageList(),repos=self.repos, ignore_installed=True)
+        self.__image_base = Image(location=self.chrootpath_baseimage, packageset=self.whattoinstallrpm, repos=self.repos, ignore_installed=True)
         self.__image = self.__image_base.create_snapshot(self.chrootpath)
         self.__container = Container(image=self.__image, name=self.jmeno)
         self._callSetupFromConfig()
