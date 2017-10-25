@@ -36,9 +36,8 @@ import copy
 import sys
 import random
 import string
-import time
 from avocado.utils import process
-from moduleframework.exceptions import ModuleFrameworkException, ConfigExc, CmdExc
+from moduleframework.mtfexceptions import ModuleFrameworkException, ConfigExc, CmdExc
 
 defroutedev = netifaces.gateways().get('default').values(
 )[0][1] if netifaces.gateways().get('default') else "lo"
@@ -326,7 +325,6 @@ class CommonFunctions(object):
         self.arch = None
         self.sys_arch = None
         self.dependencylist = {}
-        self.moduledeps = {}
         self.is_it_module = False
         self.packager = None
         # general use case is to have forwarded services to host (so thats why it is same)
