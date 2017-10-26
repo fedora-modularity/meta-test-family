@@ -73,11 +73,7 @@ class HelpMDLinter(module_framework.AvocadoTest):
         self.assertTrue(self.helpmd.get_tag("USAGE"))
 
     def test_helpmd_environment_variables(self):
-        env_variables = self.helpmd.get_tag("ENVIRONMENT VARIABLES")
-        if not env_variables:
-            self.log.warn("help.md file does not contain section ENVIRONMENT VARIABLES")
-        # In order to report warning, test has to report with True always
-        self.assertTrue(True)
+        self.mark_as_warn(self.assertTrue, self.helpmd.get_tag("ENVIRONMENT VARIABLES"))
 
     def test_helpmd_security_implications(self):
         if self.dp.get_docker_expose():

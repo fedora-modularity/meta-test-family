@@ -47,6 +47,3 @@ def skipTestIf(value, text="Test not intended for this module profile"):
     if value:
         raise ModuleFrameworkException(
             "DEPRECATED, don't use this skip, use self.cancel() inside test function, or self.skip() in setUp()")
-
-
-

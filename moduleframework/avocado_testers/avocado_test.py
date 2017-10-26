@@ -263,6 +263,19 @@ class AvocadoTest(Test):
         """
         return self.backend.run_script(*args, **kwargs)
 
+    def mark_as_warn(self, func, *args, **kwargs):
+        """
+        run function which you would like to mark as WARN
+        :param func: function for run
+        :param args: pass this args to run function
+        :param kwargs: pass thru to avocado process.run
+        :return: returns either PASS or WARN
+        """
+        try:
+            func(*args, **kwargs)
+        except AssertionError as e:
+            self.log.warn("Warning raised: %s" % e)
+
 
 def get_backend():
     """
