@@ -2,18 +2,32 @@
 .\"
 .\" This page is distributed under GPL.
 .\"
-.TH mtf-env-clean 1 2017-11-01 "" "Linux User's Manual"
+.TH MTF-ENV-CLEAN 1 2017-11-01 "" "Linux User's Manual"
 .SH NAME
-mtf-env-set \- Part of Meta-Test-Family package. It cleans environment for testing containers.
+mtf-env-clean \- cleans environment for testing containers.
 
 .SH SYNOPSIS
-\fBmtf-env-clean cleans environment for testing containers
+\fIMODULE=docker\/\fR
+.B mtf-env-clean
+
+\fIMODULE=rpm\/\fR
+.B mtf-env-clean
+
+\fIMODULE=nspawn\/\fR
+.B mtf-env-clean
 
 .SH DESCRIPTION
+.PP
 \fBmtf-env-clean\fP is the binary file for cleaning environment of Meta-Test-Family. It stops docker service.
+.PP
+\fIMODULE=docker\/\fR cleans docker service environment.
 
 .SH NOTES
-\fBmtf-env-clean\fP is useful for users who don't want to care about environment and their clean up.
+\fBmtf-env-clean\fP mtf-env-set is useful for people who don't want to clean the environment
+manually and wish to use this executable to do the job.
 
 .SH AUTHORS
 Petr Hracek, <phracek@redhat.com> (man page)
+
+.SH "SEE ALSO"
+Full documentation at: <http://meta-test-family.readthedocs.io/en/latest/user_guide/environment_setup.html>
