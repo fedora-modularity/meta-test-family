@@ -50,6 +50,7 @@ def get_dir(system_path=None, virtual_path=None):
             system_path = []
     return os.path.join(*(['/'] + system_path))
 
+
 data_files = {}
 
 paths = ['docs', 'examples', 'tools']
@@ -59,6 +60,16 @@ for path in paths:
         data_files[
             get_dir(
                 ['usr', 'share', 'moduleframework', root])] = [
+            os.path.join(root, f) for f in files]
+
+paths = ['man']
+
+for path in paths:
+    for root, dirs, files in os.walk(path, followlinks=True):
+        print(root, dirs, files)
+        data_files[
+            get_dir(
+                ['usr', 'share', 'man', 'man1'])] = [
             os.path.join(root, f) for f in files]
 
 setup(
