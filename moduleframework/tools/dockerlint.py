@@ -28,9 +28,44 @@ from moduleframework import dockerlinter
 from moduleframework.avocado_testers import container_avocado_test
 
 
-class DockerFileLinter(module_framework.AvocadoTest):
+class DockerInstructions(module_framework.AvocadoTest):
     """
     :avocado: enable
+    :avocado: tags=sanity
+
+    """
+
+    dp = None
+
+    def setUp(self):
+        # it is not intended just for docker, but just docker packages are
+        # actually properly signed
+        self.dp = dockerlinter.DockerfileLinter()
+        if self.dp.dockerfile is None:
+            dir_name = os.getcwd()
+            self.log.info("Dockerfile was not found in %s directory." % dir_name)
+            self.skip()
+
+    def test_from_is_first_directive(self):
+        self.assertTrue(self.dp.check_from_is_first())
+
+    def test_from_directive_is_valid(self):
+        self.assertTrue(self.dp.check_from_directive_is_valid())
+
+    def test_chained_run_dnf_commands(self):
+        self.assertTrue(self.dp.check_chained_run_dnf_commands())
+
+    def test_chained_run_rest_commands(self):
+        self.assertTrue(self.dp.check_chained_run_rest_commands())
+
+    def test_helpmd_is_present(self):
+        self.assert_to_warn(self.assertTrue, self.dp.check_helpmd_is_present())
+
+
+class DockerLabels(module_framework.AvocadoTest):
+    """
+    :avocado: enable
+    :avocado: sanity
 
     """
 
@@ -79,21 +114,6 @@ class DockerFileLinter(module_framework.AvocadoTest):
 
     def test_run_or_usage_label_exists(self):
         self.assertTrue(self._test_for_env_and_label("run", "usage", env=False))
-
-    def test_from_is_first_directive(self):
-        self.assertTrue(self.dp.check_from_is_first())
-
-    def test_from_directive_is_valid(self):
-        self.assertTrue(self.dp.check_from_directive_is_valid())
-
-    def test_chained_run_dnf_commands(self):
-        self.assertTrue(self.dp.check_chained_run_dnf_commands())
-
-    def test_chained_run_rest_commands(self):
-        self.assertTrue(self.dp.check_chained_run_rest_commands())
-
-    def test_helpmd_is_present(self):
-        self.assert_to_warn(self.assertTrue, self.dp.check_helpmd_is_present())
 
 
 class DockerLint(container_avocado_test.ContainerAvocadoTest):

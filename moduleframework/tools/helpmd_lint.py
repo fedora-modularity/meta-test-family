@@ -29,9 +29,10 @@ from moduleframework import module_framework
 from moduleframework.common import get_docker_file
 
 
-class HelpMDLinter(module_framework.AvocadoTest):
+class DockerHelpSanity(module_framework.AvocadoTest):
     """
     :avocado: enable
+    :avocado: optional
 
     """
 
