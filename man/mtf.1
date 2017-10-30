@@ -4,16 +4,61 @@
 .\"
 .TH mtf 1 2017-11-01 "" "Linux User's Manual"
 .SH NAME
-mtf \- Meta-Test-Family tests container images and modules with user defined tests written in Python and/or linters
-provided by meta-test-family package.
+mtf \- runs tests for container images
 
 .SH SYNOPSIS
-\fBmtf runs tests for container images
-
-\fBmtf [-l, --linters]
+[\fI\,VARIABLES\/\fT]
+.B
+mtf
+[\fI\,OPTIONS\/\fR] PYTHON_TESTS
 
 .SH DESCRIPTION
-\fBmtf\fP is the main binary file of Meta-Test-Family.
+\fBmtf\fP is the main binary file of Meta-Test-Family. It tests container images and modules with user defined tests written in Python and/or linters
+provided by meta-test-family package.
+It runs PYTHON_TESTS in avocado framework.
+
+.SH VARIABLES
+.TP
+.B AVOCADO_LOG_DEBUG=yes
+enables avocado debug output.
+.TP
+.B DEBUG=yes
+enables debugging mode to test output.
+.TP
+.B CONFIG
+defines the module configuration file. It defaults to
+.B config.yaml
+.TP
+.B MODULE
+defines tested module type, if
+.B default-module
+is not set in
+.B config.yaml.
+.TP
+.B URL to container.
+E.g. URL=docker.io/modularitycontainers/haproxy if MODULE=docker
+.TP
+.B MODULEMDURL
+overwrites the location of a moduleMD file.
+.TP
+.B COMPOSEURL
+overwrites the location of a compose Pungi build.
+.TP
+.B MTF_SKIP_DISABLING_SELINUX=yes
+does not disable SELinux. In nspawn type on Fedora 25 SELinux should be disabled, because it does not work well with SELinux enabled, this option allows to not do that.
+.TP
+.B MTF_DO_NOT_CLEANUP=yes
+does not clean up module after tests execution (a machine remains running).
+.TP
+.B MTF_REUSE=yes
+uses the same module between tests. It speeds up test execution. It can cause side effects.
+.TP
+.B MTF_REMOTE_REPOS=yes
+disables downloading of Koji packages and creating a local repo, and speeds up test execution.
+.TP
+.B MTF_DISABLE_MODULE=yes
+disables module handling to use nonmodular test mode.
+
 
 .SH OPTIONS
 .TP
@@ -27,4 +72,4 @@ Once \fBmtf\fP finishes it shows logs from failed tests.
 Petr Hracek, <phracek@redhat.com> (man page)
 
 .SH SEE ALSO
-Full documentation at: <https
+Full documentation at: <http://meta-test-family.readthedocs.io/en/latest/user_guide/index.html>

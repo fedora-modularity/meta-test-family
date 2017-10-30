@@ -7,12 +7,31 @@
 mtf-env-set \- prepares environment for testing containers.
 
 .SH SYNOPSIS
+\fIMODULE=docker\/\fR
 .B mtf-env-set
+
+\fIMODULE=rpm\/\fR
+.B mtf-env-set
+
+\fIMODULE=nspawn\/\fR
+.B mtf-env-set
+
 
 .SH DESCRIPTION
 .PP
-\fBmtf-env-clean\fP  is the binary file of Meta-Test-Family package. It installs tests dependencies, docker service
-and starts docker service.
+\fBmtf-env-set\fP is the binary file of Meta-Test-Family package.
+
+.PP
+\fIMODULE=docker\/\fR It installs tests dependencies, docker service
+and starts docker service for testing containers
+
+.PP
+\fIMODULE=rpm\/\fR installs RPM dependencies on this machine.
+
+.PP
+\fIMODULE=nspawn\/\fR installs RPM dependencies. If environment variable MTF_SKIP_DISABLING_SELINUX is
+set, it disables SELinux. It installs systemd-container package on this machine.
+
 
 .SH NOTES
 \fBmtf-env-set\fP mtf-env-set is useful for people who don't want to set the environment manually

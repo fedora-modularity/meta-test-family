@@ -18,9 +18,16 @@ mtf-env-clean \- cleans environment for testing containers.
 
 .SH DESCRIPTION
 .PP
-\fBmtf-env-clean\fP is the binary file for cleaning environment of Meta-Test-Family. It stops docker service.
+\fBmtf-env-clean\fP is the binary file for cleaning environment of Meta-Test-Family.
+
 .PP
-\fIMODULE=docker\/\fR cleans docker service environment.
+\fIMODULE=docker\/\fR stops docker service.
+
+.PP
+\fIMODULE=rpm\/\fR does not do cleanup as it can destroy this machine.
+
+.PP
+\fIMODULE=nspawn\/\fR switches back SELinux to original state.
 
 .SH NOTES
 \fBmtf-env-clean\fP mtf-env-set is useful for people who don't want to clean the environment
