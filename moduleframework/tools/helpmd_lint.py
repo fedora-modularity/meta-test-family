@@ -73,7 +73,7 @@ class HelpMDLinter(module_framework.AvocadoTest):
         self.assertTrue(self.helpmd.get_tag("USAGE"))
 
     def test_helpmd_environment_variables(self):
-        self.mark_as_warn(self.assertTrue, self.helpmd.get_tag("ENVIRONMENT VARIABLES"))
+        self.assert_to_warn(self.assertTrue, self.helpmd.get_tag("ENVIRONMENT VARIABLES"))
 
     def test_helpmd_security_implications(self):
         if self.dp.get_docker_expose():

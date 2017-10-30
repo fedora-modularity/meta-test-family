@@ -93,7 +93,7 @@ class DockerFileLinter(module_framework.AvocadoTest):
         self.assertTrue(self.dp.check_chained_run_rest_commands())
 
     def test_helpmd_is_present(self):
-        self.mark_as_warn(self.assertTrue, self.dp.check_helpmd_is_present())
+        self.assert_to_warn(self.assertTrue, self.dp.check_helpmd_is_present())
 
 
 class DockerLint(container_avocado_test.ContainerAvocadoTest):
