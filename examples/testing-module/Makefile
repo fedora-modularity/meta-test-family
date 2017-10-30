@@ -85,6 +85,10 @@ check-mtf-init:
 	cd $(TEMPDIR); grep 'class Smoke1' test.py ; grep 'default_module' config.yaml; sudo mtf test.py
 	rm -rf "$(TEMPDIR)"
 
+check-mtf-linters:
+	cd ../mtf-linters; MODULE=docker mtf-env-set
+	cd ../mtf-linters; MODULE=docker $(CMD) -l
+
 check: check-docker
 
 all: check

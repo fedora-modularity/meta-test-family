@@ -49,7 +49,10 @@ class HelpMDLinter(object):
 
     def get_tag(self, name):
         name = '# %s' % name
+        tag_found = True
         if not self.help_md:
+            common.print_info("help md does not exist.")
             return False
-        tag_exists = [x for x in self.help_md if name.upper() in x]
-        return tag_exists
+        if not [x for x in self.help_md if name.upper() in x]:
+            tag_found = False
+        return tag_found
