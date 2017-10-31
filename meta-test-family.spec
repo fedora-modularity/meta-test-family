@@ -43,6 +43,10 @@ install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
 
 %files
 %license LICENSE
+%{_mandir}/man1/mtf.1*
+%{_mandir}/man1/mtf-env-clean.1*
+%{_mandir}/man1/mtf-env-set.1*
+%{_mandir}/man1/mtf-generator.1*
 %{_bindir}/mtf
 %{_bindir}/mtf-cmd
 %{_bindir}/mtf-generator
