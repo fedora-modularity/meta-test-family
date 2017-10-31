@@ -66,7 +66,6 @@ paths = ['man']
 
 for path in paths:
     for root, dirs, files in os.walk(path, followlinks=True):
-        print(root, dirs, files)
         data_files[
             get_dir(
                 ['usr', 'share', 'man', 'man1'])] = [
