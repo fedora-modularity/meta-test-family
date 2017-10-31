@@ -27,8 +27,8 @@ from moduleframework import module_framework
 
 class ModuleLintSigning(module_framework.AvocadoTest):
     """
-    :avocado: disable
-    :avocado: tags=WIP
+    :avocado: enable
+    :avocado: tags=docker,fedora,rhel,tier1,WIP
     """
 
     def setUp(self):
@@ -48,12 +48,16 @@ class ModuleLintSigning(module_framework.AvocadoTest):
         for package in [x.strip() for x in allpackages.split('\n')]:
             pinfo = package.split(', ')
             if len(pinfo) == 3:
-                self.assertIn(KEY, pinfo[2])
+                if KEY in pinfo[2]:
+                    self.assertTrue(True,msg="%s in %s" % (KEY,pinfo[2]))
+                else:
+                    self.log.warn("Package sign verify failed: %s not in %s" % (KEY,pinfo[2]))
 
 
 class ModuleLintPackagesCheck(module_framework.AvocadoTest):
     """
     :avocado: enable
+    :avocado: tags=docker,fedora,rhel,tier1
     """
 
     def test(self):

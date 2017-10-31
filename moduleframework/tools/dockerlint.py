@@ -31,6 +31,7 @@ from moduleframework.avocado_testers import container_avocado_test
 class DockerFileLinter(module_framework.AvocadoTest):
     """
     :avocado: enable
+    :avocado: tags=docker,fedora,rhel,tier1
 
     """
 
@@ -99,6 +100,7 @@ class DockerFileLinter(module_framework.AvocadoTest):
 class DockerLint(container_avocado_test.ContainerAvocadoTest):
     """
     :avocado: enable
+    :avocado: tags=docker,fedora,rhel,tier1
     """
 
     def testLabels(self):

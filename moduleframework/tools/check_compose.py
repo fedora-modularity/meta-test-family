@@ -33,6 +33,7 @@ class ComposeTest(module_framework.NspawnAvocadoTest):
     Validate overall module compose.
 
     :avocado: enable
+    :avocado: tags=docker,fedora,rhel,tier1,slow
     """
 
     def test_component_profile_installability(self):
