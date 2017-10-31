@@ -24,5 +24,6 @@ script:
   - sudo make travis
   - sudo make -C examples/testing-module check-real-rpm-destructive
   - sudo make -C examples/testing-module check-docker-scl-multi-travis
+  - sudo make -C examples/testing-module check-mtf-linters
 
 after_script: sudo cat ~/avocado/job-results/latest/job.log
