@@ -271,10 +271,11 @@ class AvocadoTest(Test):
         :param kwargs: pass this args to run function
         :return: returns either PASS or WARN
         """
-        try:
-            func(*args, **kwargs)
-        except AssertionError as e:
-            self.log.warn("Warning raised: %s" % e)
+        ret_code = func(*args, **kwargs)
+        if not ret_code:
+            self.log.warn("Warning raised from %s function" % func)
+        else:
+            self.assertTrue(ret_code)
 
 
 def get_backend():
