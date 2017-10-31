@@ -94,7 +94,7 @@ setup(
             'mtf-init = moduleframework.mtf_init:main',
         ]
     },
-    setup_requires=[],
+    setup_requires=open('requirements.txt').read().splitlines(),
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
