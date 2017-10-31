@@ -29,7 +29,7 @@ from moduleframework import module_framework
 from moduleframework.common import get_docker_file
 
 
-class DockerHelpSanity(module_framework.AvocadoTest):
+class HelpFileSanity(module_framework.AvocadoTest):
     """
     :avocado: enable
     :avocado: optional

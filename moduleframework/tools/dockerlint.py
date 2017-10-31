@@ -28,7 +28,7 @@ from moduleframework import dockerlinter
 from moduleframework.avocado_testers import container_avocado_test
 
 
-class DockerInstructions(module_framework.AvocadoTest):
+class DockerInstructionsTests(module_framework.AvocadoTest):
     """
     :avocado: enable
     :avocado: tags=sanity
@@ -62,7 +62,7 @@ class DockerInstructions(module_framework.AvocadoTest):
         self.assert_to_warn(self.assertTrue, self.dp.check_helpmd_is_present())
 
 
-class DockerLabels(module_framework.AvocadoTest):
+class DockerLabelsTests(module_framework.AvocadoTest):
     """
     :avocado: enable
     :avocado: sanity
