@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           meta-test-family
-Version:        0.7.6
+Version:        0.7.7
 Release:        1%{?dist}
 Summary:        Tool to test components of a modular Fedora
 
@@ -61,6 +61,9 @@ install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
 
 
 %changelog
+* Tue Oct 31 2017 Petr Hracek <phracek@redhat.com> 0.7.7-1
+- new upstream release
+
 * Tue Oct 24 2017 Petr Hracek <phracek@redhat.com> 0.7.6-1
 - new upstream release
 
