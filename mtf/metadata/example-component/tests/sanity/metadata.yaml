@@ -1,0 +1,9 @@
+document: metadata
+subtype: test
+source: generaltest.py
+relevancy:
+  - rule 1
+  - rule 2
+description: some general test doing
+envvars:
+  ATOMIC: link to atomic container
