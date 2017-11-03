@@ -14,27 +14,24 @@ SUBTYPE_T = "test"
 BACKEND = "backend"
 BACKEND_DEFAULT = "mtf"
 
-try:
-    import moduleframework.tools
-    MTF_LINTER_PATH = os.path.dirname(moduleframework.tools.__file__)
-except:
-    pass
-
 class MetadataLoader(object):
     base_element = {}
     parent_backend = BACKEND_DEFAULT
-    def __init__(self, localtion="."):
+    def __init__(self, localtion=".", linters=False, backend=BACKEND_DEFAULT):
         self.location = localtion
+        self.backend = backend
         self.__load_recursive()
         self.parent_backend = self.base_element.get(BACKEND) or BACKEND_DEFAULT
+        if linters:
+            self._import_linters()
 
-    def import_mtf_tests(self,testglob, pathlenght=0):
+    def _import_tests(self,testglob, pathlenght=0):
         for testfile in glob.glob(testglob):
             self.__insert_to_test_tree(os.path.dirname(testglob.strip(os.sep).split(os.sep))[pathlenght:],
                                        testfile)
 
-    def import_mtf_linters(self):
-        self.import_mtf_tests(os.path.join(MTF_LINTER_PATH,"*.py"), pathlenght=-2)
+    def _import_linters(self):
+        raise NotImplementedError
 
     def get_metadata(self):
         return self.base_element
@@ -100,6 +97,34 @@ class MetadataLoader(object):
 
     def get_coverage(self):
         return self.base_element.get(TESTC)
+
+    def backend_test_set(self):
+        return set([x.get(SOURCE) for x in self.get_coverage() if x.get(BACKEND)==self.backend and x.get(SOURCE)])
+
+    def get_backends(self):
+        return set([x.get(BACKEND) for x in self.get_coverage()])
+
+    def filter_relevancy(self,envrion_description):
+        raise NotImplementedError
+
+    def filter_tags(self,tag_list):
+        raise NotImplementedError
+
+    def filter(self, relevancy={}, tags=[]):
+        raise NotImplementedError
+
+
+class MetadataLoaderMTF(MetadataLoader):
+    import moduleframework.tools
+    MTF_LINTER_PATH = os.path.dirname(moduleframework.tools.__file__)
+
+    def __init__(self, *args, **kwargs):
+        super(MetadataLoader, self).__init__(*args,**kwargs)
+
+    def _import_linters(self):
+        self._import_tests(os.path.join(self.MTF_LINTER_PATH,"*.py"), pathlenght=-2)
+
+
 
 
 def test_loader():
