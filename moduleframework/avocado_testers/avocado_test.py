@@ -34,6 +34,7 @@ from moduleframework.common import *
 from moduleframework.helpers.container_helper import ContainerHelper
 from moduleframework.helpers.nspawn_helper import NspawnHelper
 from moduleframework.helpers.rpm_helper import RpmHelper
+from moduleframework.helpers.openshift_helper import OpenShiftHelper
 
 
 # INTERFACE CLASS FOR GENERAL TESTS OF MODULES
@@ -292,6 +293,9 @@ def get_backend():
         return RpmHelper()
     elif parent == 'nspawn':
         return NspawnHelper()
+    elif parent == 'openshift':
+        return OpenShiftHelper()
+
 
 # To keep backward compatibility. This method could be used by pure avocado tests and is already used
 get_correct_backend = get_backend

@@ -504,6 +504,7 @@ class CommonFunctions(object):
             self.modulemdConf = link
         return link
 
+
     def getIPaddr(self):
         """
         Return protocol (IP or IPv6) address on a guest machine.
@@ -513,6 +514,9 @@ class CommonFunctions(object):
 
         :return: str
         """
+        print_info(os.environ.get('MODULE'))
+        if 'openshift' == os.environ.get('MODULE'):
+            return trans_dict['GUESTIPADDR']
         return self.ipaddr
 
     def _callSetupFromConfig(self):
@@ -641,7 +645,7 @@ class CommonFunctions(object):
         if src is not dest:
             self.run("cp -rf %s %s" % (src, dest))
 
-    def run_script(self,filename, *args, **kwargs):
+    def run_script(self, filename, *args, **kwargs):
         """
         run script or binary inside module
         :param filename: filename to copy to module
@@ -656,6 +660,7 @@ class CommonFunctions(object):
         if args:
             parameters = " " + " ".join(args)
         return self.run("bash " + dest + parameters, **kwargs)
+
 
 def get_config():
     """
@@ -697,8 +702,8 @@ def get_config():
                 raise ConfigExc("No module in yaml config defined")
             # copy rpm section to nspawn, in case not defined explicitly
             # make it backward compatible
-            if xcfg.get("module",{}).get("rpm") and not xcfg.get("module",{}).get("nspawn"):
-                xcfg["module"]["nspawn"] = copy.deepcopy(xcfg.get("module",{}).get("rpm"))
+            if xcfg.get("module", {}).get("rpm") and not xcfg.get("module", {}).get("nspawn"):
+                xcfg["module"]["nspawn"] = copy.deepcopy(xcfg.get("module", {}).get("rpm"))
             __persistent_config = xcfg
             return xcfg
         except IOError:
@@ -726,7 +731,7 @@ def get_backend_list():
 
     :return: list
     """
-    base_module_list = ["rpm", "nspawn", "docker"]
+    base_module_list = ["rpm", "nspawn", "docker", "openshift"]
     return base_module_list
 
 
@@ -757,7 +762,7 @@ def get_module_type_base():
     module_type = get_module_type()
     parent = module_type
     if module_type not in get_backend_list():
-        parent = get_config().get("module",{}).get(module_type, {}).get("parent")
+        parent = get_config().get("module", {}).get(module_type, {}).get("parent")
         if not parent:
             raise ModuleFrameworkException("Module (%s) does not provide parent backend parameter (there are: %s)" %
                                            (module_type, get_backend_list()))

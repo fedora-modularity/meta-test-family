@@ -23,7 +23,7 @@ travis:
 
 clean:
 	pip uninstall .
-	git clean -fd
+	#git clean -fd
 	rm -rf build/html
 
 install: clean
