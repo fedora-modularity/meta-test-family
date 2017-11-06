@@ -14,9 +14,47 @@ SUBTYPE_T = "test"
 BACKEND = "backend"
 BACKEND_DEFAULT = "mtf"
 
+def logic_formula(actual_tags, filter_list):
+    def tag_logic_simple(simple):
+        key = simple
+        value = True
+        if key.startswith("-"):
+            key = key[1:]
+            value = False
+        return key, value
+
+    def tag_logic_formula(normalform):
+        dictset = {}
+        for one in normalform.split(","):
+            k, v = tag_logic_simple(one)
+            dictset[k] = v
+        return dictset
+
+    def tag_logic_filter(actual_tag_list, tag_filter):
+        statement_or = False
+        # if no tags in test then add this test to set (same behaviour as avocado --tag...empty)
+        print actual_tag_list, tag_filter
+        if not actual_tag_list:
+            statement_or = True
+        actualinput = tag_logic_formula(actual_tag_list)
+        for onefilter in tag_filter:
+            filterinput = tag_logic_formula(onefilter)
+            statement_and = True
+            for key in filterinput:
+                if filterinput.get(key) != bool(actualinput.get(key)):
+                    statement_and = False
+                    break
+            if statement_and:
+                statement_or = True
+                break
+        return statement_or
+    return tag_logic_filter(actual_tags, filter_list)
+
 class MetadataLoader(object):
     base_element = {}
     parent_backend = BACKEND_DEFAULT
+    # in filter there will be items like: {"relevancy": None, "tags": None}
+    filter_list = [None]
     def __init__(self, localtion=".", linters=False, backend=BACKEND_DEFAULT):
         self.location = localtion
         self.backend = backend
@@ -98,21 +136,42 @@ class MetadataLoader(object):
     def get_coverage(self):
         return self.base_element.get(TESTC)
 
-    def backend_test_set(self):
-        return set([x.get(SOURCE) for x in self.get_coverage() if x.get(BACKEND)==self.backend and x.get(SOURCE)])
-
     def get_backends(self):
         return set([x.get(BACKEND) for x in self.get_coverage()])
 
-    def filter_relevancy(self,envrion_description):
-        raise NotImplementedError
+    def filter_relevancy(self, tests, envrion_description):
+        pass
 
-    def filter_tags(self,tag_list):
-        raise NotImplementedError
+    def filter_tags(self, tests, tag_list):
+        output = []
+        for test in tests:
+            test_tags = test.get("tags", "")
+            if logic_formula(test_tags, tag_list):
+                output.append(test)
+        return output
 
-    def filter(self, relevancy={}, tags=[]):
-        raise NotImplementedError
+    def add_filter(self, relevancy={}, tags=[]):
+        addedfilter = {'relevancy':relevancy, 'tags':tags}
+        if self.filter_list[-1] == None:
+            self.filter_list[-1] = addedfilter
+        self.filter_list.append(addedfilter)
 
+    def apply_filters(self):
+        output = self.backend_test_set()
+        for infilter in self.filter_list:
+            if infilter:
+                output = self.filter_tags(output, infilter.get("tags"))
+                output = self.filter_relevancy(output, infilter.get("relevancy"))
+        return output
+
+    def backend_test_set(self):
+        return set([x.get(SOURCE) for x in self.get_coverage() if x.get(BACKEND)==self.backend and x.get(SOURCE)])
+
+    def backend_passtrought_args(self):
+        return self.get_filters()[-1]
+
+    def get_filters(self):
+        return self.filter_list
 
 class MetadataLoaderMTF(MetadataLoader):
     import moduleframework.tools
@@ -123,8 +182,6 @@ class MetadataLoaderMTF(MetadataLoader):
 
     def _import_linters(self):
         self._import_tests(os.path.join(self.MTF_LINTER_PATH,"*.py"), pathlenght=-2)
-
-
 
 
 def test_loader():

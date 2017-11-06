@@ -1,0 +1,7 @@
+document: metadata
+subtype: general
+default_module: docker
+enable_module_lint: True
+tag_filters:
+    - "add,-rem"
+    - "dockerfilelint"

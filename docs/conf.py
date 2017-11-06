@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# meta-test-family documentation build configuration file, created by
+# metatest-family documentation build configuration file, created by
 # sphinx-quickstart on Tue Apr 21 13:42:00 2015.
 #
 # This file is execfile()d with the current directory set to its
@@ -64,7 +64,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'meta-test-family'
+project = u'metatest-family'
 copyright = u'2017, Red Hat'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -239,7 +239,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('manpage', 'meta-test-family',
+    ('manpage', 'metatest-family',
      u'helps you with writing tests for you modules and containers',
      [u'Petr Hracek', u'Jan Scotka'], 1),
 ]

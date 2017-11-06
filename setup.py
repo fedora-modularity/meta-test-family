@@ -72,13 +72,13 @@ for path in paths:
             os.path.join(root, f) for f in files]
 
 setup(
-    name='meta-test-family',
+    name='metatest-family',
     version="0.7.7",
     description='Tool to test components fo a modular Fedora.',
     keywords='modules,containers,testing,framework',
     author='Jan Scotka',
     author_email='jscotka@redhat.com',
-    url='https://github.com/fedora-modularity/meta-test-family',
+    url='https://github.com/fedora-modularity/metatest-family',
     license='GPLv2+',
     packages=find_packages(exclude=['docs', 'examples', 'tools']),
     include_package_data=True,

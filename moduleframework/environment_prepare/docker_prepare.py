@@ -42,7 +42,7 @@ class EnvDocker(CommonFunctions):
 
     def add_insecure_registry(self, registry):
         """
-        https://github.com/fedora-modularity/meta-test-family/issues/52
+        https://github.com/fedora-modularity/metatest-family/issues/52
 
         Deprecated: Append registry into inserure registry.
 

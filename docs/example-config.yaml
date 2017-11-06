@@ -3,7 +3,7 @@
 # if your module does not provide any service, you can use minimal version:
 # https://github.com/fedora-modularity/meta-test-family/blob/master/docs/example-config-minimal.yaml
 # MANDATORY
-document: meta-test
+document: metatest
 # MANDATORY
 version: 1
 # name of module for testing (it should be same as moduleMD yaml file without extension)

@@ -1,4 +1,4 @@
-document: meta-test
+document: metatest
 version: 1
 name: Module name
 modulemd-url: URL to Raw format of YAML file

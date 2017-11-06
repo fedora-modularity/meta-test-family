@@ -687,7 +687,7 @@ def get_config():
         try:
             with open(cfgfile, 'r') as ymlfile:
                 xcfg = yaml.load(ymlfile.read())
-            doc_name = ['modularity-testing', 'meta-test-family', 'meta-test']
+            doc_name = ['modularity-testing', 'metatest-family', 'metatest']
             if xcfg.get('document') not in doc_name:
                 raise ConfigExc("bad yaml file: item (%s)" %
                                 doc_name, xcfg.get('document'))

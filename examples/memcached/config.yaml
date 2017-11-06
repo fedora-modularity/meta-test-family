@@ -1,4 +1,4 @@
-document: meta-test
+document: metatest
 version: 1
 name: memcached
 modulemd-url: https://src.fedoraproject.org/modules/memcached/raw/master/f/memcached.yaml
