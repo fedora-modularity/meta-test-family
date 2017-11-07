@@ -184,7 +184,9 @@ class DockerfileLinter(object):
 
     def check_chained_run_dnf_commands(self):
         """
-        Function checks if Dockerfile does not contain more `RUN dnf/yum` commands in more then one row.
+        This function checks that there are no consecutive
+        RUN commands executing dnf/yum in the Dockerfile,
+        as these need to be chained.
 
         BAD examples:
         ~~~~~~~~~~~~
