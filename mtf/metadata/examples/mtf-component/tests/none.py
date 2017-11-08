@@ -3,7 +3,7 @@ from mtf.metatest import AvocadoTest
 class Rem1(AvocadoTest):
     """
     :avocado: enable
-    :avocado: tags=red
+    :avocado: tags=rem
     """
     def setUp(self):
         pass
@@ -23,7 +23,7 @@ class Rem2(AvocadoTest):
         pass
     def test(self):
         """
-        :avocado: tags = rem
+        :avocado: tags=rem
         """
         pass
 

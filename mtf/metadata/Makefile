@@ -2,13 +2,16 @@ PYTHONSITE=/usr/lib/python2.7/site-packages
 
 all: check
 
-check: install
-	cd example-component/tests/; tmet-agregator
-	cd example-component/tests/; tmet-agregator |grep -o 50
-	cd example-component/tests/; tmet-filter
-	cd example-component/tests/; tmet-filter | grep -o 'file://general/generaltest.py'
+integrationtests: install
+	cd examples/general-component/; tmet-agregator
+	cd examples/general-component/; tmet-agregator |grep -o 50
+	cd examples/general-component/; tmet-filter
+	cd examples/general-component/; tmet-filter | grep -o 'generaltest.py'
 
-.PHONY: check
+unittests:
+	pytest tmet/selftests.py
+
+check: install unittests integrationtests
 
 clean:
 	pip uninstall .
@@ -18,3 +21,5 @@ install: clean
 
 source: clean
 	@python setup.py sdist
+
+.PHONY: check

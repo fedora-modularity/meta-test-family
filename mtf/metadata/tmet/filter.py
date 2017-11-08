@@ -1,34 +1,40 @@
 import argparse
 import common
-import re
 
 def get_options():
     parser = argparse.ArgumentParser(description='Filter and print tests')
-    parser.add_argument('-r', dest='relevancy', default='',
+    parser.add_argument('-r', dest='relevancy',
                         help='apply relevancy filtering, expect environment specification')
-    parser.add_argument('-t', dest='tags', default='',
-                        help='apply tags filtering, expect tags in DNF form')
+    parser.add_argument('-t', dest='tags', action="append",
+                        help='apply tags filtering, expect tags in DNF form (expressions in one option means AND, more -t means OR)')
+    parser.add_argument('-b', dest='backend',
+                        help='output for selected backend')
+    parser.add_argument('--location', dest='location', default='.',
+                        help='output for selected backend')
+    parser.add_argument('--linters', dest='linters', action='store_true',
+                        help='output for selected backend')
+    parser.add_argument('tests', nargs='*', help='import tests for selected backed')
+
     args = parser.parse_args()
     return args
 
-def filter_avocado_tags(tags_input,tags_filters):
-    pass
-
-def filters(meta, relevancy, tags):
-    items = meta.get_coverage()
-    output = []
-    for key in sorted(items):
-        value = items[key]
-        #### APPLY FILTERS ######
-        source = value.get(common.SOURCE) or ""
-        if re.match(r".*://.*", source):
-            output.append(source)
-        elif re.match(r".*", source):
-            output.append('file://%s/%s' % (key, source))
-
-    return output
-
 def main():
     options = get_options()
-    meta = common.MetadataLoader()
-    print " ".join(filters(meta, options.relevancy, options.tags))
+    output = filtertests(backend=options.backend,
+                      location=options.location,
+                      linters=options.linters,
+                      tests=options.tests,
+                      tags=options.tags,
+                      relevancy=options.relevancy
+                      )
+    print " ".join([x[common.SOURCE] for x in output])
+
+def filtertests(backend, location, linters, tests, tags, relevancy):
+    meta = common.get_backend_class(backend)(location=location,
+                                                     linters=linters,
+                                                     backend=backend)
+    if tests:
+        for test in tests:
+            meta._import_tests(test)
+    meta.add_filter(tags=tags, relevancy=relevancy)
+    return meta.apply_filters()

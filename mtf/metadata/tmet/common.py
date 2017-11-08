@@ -1,8 +1,11 @@
+from __future__ import print_function
 import yaml
 import os
 import glob
-from mtf.common import print_info, print_debug
+import sys
+from mtf.common import is_debug
 from avocado.utils import process
+
 
 MFILENAME = "metadata.yaml"
 DESC = "description"
@@ -14,11 +17,15 @@ SUBTYPE = "subtype"
 SUBTYPE_G = "general"
 SUBTYPE_T = "test"
 BACKEND = "backend"
-BACKEND_DEFAULT = "mtf"
 TAGS = "tags"
 RELEVANCY = "relevancy"
 DEPENDENCIES = "deps"
+COVPATH = "coverage_path"
 
+def print_debug(*args):
+    if is_debug():
+        for arg in args:
+            print(arg, file=sys.stderr)
 
 def logic_formula(statement, filters, op_negation="-", op_and=",", op_or=None):
     """
@@ -46,7 +53,8 @@ def logic_formula(statement, filters, op_negation="-", op_and=",", op_or=None):
             dictset[k] = v
         return dictset
 
-    def tag_logic_filter(actual_tag_list, tag_filter):
+    def logic_filter(actual_tag_list, tag_filter):
+        #TODO: try to replace this part with http://www.sympy.org
         statement_or = False
         # if no tags in test then add this test to set (same behaviour as avocado --tag...empty)
         #print actual_tag_list, tag_filter
@@ -67,18 +75,16 @@ def logic_formula(statement, filters, op_negation="-", op_and=",", op_or=None):
 
     if op_or:
         filters = filters.split(op_or)
-    return tag_logic_filter(statement, filters)
+    return logic_filter(statement, filters)
 
 class MetadataLoader(object):
     base_element = {}
-    parent_backend = BACKEND_DEFAULT
+    backend = "generic"
     # in filter there will be items like: {"relevancy": None, "tags": None}
     filter_list = [None]
-    def __init__(self, location=".", linters=False, backend=BACKEND_DEFAULT, **kwargs):
+    def __init__(self, location=".", linters=False, **kwargs):
         self.location = location
-        self.backend = backend
         self._load_recursive()
-        self.parent_backend = self.base_element.get(BACKEND) or BACKEND_DEFAULT
         if linters:
             self._import_linters()
 
@@ -105,14 +111,14 @@ class MetadataLoader(object):
             return xcfg
 
     def _insert_to_coverage(self, path_list, test):
-        if not self.base_element.get(TESTC):
-            self.base_element[TESTC] = dict()
         coverage_key = "/".join(path_list)
+        print_debug("INSERT %s to %s" % (test, coverage_key))
         # add test coverage key
         # add backend key if does not exist
         self.base_element[TESTC][coverage_key] = test
+        self.base_element[TESTC][coverage_key][COVPATH] = coverage_key
         if not self.base_element[TESTC][coverage_key].get(BACKEND):
-            self.base_element[TESTC][coverage_key][BACKEND] = self.parent_backend
+            self.base_element[TESTC][coverage_key][BACKEND] = self.backend
 
     def _parse_base_coverage(self,base=None, path=[]):
         base = base or self.base_element.get(TESTE,{})
@@ -125,8 +131,6 @@ class MetadataLoader(object):
 
     def _insert_to_test_tree(self, path_list, test):
         actualelem = self.base_element
-        if not actualelem.get(TESTE):
-            actualelem[TESTE] = dict()
         actualelem = actualelem[TESTE]
         previous_item = None
         link_previous = None
@@ -154,7 +158,10 @@ class MetadataLoader(object):
             self.base_element = elem_element
         else:
             self.base_element = {}
-
+        if not self.base_element.get(TESTC):
+            self.base_element[TESTC] = dict()
+        if not self.base_element.get(TESTE):
+            self.base_element[TESTE] = dict()
         self._parse_base_coverage()
         for item in allfiles:
             self._insert_to_test_tree(os.path.dirname(item)[len(location):].split("/")[1:],
@@ -187,8 +194,10 @@ class MetadataLoader(object):
         output = self.backend_tests()
         for infilter in self.filter_list:
             if infilter:
-                output = self.filter_tags(output, infilter.get(TAGS))
-                output = self.filter_relevancy(output, infilter.get(RELEVANCY))
+                if infilter.get(TAGS):
+                    output = self.filter_tags(output, infilter.get(TAGS))
+                if infilter.get(RELEVANCY):
+                    output = self.filter_relevancy(output, infilter.get(RELEVANCY))
         return output
 
     def backend_tests(self):
@@ -204,10 +213,14 @@ class MetadataLoader(object):
 class MetadataLoaderMTF(MetadataLoader):
     import moduleframework.tools
     MTF_LINTER_PATH = os.path.dirname(moduleframework.tools.__file__)
+    listcmd = "avocado list"
+    backend = "mtf"
+    def __init__(self, *args, **kwargs):
+        super(MetadataLoaderMTF, self).__init__(*args, **kwargs)
 
     def _import_tests(self,testglob, pathlenght=0):
         print_debug("Importing tests: %s" % testglob)
-        tests = process.run("avocado list %s" % testglob, shell=True).stdout.splitlines()
+        tests = process.run("avocado list %s" % testglob, shell=True, verbose=False).stdout.splitlines()
         for testurl in tests:
             if testurl and len(testurl)>1:
                 testlinesplitted = testurl.split(" ")
@@ -220,29 +233,32 @@ class MetadataLoaderMTF(MetadataLoader):
                 self._insert_to_test_tree(testfile.strip(os.sep).split(os.sep)[pathlenght:],
                                        test)
 
-    def __init__(self, *args, **kwargs):
-        super(MetadataLoaderMTF, self).__init__(*args, **kwargs)
-
     def _import_linters(self):
         self._import_tests(os.path.join(self.MTF_LINTER_PATH,"*.py"), pathlenght=-3)
 
-    def filter_tags(self, tests={}, tag_list=[]):
-        justtests = tests.values()
-        "avocado"
+    def __avcado_tag_args(self, tag_list):
+        output = []
+        defaultparam = "--filter-by-tags-include-empty"
+        for tag in tag_list:
+            output.append("--filter-by-tags=%s" % tag)
+        if output:
+            output.append(defaultparam)
+        return " ".join(output)
 
-def test_loader():
-    mt = MetadataLoader(location="examples/general-component/tests")
-    print yaml.dump(mt.get_metadata())
 
-def test_mtf_metadata_linters_only():
-    mt = MetadataLoaderMTF(location="examples/mtf-component/tests", linters=True)
-    #print yaml.dump(mt.get_metadata())
-    print mt.backend_passtrought_args()
-    mt.add_filter(tags=["add"])
-    print mt.backend_passtrought_args()
-    print [v[SOURCE] for v in mt.backend_tests()]
-    #mt.apply_filters()
+    def filter_tags(self, tests, tag_list):
+        output = []
+        for test in tests:
+            test_tags = test.get(SOURCE)
+            cmd = process.run("%s %s %s" % (self.listcmd, self.__avcado_tag_args(tag_list), test[SOURCE]),
+                              shell=True, verbose=False)
+            if len(cmd.stdout)>10:
+                output.append(test)
+        return output
 
-#test_loader()
-
-test_mtf_metadata_linters_only()
+def get_backend_class(backend):
+    out = MetadataLoader
+    if backend == "mtf":
+        out = MetadataLoaderMTF
+    print_debug("Backend is: %s" % out)
+    return out

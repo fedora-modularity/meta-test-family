@@ -23,7 +23,7 @@ class Add2(AvocadoTest):
         pass
     def test(self):
         """
-        :avocado: tags = add
+        :avocado: tags=add
         """
         pass
 

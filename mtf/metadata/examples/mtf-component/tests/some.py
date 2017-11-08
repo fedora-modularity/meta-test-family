@@ -22,12 +22,12 @@ class AddPart(AvocadoTest):
     def tearDown(self, *args, **kwargs):
         pass
 
-    def test(self):
+    def testAdd(self):
         pass
 
     def testBad(self):
         """
-        :avocado: tags = rem
+        :avocado: tags=rem
         """
         pass
 
