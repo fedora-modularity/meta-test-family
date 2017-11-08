@@ -163,7 +163,15 @@ class DockerfileLinterInContainer(container_avocado_test.ContainerAvocadoTest):
         found_files = False
         file_list = []
         for ext in exts:
-            ret = self.run("for i in /var/cache/%s/**/*.%s" % (pkg_mgr, ext), ignore_status=True)
+            dir_with_ext = "/var/cache/{pkg_mgr}/**/*.{ext}".format(pkg_mgr=pkg_mgr, ext=ext)
+            # Some images does not contain find command and therefore we have to use for or ls.
+            ret = self.run('shopt -s globstar && for i in {dir}; do printf "%s\\n" "$i" ; done'.format(
+                dir=dir_with_ext),
+                ignore_status=True)
+            # we did not find any file with an extension.
+            # TODO I don't how to detect failure or empty files.
+            if ret.stdout.strip() == dir_with_ext:
+                continue
             file_list.extend(ret.stdout.split('\n'))
         if self._file_to_check(file_list):
             found_files = True
@@ -198,8 +206,7 @@ class DockerfileLinterInContainer(container_avocado_test.ContainerAvocadoTest):
         self.start()
         # Detect distro in image
         distro = self.run("cat /etc/os-release").stdout
-
-        if 'NAME=Fedora' in distro:
+        if 'Fedora' in distro:
             self.assertFalse(self._dnf_clean_all())
         else:
             self.assertFalse(self._yum_clean_all())
