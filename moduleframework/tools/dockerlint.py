@@ -124,7 +124,7 @@ class DockerfileLinterInContainer(container_avocado_test.ContainerAvocadoTest):
 
     def _file_to_check(self, doc_file_list):
         test_failed = False
-        for doc in doc_file_list.split('\n'):
+        for doc in doc_file_list:
             exit_status = self.run("test -e %s" % doc, ignore_status=True).exit_status
             if int(exit_status) == 0:
                 self.log.debug("%s doc file exists in container" % doc)
@@ -155,34 +155,54 @@ class DockerfileLinterInContainer(container_avocado_test.ContainerAvocadoTest):
         test_failed = False
         for pkg in list_pkg:
             pkg_doc = self.run("rpm -qd %s" % pkg, verbose=False).stdout
-            if self._file_to_check(pkg_doc):
+            if self._file_to_check(pkg_doc.split('\n')):
                 test_failed = True
         self.assertFalse(test_failed)
 
+    def _check_container_files(self, exts, pkg_mgr):
+        found_files = False
+        file_list = []
+        for ext in exts:
+            ret = self.run("for i in /var/cache/%s/**/*.%s" % (pkg_mgr, ext), ignore_status=True)
+            file_list.extend(ret.stdout.split('\n'))
+        if self._file_to_check(file_list):
+            found_files = True
+        return found_files
+
+    def _dnf_clean_all(self):
+        """
+        Function checks if files with relevant extensions exist in /var/cache/dnf directory
+        :return: True if at least one file exists
+                 False if no file exists
+        """
+        exts = ["solv", "solvx", "xml.gz", "rpm"]
+        return self._check_container_files(exts, "dnf")
+
+    def _yum_clean_all(self):
+        """
+        Function checks if files with relevant extensions exist in /var/cache/dnf directory
+        :return: True if at least one file exists
+                 False if no file exists
+        """
+        # extensions are taken from https://github.com/rpm-software-management/yum/blob/master/yum/__init__.py#L2854
+        exts = ['rpm', 'sqlite', 'sqlite.bz2', 'xml.gz', 'asc', 'mirrorlist.txt', 'cachecookie', 'xml']
+        return self._check_container_files(exts, "yum")
+
     def test_docker_clean_all(self):
         """
-        This test checks if size of /var/cache/<pkg_manager> is bigger then
-        150000 taken by command du -hsb /var/cache/<pkg_manager>
+        This test checks if `dnf/yum clean all` was called in image
 
-        :return: return True if size is less then 150000
-                 return False is size is bigger then 150000
+        :return: return True if clean all is called
+                 return False if clean all is not called
         """
         self.start()
-        pkg_mgr = "yum"
         # Detect distro in image
         distro = self.run("cat /etc/os-release").stdout
 
         if 'NAME=Fedora' in distro:
-            pkg_mgr = "dnf"
-        # Look, whether we have solv files in /var/cache/<pkg_mgr>/*.solv
-        # dnf|yum clean all deletes the file *.solv
-        ret = self.run("du -shb /var/cache/%s/" % pkg_mgr, ignore_status=True)
-        (size, directory) = ret.stdout.strip().split()
-        if int(size) < 10000:
-            correct_size = True
+            self.assertFalse(self._dnf_clean_all())
         else:
-            correct_size = False
-        self.assertTrue(correct_size)
+            self.assertFalse(self._yum_clean_all())
 
 
 class DockerLint(container_avocado_test.ContainerAvocadoTest):
