@@ -1,0 +1,7 @@
+document: test-metadata
+subtype: general
+tag_filters:
+    - "add,-rem"
+    - "dockerfilelint"
+import_tests:
+    - "*.py"

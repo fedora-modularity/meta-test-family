@@ -1,0 +1,70 @@
+# document identifier
+document: test-metadata
+# there are two types: full config is "general",for simple test metadata use "test"
+subtype: general
+# enable linters for selected module type (not supported for generic class)
+enable_lint: False
+# Import tests by path glob or by name, without complex features for coverage mapping
+import_tests:
+    - "*.py"
+    - "/bin/true"
+# DNF form of tags: Lines are logical OR, "," is logical AND, "-" is logical NOT
+tag_filters:
+    - tier1
+    - optional,-fedora
+    - dockerlinter
+    - dockerfilelinter
+# Coverage test mapping. Describe which part are covered and what are not covered (does not contain "source")
+# important are:
+#   leafs what contains test
+#   nonleafs means coverage path mapping
+tests:
+    general:
+    # path in coverage mapping
+        source: generaltest.py
+        #  code of test, where it lives (filesystem or some URL depending on backend (what is supported)
+        relevancy:
+        # relevancy descriptiont (NOT implemented now)
+             - rule 1
+             - rule 2
+        description: some general test doing
+        # description of test
+        backend: mtf
+        # which backend to use  and group tests (you can filter tests for one backend)
+    options:
+        fedora_test:
+            source: fedora_specifictest.sh
+            description: some general test doing verbose test
+            backend: general
+        extend_test:
+            source: https://github.com/fedora-modularity/meta-test-family.git
+            description: some general test doing verbose test
+            backend: general
+        test_new_option:
+            description: desc of not covered, missing source
+    networking:
+        test_use_tcp:
+            description: desc of not covered, missing source
+            backend: general
+        test_use_udp:
+            description: desc of not covered, missing source
+            backend: general
+
+# Test Sets,
+# when you would like to schedule just part of tests  and have varisou relevancy tag filters, use test_sets
+# Not implemented for now
+test_sets:
+    fedora:
+         tests:
+             - general
+             - fedora_test
+    all:
+         tests:
+             - "*"
+         tag_filters:
+    test_options:
+         tests:
+             - options/*
+    fedora:
+         tests:
+             - general

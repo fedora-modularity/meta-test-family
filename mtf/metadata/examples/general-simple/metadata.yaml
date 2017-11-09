@@ -1,0 +1,5 @@
+document: test-metadata
+subtype: general
+import_tests:
+    - "/bin/true"
+    - "/bin/false"
