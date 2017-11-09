@@ -21,6 +21,8 @@ def get_options():
                         help='output for selected backend')
     parser.add_argument('--linters', dest='linters', action='store_true',
                         help='output for selected backend')
+    parser.add_argument('--nofilters', dest='nofilters', action='store_true',
+                        help='disable all filters in config file and show all tests for backend')
     parser.add_argument('tests', nargs='*', help='import tests for selected backed')
 
     args = parser.parse_args()
@@ -34,12 +36,13 @@ def main():
                          linters=options.linters,
                          tests=options.tests,
                          tags=options.tags,
-                         relevancy=options.relevancy
+                         relevancy=options.relevancy,
+                         applyfilters=not options.nofilters
                          )
     print " ".join([x[common.SOURCE] for x in output])
 
 
-def filtertests(backend, location, linters, tests, tags, relevancy):
+def filtertests(backend, location, linters, tests, tags, relevancy, applyfilters=True):
     """
     Basic method to use it for wrapping inside another python code,
     allows apply tag filters and relevancy
@@ -58,5 +61,9 @@ def filtertests(backend, location, linters, tests, tags, relevancy):
     if tests:
         for test in tests:
             meta._import_tests(test)
-    meta.add_filter(tags=tags, relevancy=relevancy)
-    return meta.apply_filters()
+
+    if applyfilters:
+        meta.add_filter(tags=tags, relevancy=relevancy)
+        return meta.apply_filters()
+    else:
+        return meta.backend_tests()
