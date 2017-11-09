@@ -233,6 +233,20 @@ class DockerfileLinter(object):
             return False
         return True
 
+    def check_clean_all_command(self):
+        """
+        This function checks whether every RUN instruction containing a dnf/yum operation ends with a "dnf/yum clean all".
+
+        :return: True if every dnf/yum instruction contains a cleanup step
+                 False otherwise
+        """
+        for struct in self.dfp_structure:
+            if struct.get(INSTRUCT) == RUN:
+                if "dnf" in struct.get("value") or "yum" in struct.get("value"):
+                    if "clean all" in struct.get("value"):
+                        return True
+        return False
+
     def check_helpmd_is_present(self):
         """
         Function checks if helpmd. is present in COPY or ADD directives

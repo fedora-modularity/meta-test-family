@@ -130,17 +130,7 @@ def print_info(*args):
     :return: None
     """
     for arg in args:
-        result = arg
-        if isinstance(arg, basestring):
-            try:
-                result = arg.format(**trans_dict)
-            except KeyError:
-                raise ModuleFrameworkException(
-                    "String is formatted by using trans_dict. If you want to use "
-                    "brackets { } in your code, please use double brackets {{  }}."
-                    "Possible values in trans_dict are: %s"
-                    % trans_dict)
-        print(result, file=sys.stderr)
+        print(arg, file=sys.stderr)
 
 
 def print_debug(*args):
