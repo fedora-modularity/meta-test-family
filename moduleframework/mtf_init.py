@@ -74,7 +74,7 @@ class Template(object):
 
     def set_content_config_yaml(self):
         self.filePathConfig = 'config.yaml'
-        data = {"document" : "metatest",
+        data = {"document" : "meta-test",
                 "version" : "1",
                 "name" : "xxx",
                 "default_module" : "docker",

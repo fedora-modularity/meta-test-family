@@ -1,4 +1,4 @@
-document: metatest
+document: meta-test
 version: 1
 name: mariadb
 testdependencies:
