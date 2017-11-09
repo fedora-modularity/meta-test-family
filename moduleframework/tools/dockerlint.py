@@ -134,7 +134,7 @@ class DockerfileLinterInContainer(container_avocado_test.ContainerAvocadoTest):
     def test_all_nodocs(self):
         self.start()
         all_docs = self.run("rpm -qad", verbose=False).stdout
-        test_failed = self._file_to_check(all_docs)
+        test_failed = self._file_to_check(all_docs.split('\n'))
         if test_failed:
             self.log.warn("Documentation files exist in container. They are installed by Platform or by RUN commands.")
         self.assertTrue(True)
