@@ -29,7 +29,7 @@ from moduleframework.mtfexceptions import ContainerExc, ConfigExc
 
 class OpenShiftHelper(CommonFunctions):
     """
-    Basic Helper class for Docker container module type
+    Basic Helper class for OpenShift container module type
 
     :avocado: disable
     """
@@ -42,7 +42,6 @@ class OpenShiftHelper(CommonFunctions):
         self.name = None
         self.docker_id = None
         self.icontainer = self.get_url()
-        self.containerInfo = None
         if not self.icontainer:
             raise ConfigExc("No container image specified in the configuration file or environment variable.")
         if "docker=" in self.icontainer:
@@ -74,6 +73,11 @@ class OpenShiftHelper(CommonFunctions):
         return self.container_name
 
     def _app_exists(self):
+        """
+        It checks if an application already exists in OpenShift environment
+        :return: True, application exists
+                 False, application does not exist
+        """
         common.print_info("OpenShift app_exists")
         oc_status = self.runHost("oc status", ignore_status=True)
         if 'dc/%s' % self.app_name in oc_status.stdout:
@@ -88,19 +92,31 @@ class OpenShiftHelper(CommonFunctions):
         return True
 
     def _convert_string_to_json(self, string):
+        """
+        It converts a string to json format
+        :param string: String to format to json
+        :return: json output
+        """
         json_output = json.loads(string)
         common.print_info(json_output)
         return json_output
 
     def _remove_apps_from_openshift_namespaces(self, oc_service="svc"):
+        """
+        It removes an application from specific "namespace" like svc, dc, is.
+        :param oc_service: Service from which we would like to remove application
+        """
         # Check status of svc/dc/is
-        oc_status = self.runHost("oc status %s" % oc_service, ignore_status=True)
+        oc_status = self.runHost("oc get %s" % oc_service, ignore_status=True)
         common.print_info(oc_status.stdout)
         # If application exists in svc / dc / is namespace, then remove it
         oc_delete = self.runHost("oc delete %s/%s" % (oc_service, self.app_name), ignore_status=True)
         common.print_info(oc_delete.stdout)
 
     def _app_remove(self):
+        """
+        Function removes an application from all OpenShift namespaces like 'svc', 'dc', 'is'
+        """
         if self._app_exists():
             common.print_info("Application exists")
             # TODO get info from oc status and delete relevat svc/dc/is
@@ -108,6 +124,9 @@ class OpenShiftHelper(CommonFunctions):
                 self._remove_apps_from_openshift_namespaces(ns)
 
     def _create_app(self):
+        """
+        It creates an application in OpenShift environment
+        """
         common.print_info("Create_app in OpenShift")
         # Switching to system user
         #self._openshift_login(oc_user='system', oc_passwd='admin')
@@ -134,6 +153,14 @@ class OpenShiftHelper(CommonFunctions):
         self.containerInfo = self.__load_inspect_json()
 
     def _openshift_login(self, oc_ip="127.0.0.1", oc_user='developer', oc_passwd='developer', env=False):
+        """
+        It logins to an OpenShift environment on specific IP and under user and his password.
+        :param oc_ip: an IP where is an OpenShift environment running
+        :param oc_user: an username under which we can login to OpenShift environment
+        :param oc_passwd: a password for specific username
+        :param env:
+        :return:
+        """
         if env:
             if 'OPENSHIFT_IP' in os.environ:
                 oc_ip = os.environ.get('OPENSHIFT_IP')
@@ -161,21 +188,11 @@ class OpenShiftHelper(CommonFunctions):
             common.print_info("To run a command inside a container execute: ",
                         "docker exec %s /bin/bash" % self.docker_id)
 
-    def __load_inspect_json(self):
-        """
-        Load json data from docker inspect command
-
-        :return: dict
-        """
-        return json.loads(
-            self.runHost(
-                "docker inspect %s" %
-                self.container_name, verbose=common.is_not_silent()).stdout)[0]["Config"]
-
     def _get_ip_instance(self):
         """
-        Function return IP address of OpenShift POD.
-        :return:
+        It gets and IP address of an application from of OpenShift POD.
+        :return: True: getting IP address was successful
+                 False: getting IP address was not successful
         """
         oc_get_service = self.runHost("oc get service -o json")
         service = self._convert_string_to_json(oc_get_service.stdout)
@@ -190,10 +207,13 @@ class OpenShiftHelper(CommonFunctions):
         except KeyError as e:
             common.print_info(e.message)
             return False
+        except IndexError as e:
+            common.print_info(e.message)
+            return False
 
     def start(self):
         """
-        start the OpenShift application
+        starts the OpenShift application
 
         :param args: Do not use it directly (It is defined in config.yaml)
         :param command: Do not use it directly (It is defined in config.yaml)
@@ -202,11 +222,12 @@ class OpenShiftHelper(CommonFunctions):
         common.print_info("OpenShift start")
         if not self._app_exists():
             self._create_app()
+            # TODO fix in case IP is not present
             self._get_ip_instance()
 
     def stop(self):
         """
-        Stop the docker container
+        Stops the OpenShift
 
         :return: None
         """
@@ -219,7 +240,7 @@ class OpenShiftHelper(CommonFunctions):
 
     def status(self):
         """
-        get status if OpenShift is running
+        get status of an OpenShift
 
         :return: bool
         """

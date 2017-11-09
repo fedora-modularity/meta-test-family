@@ -37,18 +37,3 @@ class OpenShiftAvocadoTest(AvocadoTest):
         if get_module_type_base() != "openshift":
             self.cancel("OpenShift specific test")
         super(OpenShiftAvocadoTest, self).setUp()
-
-    def checkLabel(self, key, value):
-        """
-        check label of docker image, expect key value (could be read from config file)
-
-        :param key: str
-        :param value: str
-        :return: bool
-        """
-        if key in self.backend.containerInfo['Labels'] and (
-                    value in self.backend.containerInfo['Labels'][key]):
-            return True
-        return False
-
-
