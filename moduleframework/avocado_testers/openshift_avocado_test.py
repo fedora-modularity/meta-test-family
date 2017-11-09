@@ -27,7 +27,7 @@ from moduleframework.common import get_module_type_base
 # INTERFACE CLASSES FOR SPECIFIC MODULE TESTS
 class OpenShiftAvocadoTest(AvocadoTest):
     """
-    Class for writing tests specific just for DOCKER
+    Class for writing tests specific just for OpenShift
     derived from AvocadoTest class.
 
     :avocado: disable

@@ -24,7 +24,7 @@ Manual Setup
 **OpenShift**
 
  - Install OpenShift if not installed and if environment variable ``OPENSHIFT_LOCAL`` is specified.
- - if ``OPENSHIFT_LOCAL`` variable is specified, the it starts an OpenShift by command ``oc cluster up`` or stops it by command ``oc cluster down``.
+ - if ``OPENSHIFT_LOCAL`` variable is specified, then it starts an OpenShift by command ``oc cluster up`` or stops it by command ``oc cluster down``.
 
 Automated Setup
 ~~~~~~~~~~~~~~~

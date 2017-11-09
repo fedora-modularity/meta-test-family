@@ -504,7 +504,6 @@ class CommonFunctions(object):
             self.modulemdConf = link
         return link
 
-
     def getIPaddr(self):
         """
         Return protocol (IP or IPv6) address on a guest machine.
@@ -514,7 +513,6 @@ class CommonFunctions(object):
 
         :return: str
         """
-        print_info(os.environ.get('MODULE'))
         if 'openshift' == os.environ.get('MODULE'):
             return trans_dict['GUESTIPADDR']
         return self.ipaddr
