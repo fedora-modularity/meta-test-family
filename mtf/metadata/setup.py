@@ -18,7 +18,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 # Authors: Jan Scotka <jscotka@redhat.com>
-#          Petr Hracek <phracek@redhat.com>
 
 import os
 import sys
@@ -50,51 +49,28 @@ def get_dir(system_path=None, virtual_path=None):
             system_path = []
     return os.path.join(*(['/'] + system_path))
 
-
 data_files = {}
 
-paths = ['docs', 'examples', 'tools']
-
-for path in paths:
-    for root, dirs, files in os.walk(path, followlinks=True):
-        data_files[
-            get_dir(
-                ['usr', 'share', 'moduleframework', root])] = [
-            os.path.join(root, f) for f in files]
-
-paths = ['man']
-
-for path in paths:
-    for root, dirs, files in os.walk(path, followlinks=True):
-        data_files[
-            get_dir(
-                ['usr', 'share', 'man', 'man1'])] = [
-            os.path.join(root, f) for f in files]
 
 setup(
-    name='metatest-family',
-    version="0.7.7",
-    description='Tool to test components fo a modular Fedora.',
-    keywords='modules,containers,testing,framework',
+    name='tmet',
+    version="0.0.1",
+    description='Metadata for tests (relevancy, coverage)',
+    keywords='metadata,test',
     author='Jan Scotka',
     author_email='jscotka@redhat.com',
-    url='https://github.com/fedora-modularity/metatest-family',
+    url='https://None',
     license='GPLv2+',
-    packages=find_packages(exclude=['docs', 'examples', 'tools']),
+    packages=find_packages(),
     include_package_data=True,
     data_files=data_files.items(),
-    scripts=['tools/mtf'],
     entry_points={
         'console_scripts': [
-            'mtf-cmd = moduleframework.bashhelper:main',
-            'mtf-generator = moduleframework.mtf_generator:main',
-            'mtf-env-set = moduleframework.mtf_environment:mtfenvset',
-            'mtf-env-clean = moduleframework.mtf_environment:mtfenvclean',
-            'mtf-log-parser = moduleframework.mtf_log_parser:main',
-            'mtf-init = moduleframework.mtf_init:main',
+            'tmet-filter = tmet.filter:main',
+            'tmet-agregator = tmet.agregator:main',
         ]
     },
-    setup_requires=open('requirements.txt').read().splitlines(),
+    setup_requires=[],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
@@ -104,5 +80,5 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
-    install_requires=open('requirements.txt').read().splitlines()
+    install_requires=[]
 )

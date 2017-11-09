@@ -1,0 +1,46 @@
+document: metadata
+subtype: general
+default_module: docker
+enable_module_lint: True
+tag_filters:
+    - tier1
+    - optional,-fedora
+    - dockerlinter
+    - dockerfilelinter
+tests:
+    general:
+        source: generaltest.py
+        relevancy:
+             - rule 1
+             - rule 2
+        description: some general test doing
+    options:
+        fedora_test:
+            source: fedora_specifictest.py
+            description: some general test doing verbose test
+        extend_test:
+            source: https://github.com/fedora-modularity/meta-test-family.git
+            description: some general test doing verbose test
+        new_option:
+            description: desc of not covered, missing source
+    networking:
+        use_tcp:
+            description: desc of not covered, missing source
+        use_udp:
+            description: desc of not covered, missing source
+
+test_sets:
+    fedora:
+         tests:
+             - general
+             - fedora_test
+    all:
+         tests:
+             - "*"
+         tag_filters:
+    test_options:
+         tests:
+             - options/*
+    fedora:
+         tests:
+             - general
