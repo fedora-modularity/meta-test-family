@@ -30,6 +30,7 @@ from moduleframework.avocado_testers.avocado_test import AvocadoTest, get_backen
 from moduleframework.avocado_testers.container_avocado_test import ContainerAvocadoTest
 from moduleframework.avocado_testers.nspawn_avocado_test import NspawnAvocadoTest
 from moduleframework.avocado_testers.rpm_avocado_test import RpmAvocadoTest
+from moduleframework.avocado_testers.openshift_avocado_test import OpenShiftAvocadoTest
 from moduleframework.mtfexceptions import ModuleFrameworkException
 
 PROFILE = None

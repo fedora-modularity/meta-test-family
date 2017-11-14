@@ -24,11 +24,11 @@ import json
 import os
 import time
 from moduleframework import common
-from moduleframework.common import CommonFunctions
-from moduleframework.mtfexceptions import ContainerExc, ConfigExc
+from moduleframework.helpers.container_helper import ContainerHelper
+from moduleframework.mtfexceptions import ConfigExc
 
 
-class OpenShiftHelper(CommonFunctions):
+class OpenShiftHelper(ContainerHelper):
     """
     Basic Helper class for OpenShift container module type
 
@@ -41,8 +41,8 @@ class OpenShiftHelper(CommonFunctions):
         """
         super(OpenShiftHelper, self).__init__()
         self.name = None
-        self.docker_id = None
         self.icontainer = self.get_url()
+        self.pod_id = None
         if not self.icontainer:
             raise ConfigExc("No container image specified in the configuration file or environment variable.")
         if "docker=" in self.icontainer:
@@ -80,19 +80,46 @@ class OpenShiftHelper(CommonFunctions):
         if 'dc/%s' % self.app_name in oc_status.stdout:
             common.print_info("Application already exists.")
             return True
-        oc_services = self.runHost("oc get services -o json")
-        json_svc = self._convert_string_to_json(oc_services.stdout)
-        if not json_svc["items"]:
+        oc_services = self.runHost("oc get services -o json", ignore_status=True).stdout
+        oc_services = self._convert_string_to_json(oc_services)
+        # Check if 'items' in json output is empty or not
+        if not oc_services:
+            return False
+        # check if 'items', which is not empty, in json output contains app_name
+        if not self._check_app_in_json(oc_services, self.app_name):
             return False
         return True
 
-    def _convert_string_to_json(self, string):
+    def _check_app_in_json(self, json_output, app_name):
         """
-        It converts a string to json format
-        :param string: String to format to json
-        :return: json output
+        Function checks if json_output contains container with specified name
+
+
+        :param json_output: json output from an OpenShift command
+        :param app_name: an application which should be checked
+        :return: True if the application exists
+                 False if the application does not exist
         """
-        return json.loads(string)
+        try:
+            labels = json_output.get('metadata').get('labels')
+            if labels.get('app') == app_name:
+                # In metadata dictionary and name is stored pod_name
+                self.pod_id = json_output.get('metadata').get('name')
+                return True
+        except KeyError:
+            return False
+
+    def _convert_string_to_json(self, inp_string):
+        """
+        It converts a string to json format and returns first item in items.
+        :param inp_string: String to format to json
+        :return: items from OpenShift output
+        """
+        try:
+            items = json.loads(inp_string)
+            return items.get('items')
+        except TypeError:
+            return None
 
     def _remove_apps_from_openshift_namespaces(self, oc_service="svc"):
         """
@@ -100,15 +127,18 @@ class OpenShiftHelper(CommonFunctions):
         :param oc_service: Service from which we would like to remove application
         """
         # Check status of svc/dc/is
-        oc_get = self.runHost("oc get %s" % oc_service, ignore_status=True).stdout
+        oc_get = self.runHost("oc get %s -o json" % oc_service, ignore_status=True).stdout
+        oc_get = self._convert_string_to_json(oc_get)
         # The output is like
         # dovecot     172.30.1.1:5000/myproject/dovecot     latest    15 minutes ago
         # memcached   172.30.1.1:5000/myproject/memcached   latest    13 minutes ago
 
-        app_found = [x for x in oc_get.split('\n') if x.startswith(self.app_name)]
+        app_found = self._check_app_in_json(oc_get, self.app_name)
         if app_found:
             # If application exists in svc / dc / is namespace, then remove it
-            oc_delete = self.runHost("oc delete %s/%s" % (oc_service, self.app_name), ignore_status=True)
+            oc_delete = self.runHost("oc delete %s %s" % (oc_service, self.app_name),
+                                     ignore_status=True,
+                                     verbose=common.is_not_silent())
 
     def _app_remove(self):
         """
@@ -124,8 +154,8 @@ class OpenShiftHelper(CommonFunctions):
         It creates an application in OpenShift environment
         """
         # Switching to system user
-        oc_new_app = self.runHost("oc new-app %s --name=%s" % (self.container_name,
-                                                               self.app_name),
+        oc_new_app = self.runHost("oc new-app -l mtf_testing=true %s --name=%s" % (self.container_name,
+                                                                                   self.app_name),
                                   ignore_status=True)
         common.print_info(oc_new_app.stdout)
         time.sleep(1)
@@ -138,14 +168,17 @@ class OpenShiftHelper(CommonFunctions):
         """
         pod_initiated = False
         for x in range(0, 20):
-            pod_state = self.runHost("oc get pods", ignore_status=True)
-            pod_state = pod_state.stdout.split('\n')
+            # We need wait a second before pod is really initiated.
+            time.sleep(1)
+            pod_state = self.runHost("oc get pods -o json",
+                                     ignore_status=True,
+                                     verbose=common.is_not_silent())
+            pod_state = self._convert_string_to_json(pod_state.stdout)
             for pod in pod_state:
-                if pod.startswith(self.app_name):
-                    if "Running" in pod and "deploy" not in pod:
+                if self._check_app_in_json(pod, self.app_name):
+                    if pod.get('status', {}).get('phase') == "Running":
                         pod_initiated = True
                         break
-            time.sleep(1)
             if pod_initiated:
                 break
         return pod_initiated
@@ -169,22 +202,17 @@ class OpenShiftHelper(CommonFunctions):
         :param oc_ip: an IP where is an OpenShift environment running
         :param oc_user: an username under which we can login to OpenShift environment
         :param oc_passwd: a password for specific username
-        :param env:
+        :param env: is used for specification OpenShift IP, user and password, otherwise defaults are used
         :return:
         """
         if env:
-            if 'OPENSHIFT_IP' in os.environ:
-                oc_ip = os.environ.get('OPENSHIFT_IP')
-            if 'OPENSHIFT_USER' in os.environ:
-                oc_user = os.environ.get('OPENSHIFT_USER')
-            if 'OPENSHIFT_PASSWORD' in os.environ:
-                oc_passwd = os.environ.get('OPENSHIFT_PASSWORD')
-
+            oc_ip = common.get_openshift_ip()
+            oc_user = common.get_openshift_user()
+            oc_passwd = common.get_openshift_passwd()
         oc_output = self.runHost("oc login %s:8443 --username=%s --password=%s" % (oc_ip,
                                                                                    oc_user,
                                                                                    oc_passwd),
                                  verbose=common.is_not_silent())
-        common.print_debug(oc_output.stdout)
         return oc_output.exit_status
 
     def tearDown(self):
@@ -194,9 +222,6 @@ class OpenShiftHelper(CommonFunctions):
         :return: None
         """
         super(OpenShiftHelper, self).tearDown()
-        if common.get_if_do_cleanup():
-            # TODO will be implemented later on. I have to find a usecase what to remove
-            pass
 
     def _get_ip_instance(self):
         """
@@ -207,9 +232,10 @@ class OpenShiftHelper(CommonFunctions):
         oc_get_service = self.runHost("oc get service -o json")
         service = self._convert_string_to_json(oc_get_service.stdout)
         try:
-            for svc in service["items"]:
-                if "clusterIP" in svc.get("spec"):
-                    common.trans_dict['GUESTIPADDR'] = svc.get("spec").get("clusterIP")
+            for svc in service:
+                if svc.get('metadata').get('labels').get('app') == self.app_name:
+                    self.ipaddr = svc.get('spec').get("clusterIP")
+                    common.trans_dict['GUESTIPADDR'] = self.ipaddr
             return True
         except KeyError as e:
             common.print_info(e.message)
@@ -217,6 +243,16 @@ class OpenShiftHelper(CommonFunctions):
         except IndexError as e:
             common.print_info(e.message)
             return False
+
+    def getIPaddr(self):
+        """
+        Return protocol (IP or IPv6) address on a POD OpenShift instance.
+
+        It returns IP address of POD instance
+
+        :return: str
+        """
+        return self.ipaddr
 
     def start(self):
         """
@@ -230,8 +266,7 @@ class OpenShiftHelper(CommonFunctions):
             self._create_app()
             # Verify application is really deploy and prepared for testing.
             self._verify_pod()
-            # TODO fix in case IP is not present. We should failed.
-            self._get_ip_instance()
+        self._get_ip_instance()
 
     def stop(self):
         """
@@ -248,14 +283,11 @@ class OpenShiftHelper(CommonFunctions):
 
     def status(self):
         """
-        get status of an OpenShift
+        get status of an application in OpenShift environment
 
         :return: bool
         """
-        if self._app_exists():
-            return True
-        else:
-            return False
+        return self._app_exists()
 
     def run(self, command="ls /", **kwargs):
         """

@@ -22,6 +22,7 @@
 
 import json
 from moduleframework.common import *
+from moduleframework.mtfexceptions import ContainerExc
 
 
 class ContainerHelper(CommonFunctions):
@@ -124,7 +125,6 @@ class ContainerHelper(CommonFunctions):
             self.runHost(
                 "docker inspect %s" %
                 self.jmeno, verbose=is_not_silent()).stdout)[0]["Config"]
-
 
     def start(self, args="-it -d", command="/bin/bash"):
         """

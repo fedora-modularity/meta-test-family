@@ -37,43 +37,10 @@ class EnvOpenShift(CommonFunctions):
 
     def prepare_env(self):
         common.print_info('Loaded config for name: {}'.format(self.config['name']))
-        self.__prepare_selinux()
         self.__start_openshift_cluster()
 
     def cleanup_env(self):
         self.__stop_openshift_cluster()
-
-    def __prepare_selinux(self):
-        # disable selinux by default if not turned off
-        if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
-            # https://github.com/fedora-modularity/meta-test-family/issues/53
-            # workaround because systemd nspawn is now working well in F-26
-            if not os.path.exists(selinux_state_file):
-                common.print_info("Disabling selinux")
-                actual_state = self.runHost("getenforce", ignore_status=True).stdout.strip()
-                with open(selinux_state_file, 'w') as openfile:
-                    openfile.write(actual_state)
-                if setseto not in actual_state:
-                    self.runHost("setenforce %s" % setseto,
-                                 verbose=common.is_not_silent(),
-                                 sudo=True)
-
-    def __cleanup(self):
-        if not os.environ.get('MTF_SKIP_DISABLING_SELINUX'):
-            common.print_info("Turning back selinux to previous state")
-            actual_state = self.runHost("getenforce", ignore_status=True).stdout.strip()
-            if os.path.exists(selinux_state_file):
-                common.print_info("Turning back selinux to previous state")
-                with open(selinux_state_file, 'r') as openfile:
-                    stored_state = openfile.readline()
-                    if stored_state != actual_state:
-                        self.runHost("setenforce %s" % stored_state,
-                                     ignore_status=True,
-                                     verbose=common.is_not_silent(),
-                                     sudo=True)
-                os.remove(selinux_state_file)
-            else:
-                common.print_info("Selinux state is not stored, skipping.")
 
     def __oc_status(self):
         oc_status = self.runHost("oc status", ignore_status=True, verbose=common.is_not_silent())
@@ -87,7 +54,7 @@ class EnvOpenShift(CommonFunctions):
 
         :return: None
         """
-        if os.environ.get('OPENSHIFT_LOCAL'):
+        if common.get_openshift_local():
             if not os.path.exists('/usr/bin/oc'):
                 self.installTestDependencies(['origin', 'origin-clients'])
 
@@ -98,7 +65,7 @@ class EnvOpenShift(CommonFunctions):
         :return: None
         """
 
-        if os.environ.get('OPENSHIFT_LOCAL'):
+        if common.get_openshift_local():
             if int(self.__oc_status()) == 0:
                 common.print_info("Seems like OpenShift is already started.")
             else:
@@ -111,7 +78,7 @@ class EnvOpenShift(CommonFunctions):
 
         :return: None
         """
-        if os.environ.get('OPENSHIFT_LOCAL'):
+        if common.get_openshift_local():
             if int(self.__oc_status()) == 0:
                 common.print_info("Stopping OpenShift")
                 self.runHost("oc cluster down", verbose=common.is_not_silent())
