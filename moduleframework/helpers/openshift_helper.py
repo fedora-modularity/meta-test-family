@@ -288,10 +288,13 @@ class OpenShiftHelper(ContainerHelper):
 
     def run(self, command="ls /", **kwargs):
         """
-        Run command inside module, all params what allows avocado are passed inside shell,ignore_status, etc.
+        Run command inside OpenShift POD, all params what allows avocado are passed inside shell,ignore_status, etc.
+        https://docs.openshift.com/container-platform/3.6/dev_guide/executing_remote_commands.html
 
         :param command: str
         :param kwargs: dict
         :return: avocado.process.run
         """
-        return self.runHost("%s" % common.sanitize_cmd(command), **kwargs)
+        return self.runHost("oc exec %s %s" % (self.pod_id,
+                                               common.sanitize_cmd(command)),
+                            **kwargs)
