@@ -55,14 +55,6 @@ class OpenShiftHelper(ContainerHelper):
         self.app_ip = None
         common.print_debug(self.icontainer, self.app_name)
 
-    def get_container_url(self):
-        """
-        It returns actual URL link string to container, It is same as URL
-
-        :return: str
-        """
-        return self.icontainer
-
     def get_docker_instance_name(self):
         """
         Return docker instance name what will be used inside docker as docker image name
@@ -76,8 +68,8 @@ class OpenShiftHelper(ContainerHelper):
         :return: True, application exists
                  False, application does not exist
         """
-        oc_status = self.runHost("oc status", ignore_status=True)
-        if 'dc/%s' % self.app_name in oc_status.stdout:
+        oc_status = self.runHost("oc get dc %s -o json" % self.app_name, ignore_status=True)
+        if int(oc_status.exit_status) == 0:
             common.print_info("Application already exists.")
             return True
         oc_services = self.runHost("oc get services -o json", ignore_status=True).stdout
@@ -133,12 +125,12 @@ class OpenShiftHelper(ContainerHelper):
         # dovecot     172.30.1.1:5000/myproject/dovecot     latest    15 minutes ago
         # memcached   172.30.1.1:5000/myproject/memcached   latest    13 minutes ago
 
-        app_found = self._check_app_in_json(oc_get, self.app_name)
-        if app_found:
-            # If application exists in svc / dc / is namespace, then remove it
-            oc_delete = self.runHost("oc delete %s %s" % (oc_service, self.app_name),
-                                     ignore_status=True,
-                                     verbose=common.is_not_silent())
+        for item in oc_get:
+            if self._check_app_in_json(item, self.app_name):
+                # If application exists in svc / dc / is namespace, then remove it
+                oc_delete = self.runHost("oc delete %s %s" % (oc_service, self.app_name),
+                                         ignore_status=True,
+                                         verbose=common.is_not_silent())
 
     def _app_remove(self):
         """
@@ -222,6 +214,11 @@ class OpenShiftHelper(ContainerHelper):
         :return: None
         """
         super(OpenShiftHelper, self).tearDown()
+        try:
+            self._app_remove()
+        except Exception as e:
+            common.print_info(e, "OpenShift application already removed")
+            pass
 
     def _get_ip_instance(self):
         """
