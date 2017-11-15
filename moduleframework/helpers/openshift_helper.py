@@ -43,6 +43,7 @@ class OpenShiftHelper(ContainerHelper):
         self.name = None
         self.icontainer = self.get_url()
         self.pod_id = None
+        self._pod_status = None
         if not self.icontainer:
             raise ConfigExc("No container image specified in the configuration file or environment variable.")
         if "docker=" in self.icontainer:
@@ -54,13 +55,6 @@ class OpenShiftHelper(ContainerHelper):
         self.app_name = self.container_name.split('/')[-1]
         self.app_ip = None
         common.print_debug(self.icontainer, self.app_name)
-
-    def get_docker_instance_name(self):
-        """
-        Return docker instance name what will be used inside docker as docker image name
-        :return: str
-        """
-        return self.container_name
 
     def _app_exists(self):
         """
@@ -152,6 +146,26 @@ class OpenShiftHelper(ContainerHelper):
         common.print_info(oc_new_app.stdout)
         time.sleep(1)
 
+    def _get_pod_status(self):
+        """
+        This method checks if the POD is running within OpenShift environment.
+        :return: True if POD is running with status "Running"
+                 False all other statuses
+        """
+        pod_initiated = False
+        pod_state = self.runHost("oc get pods -o json",
+                                 ignore_status=True,
+                                 verbose=common.is_not_silent())
+
+        pod_state = self._convert_string_to_json(pod_state.stdout)
+        for pod in pod_state:
+            if self._check_app_in_json(pod, self.app_name):
+                self._pod_status = pod.get('status').get('phase')
+                if self._pod_status == "Running":
+                    pod_initiated = True
+                    break
+        return pod_initiated
+
     def _verify_pod(self):
         """
         It verifies if an application POD is initiated and ready for testing
@@ -162,30 +176,19 @@ class OpenShiftHelper(ContainerHelper):
         for x in range(0, 20):
             # We need wait a second before pod is really initiated.
             time.sleep(1)
-            pod_state = self.runHost("oc get pods -o json",
-                                     ignore_status=True,
-                                     verbose=common.is_not_silent())
-            pod_state = self._convert_string_to_json(pod_state.stdout)
-            for pod in pod_state:
-                if self._check_app_in_json(pod, self.app_name):
-                    if pod.get('status', {}).get('phase') == "Running":
-                        pod_initiated = True
-                        break
-            if pod_initiated:
+            if self._get_pod_status():
                 break
         return pod_initiated
 
     def setUp(self):
         """
         It is called by child class and it is same methof as Avocado/Unittest has. It prepares environment
-        for docker testing
-        * start docker if not
-        * pull docker image
+        for OpenShift testing
         * setup environment from config
-        * run and store identification
 
         :return: None
         """
+        self._callSetupFromConfig()
         self.icontainer = self.get_url()
 
     def _openshift_login(self, oc_ip="127.0.0.1", oc_user='developer', oc_passwd='developer', env=False):
@@ -222,7 +225,8 @@ class OpenShiftHelper(ContainerHelper):
 
     def _get_ip_instance(self):
         """
-        It gets and IP address of an application from of OpenShift POD.
+        This method verifies that we can obtain an IP address of the application
+        deployed within OpenShift.
         :return: True: getting IP address was successful
                  False: getting IP address was not successful
         """
@@ -255,7 +259,6 @@ class OpenShiftHelper(ContainerHelper):
         """
         starts the OpenShift application
 
-        :param args: Do not use it directly (It is defined in config.yaml)
         :param command: Do not use it directly (It is defined in config.yaml)
         :return: None
         """
@@ -267,11 +270,12 @@ class OpenShiftHelper(ContainerHelper):
 
     def stop(self):
         """
-        Stops the OpenShift
+        This method checks if the application is deployed within OpenShift environment
+        and removes service, deployment config and imagestream from OpenShift.
 
         :return: None
         """
-        if self.status():
+        if self._app_exists():
             try:
                 self._app_remove()
             except Exception as e:
@@ -280,11 +284,17 @@ class OpenShiftHelper(ContainerHelper):
 
     def status(self):
         """
-        get status of an application in OpenShift environment
+        Function returns whether the application exists
+        and is Running in OpenShift environment
 
-        :return: bool
+        :return: True application exists
+                 False application does not exist.
         """
-        return self._app_exists()
+        status = False
+        if self._app_exists():
+            if self._get_pod_status():
+                status = True
+        return status
 
     def run(self, command="ls /", **kwargs):
         """
