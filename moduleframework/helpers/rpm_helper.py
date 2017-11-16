@@ -23,6 +23,7 @@
 from moduleframework import pdc_data
 from moduleframework.common import *
 
+
 class RpmHelper(CommonFunctions):
     """
     Class for testing "modules" on local machine (host) directly. It could be used for scheduling tests for

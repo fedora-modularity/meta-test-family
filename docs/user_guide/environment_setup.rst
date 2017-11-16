@@ -21,13 +21,18 @@ Manual Setup
 
  - No any configuration needed
 
+**OpenShift**
+
+ - Install OpenShift if not installed and if environment variable ``OPENSHIFT_LOCAL`` is specified.
+ - if ``OPENSHIFT_LOCAL`` variable is specified, then it starts an OpenShift by command ``oc cluster up`` or stops it by command ``oc cluster down``.
+
 Automated Setup
 ~~~~~~~~~~~~~~~
 
 The environment configuration scripts should be executed in the same directory where the tests are, otherwise the environment variable **CONFIG** should be set.
 
   - to setup environment run ``MODULE=docker mtf-env-set``
-  - to execute tests run ``MODULE=docker avocado run your.test.py``
+  - to execute tests run ``MODULE=docker mtf your.test.py``
   - to cleanup environment ``MODULE=docker mtf-env-clean``
 
 Test Creation

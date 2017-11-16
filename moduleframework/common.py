@@ -86,8 +86,10 @@ DEFAULTRETRYTIMEOUT = 30
 DEFAULTNSPAWNTIMEOUT = 10
 MODULE_DEFAULT_PROFILE="default"
 
+
 def generate_unique_name(size=10):
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(size))
+
 
 def get_compose_url_modular_release():
     default_release = "27"
@@ -98,6 +100,7 @@ def get_compose_url_modular_release():
     base_url = "https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-{}/compose/Server/{}/os"
     compose_url = os.environ.get("MTF_COMPOSE_BASE") or base_url.format(release, ARCH)
     return compose_url
+
 
 def is_debug():
     """
@@ -115,6 +118,47 @@ def is_not_silent():
     :return: bool
     """
     return is_debug()
+
+
+def get_openshift_local():
+    """
+    Return the **OPENSHIFT_LOCAL** envvar.
+    :return: bool
+    """
+    return bool(os.environ.get('OPENSHIFT_LOCAL'))
+
+
+def get_openshift_ip():
+    """
+    Return the **OPENSHIFT_IP** envvar or None.
+    :return: OpenShift IP or None
+    """
+    try:
+        return os.environ.get('OPENSHIFT_IP')
+    except KeyError:
+        return None
+
+
+def get_openshift_user():
+    """
+    Return the **OPENSHIFT_USER** envvar or None.
+    :return: OpenShift User or None
+    """
+    try:
+        return os.environ.get('OPENSHIFT_USER')
+    except KeyError:
+        return None
+
+
+def get_openshift_passwd():
+    """
+    Return the **OPENSHIFT_PASSWORD** envvar or None.
+    :return: OpenShift password or None
+    """
+    try:
+        return os.environ.get('OPENSHIFT_PASSWORD')
+    except KeyError:
+        return None
 
 
 def print_info(*args):
@@ -168,6 +212,7 @@ def is_recursive_download():
     """
     return bool(os.environ.get("MTF_RECURSIVE_DOWNLOAD"))
 
+
 def get_if_do_cleanup():
     """
     Return the **MTF_DO_NOT_CLEANUP** envvar.
@@ -177,6 +222,7 @@ def get_if_do_cleanup():
     cleanup = os.environ.get('MTF_DO_NOT_CLEANUP')
     return not bool(cleanup)
 
+
 def get_if_reuse():
     """
         Return the **MTF_REUSE** envvar.
@@ -185,6 +231,7 @@ def get_if_reuse():
         """
     reuse = os.environ.get('MTF_REUSE')
     return bool(reuse)
+
 
 def get_if_remoterepos():
     """
@@ -213,8 +260,8 @@ def sanitize_text(text, replacement="_", invalid_chars=["/", ";", "&", ">", "<",
 
     invalid_chars=["/", ";", "&", ">", "<", "|"]
 
-    :param (str): text to sanitize
-    :param (str): replacement char, default: "_"
+    :param replacement: text to sanitize
+    :param invalid_chars: replacement char, default: "_"
     :return: str
     """
     for char in invalid_chars:
@@ -227,7 +274,7 @@ def sanitize_cmd(cmd):
     """
     Escape apostrophes in a command line.
 
-    :param (str): command to sanitize
+    :param cmd: command to sanitize
     :return: str
     """
     if '"' in cmd:
@@ -247,6 +294,7 @@ def translate_cmd(cmd, translation_dict=None):
             "in trans_dict are: %s. \nBAD COMMAND: %s"
             % (translation_dict, cmd))
     return formattedcommand
+
 
 def get_profile():
     """
@@ -330,9 +378,9 @@ class CommonFunctions(object):
         """
         # we have to copy object. because there is just one global object, to improve performance
         self.config = copy.deepcopy(get_config())
-        self.info = self.config.get("module",{}).get(get_module_type_base())
+        self.info = self.config.get("module", {}).get(get_module_type_base())
         # if there is inheritance join both dictionary
-        self.info.update(self.config.get("module",{}).get(get_module_type()))
+        self.info.update(self.config.get("module", {}).get(get_module_type()))
         if not self.info:
             raise ConfigExc("There is no section for (module: -> %s:) in the configuration file." %
                             get_module_type_base())
@@ -391,7 +439,7 @@ class CommonFunctions(object):
         """
         Run commands on a host.
 
-        :param (str): command to exectute
+        :param common: command to exectute
         ** kwargs: avocado process.run params like: shell, ignore_status, verbose
         :return: avocado.process.run
         """
@@ -441,15 +489,15 @@ class CommonFunctions(object):
             if 'packages' in self.config:
                 packages_rpm = self.config.get('packages',{}).get('rpms', [])
                 packages_profiles = []
-                for profile_in_conf in self.config.get('packages',{}).get('profiles',[]):
+                for profile_in_conf in self.config.get('packages', {}).get('profiles', []):
                     packages_profiles += mddata['data']['profiles'][profile_in_conf]['rpms']
                 package_list += packages_rpm + packages_profiles
             if get_if_install_default_profile():
-                profile_append = mddata.get('data',{})\
-                    .get('profiles',{}).get(MODULE_DEFAULT_PROFILE,{}).get('rpms',[])
+                profile_append = mddata.get('data', {})\
+                    .get('profiles', {}).get(MODULE_DEFAULT_PROFILE, {}).get('rpms', [])
                 package_list += profile_append
         else:
-            package_list += mddata['data']['profiles'][profile].get('rpms',[])
+            package_list += mddata['data']['profiles'][profile].get('rpms', [])
         print_info("PCKGs to install inside module:", package_list)
         return package_list
 
@@ -631,7 +679,7 @@ class CommonFunctions(object):
         if src is not dest:
             self.run("cp -rf %s %s" % (src, dest))
 
-    def run_script(self,filename, *args, **kwargs):
+    def run_script(self, filename, *args, **kwargs):
         """
         run script or binary inside module
         :param filename: filename to copy to module
@@ -646,6 +694,7 @@ class CommonFunctions(object):
         if args:
             parameters = " " + " ".join(args)
         return self.run("bash " + dest + parameters, **kwargs)
+
 
 def get_config():
     """
@@ -687,8 +736,8 @@ def get_config():
                 raise ConfigExc("No module in yaml config defined")
             # copy rpm section to nspawn, in case not defined explicitly
             # make it backward compatible
-            if xcfg.get("module",{}).get("rpm") and not xcfg.get("module",{}).get("nspawn"):
-                xcfg["module"]["nspawn"] = copy.deepcopy(xcfg.get("module",{}).get("rpm"))
+            if xcfg.get("module", {}).get("rpm") and not xcfg.get("module", {}).get("nspawn"):
+                xcfg["module"]["nspawn"] = copy.deepcopy(xcfg.get("module", {}).get("rpm"))
             __persistent_config = xcfg
             return xcfg
         except IOError:
@@ -716,7 +765,7 @@ def get_backend_list():
 
     :return: list
     """
-    base_module_list = ["rpm", "nspawn", "docker"]
+    base_module_list = ["rpm", "nspawn", "docker", "openshift"]
     return base_module_list
 
 
@@ -747,7 +796,7 @@ def get_module_type_base():
     module_type = get_module_type()
     parent = module_type
     if module_type not in get_backend_list():
-        parent = get_config().get("module",{}).get(module_type, {}).get("parent")
+        parent = get_config().get("module", {}).get(module_type, {}).get("parent")
         if not parent:
             raise ModuleFrameworkException("Module (%s) does not provide parent backend parameter (there are: %s)" %
                                            (module_type, get_backend_list()))

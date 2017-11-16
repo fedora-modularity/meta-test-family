@@ -95,7 +95,7 @@ class ContainerHelper(CommonFunctions):
 
         :return: None
         """
-        super(ContainerHelper,self).tearDown()
+        super(ContainerHelper, self).tearDown()
         if get_if_do_cleanup():
             print_info("To run a command inside a container execute: ",
                         "docker exec %s /bin/bash" % self.docker_id)

@@ -54,6 +54,7 @@ User Guide
     test: build
         cd tests; MODULE=docker MODULEMD=$(MODULEMDURL) URL="docker=$(IMAGE_NAME)" make all
         cd tests; MODULE=nspawn MODULEMD=$(MODULEMDURL) make all
+        cd tests; MODULE=openshift OPENSHIFT_IP="127.0.0.1" OPENSHIFT_USER="developer" OPENSHIFT_PASSWORD="developer" make all
 
 7. `Prepare the environment`_ to run tests in.
 
@@ -71,14 +72,14 @@ User Guide
  .. code-block:: shell
 
     #run Python tests from the tests/ directory
-    $ sudo MODULE=docker avocado run ./*.py
+    $ sudo MODULE=docker mtf ./*.py
 
  or
 
  .. code-block:: shell
 
     #run Bash tests from the tests/ directory
-    $ sudo MODULE=docker avocado run ./*.sh
+    $ sudo MODULE=docker mtf ./*.sh
 
 
 9. `Clean up the environment`_ after test execution.
