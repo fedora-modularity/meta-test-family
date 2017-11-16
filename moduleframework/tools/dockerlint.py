@@ -31,7 +31,7 @@ from moduleframework.avocado_testers import container_avocado_test
 class DockerInstructionsTests(module_framework.AvocadoTest):
     """
     :avocado: enable
-    :avocado: tags=sanity
+    :avocado: tags=sanity,rhel,fedora,docker,docker_instruction_test
 
     """
 
@@ -65,7 +65,7 @@ class DockerInstructionsTests(module_framework.AvocadoTest):
 class DockerLabelsTests(module_framework.AvocadoTest):
     """
     :avocado: enable
-    :avocado: sanity
+    :avocado: tags=sanity,rhel,fedora,docker,docker_labels_test
 
     """
 
@@ -119,6 +119,7 @@ class DockerLabelsTests(module_framework.AvocadoTest):
 class DockerfileLinterInContainer(container_avocado_test.ContainerAvocadoTest):
     """
     :avocado: enable
+    :avocado: tags=sanity,rhel,fedora,docker,docker_lint_inside_test
 
     """
 
@@ -215,6 +216,7 @@ class DockerfileLinterInContainer(container_avocado_test.ContainerAvocadoTest):
 class DockerLint(container_avocado_test.ContainerAvocadoTest):
     """
     :avocado: enable
+    :avocado: tags=sanity,rhel,fedora,docker,docker_labels_inspect_test
     """
 
     def testLabels(self):

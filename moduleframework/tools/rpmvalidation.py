@@ -35,6 +35,7 @@ class rpmvalidation(module_framework.AvocadoTest):
     http://refspecs.linuxfoundation.org/FHS_3.0/fhs/index.html
     
     :avocado: enable
+    :avocado: tags=sanity,rhel,fedora,docker,module,rpmvalidation_test
     """
     fhs_base_paths_workaound = [
         '/var/kerberos',
@@ -93,7 +94,7 @@ class rpmvalidation(module_framework.AvocadoTest):
         self.log.info("%s not found in %s" % (filepath, self.fhs_base_paths))
         return False
 
-    def test(self):
+    def testPaths(self):
         self.start()
         allpackages = filter(bool, self.run("rpm -qa").stdout.split("\n"))
         common.print_debug(allpackages)

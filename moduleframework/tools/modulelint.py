@@ -28,7 +28,7 @@ from moduleframework import module_framework
 class ModuleLintSigning(module_framework.AvocadoTest):
     """
     :avocado: disable
-    :avocado: tags=WIP
+    :avocado: tags=WIP,rhel,fedora,docker,module,package_signing_test
     """
 
     def setUp(self):
@@ -53,7 +53,10 @@ class ModuleLintSigning(module_framework.AvocadoTest):
 
 class ModuleLintPackagesCheck(module_framework.AvocadoTest):
     """
+    Check if packages what are expected to be installed all installed
+
     :avocado: enable
+    :avocado: tags=sanity,rhel,fedora,docker,module,package_installed_test
     """
 
     def test(self):
