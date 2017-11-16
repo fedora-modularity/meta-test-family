@@ -17,7 +17,7 @@ check-linter:
 
 travis:
 	make -C examples/testing-module travis
-	cd examples/linter/tools && PYTHONPATH=${PWD} MODULE=docker ${PWD}/tools/mtf -l
+	cd examples/linter/tools && PYTHONPATH=${PWD} MODULE=docker mtf -l
 
 .PHONY: clean
 

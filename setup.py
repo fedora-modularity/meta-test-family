@@ -83,15 +83,15 @@ setup(
     packages=find_packages(exclude=['docs', 'examples', 'tools']),
     include_package_data=True,
     data_files=data_files.items(),
-    scripts=['tools/mtf'],
+    scripts=[],
     entry_points={
         'console_scripts': [
             'mtf-cmd = moduleframework.bashhelper:main',
             'mtf-generator = moduleframework.mtf_generator:main',
             'mtf-env-set = moduleframework.mtf_environment:mtfenvset',
             'mtf-env-clean = moduleframework.mtf_environment:mtfenvclean',
-            'mtf-log-parser = moduleframework.mtf_log_parser:main',
             'mtf-init = moduleframework.mtf_init:main',
+            'mtf = moduleframework.mtf_scheduler:main',
         ]
     },
     setup_requires=open('requirements.txt').read().splitlines(),
