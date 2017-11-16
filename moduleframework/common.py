@@ -200,8 +200,8 @@ def get_if_install_default_profile():
 
         :return: bool
         """
-    reuse = os.environ.get('MTF_INSTALL_DEFAULT')
-    return bool(reuse)
+    envvar = os.environ.get('MTF_INSTALL_DEFAULT')
+    return bool(envvar)
 
 
 def is_recursive_download():
@@ -305,10 +305,8 @@ def get_profile():
 
     :return: str
     """
-    profile = os.environ.get('PROFILE')
-    if not profile:
-        profile = "default"
-    return profile
+
+    return os.environ.get('PROFILE') or MODULE_DEFAULT_PROFILE
 
 
 def get_url():
@@ -494,7 +492,7 @@ class CommonFunctions(object):
                 package_list += packages_rpm + packages_profiles
             if get_if_install_default_profile():
                 profile_append = mddata.get('data', {})\
-                    .get('profiles', {}).get(MODULE_DEFAULT_PROFILE, {}).get('rpms', [])
+                    .get('profiles', {}).get(get_profile(), {}).get('rpms', [])
                 package_list += profile_append
         else:
             package_list += mddata['data']['profiles'][profile].get('rpms', [])
