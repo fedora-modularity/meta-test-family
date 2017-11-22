@@ -33,7 +33,7 @@ from avocado.utils import process
 from moduleframework import common
 
 
-def cli():
+def mtfparser():
     # for right name of man; man page generator needs it: script_name differs, its defined in setup.py
     script_name = "mtf"
     parser = argparse.ArgumentParser(
@@ -75,9 +75,12 @@ def cli():
                        help='URL overrides the value of module.docker.container or module.rpm.repo.')
     group.add_argument("--modulemdurl", action="store",
                        help='overwrites the location of a moduleMD file')
+    return parser
 
+
+def cli():
     # unknown options are forwarded to avocado run
-    args, unknown = parser.parse_known_args()
+    args, unknown = mtfparser().parse_known_args()
 
     # uses additional arguments, set up variable asap, its used afterwards:
     if args.debug:
@@ -123,11 +126,11 @@ def cli():
             os.environ.get('MODULE'), args.module))
     else:
         # TODO: what to do here? whats the defaults value for MODULE, do I know it?
-        common.print_info("MODULE={0} ; we support {1} \n === expecting your magic, enjoy! === \n"
-                          "{2}".format(os.environ.get('MODULE'), common.get_backend_list(), parser.epilog))
+        common.print_info("MODULE={0} ; we support {1} \n === expecting your magic, enjoy! === ".format(
+            os.environ.get('MODULE'), common.get_backend_list()))
 
     common.print_debug("MODULE={0}".format(os.environ.get('MODULE')))
-    return args, unknown, parser
+    return args, unknown
 
 
 class AvocadoStart(object):
@@ -214,8 +217,6 @@ class AvocadoStart(object):
                     delimiter = "-------------------------"
             os.remove(self.json_tmppath)
 
-# for man page generator
-_, _, man = cli()
 
 def main():
     common.print_debug('verbose/debug mode')
@@ -234,3 +235,7 @@ def main():
         # when there is any need, change general method or create specific one:
         returncode = a.avocado_general()
     exit(returncode)
+
+
+
+
