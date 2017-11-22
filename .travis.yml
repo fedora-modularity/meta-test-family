@@ -29,6 +29,5 @@ script:
   - sudo make -C examples/testing-module check-real-rpm-destructive
   - sudo make -C examples/testing-module check-docker-scl-multi-travis
   - sudo make -C mtf/metadata check
-  - "make PYTHON=python${TRAVIS_PYTHON_VERSION} COVERAGE=true check && python$TRAVIS_PYTHON_VERSION setup.py install --root $PWD/i"
 
 after_script: sudo cat ~/avocado/job-results/latest/job.log
