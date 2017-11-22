@@ -34,16 +34,18 @@ from moduleframework import common
 
 
 def cli():
-    file_name = os.path.basename(sys.argv[0])
+    # for right name of man; man page generator needs it: script_name differs, its defined in setup.py
+    script_name = "mtf"
     parser = argparse.ArgumentParser(
         # TODO
+        prog="{0}".format(script_name),
         description=textwrap.dedent('''\
         unknown arguments are forwarded to avocado:
            optionally use additional avocado param like --show-job-log, see avocado action --help'''),
         formatter_class=argparse.RawTextHelpFormatter,
         # epilog(with http link) is used in some error msg too:
         epilog="see http://meta-test-family.readthedocs.io for more info",
-        usage=("{0} [options] local_tests".format(file_name)),
+        usage="{0} [options] local_tests".format(script_name),
     )
     parser.add_argument("--linter", "-l", action="store_true",
                         default=False, help='adds additional compose checks')
@@ -51,6 +53,8 @@ def cli():
                         default=False, help='Setup by mtfenvset')
     parser.add_argument("--action", action="store", default='run',
                         help='Action for avocado, see avocado --help for subcommands')
+    # Solely for the purpose of manpage generator, copy&paste from setup.py
+    parser.man_short_description = "tool to test components for a modular Fedora."
 
     # parameters tights to avocado
     group_avocado = parser.add_argument_group(
@@ -123,7 +127,7 @@ def cli():
                           "{2}".format(os.environ.get('MODULE'), common.get_backend_list(), parser.epilog))
 
     common.print_debug("MODULE={0}".format(os.environ.get('MODULE')))
-    return args, unknown
+    return args, unknown, parser
 
 
 class AvocadoStart(object):
@@ -210,6 +214,8 @@ class AvocadoStart(object):
                     delimiter = "-------------------------"
             os.remove(self.json_tmppath)
 
+# for man page generator
+_, _, man = cli()
 
 def main():
     common.print_debug('verbose/debug mode')
