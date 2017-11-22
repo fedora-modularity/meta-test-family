@@ -13,7 +13,7 @@ before_install:
   - sudo pip install avocado-framework
   - pip install avocado-framework
 
-install: sudo make install
+install: sudo make install_pip
 
 script:
   - sudo make -C examples/testing-module check-inheritance

@@ -2,7 +2,7 @@ NAME=moduleframework
 INSTALLPATH=/usr/share/$(NAME)
 PYTHONSITE=/usr/lib/python2.7/site-packages
 
-all: install check
+all: install_pip check
 
 check:
 	make -C examples/testing-module check
@@ -21,13 +21,20 @@ travis:
 
 .PHONY: clean
 
-clean:
+clean_pip:
 	pip uninstall .
-	#git clean -fd
-	rm -rf build/html
+	rm -rf build/* dist/*
+
+
+install_pip: clean_pip
+	pip install -U .
+
+clean:
+	@python setup.py clean
+	rm -rf build/* dist/*
 
 install: clean
-	pip install -U .
+	@python setup.py install
 
 source: clean
 	@python setup.py sdist
