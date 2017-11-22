@@ -28,6 +28,7 @@ from moduleframework import module_framework
 class Basic(module_framework.AvocadoTest):
     """
     :avocado: enable
+    :avocado: tags=sanity,general,fedora,rhel
     """
 
     def test(self):

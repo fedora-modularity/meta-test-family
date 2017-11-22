@@ -32,7 +32,7 @@ from moduleframework.common import get_docker_file
 class HelpFileSanity(module_framework.AvocadoTest):
     """
     :avocado: enable
-    :avocado: optional
+    :avocado: tags=optional,rhel,fedora,docker,helpmd_sanity_test
 
     """
 
