@@ -1,6 +1,5 @@
 PyYAML
 avocado-framework
-avocado-framework-plugin-result-html
 dockerfile-parse
 modulemd
 netifaces
