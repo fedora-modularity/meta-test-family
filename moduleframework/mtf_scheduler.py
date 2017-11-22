@@ -54,7 +54,7 @@ def mtfparser():
     parser.add_argument("--action", action="store", default='run',
                         help='Action for avocado, see avocado --help for subcommands')
     # Solely for the purpose of manpage generator, copy&paste from setup.py
-    parser.man_short_description = "tool to test components for a modular Fedora"
+    parser.man_short_description = "tool to test components for a modular Fedora."
 
     # parameters tights to avocado
     group_avocado = parser.add_argument_group(
