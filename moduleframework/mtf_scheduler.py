@@ -36,16 +36,29 @@ from moduleframework import common
 def mtfparser():
     # for right name of man; man page generator needs it: script_name differs, its defined in setup.py
     script_name = "mtf"
+    description = \
+"""
+VARIABLES
+
+       CONFIG defines the module configuration file. It defaults to config.yaml
+
+       MODULE defines tested module type, if default-module is not set in config.yaml.
+
+       URL to container.
+              E.g. URL=docker.io/modularitycontainers/haproxy if MODULE=docker
+
+       MODULEMDURL
+              overwrites the location of a moduleMD file.
+
+       and more at http://meta-test-family.readthedocs.io/en/latest/user_guide/environment_variables.html
+"""
     parser = argparse.ArgumentParser(
         # TODO
         prog="{0}".format(script_name),
-        description=textwrap.dedent('''\
-        unknown arguments are forwarded to avocado:
-           optionally use additional avocado param like --show-job-log, see avocado action --help'''),
+        description=description,
         formatter_class=argparse.RawTextHelpFormatter,
-        # epilog(with http link) is used in some error msg too:
         epilog="see http://meta-test-family.readthedocs.io for more info",
-        usage="{0} [options] local_tests".format(script_name),
+        usage="[VARIABLES] {0} [options] local_tests".format(script_name),
     )
     parser.add_argument("--linter", "-l", action="store_true",
                         default=False, help='adds additional compose checks')
@@ -53,8 +66,16 @@ def mtfparser():
                         default=False, help='Setup by mtfenvset')
     parser.add_argument("--action", action="store", default='run',
                         help='Action for avocado, see avocado --help for subcommands')
+
     # Solely for the purpose of manpage generator, copy&paste from setup.py
-    parser.man_short_description = "tool to test components for a modular Fedora."
+    parser.man_short_description = \
+""" 
+tool to test components for a modular Fedora.
+
+mtf is a main binary file of Meta-Test-Family.
+
+It tests container images and/or modules with user defined tests using avocado framework as test runner.
+"""
 
     # parameters tights to avocado
     group_avocado = parser.add_argument_group(
