@@ -66,6 +66,8 @@ VARIABLES
                         default=False, help='Setup by mtfenvset')
     parser.add_argument("--action", action="store", default='run',
                         help='Action for avocado, see avocado --help for subcommands')
+    parser.add_argument("--version", action="store_true",
+                        default=False, help='show version and exit')
 
     # Solely for the purpose of manpage generator, copy&paste from setup.py
     parser.man_short_description = \
@@ -102,6 +104,10 @@ It tests container images and/or modules with user defined tests using avocado f
 def cli():
     # unknown options are forwarded to avocado run
     args, unknown = mtfparser().parse_known_args()
+
+    if args.version:
+        print "0.7.7"
+        exit(0)
 
     # uses additional arguments, set up variable asap, its used afterwards:
     if args.debug:
