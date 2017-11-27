@@ -28,24 +28,24 @@ def test_mtf_metadata_linters_and_tests_noconfig():
     # print yaml.dump(mt.get_metadata())
     # print mt.backend_passtrought_args()
     # print mt.apply_filters()
-    case_justlinters_nofilter = len(mt.apply_filters())
+    case_justlinters_nofilter = mt.apply_filters()
     print_debug(case_justlinters_nofilter)
     mt._import_tests("*.py")
-    case_lintersanstests_nofilter = len(mt.apply_filters())
+    case_lintersanstests_nofilter = mt.apply_filters()
     print_debug(case_lintersanstests_nofilter)
     mt.add_filter(tags=["add"])
-    case_lintersanstests_filter1 = len(mt.apply_filters())
+    case_lintersanstests_filter1 = mt.apply_filters()
     print_debug(case_lintersanstests_filter1)
     mt.add_filter(tags=["-add"])
-    case_lintersanstests_filter2 = len(mt.apply_filters())
+    case_lintersanstests_filter2 = mt.apply_filters()
     print_debug(case_lintersanstests_filter2)
 
-    assert case_justlinters_nofilter > 20
-    assert case_lintersanstests_nofilter > case_justlinters_nofilter
-    assert case_lintersanstests_filter1 > case_justlinters_nofilter
-    assert case_lintersanstests_filter1 < case_lintersanstests_nofilter
-    assert case_lintersanstests_filter1 > case_lintersanstests_filter2
-    assert case_lintersanstests_filter2 < case_justlinters_nofilter
+    assert len(case_justlinters_nofilter) > 20
+    assert len(case_lintersanstests_nofilter) > len(case_justlinters_nofilter)
+    assert len(case_lintersanstests_filter1) < len(case_justlinters_nofilter)
+    assert len(case_lintersanstests_filter1) < len(case_lintersanstests_nofilter)
+    assert len(case_lintersanstests_filter1) > len(case_lintersanstests_filter2)
+    assert len(case_lintersanstests_filter2) < len(case_justlinters_nofilter)
     # print [v[SOURCE] for v in mt.backend_tests()]
     # mt.apply_filters()
 
