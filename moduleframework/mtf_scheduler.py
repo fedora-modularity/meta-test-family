@@ -25,8 +25,6 @@ import argparse
 import os
 import moduleframework
 import tempfile
-import textwrap
-import sys
 import json
 
 from avocado.utils import process
