@@ -94,7 +94,7 @@ setup(
             'mtf = moduleframework.mtf_scheduler:main',
         ]
     },
-    setup_requires=open('requirements.txt').read().splitlines(),
+    setup_requires=[],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
