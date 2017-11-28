@@ -25,25 +25,59 @@ import argparse
 import os
 import moduleframework
 import tempfile
-import textwrap
-import sys
 import json
 
 from avocado.utils import process
 from moduleframework import common
 
 
-def cli():
-    file_name = os.path.basename(sys.argv[0])
+def mtfparser():
+    # for right name of man; man page generator needs it: script_name differs, its defined in setup.py
+    script_name = "mtf"
+    description = \
+"""
+VARIABLES
+
+    AVOCADO_LOG_DEBUG=yes enables avocado debug output.
+
+    DEBUG=yes enables debugging mode to test output.
+
+    CONFIG defines the module configuration file. It defaults to config.yaml.
+
+    MODULE defines tested module type, if default-module is not set in config.yaml.
+
+            =docker uses the docker section of config.yaml.
+            =rpm uses the rpm section of config.yaml and tests RPMs directly on a host.
+            =nspawn tests RPMs in a virtual environment with systemd-nspawn.
+
+    URL overrides the value of module.docker.container or module.rpm.repo.
+       The URL should correspond to the MODULE variable, for example:
+            URL=docker.io/modularitycontainers/haproxy if MODULE=docker
+            URL=https://phracek.fedorapeople.org/haproxy-module-repo # if MODULE=nspawn or MODULE=rpm
+
+    MODULEMDURL overwrites the location of a moduleMD file.
+
+    COMPOSEURL overwrites the location of a compose Pungi build.
+
+    MTF_SKIP_DISABLING_SELINUX=yes
+       does not disable SELinux. In nspawn type on Fedora 25 SELinux should be disabled,
+       because it does not work well with SELinux enabled.
+
+    MTF_DO_NOT_CLEANUP=yes does not clean up module after tests execution.
+
+    MTF_REUSE=yes uses the same module between tests. It speeds up test execution.
+
+    MTF_REMOTE_REPOS=yes disables downloading of Koji packages and creating a local repo.
+
+    MTF_DISABLE_MODULE=yes disables module handling to use nonmodular test mode.
+"""
     parser = argparse.ArgumentParser(
         # TODO
-        description=textwrap.dedent('''\
-        unknown arguments are forwarded to avocado:
-           optionally use additional avocado param like --show-job-log, see avocado action --help'''),
+        prog="{0}".format(script_name),
+        description=description,
         formatter_class=argparse.RawTextHelpFormatter,
-        # epilog(with http link) is used in some error msg too:
         epilog="see http://meta-test-family.readthedocs.io for more info",
-        usage=("{0} [options] local_tests".format(file_name)),
+        usage="[VARIABLES] {0} [options] local_tests".format(script_name),
     )
     parser.add_argument("--linter", "-l", action="store_true",
                         default=False, help='adds additional compose checks')
@@ -51,6 +85,18 @@ def cli():
                         default=False, help='Setup by mtfenvset')
     parser.add_argument("--action", action="store", default='run',
                         help='Action for avocado, see avocado --help for subcommands')
+    parser.add_argument("--version", action="store_true",
+                        default=False, help='show version and exit')
+
+    # Solely for the purpose of manpage generator, copy&paste from setup.py
+    parser.man_short_description = \
+""" 
+tool to test components for a modular Fedora.
+
+mtf is a main binary file of Meta-Test-Family.
+
+It tests container images and/or modules with user defined tests using avocado framework as test runner.
+"""
 
     # parameters tights to avocado
     group_avocado = parser.add_argument_group(
@@ -71,9 +117,16 @@ def cli():
                        help='URL overrides the value of module.docker.container or module.rpm.repo.')
     group.add_argument("--modulemdurl", action="store",
                        help='overwrites the location of a moduleMD file')
+    return parser
 
+
+def cli():
     # unknown options are forwarded to avocado run
-    args, unknown = parser.parse_known_args()
+    args, unknown = mtfparser().parse_known_args()
+
+    if args.version:
+        print "0.7.7"
+        exit(0)
 
     # uses additional arguments, set up variable asap, its used afterwards:
     if args.debug:
@@ -119,8 +172,8 @@ def cli():
             os.environ.get('MODULE'), args.module))
     else:
         # TODO: what to do here? whats the defaults value for MODULE, do I know it?
-        common.print_info("MODULE={0} ; we support {1} \n === expecting your magic, enjoy! === \n"
-                          "{2}".format(os.environ.get('MODULE'), common.get_backend_list(), parser.epilog))
+        common.print_info("MODULE={0} ; we support {1} \n === expecting your magic, enjoy! === ".format(
+            os.environ.get('MODULE'), common.get_backend_list()))
 
     common.print_debug("MODULE={0}".format(os.environ.get('MODULE')))
     return args, unknown
@@ -228,3 +281,7 @@ def main():
         # when there is any need, change general method or create specific one:
         returncode = a.avocado_general()
     exit(returncode)
+
+
+
+
