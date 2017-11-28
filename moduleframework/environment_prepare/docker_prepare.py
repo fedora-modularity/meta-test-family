@@ -29,6 +29,7 @@ from avocado.utils import service
 from moduleframework.common import print_info, CommonFunctions
 import os
 
+
 class EnvDocker(CommonFunctions):
 
     def prepare_env(self):

@@ -22,6 +22,7 @@
 from moduleframework.module_framework import AvocadoTest
 from moduleframework.common import get_module_type_base
 
+
 class NspawnAvocadoTest(AvocadoTest):
     """
     Class for writing tests specific just for RPM module testing inside NSPAWN env

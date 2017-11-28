@@ -31,6 +31,7 @@ class RpmHelper(CommonFunctions):
 
     :avocado: disable
     """
+    _URL = None
 
     def __init__(self):
         """
@@ -46,14 +47,27 @@ class RpmHelper(CommonFunctions):
         self.bootstrappackages = []
         self.repos = []
 
-    def getURL(self):
+    @property
+    def URL(self):
         """
         Return semicolon separated string of repositories what will be used, could be simialr to URL param,
          it contains also dependent repositories from PDC
 
         :return: str
         """
-        return ";".join(self.repos)
+        return self._URL
+
+    @URL.getter
+    def URL(self):
+        """
+        Function returns string as semicolon separated repos
+        :return: string
+        """
+        return ';'.join(self.repos)
+
+    @URL.setter
+    def URL(self, value):
+        self._URL = value
 
     def setUp(self):
         """

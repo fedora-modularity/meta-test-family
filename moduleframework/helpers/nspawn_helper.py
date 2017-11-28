@@ -50,12 +50,10 @@ class NspawnHelper(RpmHelper):
         actualtime = time.time()
         self.chrootpath_baseimage = ""
         if not get_if_reuse():
-            self.jmeno = "%s_%r" % (self.component_name, actualtime)
+            self.name = "%s_%r" % (self.component_name, actualtime)
         else:
-            self.jmeno = self.component_name
-        self.chrootpath = os.path.abspath(self.baseprefix + self.jmeno)
-
-
+            self.name = self.component_name
+        self.chrootpath = os.path.abspath(self.baseprefix + self.name)
 
     def setUp(self):
         """
@@ -75,13 +73,16 @@ class NspawnHelper(RpmHelper):
                                                     self.component_name +
                                                     "_image_" +
                                                     hashlib.md5(" ".join(self.repos)).hexdigest())
-        self.__image_base = Image(location=self.chrootpath_baseimage, packageset=self.whattoinstallrpm, repos=self.repos, ignore_installed=True)
+        self.__image_base = Image(location=self.chrootpath_baseimage,
+                                  packageset=self.whattoinstallrpm,
+                                  repos=self.repos,
+                                  ignore_installed=True)
         self.__image = self.__image_base.create_snapshot(self.chrootpath)
-        self.__container = Container(image=self.__image, name=self.jmeno)
+        self.__container = Container(image=self.__image, name=self.name)
         self._callSetupFromConfig()
         self.__container.boot_machine()
 
-    def run (self, command, **kwargs):
+    def run(self, command, **kwargs):
         return self.__container.execute(command=translate_cmd(command, translation_dict=trans_dict), **kwargs)
 
     def start(self, command="/bin/true"):
@@ -142,6 +143,6 @@ class NspawnHelper(RpmHelper):
             except:
                 pass
         else:
-            print_info("tearDown skipped", "running nspawn: %s" % self.jmeno)
+            print_info("tearDown skipped", "running nspawn: %s" % self.name)
             print_info("To connect to a machine use:",
-                       "machinectl shell root@%s /bin/bash" % self.jmeno)
+                       "machinectl shell root@%s /bin/bash" % self.name)

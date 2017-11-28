@@ -189,7 +189,7 @@ class OpenShiftHelper(ContainerHelper):
         :return: None
         """
         self._callSetupFromConfig()
-        self.icontainer = self.get_url()
+        self._icontainer = self.get_url()
 
     def _openshift_login(self, oc_ip="127.0.0.1", oc_user='developer', oc_passwd='developer', env=False):
         """
@@ -245,7 +245,8 @@ class OpenShiftHelper(ContainerHelper):
             common.print_info(e.message)
             return False
 
-    def getIPaddr(self):
+    @property
+    def ipaddr(self):
         """
         Return protocol (IP or IPv6) address on a POD OpenShift instance.
 
@@ -253,7 +254,15 @@ class OpenShiftHelper(ContainerHelper):
 
         :return: str
         """
-        return self.ipaddr
+        return self._ipaddr
+
+    @ipaddr.setter
+    def ipaddr(self, value):
+        self._ipaddr = value
+
+    @ipaddr.getter
+    def ipaddr(self):
+        return self._ipaddr
 
     def start(self):
         """

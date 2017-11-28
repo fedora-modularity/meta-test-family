@@ -31,6 +31,7 @@ from moduleframework.common import CommonFunctions, print_info, is_not_silent
 selinux_state_file="/var/tmp/mtf_selinux_state"
 setseto = "Permissive"
 
+
 class EnvNspawn(CommonFunctions):
 
     def prepare_env(self):
@@ -41,7 +42,6 @@ class EnvNspawn(CommonFunctions):
 
     def cleanup_env(self):
         self.__cleanup()
-
 
     def __prepare_selinux(self):
         # disable selinux by default if not turned off
@@ -54,7 +54,9 @@ class EnvNspawn(CommonFunctions):
                 with open(selinux_state_file, 'w') as openfile:
                     openfile.write(actual_state)
                 if setseto not in actual_state:
-                    self.runHost("setenforce %s" % setseto, verbose=is_not_silent(), sudo=True)
+                    self.runHost("setenforce %s" % setseto,
+                                 verbose=is_not_silent(),
+                                 sudo=True)
 
     def __install_machined(self):
         # install systemd-nspawn in case not installed
@@ -70,7 +72,10 @@ class EnvNspawn(CommonFunctions):
                 with open(selinux_state_file, 'r') as openfile:
                     stored_state = openfile.readline()
                     if stored_state != actual_state:
-                        self.runHost("setenforce %s" % stored_state, ignore_status=True, verbose=is_not_silent(), sudo=True)
+                        self.runHost("setenforce %s" % stored_state,
+                                     ignore_status=True,
+                                     verbose=is_not_silent(),
+                                     sudo=True)
                 os.remove(selinux_state_file)
             else:
                 print_info("Selinux state is not stored, skipping.")

@@ -226,14 +226,14 @@ class AvocadoTest(Test):
         """
         return self.backend.copyFrom(*args, **kwargs)
 
-    def getIPaddr(self, *args, **kwargs):
+    def ipaddr(self, *args, **kwargs):
         """
         Return ip addr string of guest machine
         In many cases it should be same as host machine and port should be forwarded to host
 
         :return: str
         """
-        return self.backend.getIPaddr(*args, **kwargs)
+        return self.backend.ipaddr(*args, **kwargs)
 
     def getArch(self):
         """
@@ -243,7 +243,7 @@ class AvocadoTest(Test):
         """
         return self.backend.getArch()
 
-    def getModuleDependencies(self):
+    def dependencylist(self):
         """
         get list of module dependencies dictionary, there is structure like:
         {module_name: {stream: master, urls=[repo_url1, repo_url2]},
@@ -251,7 +251,7 @@ class AvocadoTest(Test):
 
         :return: dict
         """
-        return self.backend.getModuleDependencies()
+        return self.backend.dependencylist
 
     def run_script(self, *args, **kwargs):
         """
