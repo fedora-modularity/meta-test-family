@@ -235,8 +235,8 @@ class OpenShiftHelper(ContainerHelper):
         try:
             for svc in service:
                 if svc.get('metadata').get('labels').get('app') == self.app_name:
-                    self.ipaddr = svc.get('spec').get("clusterIP")
-                    common.trans_dict['GUESTIPADDR'] = self.ipaddr
+                    self._ipaddr = svc.get('spec').get("clusterIP")
+                    common.trans_dict['GUESTIPADDR'] = self._ipaddr
             return True
         except KeyError as e:
             common.print_info(e.message)
@@ -259,10 +259,6 @@ class OpenShiftHelper(ContainerHelper):
     @ipaddr.setter
     def ipaddr(self, value):
         self._ipaddr = value
-
-    @ipaddr.getter
-    def ipaddr(self):
-        return self._ipaddr
 
     def start(self):
         """
