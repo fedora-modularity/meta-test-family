@@ -243,7 +243,7 @@ def get_odcs_auth():
     :envvar MTF_ODCS: yes or token
     :return:
     """
-    odcstoken = os.environ.get('MTF_ODCS',"")
+    odcstoken = os.environ.get('MTF_ODCS')
 
     # in case you dont have token enabled, try to ask for openidc via web browser
     if odcstoken in TRUE_VALUES_DICT:
@@ -271,9 +271,8 @@ def get_odcs_auth():
         except requests.exceptions.HTTPError as e:
             print_info(e.response.text)
             raise ModuleFrameworkException("Unable to get token via OpenIDC for your user")
-    if len(odcstoken)<10:
+    if odcstoken and len(odcstoken)<10:
         raise ModuleFrameworkException("Unable to parse token for ODCS, token is too short: %s" % odcstoken)
-
     return odcstoken
 
 
