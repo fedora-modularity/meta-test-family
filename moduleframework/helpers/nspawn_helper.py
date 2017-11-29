@@ -50,9 +50,9 @@ class NspawnHelper(RpmHelper):
         actualtime = time.time()
         self.chrootpath_baseimage = ""
         if not get_if_reuse():
-            self.jmeno = "%s_%r" % (self.moduleName, actualtime)
+            self.jmeno = "%s_%r" % (self.component_name, actualtime)
         else:
-            self.jmeno = self.moduleName
+            self.jmeno = self.component_name
         self.chrootpath = os.path.abspath(self.baseprefix + self.jmeno)
 
 
@@ -72,7 +72,7 @@ class NspawnHelper(RpmHelper):
         self.setRepositoriesAndWhatToInstall()
         # never move this line to __init__ this localtion can change before setUp (set repositories)
         self.chrootpath_baseimage = os.path.abspath(self.baseprefix +
-                                                    self.moduleName +
+                                                    self.component_name +
                                                     "_image_" +
                                                     hashlib.md5(" ".join(self.repos)).hexdigest())
         self.__image_base = Image(location=self.chrootpath_baseimage, packageset=self.whattoinstallrpm, repos=self.repos, ignore_installed=True)

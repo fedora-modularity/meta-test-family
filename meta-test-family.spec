@@ -23,6 +23,7 @@ Requires:       python2-pdc-client
 Requires:       python2-modulemd
 Requires:       python2-dockerfile-parse
 Requires:       python-mistune
+Requires:       python2-odcs-client
 Provides:       modularity-testing-framework = %{version}-%{release}
 Obsoletes:      modularity-testing-framework < 0.5.18-2
 
@@ -53,6 +54,7 @@ install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
 %{_bindir}/mtf-env-set
 %{_bindir}/mtf-env-clean
 %{_bindir}/mtf-init
+%{_bindir}/mtf-pdc-module-info-reader
 %{python2_sitelib}/moduleframework/
 %{python2_sitelib}/mtf/
 %{python2_sitelib}/meta_test_family-*.egg-info/
