@@ -23,46 +23,54 @@
 #
 
 from moduleframework.pdc_data import PDCParser
-from optparse import OptionParser
+from argparse import ArgumentParser
+import yaml
+import re
 
-if __name__ == '__main__':
-    parser = OptionParser()
-    parser.add_option(
+def cli():
+    parser = ArgumentParser()
+    parser.add_argument(
         "-f",
         "--file",
         dest="filename",
         help="file with message to read fedora message bus",
         default=None)
-    parser.add_option(
+    parser.add_argument(
         "-r",
         "--release",
         dest="release",
         help="Use release in format name-stream-version as input",
         default=None)
-    parser.add_option("-l", "--latest", dest="latest",
+    parser.add_argument("-l", "--latest", dest="latest",
                       help="Use latest bits, build by MBS and stored in PDC")
-    parser.add_option(
+    parser.add_argument(
         "--commit",
         dest="commit",
         action="store_true",
-        default=False,
         help="print git commit hash of exact version of module")
+    return parser.parse_args()
 
-    a = PDCParser()
-    (options, args) = parser.parse_args()
+
+def main():
+    options = cli()
+    name = None
+    stream = None
+    version = None
     if options.filename:
         flh = open(options.filename)
         stdinput = "".join(flh.readlines()).strip()
+        raw = yaml.load(stdinput)
+        name = raw["msg"]["name"]
+        stream = raw["msg"]["stream"]
+        version = raw["msg"]["version"]
         flh.close()
-        a.setViaFedMsg(stdinput)
     elif options.release:
-        a.setFullVersion(options.release)
+        name, stream, version = re.search(
+            "(.*)-(.*)-(.*)", options.release).groups()
     elif options.latest:
-        a.setLatestPDC(options.latest)
-    else:
-        raise Exception(parser.print_help())
-
+        name = options.latest
+    pdc_solver = PDCParser(name, stream, version)
     if options.commit:
-        print a.generateGitHash()
+        print pdc_solver.generateGitHash()
     else:
-        print " ".join(a.generateParams())
+        print " ".join(pdc_solver.generateParams())

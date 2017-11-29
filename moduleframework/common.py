@@ -36,6 +36,7 @@ import copy
 import sys
 import random
 import string
+import requests
 from avocado.utils import process
 from moduleframework.mtfexceptions import ModuleFrameworkException, ConfigExc, CmdExc
 
@@ -84,22 +85,11 @@ DEFAULTRETRYCOUNT = 3
 # time in seconds
 DEFAULTRETRYTIMEOUT = 30
 DEFAULTNSPAWNTIMEOUT = 10
-MODULE_DEFAULT_PROFILE="default"
-
+MODULE_DEFAULT_PROFILE = "default"
+TRUE_VALUES_DICT = ['yes', 'YES', 'yes', 'True', 'true', 'ok', 'OK']
 
 def generate_unique_name(size=10):
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(size))
-
-
-def get_compose_url_modular_release():
-    default_release = "27"
-    release = os.environ.get("MTF_FEDORA_RELEASE") or default_release
-    if release == "master":
-        release = default_release
-
-    base_url = "https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-{}/compose/Server/{}/os"
-    compose_url = os.environ.get("MTF_COMPOSE_BASE") or base_url.format(release, ARCH)
-    return compose_url
 
 
 def is_debug():
@@ -243,6 +233,49 @@ def get_if_remoterepos():
     return bool(remote_repos)
 
 
+def get_odcs_auth():
+    """
+    use ODCS for creating composes as URL parameter
+    It enables this feature in case MTF_ODCS envvar is set
+    MTF_ODCS=yes -- use openidc and token for your user
+    MTF_ODCS=OIDC_token_string -- use this token for authentication
+
+    :envvar MTF_ODCS: yes or token
+    :return:
+    """
+    odcstoken = os.environ.get('MTF_ODCS')
+
+    # in case you dont have token enabled, try to ask for openidc via web browser
+    if odcstoken in TRUE_VALUES_DICT:
+        # to not have hard dependency on openidc (use just when using ODCS without defined token)
+        import openidc_client
+        id_provider = 'https://id.fedoraproject.org/openidc/'
+        # Get the auth token using the OpenID client.
+        oidc = openidc_client.OpenIDCClient(
+            'odcs',
+            id_provider,
+            {'Token': 'Token', 'Authorization': 'Authorization'},
+            'odcs-authorizer',
+            'notsecret',
+        )
+
+        scopes = [
+            'openid',
+            'https://id.fedoraproject.org/scope/groups',
+            'https://pagure.io/odcs/new-compose',
+            'https://pagure.io/odcs/renew-compose',
+            'https://pagure.io/odcs/delete-compose',
+        ]
+        try:
+            odcstoken = oidc.get_token(scopes, new_token=True)
+        except requests.exceptions.HTTPError as e:
+            print_info(e.response.text)
+            raise ModuleFrameworkException("Unable to get token via OpenIDC for your user")
+    if odcstoken and len(odcstoken)<10:
+        raise ModuleFrameworkException("Unable to parse token for ODCS, token is too short: %s" % odcstoken)
+    return odcstoken
+
+
 def get_if_module():
     """
     Return the **MTF_DISABLE_MODULE** envvar.
@@ -352,19 +385,17 @@ class CommonFunctions(object):
     """
     config = None
     modulemdConf = None
+    component_name = None
+    source = None
+    arch = None
+    sys_arch = None
+    dependencylist = {}
+    is_it_module = False
+    packager = None
+    # general use case is to have forwarded services to host (so thats why it is same)
+    ipaddr = trans_dict["HOSTIPADDR"]
 
     def __init__(self, *args, **kwargs):
-        self.config = None
-        self.modulemdConf = None
-        self.moduleName = None
-        self.source = None
-        self.arch = None
-        self.sys_arch = None
-        self.dependencylist = {}
-        self.is_it_module = False
-        self.packager = None
-        # general use case is to have forwarded services to host (so thats why it is same)
-        self.ipaddr = trans_dict["HOSTIPADDR"]
         trans_dict["GUESTARCH"] = self.getArch()
         self.loadconfig()
 
@@ -388,7 +419,7 @@ class CommonFunctions(object):
         else:
             pass
 
-        self.moduleName = sanitize_text(self.config['name'])
+        self.component_name = sanitize_text(self.config['name'])
         self.source = self.config.get('source')
         self.set_url()
 

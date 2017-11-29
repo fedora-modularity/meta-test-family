@@ -23,13 +23,10 @@
 import os
 import sys
 
-try:
-    from setuptools import setup, find_packages
-except ImportError:
-    from distutils.core import setup
-
+from setuptools import setup, find_packages
 from setuptools.command.build_py import build_py
 from setuptools.command.install import install
+
 try:
     sys.path = [os.path.join(os.getcwd(), 'build_manpages')] + sys.path
     from build_manpages.build_manpages import build_manpages, get_build_py_cmd, get_install_cmd
@@ -41,6 +38,7 @@ except:
 
 # copy from https://github.com/avocado-framework/avocado/blob/master/setup.py
 VIRTUAL_ENV = hasattr(sys, 'real_prefix')
+
 
 def get_dir(system_path=None, virtual_path=None):
     """
@@ -102,6 +100,7 @@ setup(
             'mtf-env-clean = moduleframework.mtf_environment:mtfenvclean',
             'mtf-init = moduleframework.mtf_init:main',
             'mtf = moduleframework.mtf_scheduler:main',
+            'mtf-pdc-module-info-reader = moduleframework.pdc_msg_module_info_reader:main',
         ]
     },
     setup_requires=[],
