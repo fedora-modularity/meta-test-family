@@ -332,7 +332,7 @@ def get_repo_url(wmodule="base-runtime", wstream="master"):
 PDCParser = PDCParserGeneral
 if get_odcs_auth():
     PDCParser = PDCParserODCS
-elif get_if_remoterepos():
+elif not get_if_remoterepos():
     PDCParser = PDCParserKoji
 
 def test_PDC_general_base_runtime():
