@@ -36,6 +36,7 @@ import copy
 import sys
 import random
 import string
+import requests
 from avocado.utils import process
 from moduleframework.mtfexceptions import ModuleFrameworkException, ConfigExc, CmdExc
 
@@ -84,8 +85,8 @@ DEFAULTRETRYCOUNT = 3
 # time in seconds
 DEFAULTRETRYTIMEOUT = 30
 DEFAULTNSPAWNTIMEOUT = 10
-MODULE_DEFAULT_PROFILE="default"
-
+MODULE_DEFAULT_PROFILE = "default"
+TRUE_VALUES_DICT = ['yes', 'YES', 'yes', 'True', 'true', 'ok', 'OK']
 
 def generate_unique_name(size=10):
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(size))
@@ -231,8 +232,48 @@ def get_if_remoterepos():
     remote_repos = os.environ.get('MTF_REMOTE_REPOS')
     return bool(remote_repos)
 
+
 def get_odcs_auth():
-    odcstoken = os.environ.get('MTF_ODCS')
+    """
+    use ODCS for creating composes as URL parameter
+    It enables this feature in case MTF_ODCS envvar is set
+    MTF_ODCS=yes -- use openidc and token for your user
+    MTF_ODCS=OIDC_token_string -- use this token for authentication
+
+    :envvar MTF_ODCS: yes or token
+    :return:
+    """
+    odcstoken = os.environ.get('MTF_ODCS',"")
+
+    # in case you dont have token enabled, try to ask for openidc via web browser
+    if odcstoken in TRUE_VALUES_DICT:
+        # to not have hard dependency on openidc (use just when using ODCS without defined token)
+        import openidc_client
+        id_provider = 'https://id.fedoraproject.org/openidc/'
+        # Get the auth token using the OpenID client.
+        oidc = openidc_client.OpenIDCClient(
+            'odcs',
+            id_provider,
+            {'Token': 'Token', 'Authorization': 'Authorization'},
+            'odcs-authorizer',
+            'notsecret',
+        )
+
+        scopes = [
+            'openid',
+            'https://id.fedoraproject.org/scope/groups',
+            'https://pagure.io/odcs/new-compose',
+            'https://pagure.io/odcs/renew-compose',
+            'https://pagure.io/odcs/delete-compose',
+        ]
+        try:
+            odcstoken = oidc.get_token(scopes, new_token=True)
+        except requests.exceptions.HTTPError as e:
+            print_info(e.response.text)
+            raise ModuleFrameworkException("Unable to get token via OpenIDC for your user")
+    if len(odcstoken)<10:
+        raise ModuleFrameworkException("Unable to parse token for ODCS, token is too short: %s" % odcstoken)
+
     return odcstoken
 
 
