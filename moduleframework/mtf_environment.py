@@ -61,6 +61,7 @@ def cliparser_mtfenvclean():
     return parser
 
 
+# to handle start without MODULE set; the whole module is called by man page generator for argparsers
 try:
     module_name = get_module_type_base()
     print_info("Setting environment for module: {} ".format(module_name))
@@ -79,6 +80,7 @@ elif module_name == "openshift":
 
 def mtfenvset():
     cliparser_mtfenvset().parse_args()
+    # to handle start without MODULE set
     try:
         get_module_type_base()
     except ModuleFrameworkException as e:
@@ -91,6 +93,7 @@ def mtfenvset():
 
 def mtfenvclean():
     cliparser_mtfenvclean().parse_args()
+    # to handle start without MODULE set
     try:
         get_module_type_base()
     except ModuleFrameworkException as e:
