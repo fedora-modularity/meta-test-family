@@ -98,5 +98,3 @@ ENV/
 examples/baseruntime/generated.py
 examples/memcached/generated.py
 
-# Generated man page
-man

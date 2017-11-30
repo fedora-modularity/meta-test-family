@@ -2,3 +2,6 @@
 	path = tools/check_modulemd
 	url = https://github.com/fedora-modularity/check_modulemd
 
+[submodule "build_manpages"]
+	path = build_manpages
+	url = https://github.com/praiskup/build_manpages
