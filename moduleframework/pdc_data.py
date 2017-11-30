@@ -33,7 +33,7 @@ import os
 import sys
 from avocado.utils import process
 from common import print_info, DEFAULTRETRYCOUNT, DEFAULTRETRYTIMEOUT, \
-    get_if_remoterepos, MODULEFILE, print_debug,\
+    get_if_remoterepos, BASEPATHDIR, MODULEFILE, print_debug,\
     is_debug, ARCH, is_recursive_download, trans_dict, get_odcs_auth
 from moduleframework import mtfexceptions
 from pdc_client import PDCClient
