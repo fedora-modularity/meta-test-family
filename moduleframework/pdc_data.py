@@ -28,14 +28,13 @@ Download and create local repos
 Construct parameters for automatization (CIs)
 """
 
-import warnings
 import yaml
 import os
 import sys
 from avocado.utils import process
 from common import print_info, DEFAULTRETRYCOUNT, DEFAULTRETRYTIMEOUT, \
     get_if_remoterepos, MODULEFILE, print_debug,\
-    is_debug, ARCH, is_recursive_download, trans_dict, BASEPATHDIR, get_odcs_auth
+    is_debug, ARCH, is_recursive_download, trans_dict, get_odcs_auth
 from moduleframework import mtfexceptions
 from pdc_client import PDCClient
 from timeoutlib import Retry
@@ -267,14 +266,16 @@ class PDCParserODCS(PDCParserGeneral):
 
     def get_repo(self):
         odcs = ODCS(ODCS_URL, auth_mech=AuthMech.OpenIDC, openidc_token=self.auth_token)
-        print_debug("ODCS Starting module composing")
+        print_debug("ODCS Starting module composing: %s" % odcs,
+                    "%s compose for: %s" % (self.compose_type, self.get_module_identifier()))
         compose_builder = odcs.new_compose(self.get_module_identifier(), self.compose_type)
         timeout_time=600
         print_debug("ODCS Module compose started, timeout set to %ss" % timeout_time)
         compose_state = odcs.wait_for_compose(compose_builder["id"], timeout=timeout_time)
         if compose_state["state_name"] == "done":
-            print_info("ODCS Compose done, URL with repo file", compose_state["result_repofile"])
-            return compose_state["result_repofile"]
+            compose = "{compose}/{arch}/os".format(compose=compose_state["result_repo"], arch=ARCH)
+            print_info("ODCS Compose done, URL with repo file", compose)
+            return compose
         else:
             raise mtfexceptions.PDCExc("ODCS: Failed to generate compose for module: %s" %
                                        self.get_module_identifier())
@@ -385,7 +386,8 @@ def test_PDC_ODCS_nodejs():
     parser = PDCParserODCS("nodejs", "8")
     # TODO: need to setup MTF_ODCS variable with odcs token, and ODCS version at least 0.1.2
     # or your user will be asked to for token interactively
-    #print_info(parser.get_repo())
+    if get_odcs_auth():
+        print_info(parser.get_repo())
 
 
 
