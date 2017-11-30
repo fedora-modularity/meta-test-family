@@ -151,7 +151,7 @@ class ContainerHelper(CommonFunctions):
         if self.status() is False:
             raise ContainerExc(
                 "Container %s (for module %s) is not running, probably DEAD immediately after start (ID: %s)" % (
-                    self.jmeno, self.moduleName, self.docker_id))
+                    self.jmeno, self.component_name, self.docker_id))
             trans_dict["GUESTPACKAGER"] = self.get_packager()
 
     def stop(self):
