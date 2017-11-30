@@ -243,7 +243,7 @@ class AvocadoTest(Test):
         """
         return self.backend.getArch()
 
-    def dependencylist(self):
+    def dependency_list(self):
         """
         get list of module dependencies dictionary, there is structure like:
         {module_name: {stream: master, urls=[repo_url1, repo_url2]},
@@ -251,7 +251,7 @@ class AvocadoTest(Test):
 
         :return: dict
         """
-        return self.backend.dependencylist
+        return self.backend.dependency_list
 
     def run_script(self, *args, **kwargs):
         """

@@ -55,14 +55,6 @@ class RpmHelper(CommonFunctions):
 
         :return: str
         """
-        return self._URL
-
-    @URL.getter
-    def URL(self):
-        """
-        Function returns string as semicolon separated repos
-        :return: string
-        """
         return ';'.join(self.repos)
 
     @URL.setter

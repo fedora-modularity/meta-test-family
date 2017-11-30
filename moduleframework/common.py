@@ -396,6 +396,7 @@ class CommonFunctions(object):
     _dependency_list = None
 
     def __init__(self, *args, **kwargs):
+        # general use case is to have forwarded services to host (so thats why it is same)
         trans_dict["GUESTARCH"] = self.getArch()
         self.loadconfig()
 
