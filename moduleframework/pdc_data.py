@@ -106,7 +106,7 @@ class PDCParserGeneral():
             def retry_tmpfunc():
                 # Using develop=True to not authenticate to the server
                 pdc_session = PDCClient(PDC_SERVER, ssl_verify=True, develop=True)
-                print print_debug(pdc_session, pdc_query)
+                print_debug(pdc_session, pdc_query)
                 return pdc_session(**pdc_query)
             mod_info = retry_tmpfunc()
             if not mod_info or "results" not in mod_info.keys() or not mod_info["results"]:
@@ -343,6 +343,7 @@ def test_PDC_general_base_runtime():
     print_info(parser.get_repo())
     assert BASE_REPO_URL[:30] in parser.get_repo()
     print_info(parser.generateParams())
+    assert len(parser.generateParams()) == 3
     assert "MODULE=nspawn" in " ".join(parser.generateParams())
     print_info("URL=%s" % BASE_REPO_URL[:30])
     assert "URL=%s" % BASE_REPO_URL[:30] in " ".join(parser.generateParams())
