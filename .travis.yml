@@ -12,10 +12,7 @@ services:
   - docker
 
 before_install:
-  - sudo apt-get -y install curl python-software-properties software-properties-common python-pip python-dev build-essential git make
-  - sudo apt-get -y install libkrb5-dev netcat mysql-client-5.5 python-pytest
-  - sudo pip install avocado-framework
-  - pip install avocado-framework
+  - sudo ./requirements.sh
 
 install: sudo make install_pip
 
@@ -30,6 +27,5 @@ script:
   - sudo make -C examples/testing-module check-docker-scl-multi-travis
   - sudo make -C examples/testing-module check-mtf-pdc-module-info-reader
   - sudo make -C mtf/metadata check
-
 
 after_script: sudo cat ~/avocado/job-results/latest/job.log
