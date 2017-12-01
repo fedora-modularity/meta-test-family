@@ -13,6 +13,7 @@ services:
 
 before_install:
   - sudo ./requirements.sh
+  - ./requirements.sh
 
 install: sudo make install_pip
 
