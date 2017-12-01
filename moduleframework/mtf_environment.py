@@ -24,6 +24,8 @@
 """
 Module to setup and cleanup the test environment.
 """
+import argparse
+from moduleframework.common import ModuleFrameworkException
 from moduleframework.common import get_module_type_base, print_info
 from moduleframework.environment_prepare.docker_prepare import EnvDocker
 from moduleframework.environment_prepare.rpm_prepare import EnvRpm
@@ -31,8 +33,40 @@ from moduleframework.environment_prepare.nspawn_prepare import EnvNspawn
 from moduleframework.environment_prepare.openshift_prepare import EnvOpenShift
 
 
-module_name = get_module_type_base()
-print_info("Setting environment for module: {} ".format(module_name))
+def cliparser_mtfenvset():
+    # method needs to be without parameter due to man generator
+    script_name="mtf-env-set"
+    parser = argparse.ArgumentParser(
+        description='Its is a binary file used for setting environment before usage of Meta-Test-Family. See documentation at: http://meta-test-family.readthedocs.io/en/latest/user_guide/environment_setup.html',
+        formatter_class=argparse.RawTextHelpFormatter,
+        prog=script_name,
+        epilog="see http://meta-test-family.readthedocs.io for more info",
+        usage="MODULE=[choose_module_type] {0}".format(script_name),
+    )
+    parser.man_short_description = "prepares environment for testing containers"
+    return parser
+
+
+def cliparser_mtfenvclean():
+    # method needs to be without parameter due to man generator
+    script_name="mtf-env-clean"
+    parser = argparse.ArgumentParser(
+        description='Its is a binary file used for setting environment before usage of Meta-Test-Family. See documentation at: http://meta-test-family.readthedocs.io/en/latest/user_guide/environment_setup.html',
+        formatter_class=argparse.RawTextHelpFormatter,
+        prog=script_name,
+        epilog="see http://meta-test-family.readthedocs.io for more info",
+        usage="MODULE=[choose_module_type] {0}".format(script_name),
+    )
+    parser.man_short_description = "prepares environment for testing containers"
+    return parser
+
+
+# to handle start without MODULE set; the whole module is called by man page generator for argparsers
+try:
+    module_name = get_module_type_base()
+    print_info("Setting environment for module: {} ".format(module_name))
+except ModuleFrameworkException as e:
+    module_name = None
 
 if module_name == "docker":
     env = EnvDocker()
@@ -45,12 +79,26 @@ elif module_name == "openshift":
 
 
 def mtfenvset():
+    cliparser_mtfenvset().parse_args()
+    # to handle start without MODULE set
+    try:
+        get_module_type_base()
+    except ModuleFrameworkException as e:
+        print_info(e)
+        exit(1)
     print_info("Preparing environment ...")
     # cleanup_env exists in more forms for backend : EnvDocker/EnvRpm/EnvNspawn
     env.prepare_env()
 
 
 def mtfenvclean():
+    cliparser_mtfenvclean().parse_args()
+    # to handle start without MODULE set
+    try:
+        get_module_type_base()
+    except ModuleFrameworkException as e:
+        print_info(e)
+        exit(1)
     # cleanup_env exists in more forms for backend: EnvDocker/EnvRpm/EnvNspawn
     env.cleanup_env()
     print_info("All clean")

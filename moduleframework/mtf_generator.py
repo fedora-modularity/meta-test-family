@@ -34,7 +34,17 @@ See `Multiline Bash snippet tests`_ for more information.
 """
 
 from common import print_info, CommonFunctions
+import argparse
 
+
+def cliparser():
+    parser = argparse.ArgumentParser(
+        prog="mtf-generator",
+        description="generates code for tests written in config.yaml file.",
+        epilog="see http://meta-test-family.readthedocs.io for more info",
+    )
+    parser.man_short_description = "Its is a binary file included in Meta-Test-Family package.  It generates code for tests written in config.yaml file for usage by mtf binary."
+    return parser
 
 class TestGenerator(CommonFunctions):
     def __init__(self):
@@ -95,6 +105,8 @@ def main():
     """
     Creates ``tests/generated.py`` file .
     """
+    # this tool doesn't use any options, so adding only --help
+    cliparser().parse_args()
     config = TestGenerator()
     configout = open('generated.py', 'w')
     configout.write(config.output)

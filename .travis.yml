@@ -1,8 +1,5 @@
 language: python
 
-before_script:
-  - git submodule update --init
-
 python:
   - "2.7"
 

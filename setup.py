@@ -23,18 +23,11 @@
 import os
 import sys
 
-from setuptools import setup, find_packages
-from setuptools.command.build_py import build_py
-from setuptools.command.install import install
-
 try:
-    sys.path = [os.path.join(os.getcwd(), 'build_manpages')] + sys.path
-    from build_manpages.build_manpages import build_manpages, get_build_py_cmd, get_install_cmd
-except:
-    print("=======================================")
-    print("Use 'git submodule update --init' first")
-    print("=======================================")
-    raise
+    from setuptools import setup, find_packages
+except ImportError:
+    from distutils.core import setup
+
 
 # copy from https://github.com/avocado-framework/avocado/blob/master/setup.py
 VIRTUAL_ENV = hasattr(sys, 'real_prefix')
@@ -113,10 +106,5 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
-    install_requires=open('requirements.txt').read().splitlines(),
-    cmdclass={
-        'build_manpages': build_manpages,
-        'build_py': get_build_py_cmd(build_py),
-        'install': get_install_cmd(install),
-    },
+    install_requires=open('requirements.txt').read().splitlines()
 )
