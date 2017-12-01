@@ -41,7 +41,7 @@ class RpmHelper(CommonFunctions):
         # allow to fake environment in ubuntu (for Travis)
         if not os.path.exists(baserepodir):
             baserepodir="/var/tmp"
-        self.yumrepo = os.path.join(baserepodir, "%s.repo" % self.moduleName)
+        self.yumrepo = os.path.join(baserepodir, "%s.repo" % self.component_name)
         self.whattoinstallrpm = []
         self.bootstrappackages = []
         self.repos = []
@@ -69,7 +69,7 @@ class RpmHelper(CommonFunctions):
         self.__prepare()
 
     def __addModuleDependency(self, url, name=None, stream="master"):
-        name = name if name else self.moduleName
+        name = name if name else self.component_name
         if name in self.dependencylist:
             self.dependencylist[name]['urls'].append(url)
         else:
@@ -90,9 +90,11 @@ class RpmHelper(CommonFunctions):
             self.repos += get_compose_url() or self.get_url()
             # add also all dependent modules repositories if it is module
             # TODO: removed this dependency search
-            if not get_compose_url() and self.is_it_module:
-                depend_repos = [get_compose_url_modular_release()]
-                self.repos += depend_repos
+            if self.is_it_module and not get_compose_url():
+                # inside this code we don't know anything about modules, this leads to
+                # generic repositories in pdc_data.PDCParserGeneral
+                pdcsolver = pdc_data.PDCParserGeneral(self.component_name)
+                self.repos += [pdcsolver.get_repo()]
         self.repos = list(set(self.repos))
         if whattooinstall:
             self.whattoinstallrpm = list(set(whattooinstall))
@@ -117,7 +119,7 @@ baseurl=%s
 enabled=1
 gpgcheck=0
 
-""" % (self.moduleName, counter, self.moduleName, counter, repo)
+""" % (self.component_name, counter, self.component_name, counter, repo)
             f.write(add)
         f.close()
         self.install_packages()

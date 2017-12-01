@@ -99,6 +99,13 @@ check-mtf-options:
 	cd $(TEMPDIR); grep 'MODULE=docker' log
 	rm -rf "$(TEMPDIR)"
 
+check-mtf-pdc-module-info-reader:
+	mtf-pdc-module-info-reader -r testmodule-master-20170926102903
+	mtf-pdc-module-info-reader -r testmodule-master-20170926102903 --commit | grep 9107dcf53f6201a01b8c8d18493aae0175bcfb19
+	mtf-pdc-module-info-reader -r testmodule-master-20170926102903 | grep 'MODULE=nspawn'
+	mtf-pdc-module-info-reader -r testmodule-master-20170926102903 | grep 'MODULEMDURL=file:/'
+	mtf-pdc-module-info-reader -r testmodule-master-20170926102903 | grep 'URL=https://koj'
+
 check: check-docker
 
 all: check

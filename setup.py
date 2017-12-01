@@ -93,6 +93,7 @@ setup(
             'mtf-env-clean = moduleframework.mtf_environment:mtfenvclean',
             'mtf-init = moduleframework.mtf_init:main',
             'mtf = moduleframework.mtf_scheduler:main',
+            'mtf-pdc-module-info-reader = moduleframework.pdc_msg_module_info_reader:main',
         ]
     },
     setup_requires=[],

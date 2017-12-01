@@ -17,14 +17,16 @@ before_install:
 install: sudo make install_pip
 
 script:
+  - sudo make travis
   - sudo make -C examples/testing-module check-inheritance
   - sudo make -C examples/testing-module check-default-config
   - sudo make -C examples/testing-module check-pure-docker
   - sudo make -C examples/testing-module check-exceptions
   - sudo make -C examples/testing-module check-test-mtf-bin-modulelint
-  - sudo make travis
   - sudo make -C examples/testing-module check-real-rpm-destructive
   - sudo make -C examples/testing-module check-docker-scl-multi-travis
+  - sudo make -C examples/testing-module check-mtf-pdc-module-info-reader
   - sudo make -C mtf/metadata check
+
 
 after_script: sudo cat ~/avocado/job-results/latest/job.log
