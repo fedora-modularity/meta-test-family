@@ -27,14 +27,10 @@ from setuptools import setup, find_packages
 from setuptools.command.build_py import build_py
 from setuptools.command.install import install
 
-try:
-    sys.path = [os.path.join(os.getcwd(), 'build_manpages')] + sys.path
-    from build_manpages.build_manpages import build_manpages, get_build_py_cmd, get_install_cmd
-except:
-    print("=======================================")
-    print("Use 'git submodule update --init' first")
-    print("=======================================")
-    raise
+# TODO: remove this woraround after new manpages will exist
+os.system('git submodule update --init')
+sys.path = [os.path.join(os.getcwd(), 'build_manpages')] + sys.path
+from build_manpages.build_manpages import build_manpages, get_build_py_cmd, get_install_cmd
 
 # copy from https://github.com/avocado-framework/avocado/blob/master/setup.py
 VIRTUAL_ENV = hasattr(sys, 'real_prefix')
