@@ -1,0 +1,44 @@
+.\" Copyright Petr Hracek, 2017
+.\"
+.\" This page is distributed under GPL.
+.\"
+.TH MTF-ENV-SET 1 2017-11-01 "" "Linux User's Manual"
+.SH NAME
+mtf-env-set \- prepares environment for testing containers.
+
+.SH SYNOPSIS
+\fIMODULE=docker\/\fR
+.B mtf-env-set
+
+\fIMODULE=rpm\/\fR
+.B mtf-env-set
+
+\fIMODULE=nspawn\/\fR
+.B mtf-env-set
+
+
+.SH DESCRIPTION
+.PP
+\fBmtf-env-set\fP is a binary file used for setting environment before usage of Meta-Test-Family.
+
+.PP
+\fIMODULE=docker\/\fR It installs tests dependencies, docker service
+and starts docker service for testing containers
+
+.PP
+\fIMODULE=rpm\/\fR installs RPM dependencies on this machine.
+
+.PP
+\fIMODULE=nspawn\/\fR installs RPM dependencies. If environment variable MTF_SKIP_DISABLING_SELINUX is
+set, it disables SELinux. It installs systemd-container package on this machine.
+
+
+.SH NOTES
+\fBmtf-env-set\fP mtf-env-set is useful for people who don't want to set the environment manually
+and wish to use this executable to do the job.
+
+.SH AUTHORS
+Petr Hracek, <phracek@redhat.com> (man page)
+
+.SH "SEE ALSO"
+Full documentation at: <http://meta-test-family.readthedocs.io/en/latest/user_guide/environment_setup.html>
