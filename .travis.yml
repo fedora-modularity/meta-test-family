@@ -1,8 +1,5 @@
 language: python
 
-before_script:
-  - git submodule update --init
-
 python:
   - "2.7"
 
@@ -12,10 +9,7 @@ services:
   - docker
 
 before_install:
-  - sudo apt-get -y install curl python-software-properties software-properties-common python-pip python-dev build-essential git make
-  - sudo apt-get -y install libkrb5-dev netcat mysql-client-5.5 python-pytest
-  - sudo pip install avocado-framework
-  - pip install avocado-framework
+  - sudo ./requirements.sh
 
 install: sudo make install_pip
 
