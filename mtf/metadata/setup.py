@@ -80,5 +80,5 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
-    install_requires=[]
+    install_requires=open('requirements.txt').read().splitlines()
 )

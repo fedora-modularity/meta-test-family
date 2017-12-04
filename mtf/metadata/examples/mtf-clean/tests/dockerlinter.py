@@ -1,33 +1,21 @@
-from mtf.metatest import AvocadoTest
+from avocado import Test
 
 
-class DockerFileLint(AvocadoTest):
+class DockerFileLint(Test):
     """
     :avocado: enable
     :avocado: tags=dockerfilelint,docker,rhel,fedora
     """
 
-    def setUp(self):
-        pass
-
-    def tearDown(self, *args, **kwargs):
-        pass
-
     def test(self):
         pass
 
 
-class DockerLint(AvocadoTest):
+class DockerLint(Test):
     """
     :avocado: enable
     :avocado: tags=dockerlint,docker,rhel,fedora
     """
-
-    def setUp(self):
-        pass
-
-    def tearDown(self, *args, **kwargs):
-        pass
 
     def test(self):
         pass

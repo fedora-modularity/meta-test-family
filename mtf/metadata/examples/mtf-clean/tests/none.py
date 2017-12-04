@@ -1,32 +1,20 @@
-from mtf.metatest import AvocadoTest
+from avocado import Test
 
 
-class Rem1(AvocadoTest):
+class Rem1(Test):
     """
     :avocado: enable
     :avocado: tags=rem
     """
 
-    def setUp(self):
-        pass
-
-    def tearDown(self, *args, **kwargs):
-        pass
-
     def test(self):
         pass
 
 
-class Rem2(AvocadoTest):
+class Rem2(Test):
     """
     :avocado: enable
     """
-
-    def setUp(self):
-        pass
-
-    def tearDown(self, *args, **kwargs):
-        pass
 
     def test(self):
         """
@@ -35,16 +23,10 @@ class Rem2(AvocadoTest):
         pass
 
 
-class Rem3(AvocadoTest):
+class Rem3(Test):
     """
     :avocado: disable
     """
-
-    def setUp(self):
-        pass
-
-    def tearDown(self, *args, **kwargs):
-        pass
 
     def test(self):
         pass

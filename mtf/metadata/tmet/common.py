@@ -1,10 +1,11 @@
 from __future__ import print_function
 import yaml
 import os
+import sys
 import glob
-from mtf.common import print_debug
 from avocado.utils import process
 from urlparse import urlparse
+from warnings import warn
 
 """
 Basic classes for metatadata handling, it contains classes derived from general metadata parser
@@ -31,6 +32,14 @@ COVPATH = "coverage_path"
 MODULELINT = "enable_lint"
 IMPORT_TESTS = "import_tests"
 TAG_FILETERS = "tag_filters"
+
+def print_debug(*args):
+    """
+    Own implementation of print_debug, to not be dependent on MTF anyhow inside metadata
+    """
+    if os.environ.get("DEBUG"):
+        for arg in args:
+            print(arg, file=sys.stderr)
 
 
 def logic_formula(statement, filters, op_negation="-", op_and=",", op_or=None):
@@ -81,6 +90,8 @@ def logic_formula(statement, filters, op_negation="-", op_and=",", op_or=None):
 
     if op_or:
         filters = filters.split(op_or)
+    elif isinstance(filters,str):
+        filters = [filters]
     return logic_filter(statement, filters)
 
 
@@ -319,8 +330,12 @@ class MetadataLoaderMTF(MetadataLoader):
     """
     metadata specific class for MTF (avocado) tests
     """
-    import moduleframework.tools
-    MTF_LINTER_PATH = os.path.dirname(moduleframework.tools.__file__)
+    try:
+        import moduleframework.tools
+        MTF_LINTER_PATH = os.path.dirname(moduleframework.tools.__file__)
+    except:
+        warn("MTF library not installed, linters are ignored")
+        MTF_LINTER_PATH = None
     listcmd = "avocado list"
     backends = ["mtf", "avocado"]
 
@@ -345,7 +360,8 @@ class MetadataLoaderMTF(MetadataLoader):
                                           test)
 
     def _import_linters(self):
-        self._import_tests(os.path.join(self.MTF_LINTER_PATH, "*.py"), pathlenght=-3)
+        if self.MTF_LINTER_PATH:
+            self._import_tests(os.path.join(self.MTF_LINTER_PATH, "*.py"), pathlenght=-3)
 
     def __avcado_tag_args(self, tag_list, defaultparam="--filter-by-tags-include-empty"):
         output = []

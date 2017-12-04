@@ -1,4 +1,4 @@
-from common import MetadataLoader, MetadataLoaderMTF, SOURCE, print_debug
+from common import MetadataLoader, MetadataLoaderMTF, SOURCE, print_debug, logic_formula
 from filter import filtertests
 import yaml
 
@@ -152,7 +152,7 @@ def test_filter_general():
                           tags=[],
                           relevancy="")
     print_debug(out)
-    assert len(out) == 5
+    assert len(out) == 6
 
 
 def test_mtf_config():
@@ -188,6 +188,15 @@ def test_general_config():
     print_debug(out)
     assert len(out) == 2
 
+def test_logic_formula_parser():
+    assert logic_formula('tag1', ['tag1'])
+    assert not logic_formula('tag2', ['tag1'])
+    assert logic_formula('tag1,tag2', ['tag1'])
+    assert logic_formula('', ['tag1'])
+    assert logic_formula('tag1', ['tag1','tag2'])
+    assert not logic_formula('tag3', ['tag1', 'tag2'])
+    assert logic_formula('tag3,tag1', ['tag1', 'tag2'])
+    assert logic_formula('tag3,tag2,tag1', ['tag1', 'tag2'])
 
 # test_loader()
 # test_mtf_metadata_linters_only()
@@ -195,3 +204,4 @@ def test_general_config():
 # test_filter_general()
 # test_mtf_config()
 # test_general_config()
+# test_logic_formula_parser()
