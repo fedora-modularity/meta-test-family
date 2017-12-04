@@ -1,0 +1,8 @@
+document: test-metadata
+subtype: general
+enable_lint: True
+tag_filters:
+    - "docker_labels_inspect_test"
+import_tests:
+    - "*.py"
+    - "/bin/true"

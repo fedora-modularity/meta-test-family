@@ -25,5 +25,6 @@ script:
   - sudo make -C examples/testing-module check-docker-scl-multi-travis
   - sudo make -C examples/testing-module check-mtf-pdc-module-info-reader
   - sudo make -C mtf/metadata check
+  - sudo make -C examples/testing-module check-mtf-metadata
 
 after_script: sudo cat ~/avocado/job-results/latest/job.log
