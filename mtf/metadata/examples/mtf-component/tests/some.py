@@ -1,33 +1,21 @@
-from mtf.metatest import AvocadoTest
+from avocado import Test
 
 
-class Add1(AvocadoTest):
+class Add1(Test):
     """
     :avocado: enable
     :avocado: tags=add
     """
-
-    def setUp(self):
-        pass
-
-    def tearDown(self, *args, **kwargs):
-        pass
 
     def test(self):
         pass
 
 
-class AddPart(AvocadoTest):
+class AddPart(Test):
     """
     :avocado: enable
     :avocado: tags=add
     """
-
-    def setUp(self):
-        pass
-
-    def tearDown(self, *args, **kwargs):
-        pass
 
     def testAdd(self):
         pass
@@ -39,17 +27,11 @@ class AddPart(AvocadoTest):
         pass
 
 
-class Rem2(AvocadoTest):
+class Rem2(Test):
     """
     :avocado: enable
     :avocado: tags=rem
     """
-
-    def setUp(self):
-        pass
-
-    def tearDown(self, *args, **kwargs):
-        pass
 
     def test(self):
         pass

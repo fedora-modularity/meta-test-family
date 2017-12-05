@@ -34,10 +34,13 @@ tests:
     options:
         fedora_test:
             source: fedora_specifictest.sh
+            # how to specify tags in generic tests
+            tags: tier1,tier2,tag1
             description: some general test doing verbose test
             backend: general
         extend_test:
             source: https://github.com/fedora-modularity/meta-test-family.git
+            tags: optional
             description: some general test doing verbose test
             backend: general
         test_new_option:
