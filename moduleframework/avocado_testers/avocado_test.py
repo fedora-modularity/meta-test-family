@@ -26,9 +26,9 @@ main module provides all helpers for various module types and AVOCADO(unittest) 
 what you should use for your tests (inherited)
 """
 
-
 from avocado import Test
 from avocado.core import exceptions
+import warnings
 
 from moduleframework.common import *
 from moduleframework.helpers.container_helper import ContainerHelper
@@ -226,6 +226,17 @@ class AvocadoTest(Test):
         """
         return self.backend.copyFrom(*args, **kwargs)
 
+    def getIPaddr(self, *args, **kwargs):
+        """
+        Return ip addr string of guest machine
+        In many cases it should be same as host machine and port should be forwarded to host
+
+        :return: str
+        """
+        warnings.warn("Function getIPaddr is deprecated. Use self.ipaddr instead",
+                      DeprecationWarning)
+        return self.backend.ipaddr(*args, **kwargs)
+
     def ipaddr(self, *args, **kwargs):
         """
         Return ip addr string of guest machine
@@ -242,6 +253,18 @@ class AvocadoTest(Test):
         :return: str
         """
         return self.backend.getArch()
+
+    def getModuleDependencies(self):
+        """
+        get list of module dependencies dictionary, there is structure like:
+        {module_name: {stream: master, urls=[repo_url1, repo_url2]},
+         dependent_module_name: {stream: f26, urls=[repo_url3]}}
+
+        :return: dict
+        """
+        warnings.warn("Function getModuleDependencies is deprecated. Use self.dependency_list instead",
+                      DeprecationWarning)
+        return self.dependency_list()
 
     def dependency_list(self):
         """

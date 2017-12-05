@@ -47,6 +47,17 @@ class RpmHelper(CommonFunctions):
         self.bootstrappackages = []
         self.repos = []
 
+    def getURL(self):
+        """
+        Return semicolon separated string of repositories what will be used, could be simialr to URL param,
+         it contains also dependent repositories from PDC
+
+        :return: str
+        """
+        warnings.warn("Function getURL is deprecated. Use self.URL instead",
+                      DeprecationWarning)
+        return ';'.join(self.repos)
+
     @property
     def URL(self):
         """

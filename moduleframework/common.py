@@ -37,6 +37,7 @@ import sys
 import random
 import string
 import requests
+import warnings
 from avocado.utils import process
 from moduleframework.mtfexceptions import ModuleFrameworkException, ConfigExc, CmdExc
 
@@ -530,6 +531,16 @@ class CommonFunctions(object):
             package_list += mddata['data']['profiles'][profile].get('rpms', [])
         print_info("PCKGs to install inside module:", package_list)
         return package_list
+
+    def getModuleDependencies(self):
+        """
+        Return module dependencies.
+
+        :return: list
+        """
+        warnings.warn("Function getModuleDependencies is deprecated. Use self.dependency_list instead",
+                      DeprecationWarning)
+        return self.dependency_list
 
     @property
     def dependency_list(self):

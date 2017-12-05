@@ -58,6 +58,16 @@ class ContainerHelper(CommonFunctions):
         if get_if_reuse():
             self.docker_static_name = "--name %s" % static_name
 
+    def getURL(self):
+        """
+        It returns actual URL link string to container, It is same as URL
+
+        :return: str
+        """
+        warnings.warn("Function getURL is deprecated. Use self.URL instead",
+                      DeprecationWarning)
+        return self._icontainer
+
     @property
     def URL(self):
         """
