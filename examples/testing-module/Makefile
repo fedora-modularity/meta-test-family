@@ -76,6 +76,7 @@ check-memcached-both: prepare-docker prepare-nspawn
 	cd ../memcached; MODULE=docker $(CMD) sanity1.py
 	cd ../memcached; MODULE=nspawn $(CMD) sanity1.py
 
+
 check-minimal-config-rpm-noenvvar: prepare-nspawn
 	MTF_REMOTE_REPOS= DOCKERFILE= MODULE=nspawn $(CMD) $(TESTS)
 
@@ -105,6 +106,13 @@ check-mtf-pdc-module-info-reader:
 	mtf-pdc-module-info-reader -r testmodule-master-20170926102903 | grep 'MODULE=nspawn'
 	mtf-pdc-module-info-reader -r testmodule-master-20170926102903 | grep 'MODULEMDURL=file:/'
 	mtf-pdc-module-info-reader -r testmodule-master-20170926102903 | grep 'URL=https://koj'
+
+check-mtf-metadata:
+	make -C ../test_metadata_loader test
+
+check-memcached-metadata-loader: prepare-docker
+	make -C ../memcached test
+
 
 check: check-docker
 
