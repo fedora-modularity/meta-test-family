@@ -29,6 +29,8 @@ import json
 
 from avocado.utils import process
 from moduleframework import common
+from mtf.metadata.tmet.filter import filtertests
+from mtf.metadata.tmet import common as metadata_common
 
 
 def mtfparser():
@@ -87,6 +89,10 @@ VARIABLES
                         help='Action for avocado, see avocado --help for subcommands')
     parser.add_argument("--version", action="store_true",
                         default=False, help='show version and exit')
+    parser.add_argument("--metadata", action="store_true",
+                        default=False, help="""load configuration for test sets from metadata file
+                        (https://github.com/fedora-modularity/meta-test-family/blob/devel/mtf/metadata/README.md)""")
+
 
     # Solely for the purpose of manpage generator, copy&paste from setup.py
     parser.man_short_description = \
@@ -180,19 +186,15 @@ def cli():
 
 
 class AvocadoStart(object):
+    tests = []
+    json_tmppath = None
+    additionalAvocadoArg = ''
+
     def __init__(self, args, unknown):
-
-        # its used for filepath in loadCli:
-        self.json_tmppath = None
-        site_libs = os.path.dirname(moduleframework.__file__)
-        mtf_tools = "tools"
-
         # choose between TESTS and ADDITIONAL ENVIRONMENT from options
-        self.tests = ''
         if args.linter:
-            self.tests = (
-                "{SITE_LIB}/{MTF_TOOLS}/*.py".format(SITE_LIB=site_libs, MTF_TOOLS=mtf_tools))
-        self.additionalAvocadoArg = ''
+            self.tests.append(
+                "{MTF_TOOLS}/*.py".format(MTF_TOOLS=metadata_common.MetadataLoaderMTF.MTF_LINTER_PATH))
         self.args = args
 
         for param in unknown:
@@ -200,14 +202,20 @@ class AvocadoStart(object):
             # http://avocado-framework.readthedocs.io/en/52.0/WritingTests.html#categorizing-tests
             if os.path.exists(param):
                 # this is list of tests in local file
-                self.tests += " {0} ".format(param)
+                self.tests.append(param)
             else:
                 # this is additional avocado param
                 self.additionalAvocadoArg += " {0} ".format(param)
-
+        if self.args.metadata:
+            common.print_info("Using Metadata loader for tests and filtering")
+            metadata_tests = filtertests(backend="mtf", location=os.getcwd(), linters=False, tests=[], tags=[], relevancy="")
+            tests_dict = [x[metadata_common.SOURCE] for x in metadata_tests]
+            self.tests += tests_dict
+            common.print_debug("Loaded tests via metadata file: %s" % tests_dict)
         common.print_debug("tests = {0}".format(self.tests))
         common.print_debug("additionalAvocadoArg = {0}".format(
             self.additionalAvocadoArg))
+
 
     def avocado_run(self):
         self.json_tmppath = tempfile.mktemp()
@@ -220,7 +228,7 @@ class AvocadoStart(object):
 
         # run avocado with right cmd arguments
         bash = process.run("{AVOCADO} {a} {b}".format(
-            AVOCADO=avocadoAction, a=self.additionalAvocadoArg, b=self.tests), shell=True, ignore_status=True)
+            AVOCADO=avocadoAction, a=self.additionalAvocadoArg, b=" ".join(self.tests)), shell=True, ignore_status=True)
         common.print_info(bash.stdout, bash.stderr)
         common.print_debug("Command used: ", bash.command)
         return bash.exit_status
@@ -232,7 +240,7 @@ class AvocadoStart(object):
         avocadoAction = "avocado {ACTION} {AVOCADO_ARGS}".format(
             ACTION=self.args.action, AVOCADO_ARGS=avocado_args)
         bash = process.run("{AVOCADO} {a} {b}".format(
-            AVOCADO=avocadoAction, a=self.additionalAvocadoArg, b=self.tests), shell=True, ignore_status=True)
+            AVOCADO=avocadoAction, a=self.additionalAvocadoArg, b=" ".join(self.tests)), shell=True, ignore_status=True)
         common.print_info(bash.stdout, bash.stderr)
         common.print_debug("Command used: ", bash.command)
         return bash.exit_status
