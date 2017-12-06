@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           meta-test-family
-Version:        0.7.7
+Version:        0.7.8
 Release:        1%{?dist}
 Summary:        Tool to test components of a modular Fedora
 
@@ -61,6 +61,181 @@ install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
 
 
 %changelog
+* Wed Dec 06 2017 Jan Scotka <jscotka@redhat.com> 0.7.8-1
+- remove mtf-env-clean from runthem script, it is on not good place and cleanup
+  of env is not important to have it ther (jscotka@redhat.com)
+- add vagrant file (jscotka@redhat.com)
+- add vagrant file for metadata (jscotka@redhat.com)
+- support for metadata to mtf tool (jscotka@redhat.com)
+- metadata: fix generic test filters (jscotka@redhat.com)
+- dependencies for testing in nicer and cleaner format for various distros
+  (jscotka@redhat.com)
+- remove mtf manpage (jscotka@redhat.com)
+- revert generated man pages code (jscotka@redhat.com)
+- Revert "remove all manpages" (scottyh@post.cz)
+- run also without sudo, to improve pip for avocado (jscotka@redhat.com)
+- dependencies in vagrant, travis and for local installation to file
+  (jscotka@redhat.com)
+- trying to clean man-page-generator (psklenar@redhat.com)
+- add test for mtf-pdc-module-info-reader tool and enable it in travis
+  (jscotka@redhat.com)
+- trying to clean man-page-generator (psklenar@redhat.com)
+- trying to clean man-page-generator (psklenar@redhat.com)
+- remove regression, pdc_data needs to import BASEPATHDIR (jscotka@redhat.com)
+- fix vagrant file, fix odcs format of repo, expected dir not repofile
+  (jscotka@redhat.com)
+- remove print function, typo (jscotka@redhat.com)
+- create clean commit based on PR#172 (jscotka@redhat.com)
+- add cool comments (psklenar@redhat.com)
+- man page is generated now (psklenar@redhat.com)
+- man page is generated now (psklenar@redhat.com)
+- man page is generated now (psklenar@redhat.com)
+- remove mtf-log-parser from specfile (jscotka@redhat.com)
+- add all variables (psklenar@redhat.com)
+- fix copr builds (jscotka@redhat.com)
+- removed unused imports (psklenar@redhat.com)
+- fixing all issues (jscotka@redhat.com)
+- add version as its needed for man page generator (psklenar@redhat.com)
+- script to run containers in taskotron (jscotka@redhat.com)
+- trying travis (psklenar@redhat.com)
+- some info about VARIABLES (psklenar@redhat.com)
+- empty commit to start tests (psklenar@redhat.com)
+- delete file (psklenar@redhat.com)
+- not needed (psklenar@redhat.com)
+- new line (psklenar@redhat.com)
+- needed setup, parser in function (psklenar@redhat.com)
+- have parser in function (psklenar@redhat.com)
+- man mtf page is generated (psklenar@redhat.com)
+- revert back to using python setup.py for package installation
+  (jscotka@redhat.com)
+- remove avocado html plugin from python dependencies, it is not important for
+  mtf anyhow (jscotka@redhat.com)
+- test metadata support tool for MTF (jscotka@redhat.com)
+- fix profile handling (jscotka@redhat.com)
+- add some tags to modulelint tests, to be able to filter them
+  (jscotka@redhat.com)
+- Updating docstring and adding pod functions (phracek@redhat.com)
+- Support run command. (phracek@redhat.com)
+- Better check if application exists (phracek@redhat.com)
+- Fixes based on the PR comments. (phracek@redhat.com)
+- Use command oc get and stdout instead of parsing json. (phracek@redhat.com)
+- Add more docu stuff and some fixes. (phracek@redhat.com)
+- testing containers in OpenShift (phracek@redhat.com)
+- Update setup.py (phracek@redhat.com)
+- Fix problem with paramters (phracek@redhat.com)
+- Rewrite dnf/yum clean all functions (phracek@redhat.com)
+- Check specific file extensions in /var/cache/yum|dnf directories
+  (phracek@redhat.com)
+- doc test is splitted into two tests. One is for whole image and second one is
+  related only for install RPMs by RUN command (phracek@redhat.com)
+- Add suport for check nodocs and clean_all (phracek@redhat.com)
+- Update docstring (phracek@redhat.com)
+- Update RTD. Use sphinx-build-2 (phracek@redhat.com)
+- Update name classes (phracek@redhat.com)
+- Update setup.py (phracek@redhat.com)
+- Bump version to 0.7.7 (phracek@redhat.com)
+- Documentation about linters (phracek@redhat.com)
+- Split linters into more classes (phracek@redhat.com)
+- Couple updates based on PR. (phracek@redhat.com)
+- Rename function to assert_to_warn (phracek@redhat.com)
+- Package man pages (phracek@redhat.com)
+- man page updates based on #151 PR (phracek@redhat.com)
+- Implement func mark_as_warn (phracek@redhat.com)
+- Fix error in case help_md does not exist (phracek@redhat.com)
+- Couple updates. (phracek@redhat.com)
+- remove workarounds and add rpm to base package set workaround
+  (jscotka@redhat.com)
+- typos (psklenar@redhat.com)
+- modify how it works images and store rendered output (jscotka@redhat.com)
+- docs into RTD (psklenar@redhat.com)
+- testsuite for mtf-init (psklenar@redhat.com)
+- Bump version to 0.7.6 (phracek@redhat.com)
+- Add mtf-generator man page. (phracek@redhat.com)
+- Manual page for Meta-Test-Family (phracek@redhat.com)
+- Fix error in case help_md does not exist (phracek@redhat.com)
+- Fixes #142 Fix tracebacks for COPY and ADD directives (phracek@redhat.com)
+- systemd test examples - testing fedora or centos via nspawn
+  (jscotka@redhat.com)
+- fix multihost regression, caused by code cleanup (jscotka@redhat.com)
+- change test for decorators to generic one, and change self.skip to
+  self.cancel() (jscotka@redhat.com)
+- mistake in os.path.exist (there were makedirs by mistake)
+  (jscotka@redhat.com)
+- there is sometimes problem to do chmod, so run it via bash
+  (jscotka@redhat.com)
+- test for exception return in case of failed command, check ret code and
+  raised exception (jscotka@redhat.com)
+- add function to run script on remote machine (jscotka@redhat.com)
+- nspawn operation moved to low level library not depenedent on mtf structure
+  (jscotka@redhat.com)
+- add argparse, move test.py into templates (psklenar@redhat.com)
+- Bump new release (phracek@redhat.com)
+- Update documentation and use absolute path (phracek@redhat.com)
+- Fix some logging issues and yum checks (phracek@redhat.com)
+- raise error in case of compatibility (error has to be raised explicitly)
+  (jscotka@redhat.com)
+- script which generate easy template (psklenar@redhat.com)
+- create snapshot before calling setup from config, because machine does not
+  have root directory (jscotka@redhat.com)
+- Skip help.md for now if it does not exist (phracek@redhat.com)
+- add tests for RUN instructions. One for dnf part and the other one for the
+  rest (phracek@redhat.com)
+- Use WARNING in case of ENVIRONMENT VARIABLES are not set in help.md
+  (phracek@redhat.com)
+- Add check for presence help.md (phracek@redhat.com)
+- several fixes based on comment from PR. (phracek@redhat.com)
+- New help.md fixes (phracek@redhat.com)
+- Fix problems found during review (phracek@redhat.com)
+- help.md sanity checker (phracek@redhat.com)
+- Linter for help.md file (phracek@redhat.com)
+- Check for is FROM first (phracek@redhat.com)
+- linter: check Red Hat's and Fedora's images (ttomecek@redhat.com)
+- add comment and link to bugzilla (jscotka@redhat.com)
+- partial change of backward compatibility (jscotka@redhat.com)
+- fix issue with bad exit code of mtf command (jscotka@redhat.com)
+- Hidden feature for install packages from default module via ENVVAR, for
+  further purposes, should not be used now (jscotka@redhat.com)
+- pep8 change (jscotka@redhat.com)
+- test module uses this config, after fixing composeurl handling, if there is
+  bad link, causes error (jscotka@redhat.com)
+- back to original timeout library (jscotka@redhat.com)
+- spec: fix URL (phracek@redhat.com)
+- fix compose handling and fix container issue with using container instead of
+  url (jscotka@redhat.com)
+- Remove shebang from two python files (phracek@redhat.com)
+- Fix shebangs and so (phracek@redhat.com)
+- avocado could say 'FAIL' too (psklenar@redhat.com)
+- typo (jscotka@redhat.com)
+- repair typo in config.yaml and add call of mtf-set-env to makefile
+  (jscotka@redhat.com)
+- better name of the file (psklenar@redhat.com)
+- move main into site package (psklenar@redhat.com)
+- new line fix (psklenar@redhat.com)
+- function add, not so many spaces (psklenar@redhat.com)
+- new line (psklenar@redhat.com)
+- new tool avocado_log_json.py (psklenar@redhat.com)
+- mtf summary (psklenar@redhat.com)
+- add sample output, to see what you can expect (jscotka@redhat.com)
+- add internal usage test as class of simpleTest.py (jscotka@redhat.com)
+- add usage tests and improve doc (jscotka@redhat.com)
+- Revert "add usage tests and improve doc" (jscotka@redhat.com)
+- add usage tests and improve doc (jscotka@redhat.com)
+- improv base avocado class to not skip modules with proper backend (parent)
+  (jscotka@redhat.com)
+- repaired submodule for check_modulemd (jscotka@redhat.com)
+- revert back submodule (jscotka@redhat.com)
+- example how S2I image can be tested with build process (jscotka@redhat.com)
+- Update dockerlint a bit according to Container:Guidelines
+  (phracek@redhat.com)
+- remov baseruntime from Makefile (jscotka@redhat.com)
+- remove python docker requirements, cause trouble in taskotron for shell test:
+  (jscotka@redhat.com)
+- move this important testcase to the end, cause sometimes error
+  (jscotka@redhat.com)
+- function removed, have to remove from nspawn helper (jscotka@redhat.com)
+- taskotron - fix issue with missing base compose repo, when disabled local
+  koji cloning (jscotka@redhat.com)
+
 * Tue Oct 31 2017 Petr Hracek <phracek@redhat.com> 0.7.7-1
 - new upstream release
 
