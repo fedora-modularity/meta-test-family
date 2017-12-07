@@ -228,23 +228,24 @@ class AvocadoTest(Test):
 
     def getIPaddr(self, *args, **kwargs):
         """
-        Return ip addr string of guest machine
+        Return ip address string of guest machine
         In many cases it should be same as host machine and port should be forwarded to host
 
         :return: str
         """
-        warnings.warn("Function getIPaddr is deprecated. Use self.ipaddr instead",
+        warnings.warn("Function getIPaddr is deprecated. Use self.ip_address instead",
                       DeprecationWarning)
-        return self.backend.ipaddr(*args, **kwargs)
+        return self.backend.ip_address(*args, **kwargs)
 
-    def ipaddr(self, *args, **kwargs):
+    @property
+    def ip_address(self, *args, **kwargs):
         """
-        Return ip addr string of guest machine
+        Return ip address string of guest machine
         In many cases it should be same as host machine and port should be forwarded to host
 
         :return: str
         """
-        return self.backend.ipaddr(*args, **kwargs)
+        return self.backend.ip_address(*args, **kwargs)
 
     def getArch(self):
         """
@@ -266,6 +267,7 @@ class AvocadoTest(Test):
                       DeprecationWarning)
         return self.dependency_list()
 
+    @property
     def dependency_list(self):
         """
         get list of module dependencies dictionary, there is structure like:

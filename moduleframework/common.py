@@ -393,7 +393,7 @@ class CommonFunctions(object):
     is_it_module = False
     packager = None
     # general use case is to have forwarded services to host (so thats why it is same)
-    _ipaddr = trans_dict["HOSTIPADDR"]
+    _ip_address = trans_dict["HOSTIPADDR"]
     _dependency_list = None
 
     def __init__(self, *args, **kwargs):
@@ -597,10 +597,10 @@ class CommonFunctions(object):
 
         :return: str
         """
-        return self._ipaddr
+        return self.ip_address
 
     @property
-    def ipaddr(self):
+    def ip_address(self):
         """
         Return protocol (IP or IPv6) address on a guest machine.
 
@@ -609,11 +609,11 @@ class CommonFunctions(object):
 
         :return: str
         """
-        return self._ipaddr
+        return self._ip_address
 
-    @ipaddr.setter
-    def ipaddr(self, value):
-        self._ipaddr = value
+    @ip_address.setter
+    def ip_address(self, value):
+        self._ip_address = value
 
     def _callSetupFromConfig(self):
         """

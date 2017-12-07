@@ -30,15 +30,15 @@ class SimpleTests(module_framework.ContainerAvocadoTest):
     """
     :avocado: enable
     """
-    ipaddr = module_framework.trans_dict["GUESTIPADDR"]
+    ip_address = module_framework.trans_dict["GUESTIPADDR"]
     port = "8080"
 
-    def life_check(self, ipaddr=None, port=None, textcheck="Hello from gunicorn WSGI application!"):
-        ipaddr = ipaddr or self.ipaddr
+    def life_check(self, ip_address=None, port=None, textcheck="Hello from gunicorn WSGI application!"):
+        ip_address = ip_address or self.ip_address
         port = port or self.port
         # wait until container initialized (without probe)
         time.sleep(3)
-        urlfd = urllib.urlopen("http://%s:%s" % (ipaddr, port))
+        urlfd = urllib.urlopen("http://%s:%s" % (ip_address, port))
         self.assertIn(textcheck, urlfd.read())
         urlfd.close()
 
@@ -49,7 +49,7 @@ class SimpleTests(module_framework.ContainerAvocadoTest):
     def test_via_curl(self):
         self.start()
         self.life_check()
-        output = self.runHost("curl http://%s:%s" % (self.ipaddr, self.port))
+        output = self.runHost("curl http://%s:%s" % (self.ip_address, self.port))
         self.assertIn("Hello from gunicorn WSGI application!", output.stdout)
 
     def test_another_port(self):

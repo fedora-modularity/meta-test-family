@@ -235,8 +235,8 @@ class OpenShiftHelper(ContainerHelper):
         try:
             for svc in service:
                 if svc.get('metadata').get('labels').get('app') == self.app_name:
-                    self._ipaddr = svc.get('spec').get("clusterIP")
-                    common.trans_dict['GUESTIPADDR'] = self._ipaddr
+                    self.ip_address = svc.get('spec').get("clusterIP")
+                    common.trans_dict['GUESTIPADDR'] = self.ip_address
             return True
         except KeyError as e:
             common.print_info(e.message)
@@ -246,7 +246,7 @@ class OpenShiftHelper(ContainerHelper):
             return False
 
     @property
-    def ipaddr(self):
+    def ip_address(self):
         """
         Return protocol (IP or IPv6) address on a POD OpenShift instance.
 
@@ -254,11 +254,11 @@ class OpenShiftHelper(ContainerHelper):
 
         :return: str
         """
-        return self._ipaddr
+        return self._ip_address
 
-    @ipaddr.setter
-    def ipaddr(self, value):
-        self._ipaddr = value
+    @ip_address.setter
+    def ip_address(self, value):
+        self._ip_address = value
 
     def start(self):
         """

@@ -102,5 +102,6 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
-    install_requires=open('requirements.txt').read().splitlines()
+    install_requires=open('requirements.txt').read().splitlines(),
+    zip_safe=True
 )

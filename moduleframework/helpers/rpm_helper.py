@@ -140,7 +140,7 @@ gpgcheck=0
             f.write(add)
         f.close()
         self.install_packages()
-        self._ipaddr = trans_dict["GUESTIPADDR"]
+        self.ip_address = trans_dict["GUESTIPADDR"]
 
     def copyTo(self, src, dest):
         """
