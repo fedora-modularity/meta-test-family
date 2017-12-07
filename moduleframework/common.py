@@ -37,6 +37,7 @@ import sys
 import random
 import string
 import requests
+import warnings
 from avocado.utils import process
 from moduleframework.mtfexceptions import ModuleFrameworkException, ConfigExc, CmdExc
 
@@ -389,13 +390,14 @@ class CommonFunctions(object):
     source = None
     arch = None
     sys_arch = None
-    dependencylist = {}
     is_it_module = False
     packager = None
     # general use case is to have forwarded services to host (so thats why it is same)
-    ipaddr = trans_dict["HOSTIPADDR"]
+    _ip_address = trans_dict["HOSTIPADDR"]
+    _dependency_list = None
 
     def __init__(self, *args, **kwargs):
+        # general use case is to have forwarded services to host (so thats why it is same)
         trans_dict["GUESTARCH"] = self.getArch()
         self.loadconfig()
 
@@ -516,7 +518,7 @@ class CommonFunctions(object):
         mddata = self.getModulemdYamlconfig()
         if not profile:
             if 'packages' in self.config:
-                packages_rpm = self.config.get('packages',{}).get('rpms', [])
+                packages_rpm = self.config.get('packages', {}).get('rpms', [])
                 packages_profiles = []
                 for profile_in_conf in self.config.get('packages', {}).get('profiles', []):
                     packages_profiles += mddata['data']['profiles'][profile_in_conf]['rpms']
@@ -536,8 +538,23 @@ class CommonFunctions(object):
 
         :return: list
         """
+        warnings.warn("Function getModuleDependencies is deprecated. Use self.dependency_list instead",
+                      DeprecationWarning)
+        return self.dependency_list
 
-        return self.dependencylist
+    @property
+    def dependency_list(self):
+        """
+        Return module dependencies.
+
+        :return: list
+        """
+
+        return self._dependency_list
+
+    @dependency_list.setter
+    def dependency_list(self, value):
+        self._dependency_list = value
 
     def getModulemdYamlconfig(self, urllink=None):
         """
@@ -580,7 +597,23 @@ class CommonFunctions(object):
 
         :return: str
         """
-        return self.ipaddr
+        return self.ip_address
+
+    @property
+    def ip_address(self):
+        """
+        Return protocol (IP or IPv6) address on a guest machine.
+
+        In many cases it should be same as a host machine's and a port
+        should be forwarded to a host.
+
+        :return: str
+        """
+        return self._ip_address
+
+    @ip_address.setter
+    def ip_address(self, value):
+        self._ip_address = value
 
     def _callSetupFromConfig(self):
         """

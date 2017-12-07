@@ -37,23 +37,23 @@ class ContainerHelper(CommonFunctions):
         set basic object variables
         """
         super(ContainerHelper, self).__init__()
-        static_name="testcontainer"
+        static_name = "testcontainer"
         self.tarbased = None
-        self.jmeno = None
+        self.name = None
         self.docker_id = None
-        self.icontainer = self.get_url()
-        if not self.icontainer:
+        self._icontainer = self.get_url()
+        if not self._icontainer:
             raise ConfigExc("No container image specified in the configuration file or environment variable.")
-        if ".tar" in self.icontainer:
-            self.jmeno = static_name
+        if ".tar" in self._icontainer:
+            self.name = static_name
             self.tarbased = True
-        if "docker=" in self.icontainer:
-            self.jmeno = self.icontainer[7:]
+        if "docker=" in self._icontainer:
+            self.name = self._icontainer[7:]
             self.tarbased = False
         else:
             # untrusted source
             self.tarbased = False
-            self.jmeno = self.icontainer
+            self.name = self._icontainer
         self.docker_static_name = ""
         if get_if_reuse():
             self.docker_static_name = "--name %s" % static_name
@@ -64,14 +64,29 @@ class ContainerHelper(CommonFunctions):
 
         :return: str
         """
-        return self.icontainer
+        warnings.warn("Function getURL is deprecated. Use self.URL instead",
+                      DeprecationWarning)
+        return self._icontainer
+
+    @property
+    def URL(self):
+        """
+        It returns actual URL link string to container, It is same as URL
+
+        :return: str
+        """
+        return self._icontainer
+
+    @URL.setter
+    def URL(self, value):
+        self._icontainer = value
 
     def getDockerInstanceName(self):
         """
         Return docker instance name what will be used inside docker as docker image name
         :return: str
         """
-        return self.jmeno
+        return self.name
 
     def setUp(self):
         """
@@ -84,7 +99,7 @@ class ContainerHelper(CommonFunctions):
 
         :return: None
         """
-        self.icontainer = self.get_url()
+        self._icontainer = self.get_url()
         self._callSetupFromConfig()
         self.__pullContainer()
         self.containerInfo = self.__load_inspect_json()
@@ -109,11 +124,11 @@ class ContainerHelper(CommonFunctions):
         if self.tarbased:
             self.runHost(
                 "docker import %s %s" %
-                (self.icontainer, self.jmeno), verbose=is_not_silent())
-        elif "docker=" in self.icontainer:
+                (self._icontainer, self.name), verbose=is_not_silent())
+        elif "docker=" in self._icontainer:
             pass
         else:
-            self.runHost("docker pull %s" % self.jmeno, verbose=is_not_silent())
+            self.runHost("docker pull %s" % self.name, verbose=is_not_silent())
 
     def __load_inspect_json(self):
         """
@@ -124,7 +139,7 @@ class ContainerHelper(CommonFunctions):
         return json.loads(
             self.runHost(
                 "docker inspect %s" %
-                self.jmeno, verbose=is_not_silent()).stdout)[0]["Config"]
+                self.name, verbose=is_not_silent()).stdout)[0]["Config"]
 
     def start(self, args="-it -d", command="/bin/bash"):
         """
@@ -138,12 +153,12 @@ class ContainerHelper(CommonFunctions):
             if self.info.get('start'):
                 self.docker_id = self.runHost(
                     "%s -d %s %s" %
-                    (self.info['start'], self.docker_static_name, self.jmeno), shell=True, ignore_bg_processes=True,
+                    (self.info['start'], self.docker_static_name, self.name), shell=True, ignore_bg_processes=True,
                     verbose=is_not_silent()).stdout
             else:
                 self.docker_id = self.runHost(
                     "docker run %s %s %s %s" %
-                    (args, self.docker_static_name, self.jmeno, command),
+                    (args, self.docker_static_name, self.name, command),
                     shell=True, ignore_bg_processes=True, verbose=is_not_silent()).stdout
             self.docker_id = self.docker_id.strip()
             # It installs packages in container is removed by default, in future maybe reconciled.
@@ -151,7 +166,7 @@ class ContainerHelper(CommonFunctions):
         if self.status() is False:
             raise ContainerExc(
                 "Container %s (for module %s) is not running, probably DEAD immediately after start (ID: %s)" % (
-                    self.jmeno, self.component_name, self.docker_id))
+                    self.name, self.moduleName, self.docker_id))
             trans_dict["GUESTPACKAGER"] = self.get_packager()
 
     def stop(self):
