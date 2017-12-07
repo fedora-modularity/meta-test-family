@@ -22,7 +22,6 @@
 
 from moduleframework import pdc_data
 from moduleframework.common import *
-from moduleframework.exceptions import *
 
 
 class RpmHelper(CommonFunctions):
@@ -42,26 +41,10 @@ class RpmHelper(CommonFunctions):
         # allow to fake environment in ubuntu (for Travis)
         if not os.path.exists(baserepodir):
             baserepodir="/var/tmp"
-        self.yumrepo = os.path.join(baserepodir, "%s.repo" % self.moduleName)
-        self.whattoinstallrpm = ""
+        self.yumrepo = os.path.join(baserepodir, "%s.repo" % self.component_name)
+        self.whattoinstallrpm = []
         self.bootstrappackages = []
         self.repos = []
-
-    def __setModuleDependencies(self):
-        if self.is_it_module:
-            if not get_if_remoterepos():
-                temprepositories = self.getModulemdYamlconfig()\
-                    .get("data",{}).get("dependencies",{}).get("requires",{})
-                temprepositories_cycle = dict(temprepositories)
-                for x in temprepositories_cycle:
-                    pdc = pdc_data.PDCParser()
-                    pdc.setLatestPDC(x, temprepositories_cycle[x])
-                    temprepositories.update(pdc.generateDepModules())
-                self.moduledeps = temprepositories
-                print_info("Detected module dependencies:", self.moduledeps)
-            else:
-                self.moduledeps = {"base-runtime": "master"}
-                print_info("Remote repositories are enabled", self.moduledeps)
 
     def getURL(self):
         """
@@ -81,13 +64,12 @@ class RpmHelper(CommonFunctions):
 
         :return: None
         """
-        #self.setModuleDependencies()
         self.setRepositoriesAndWhatToInstall()
         self._callSetupFromConfig()
         self.__prepare()
 
     def __addModuleDependency(self, url, name=None, stream="master"):
-        name = name if name else self.moduleName
+        name = name if name else self.component_name
         if name in self.dependencylist:
             self.dependencylist[name]['urls'].append(url)
         else:
@@ -105,24 +87,21 @@ class RpmHelper(CommonFunctions):
         if repos:
             self.repos = repos
         else:
-            self.repos += self.get_url()
+            self.repos += get_compose_url() or self.get_url()
             # add also all dependent modules repositories if it is module
             # TODO: removed this dependency search
-            if self.is_it_module:
-                depend_repos = [get_compose_url_modular_release()]
-                #for dep in self.moduledeps:
-                #    latesturl = pdc_data.get_repo_url(dep, self.moduledeps[dep])
-                #    depend_repos.append(latesturl)
-                #    self.__addModuleDependency(url=latesturl, name = dep, stream = self.moduledeps[dep])
-                #map(self.__addModuleDependency, depend_repos)
-                self.repos += depend_repos
-        #map(self.__addModuleDependency, self.repos)
+            if self.is_it_module and not get_compose_url():
+                # inside this code we don't know anything about modules, this leads to
+                # generic repositories in pdc_data.PDCParserGeneral
+                pdcsolver = pdc_data.PDCParserGeneral(self.component_name)
+                self.repos += [pdcsolver.get_repo()]
+        self.repos = list(set(self.repos))
         if whattooinstall:
-            self.whattoinstallrpm = " ".join(set(whattooinstall))
+            self.whattoinstallrpm = list(set(whattooinstall))
         else:
-            self.bootstrappackages = pdc_data.getBasePackageSet(modulesDict=self.moduledeps,
+            self.bootstrappackages = pdc_data.getBasePackageSet(modulesDict=None,
                                                                 isModule=self.is_it_module, isContainer=False)
-            self.whattoinstallrpm = " ".join(set(self.getPackageList() + self.bootstrappackages))
+            self.whattoinstallrpm = list(set(self.getPackageList() + self.bootstrappackages))
 
     def __prepare(self):
         """
@@ -140,7 +119,7 @@ baseurl=%s
 enabled=1
 gpgcheck=0
 
-""" % (self.moduleName, counter, self.moduleName, counter, repo)
+""" % (self.component_name, counter, self.component_name, counter, repo)
             f.write(add)
         f.close()
         self.install_packages()

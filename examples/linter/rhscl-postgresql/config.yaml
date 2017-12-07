@@ -1,0 +1,7 @@
+document: meta-test
+version: 1
+name: etcd
+module:
+    docker:
+        start: "docker run -it -d -e POSTGRESQL_USER=test -e POSTGRESQL_PASSWORD=testt -e POSTGRESQL_DATABASE=db"
+        container: registry.access.redhat.com/rhscl/postgresql-95-rhel7

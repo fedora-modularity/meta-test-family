@@ -1,0 +1,3 @@
+avocado-framework
+pytest
+PyYAML

@@ -1,0 +1,37 @@
+document: meta-test
+version: 1
+name: memcached
+modulemd-url: https://src.fedoraproject.org/modules/memcached/raw/master/f/memcached.yaml
+service:
+    port: 11211
+packages:
+    rpms:
+        - memcached
+        - perl-Carp
+testdependencies:
+    rpms:
+        - nc
+module:
+    docker:
+        start: "docker run -it -e CACHE_SIZE=128 -p 11211:11211"
+        labels:
+            description: "memcached is a high-performance, distributed memory"
+            io.k8s.description: "memcached is a high-performance, distributed memory"
+        source: https://github.com/container-images/memcached.git
+        container: docker.io/modularitycontainers/memcached
+    rpm:
+        start: systemctl start memcached
+        stop: systemctl stop memcached
+        status: systemctl status memcached
+        url: https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-26/compose/Server/x86_64/os/
+test:
+    processrunning:
+        - 'ls  /proc/*/exe -alh | grep memcached'
+testhost:
+    selfcheck:
+        - 'echo errr | nc localhost 11211'
+        - 'echo set AAA 0 4 2 | nc localhost 11211'
+        - 'echo get AAA | nc localhost 11211'
+    selcheckError:
+        - 'echo errr | nc localhost 11211 |grep ERROR'
+

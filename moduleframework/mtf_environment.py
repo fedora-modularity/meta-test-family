@@ -24,10 +24,11 @@
 """
 Module to setup and cleanup the test environment.
 """
-from moduleframework.module_framework import *
+from moduleframework.common import get_module_type_base, print_info
 from moduleframework.environment_prepare.docker_prepare import EnvDocker
 from moduleframework.environment_prepare.rpm_prepare import EnvRpm
 from moduleframework.environment_prepare.nspawn_prepare import EnvNspawn
+from moduleframework.environment_prepare.openshift_prepare import EnvOpenShift
 
 
 module_name = get_module_type_base()
@@ -39,6 +40,8 @@ elif module_name == "rpm":
     env = EnvRpm()
 elif module_name == "nspawn":
     env = EnvNspawn()
+elif module_name == "openshift":
+    env = EnvOpenShift()
 
 
 def mtfenvset():

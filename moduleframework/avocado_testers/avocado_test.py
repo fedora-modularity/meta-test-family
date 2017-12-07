@@ -34,6 +34,7 @@ from moduleframework.common import *
 from moduleframework.helpers.container_helper import ContainerHelper
 from moduleframework.helpers.nspawn_helper import NspawnHelper
 from moduleframework.helpers.rpm_helper import RpmHelper
+from moduleframework.helpers.openshift_helper import OpenShiftHelper
 
 
 # INTERFACE CLASS FOR GENERAL TESTS OF MODULES
@@ -252,6 +253,31 @@ class AvocadoTest(Test):
         """
         return self.backend.getModuleDependencies()
 
+    def run_script(self, *args, **kwargs):
+        """
+        run script or binary inside module
+
+        :param filename: filename to copy to module
+        :param args: pass this args as cmdline args to run binary
+        :param kwargs: pass thru to avocado process.run
+        :return: avocado process.run object
+        """
+        return self.backend.run_script(*args, **kwargs)
+
+    def assert_to_warn(self, func, *args, **kwargs):
+        """
+        run function which you would like to mark as WARN
+        :param func: function for run
+        :param args: pass this args to run function
+        :param kwargs: pass this args to run function
+        :return: returns either PASS or WARN
+        """
+        try:
+            func(*args, **kwargs)
+        except AssertionError as e:
+            self.log.warn("Warning raised: %s" % e)
+
+
 def get_backend():
     """
     Return proper module backend, set by config by default_module section, or defined via
@@ -267,6 +293,9 @@ def get_backend():
         return RpmHelper()
     elif parent == 'nspawn':
         return NspawnHelper()
+    elif parent == 'openshift':
+        return OpenShiftHelper()
+
 
 # To keep backward compatibility. This method could be used by pure avocado tests and is already used
 get_correct_backend = get_backend

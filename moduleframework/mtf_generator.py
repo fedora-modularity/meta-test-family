@@ -33,8 +33,7 @@ See `Multiline Bash snippet tests`_ for more information.
 .. _Multiline Bash snippet tests: ../user_guide/how_to_write_conf_file#multiline-bash-snippet-tests
 """
 
-from __future__ import print_function
-from moduleframework.common import CommonFunctions
+from common import print_info, CommonFunctions
 
 
 class TestGenerator(CommonFunctions):
@@ -89,7 +88,7 @@ class GeneratedTestsConfig(module_framework.AvocadoTest):
             self.output = self.output + \
                 '        self.%s(""" %s """,  shell=%r)\n' % (
                     method, line, method == "runHost")
-        print("Added test (runmethod: %s): %s" % (method, testname))
+        print_info("Added test (runmethod: %s): %s" % (method, testname))
 
 
 def main():

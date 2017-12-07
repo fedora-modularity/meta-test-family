@@ -1,0 +1,7 @@
+document: meta-test
+version: 1
+name: tools
+module:
+    docker:
+        start: "docker run -it -d"
+        container: candidate-registry.fedoraproject.org/f26/tools:latest

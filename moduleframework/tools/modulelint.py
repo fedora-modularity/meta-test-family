@@ -21,93 +21,14 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 from __future__ import print_function
-import os
 
 from moduleframework import module_framework
-from moduleframework import dockerlinter
-from moduleframework.avocado_testers import container_avocado_test
-
-
-class DockerFileLinter(module_framework.AvocadoTest):
-    """
-    :avocado: enable
-
-    """
-
-    dp = None
-
-    def setUp(self):
-        # it is not intended just for docker, but just docker packages are
-        # actually properly signed
-        self.dp = dockerlinter.DockerfileLinter()
-        if self.dp.dockerfile is None:
-            self.skip()
-
-    def test_architecture_in_env_and_label_exists(self):
-        self.assertTrue(self.dp.get_docker_specific_env("ARCH="))
-        self.assertTrue(self.dp.get_specific_label("architecture"))
-
-    def test_name_in_env_and_label_exists(self):
-        self.assertTrue(self.dp.get_docker_specific_env("NAME="))
-        self.assertTrue(self.dp.get_specific_label("name"))
-
-    def test_release_label_exists(self):
-        self.assertTrue(self.dp.get_specific_label("release"))
-
-    def test_version_label_exists(self):
-        self.assertTrue(self.dp.get_specific_label("version"))
-
-    def test_com_redhat_component_label_exists(self):
-        self.assertTrue(self.dp.get_specific_label("com.redhat.component"))
-
-    def test_summary_label_exists(self):
-        self.assertTrue(self.dp.get_specific_label("summary"))
-
-    def test_run_or_usage_label_exists(self):
-        label_found = True
-        run = self.dp.get_specific_label("run")
-        if not run:
-            label_found = self.dp.get_specific_label("usage")
-        self.assertTrue(label_found)
-
-
-
-class DockerLint(container_avocado_test.ContainerAvocadoTest):
-    """
-    :avocado: enable
-    """
-
-    def testBasic(self):
-        self.start()
-        self.assertTrue("bin" in self.run("ls /").stdout)
-
-    def testContainerIsRunning(self):
-        """
-        Function tests whether container is running
-        :return:
-        """
-        self.start()
-        self.assertIn(self.backend.jmeno.rsplit("/")[-1], self.runHost("docker ps").stdout)
-
-    def testLabels(self):
-        """
-        Function tests whether labels are set in modulemd YAML file properly.
-        :return:
-        """
-        llabels = self.getConfigModule().get('labels')
-        if llabels is None or len(llabels) == 0:
-            print("No labels defined in config to check")
-            self.cancel()
-        for key in self.getConfigModule()['labels']:
-            aaa = self.checkLabel(key, self.getConfigModule()['labels'][key])
-            print(">>>>>> ", aaa, key)
-            self.assertTrue(aaa)
 
 
 class ModuleLintSigning(module_framework.AvocadoTest):
     """
     :avocado: disable
-    :avocado: tags=WIP
+    :avocado: tags=WIP,rhel,fedora,docker,module,package_signing_test
     """
 
     def setUp(self):
@@ -132,7 +53,10 @@ class ModuleLintSigning(module_framework.AvocadoTest):
 
 class ModuleLintPackagesCheck(module_framework.AvocadoTest):
     """
+    Check if packages what are expected to be installed all installed
+
     :avocado: enable
+    :avocado: tags=sanity,rhel,fedora,docker,module,package_installed_test
     """
 
     def test(self):

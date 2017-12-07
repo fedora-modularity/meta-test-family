@@ -24,6 +24,8 @@
 Custom configuration and debugging library.
 """
 
+from __future__ import print_function
+
 import netifaces
 import socket
 import os
@@ -31,12 +33,12 @@ import urllib
 import yaml
 import subprocess
 import copy
-import warnings
-
+import sys
+import random
+import string
+import requests
 from avocado.utils import process
-
-from moduleframework.exceptions import *
-from moduleframework.compose_info import ComposeParser
+from moduleframework.mtfexceptions import ModuleFrameworkException, ConfigExc, CmdExc
 
 defroutedev = netifaces.gateways().get('default').values(
 )[0][1] if netifaces.gateways().get('default') else "lo"
@@ -53,6 +55,7 @@ PACKAGER_COMMAND = "test -e /usr/bin/dnf && echo 'dnf -y'   ||" \
 hostpackager = subprocess.check_output([PACKAGER_COMMAND], shell=True).strip()
 guestpackager = hostpackager
 ARCH = "x86_64"
+DOCKERFILE = "Dockerfile"
 
 __persistent_config = None
 
@@ -82,15 +85,12 @@ DEFAULTRETRYCOUNT = 3
 # time in seconds
 DEFAULTRETRYTIMEOUT = 30
 DEFAULTNSPAWNTIMEOUT = 10
+MODULE_DEFAULT_PROFILE = "default"
+TRUE_VALUES_DICT = ['yes', 'YES', 'yes', 'True', 'true', 'ok', 'OK']
 
-def get_compose_url_modular_release():
-    release = os.environ.get("MTF_FEDORA_RELEASE") or "26"
-    if release == "master":
-        release = "26"
-    compose_url = os.environ.get("MTF_BASE_COMPOSE_URL") or \
-                  "https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-%s/compose/Server/%s/os" \
-                  % (release, ARCH)
-    return compose_url
+def generate_unique_name(size=10):
+    return ''.join(random.choice(string.ascii_lowercase) for _ in range(size))
+
 
 def is_debug():
     """
@@ -110,6 +110,47 @@ def is_not_silent():
     return is_debug()
 
 
+def get_openshift_local():
+    """
+    Return the **OPENSHIFT_LOCAL** envvar.
+    :return: bool
+    """
+    return bool(os.environ.get('OPENSHIFT_LOCAL'))
+
+
+def get_openshift_ip():
+    """
+    Return the **OPENSHIFT_IP** envvar or None.
+    :return: OpenShift IP or None
+    """
+    try:
+        return os.environ.get('OPENSHIFT_IP')
+    except KeyError:
+        return None
+
+
+def get_openshift_user():
+    """
+    Return the **OPENSHIFT_USER** envvar or None.
+    :return: OpenShift User or None
+    """
+    try:
+        return os.environ.get('OPENSHIFT_USER')
+    except KeyError:
+        return None
+
+
+def get_openshift_passwd():
+    """
+    Return the **OPENSHIFT_PASSWORD** envvar or None.
+    :return: OpenShift password or None
+    """
+    try:
+        return os.environ.get('OPENSHIFT_PASSWORD')
+    except KeyError:
+        return None
+
+
 def print_info(*args):
     """
     Print information from the expected stdout and
@@ -123,17 +164,7 @@ def print_info(*args):
     :return: None
     """
     for arg in args:
-        result = arg
-        if isinstance(arg, basestring):
-            try:
-                result = arg.format(**trans_dict)
-            except KeyError:
-                raise ModuleFrameworkException(
-                    "String is formatted by using trans_dict. If you want to use "
-                    "brackets { } in your code, please use double brackets {{  }}."
-                    "Possible values in trans_dict are: %s"
-                    % trans_dict)
-        print >> sys.stderr, result
+        print(arg, file=sys.stderr)
 
 
 def print_debug(*args):
@@ -152,6 +183,17 @@ def print_debug(*args):
     if is_debug():
         print_info(*args)
 
+
+def get_if_install_default_profile():
+    """
+        Return the **MTF_INSTALL_DEFAULT** envvar.
+
+        :return: bool
+        """
+    envvar = os.environ.get('MTF_INSTALL_DEFAULT')
+    return bool(envvar)
+
+
 def is_recursive_download():
     """
     Return the **MTF_RECURSIVE_DOWNLOAD** envvar.
@@ -159,6 +201,7 @@ def is_recursive_download():
     :return: bool
     """
     return bool(os.environ.get("MTF_RECURSIVE_DOWNLOAD"))
+
 
 def get_if_do_cleanup():
     """
@@ -169,6 +212,7 @@ def get_if_do_cleanup():
     cleanup = os.environ.get('MTF_DO_NOT_CLEANUP')
     return not bool(cleanup)
 
+
 def get_if_reuse():
     """
         Return the **MTF_REUSE** envvar.
@@ -178,6 +222,7 @@ def get_if_reuse():
     reuse = os.environ.get('MTF_REUSE')
     return bool(reuse)
 
+
 def get_if_remoterepos():
     """
     Return the **MTF_REMOTE_REPOS** envvar.
@@ -186,6 +231,49 @@ def get_if_remoterepos():
     """
     remote_repos = os.environ.get('MTF_REMOTE_REPOS')
     return bool(remote_repos)
+
+
+def get_odcs_auth():
+    """
+    use ODCS for creating composes as URL parameter
+    It enables this feature in case MTF_ODCS envvar is set
+    MTF_ODCS=yes -- use openidc and token for your user
+    MTF_ODCS=OIDC_token_string -- use this token for authentication
+
+    :envvar MTF_ODCS: yes or token
+    :return:
+    """
+    odcstoken = os.environ.get('MTF_ODCS')
+
+    # in case you dont have token enabled, try to ask for openidc via web browser
+    if odcstoken in TRUE_VALUES_DICT:
+        # to not have hard dependency on openidc (use just when using ODCS without defined token)
+        import openidc_client
+        id_provider = 'https://id.fedoraproject.org/openidc/'
+        # Get the auth token using the OpenID client.
+        oidc = openidc_client.OpenIDCClient(
+            'odcs',
+            id_provider,
+            {'Token': 'Token', 'Authorization': 'Authorization'},
+            'odcs-authorizer',
+            'notsecret',
+        )
+
+        scopes = [
+            'openid',
+            'https://id.fedoraproject.org/scope/groups',
+            'https://pagure.io/odcs/new-compose',
+            'https://pagure.io/odcs/renew-compose',
+            'https://pagure.io/odcs/delete-compose',
+        ]
+        try:
+            odcstoken = oidc.get_token(scopes, new_token=True)
+        except requests.exceptions.HTTPError as e:
+            print_info(e.response.text)
+            raise ModuleFrameworkException("Unable to get token via OpenIDC for your user")
+    if odcstoken and len(odcstoken)<10:
+        raise ModuleFrameworkException("Unable to parse token for ODCS, token is too short: %s" % odcstoken)
+    return odcstoken
 
 
 def get_if_module():
@@ -205,8 +293,8 @@ def sanitize_text(text, replacement="_", invalid_chars=["/", ";", "&", ">", "<",
 
     invalid_chars=["/", ";", "&", ">", "<", "|"]
 
-    :param (str): text to sanitize
-    :param (str): replacement char, default: "_"
+    :param replacement: text to sanitize
+    :param invalid_chars: replacement char, default: "_"
     :return: str
     """
     for char in invalid_chars:
@@ -219,12 +307,26 @@ def sanitize_cmd(cmd):
     """
     Escape apostrophes in a command line.
 
-    :param (str): command to sanitize
+    :param cmd: command to sanitize
     :return: str
     """
     if '"' in cmd:
         cmd = cmd.replace('"', r'\"')
     return cmd
+
+
+def translate_cmd(cmd, translation_dict=None):
+    if not translation_dict:
+        return cmd
+    try:
+        formattedcommand = cmd.format(**translation_dict)
+    except KeyError:
+        raise ModuleFrameworkException(
+            "Command is formatted by using trans_dict. If you want to use "
+            "brackets { } in your code, please use {{ }}. Possible values "
+            "in trans_dict are: %s. \nBAD COMMAND: %s"
+            % (translation_dict, cmd))
+    return formattedcommand
 
 
 def get_profile():
@@ -236,10 +338,8 @@ def get_profile():
 
     :return: str
     """
-    profile = os.environ.get('PROFILE')
-    if not profile:
-        profile = "default"
-    return profile
+
+    return os.environ.get('PROFILE') or MODULE_DEFAULT_PROFILE
 
 
 def get_url():
@@ -260,20 +360,9 @@ def get_compose_url():
 
     :return: str
     """
-    compose_url = os.environ.get('COMPOSEURL')
-    if not compose_url:
-        readconfig = CommonFunctions()
-        readconfig.loadconfig()
-        try:
-            if readconfig.config.get("compose-url"):
-                compose_url = readconfig.config.get("compose-url")
-            elif readconfig.config['module']['rpm'].get("repo"):
-                compose_url = readconfig.config['module']['rpm'].get("repo")
-            else:
-                compose_url = readconfig.config['module']['rpm'].get("repos")[0]
-        except AttributeError:
-            return None
-    return compose_url
+    readconfig = get_config()
+    compose_url = os.environ.get('COMPOSEURL') or readconfig.get("compose-url")
+    return [compose_url] if compose_url else []
 
 
 def get_modulemdurl():
@@ -296,20 +385,17 @@ class CommonFunctions(object):
     """
     config = None
     modulemdConf = None
+    component_name = None
+    source = None
+    arch = None
+    sys_arch = None
+    dependencylist = {}
+    is_it_module = False
+    packager = None
+    # general use case is to have forwarded services to host (so thats why it is same)
+    ipaddr = trans_dict["HOSTIPADDR"]
 
     def __init__(self, *args, **kwargs):
-        self.config = None
-        self.modulemdConf = None
-        self.moduleName = None
-        self.source = None
-        self.arch = None
-        self.sys_arch = None
-        self.dependencylist = {}
-        self.moduledeps = {}
-        self.is_it_module = False
-        self.packager = None
-        # general use case is to have forwarded services to host (so thats why it is same)
-        self.ipaddr = trans_dict["HOSTIPADDR"]
         trans_dict["GUESTARCH"] = self.getArch()
         self.loadconfig()
 
@@ -321,9 +407,9 @@ class CommonFunctions(object):
         """
         # we have to copy object. because there is just one global object, to improve performance
         self.config = copy.deepcopy(get_config())
-        self.info = self.config.get("module",{}).get(get_module_type_base())
+        self.info = self.config.get("module", {}).get(get_module_type_base())
         # if there is inheritance join both dictionary
-        self.info.update(self.config.get("module",{}).get(get_module_type()))
+        self.info.update(self.config.get("module", {}).get(get_module_type()))
         if not self.info:
             raise ConfigExc("There is no section for (module: -> %s:) in the configuration file." %
                             get_module_type_base())
@@ -333,7 +419,7 @@ class CommonFunctions(object):
         else:
             pass
 
-        self.moduleName = sanitize_text(self.config['name'])
+        self.component_name = sanitize_text(self.config['name'])
         self.source = self.config.get('source')
         self.set_url()
 
@@ -368,7 +454,6 @@ class CommonFunctions(object):
         """
         return self.info.get("url")
 
-
     def getArch(self):
         """
         Get system architecture.
@@ -383,20 +468,12 @@ class CommonFunctions(object):
         """
         Run commands on a host.
 
-        :param (str): command to exectute
+        :param common: command to exectute
         ** kwargs: avocado process.run params like: shell, ignore_status, verbose
         :return: avocado.process.run
         """
-        try:
-            formattedcommand = command.format(**trans_dict)
-        except KeyError:
-            raise ModuleFrameworkException(
-                "Command is formatted by using trans_dict. If you want to use "
-                "brackets { } in your code, please use {{ }}. Possible values "
-                "in trans_dict are: %s. \nBAD COMMAND: %s"
-                % (trans_dict, command))
-        return process.run("%s" % formattedcommand, **kwargs)
 
+        return process.run("%s" % translate_cmd(command, translation_dict=trans_dict), **kwargs)
 
     def get_test_dependencies(self):
         """
@@ -428,7 +505,6 @@ class CommonFunctions(object):
             except process.CmdError as e:
                 raise CmdExc("Installation failed; Do you have permission to do that?", e)
 
-
     def getPackageList(self, profile=None):
         """
         Return list of packages what has to be installed inside module
@@ -437,15 +513,20 @@ class CommonFunctions(object):
         :return: list of packages (rpms)
         """
         package_list = []
+        mddata = self.getModulemdYamlconfig()
         if not profile:
             if 'packages' in self.config:
                 packages_rpm = self.config.get('packages',{}).get('rpms', [])
                 packages_profiles = []
-                for profile_in_conf in self.config.get('packages',{}).get('profiles',[]):
-                    packages_profiles += self.getModulemdYamlconfig()['data']['profiles'][profile_in_conf]['rpms']
+                for profile_in_conf in self.config.get('packages', {}).get('profiles', []):
+                    packages_profiles += mddata['data']['profiles'][profile_in_conf]['rpms']
                 package_list += packages_rpm + packages_profiles
+            if get_if_install_default_profile():
+                profile_append = mddata.get('data', {})\
+                    .get('profiles', {}).get(get_profile(), {}).get('rpms', [])
+                package_list += profile_append
         else:
-            package_list += self.getModulemdYamlconfig()['data']['profiles'][profile]['rpms']
+            package_list += mddata['data']['profiles'][profile].get('rpms', [])
         print_info("PCKGs to install inside module:", package_list)
         return package_list
 
@@ -489,7 +570,6 @@ class CommonFunctions(object):
         if not urllink:
             self.modulemdConf = link
         return link
-
 
     def getIPaddr(self):
         """
@@ -573,7 +653,6 @@ class CommonFunctions(object):
         command = self.info.get('stop') or command
         self.run(command, shell=True, ignore_bg_processes=True, verbose=is_not_silent())
 
-
     def install_packages(self, packages=None):
         """
         Install packages in config (by config or via parameter)
@@ -606,6 +685,45 @@ class CommonFunctions(object):
             self._callCleanupFromConfig()
         else:
             print_info("TearDown phase skipped.")
+
+    def copyTo(self, src, dest):
+        """
+        Copy file to module from host
+
+        :param src: source file on host
+        :param dest: destination file on module
+        :return: None
+        """
+        if  src is not dest:
+            self.run("cp -rf %s %s" % (src, dest))
+
+    def copyFrom(self, src, dest):
+        """
+        Copy file from module to host
+
+        :param src: source file on module
+        :param dest: destination file on host
+        :return: None
+        """
+        if src is not dest:
+            self.run("cp -rf %s %s" % (src, dest))
+
+    def run_script(self, filename, *args, **kwargs):
+        """
+        run script or binary inside module
+        :param filename: filename to copy to module
+        :param args: pass this args as cmdline args to run binary
+        :param kwargs: pass thru to avocado process.run
+        :return: avocado process.run object
+        """
+        dest = "/tmp/%s" % generate_unique_name()
+        self.copyTo(filename, dest)
+        #self.run("bash %s" % dest)
+        parameters = ""
+        if args:
+            parameters = " " + " ".join(args)
+        return self.run("bash " + dest + parameters, **kwargs)
+
 
 def get_config():
     """
@@ -647,8 +765,8 @@ def get_config():
                 raise ConfigExc("No module in yaml config defined")
             # copy rpm section to nspawn, in case not defined explicitly
             # make it backward compatible
-            if xcfg.get("module",{}).get("rpm") and not xcfg.get("module",{}).get("nspawn"):
-                xcfg["module"]["nspawn"] = copy.deepcopy(xcfg.get("module",{}).get("rpm"))
+            if xcfg.get("module", {}).get("rpm") and not xcfg.get("module", {}).get("nspawn"):
+                xcfg["module"]["nspawn"] = copy.deepcopy(xcfg.get("module", {}).get("rpm"))
             __persistent_config = xcfg
             return xcfg
         except IOError:
@@ -669,14 +787,16 @@ def list_modules_from_config():
     modulelist = get_config().get("module").keys()
     return modulelist
 
+
 def get_backend_list():
     """
     Get backends
 
     :return: list
     """
-    base_module_list = ["rpm", "nspawn", "docker"]
+    base_module_list = ["rpm", "nspawn", "docker", "openshift"]
     return base_module_list
+
 
 def get_module_type():
     """
@@ -705,10 +825,31 @@ def get_module_type_base():
     module_type = get_module_type()
     parent = module_type
     if module_type not in get_backend_list():
-        parent = get_config().get("module",{}).get(module_type, {}).get("parent")
+        parent = get_config().get("module", {}).get(module_type, {}).get("parent")
         if not parent:
             raise ModuleFrameworkException("Module (%s) does not provide parent backend parameter (there are: %s)" %
                                            (module_type, get_backend_list()))
     if parent not in get_backend_list():
         raise ModuleFrameworkException("As parent is allowed just base type: %s" % get_backend_list)
     return parent
+
+
+def get_docker_file(dir_name="../"):
+    """
+    Function returns full path to dockerfile.
+    :param dir_name: dir_name, where should be Dockerfile located
+    :return: full_path to Dockerfile
+    """
+    fromenv = os.environ.get("DOCKERFILE")
+    if fromenv:
+        dockerfile = fromenv
+        dir_name = os.getcwd()
+    else:
+        dir_name = os.path.abspath(dir_name)
+        dockerfile = DOCKERFILE
+    dockerfile = os.path.join(dir_name, dockerfile)
+
+    if not os.path.exists(dockerfile):
+        dockerfile = None
+        print_debug("Dockerfile should exists in the %s directory." % os.path.abspath(dir_name))
+    return dockerfile

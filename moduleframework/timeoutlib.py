@@ -21,18 +21,11 @@
 
 import signal
 import time
-import logging
-from common import print_info
-
-log = logging.getLogger('avocado.test')
-
 
 class Timeout(object):
     def __init__(self, retry, timeout):
         self.retry = retry
         self.timeout = timeout
-        log.debug("Started timeout period: ", timeout)
-        log.debug("Number of remainig retry: ", retry)
 
     def __enter__(self):
         def timeout_handler(signum, frame):
@@ -45,7 +38,6 @@ class Timeout(object):
         signal.alarm(self.timeout)
 
     def __exit__(self, type, value, traceback):
-        log.debug("Time were exceeded")
         signal.alarm(0)
         signal.signal(signal.SIGALRM, self.orig_sighand)
 
@@ -65,7 +57,7 @@ class Retry(object):
     def __init__(self, attempts=1, timeout=None, exceptions=(Exception,), error=None, inverse=False, delay=None):
         """
         Try to run things ATTEMPTS times, at max, each attempt must not exceed TIMEOUT seconds.
-        Restart only when one of EXCEPTIONS is raised, all other exceptions will just bubble up.
+        Restart only when one of EXCEPTIONS is raised, all other mtfexceptions will just bubble up.
         When the maximal number of attempts is reached, raise ERROR. Wait DELAY seconds between
         attempts.
         When INVERSE is True, successfull return of wrapped code is considered as a failure.
@@ -84,13 +76,12 @@ class Retry(object):
             self.failed_attempts = 0
             self.timeouts_triggered = 0
 
-    def handle_failure(self, start_time, exc):
+    def handle_failure(self, start_time):
         if __debug__:
             self.failed_attempts += 1
+
         self.attempts -= 1
-        log.debug("Remaining attempts: ", self.attempts)
         if self.attempts == 0:
-            print_info("Original exeption:", exc)
             raise self.error
 
         # Before the next iteration sleep $delay seconds. It's the
@@ -115,8 +106,7 @@ class Retry(object):
 
             while True:
                 if delay is not None:
-                    log.debug("Sleeping for delay:", delay)
-                    time.sleep(delay)
+                  time.sleep(delay)
 
                 with self.timeout_wrapper(self, self.timeout):
                     start_time = time.time()
@@ -130,21 +120,18 @@ class Retry(object):
                         if self.inverse:
                             return True
 
-                        # Handle exceptions we are expected to catch, by logging a failed
+                        # Handle mtfexceptions we are expected to catch, by logging a failed
                         # attempt, and checking the number of attempts.
-                        delay = self.handle_failure(start_time, e)
-                        log.debug("Exception were catch:", e)
-                        log.debug("Continue to next round")
+                        delay = self.handle_failure(start_time)
                         continue
 
                     except Exception as e:
-                        # Handle all other exceptions, by logging a failed attempt and
+                        # Handle all other mtfexceptions, by logging a failed attempt and
                         # re-raising the exception, effectively killing the loop.
                         if __debug__:
                             self.failed_attempts += 1
                         raise e
 
-                delay = self.handle_failure(start_time, "")
+                delay = self.handle_failure(start_time)
 
         return __wrap
-

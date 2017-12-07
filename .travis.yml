@@ -1,4 +1,5 @@
 language: python
+
 python:
   - "2.7"
 
@@ -8,21 +9,22 @@ services:
   - docker
 
 before_install:
-  - sudo apt-get -y install curl python-software-properties software-properties-common python-pip python-dev build-essential git make
-  - sudo apt-get -y install libkrb5-dev netcat mysql-client-5.5
-  - sudo pip install avocado-framework
-  - pip install avocado-framework
+  - sudo ./requirements.sh
+  - ./requirements.sh
 
-install: sudo make install
+install: sudo make install_pip
 
 script:
+  - sudo make travis
   - sudo make -C examples/testing-module check-inheritance
   - sudo make -C examples/testing-module check-default-config
   - sudo make -C examples/testing-module check-pure-docker
   - sudo make -C examples/testing-module check-exceptions
   - sudo make -C examples/testing-module check-test-mtf-bin-modulelint
-  - sudo make travis
   - sudo make -C examples/testing-module check-real-rpm-destructive
   - sudo make -C examples/testing-module check-docker-scl-multi-travis
+  - sudo make -C examples/testing-module check-mtf-pdc-module-info-reader
+  - sudo make -C mtf/metadata check
+  - sudo make -C examples/testing-module check-mtf-metadata
 
 after_script: sudo cat ~/avocado/job-results/latest/job.log

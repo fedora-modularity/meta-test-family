@@ -26,7 +26,8 @@ module for environment setup and cleanup, to be able to split action for ansible
 """
 
 from avocado.utils import service
-from moduleframework.common import *
+from moduleframework.common import print_info, CommonFunctions
+import os
 
 class EnvDocker(CommonFunctions):
 

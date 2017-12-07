@@ -25,9 +25,11 @@
 
 from moduleframework import module_framework
 
-class ModulelintSanity(module_framework.AvocadoTest):
+class Basic(module_framework.AvocadoTest):
     """
     :avocado: enable
+    :avocado: tags=sanity,general,fedora,rhel
     """
-    def testPass(self):
-        pass
+
+    def test(self):
+        self.start()

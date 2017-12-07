@@ -26,10 +26,12 @@ main module provides helpers for various module types and AVOCADO(unittest) clas
 what you should use for your tests (inherited)
 """
 
-from moduleframework.avocado_testers.avocado_test import *
+from moduleframework.avocado_testers.avocado_test import AvocadoTest, get_backend
 from moduleframework.avocado_testers.container_avocado_test import ContainerAvocadoTest
 from moduleframework.avocado_testers.nspawn_avocado_test import NspawnAvocadoTest
 from moduleframework.avocado_testers.rpm_avocado_test import RpmAvocadoTest
+from moduleframework.avocado_testers.openshift_avocado_test import OpenShiftAvocadoTest
+from moduleframework.mtfexceptions import ModuleFrameworkException
 
 PROFILE = None
 
@@ -46,6 +48,3 @@ def skipTestIf(value, text="Test not intended for this module profile"):
     if value:
         raise ModuleFrameworkException(
             "DEPRECATED, don't use this skip, use self.cancel() inside test function, or self.skip() in setUp()")
-
-
-

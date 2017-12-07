@@ -22,6 +22,7 @@
 
 import json
 from moduleframework.common import *
+from moduleframework.mtfexceptions import ContainerExc
 
 
 class ContainerHelper(CommonFunctions):
@@ -49,10 +50,6 @@ class ContainerHelper(CommonFunctions):
         if "docker=" in self.icontainer:
             self.jmeno = self.icontainer[7:]
             self.tarbased = False
-        elif "docker.io" in self.info['container']:
-            # Trusted source
-            self.tarbased = False
-            self.jmeno = self.icontainer
         else:
             # untrusted source
             self.tarbased = False
@@ -98,7 +95,7 @@ class ContainerHelper(CommonFunctions):
 
         :return: None
         """
-        super(ContainerHelper,self).tearDown()
+        super(ContainerHelper, self).tearDown()
         if get_if_do_cleanup():
             print_info("To run a command inside a container execute: ",
                         "docker exec %s /bin/bash" % self.docker_id)
@@ -129,7 +126,6 @@ class ContainerHelper(CommonFunctions):
                 "docker inspect %s" %
                 self.jmeno, verbose=is_not_silent()).stdout)[0]["Config"]
 
-
     def start(self, args="-it -d", command="/bin/bash"):
         """
         start the docker container
@@ -155,7 +151,7 @@ class ContainerHelper(CommonFunctions):
         if self.status() is False:
             raise ContainerExc(
                 "Container %s (for module %s) is not running, probably DEAD immediately after start (ID: %s)" % (
-                    self.jmeno, self.moduleName, self.docker_id))
+                    self.jmeno, self.component_name, self.docker_id))
             trans_dict["GUESTPACKAGER"] = self.get_packager()
 
     def stop(self):

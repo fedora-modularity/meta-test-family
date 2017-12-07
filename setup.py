@@ -23,10 +23,7 @@
 import os
 import sys
 
-try:
-    from setuptools import setup, find_packages
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup, find_packages
 
 # copy from https://github.com/avocado-framework/avocado/blob/master/setup.py
 VIRTUAL_ENV = hasattr(sys, 'real_prefix')
@@ -50,6 +47,7 @@ def get_dir(system_path=None, virtual_path=None):
             system_path = []
     return os.path.join(*(['/'] + system_path))
 
+
 data_files = {}
 
 paths = ['docs', 'examples', 'tools']
@@ -61,10 +59,19 @@ for path in paths:
                 ['usr', 'share', 'moduleframework', root])] = [
             os.path.join(root, f) for f in files]
 
+paths = ['man']
+
+for path in paths:
+    for root, dirs, files in os.walk(path, followlinks=True):
+        data_files[
+            get_dir(
+                ['usr', 'share', 'man', 'man1'])] = [
+            os.path.join(root, f) for f in files]
+
 setup(
     name='meta-test-family',
-    version="0.7.3",
-    description='Tool to test components fo a modular Fedora.',
+    version="0.7.8",
+    description='Tool to test components for a modular Fedora.',
     keywords='modules,containers,testing,framework',
     author='Jan Scotka',
     author_email='jscotka@redhat.com',
@@ -73,14 +80,16 @@ setup(
     packages=find_packages(exclude=['docs', 'examples', 'tools']),
     include_package_data=True,
     data_files=data_files.items(),
-    scripts=['tools/mtf'],
+    scripts=[],
     entry_points={
         'console_scripts': [
             'mtf-cmd = moduleframework.bashhelper:main',
             'mtf-generator = moduleframework.mtf_generator:main',
             'mtf-env-set = moduleframework.mtf_environment:mtfenvset',
             'mtf-env-clean = moduleframework.mtf_environment:mtfenvclean',
-            'mtf-log-parser = moduleframework.mtf_log_parser:main',
+            'mtf-init = moduleframework.mtf_init:main',
+            'mtf = moduleframework.mtf_scheduler:main',
+            'mtf-pdc-module-info-reader = moduleframework.pdc_msg_module_info_reader:main',
         ]
     },
     setup_requires=[],

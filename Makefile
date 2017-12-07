@@ -2,20 +2,36 @@ NAME=moduleframework
 INSTALLPATH=/usr/share/$(NAME)
 PYTHONSITE=/usr/lib/python2.7/site-packages
 
-all: install check
+all: install_pip check
 
 check:
 	make -C examples/testing-module check
 
+check-linter:
+	@# don't use $(shell ) -- it messes out output
+	cd examples/linter/tools && PYTHONPATH=${PWD} MODULE=docker ${PWD}/tools/mtf -l
+	cd examples/linter/rhscl-postgresql && PYTHONPATH=${PWD} MODULE=docker ${PWD}/tools/mtf -l
+	cd examples/linter/rhscl-nginx && PYTHONPATH=${PWD} MODULE=docker ${PWD}/tools/mtf -l
+	cd examples/linter/f26-etcd && PYTHONPATH=${PWD} MODULE=docker ${PWD}/tools/mtf -l
+	cd examples/linter/f26-flannel && PYTHONPATH=${PWD} MODULE=docker ${PWD}/tools/mtf -l
+
 travis:
 	make -C examples/testing-module travis
+	cd examples/linter/tools && PYTHONPATH=${PWD} MODULE=docker mtf -l
 
 .PHONY: clean
 
+clean_pip:
+	pip uninstall .
+	rm -rf build/* dist/*
+
+
+install_pip: clean_pip
+	pip install -U .
+
 clean:
 	@python setup.py clean
-	git clean -fd
-	rm -rf build/html
+	rm -rf build/* dist/*
 
 install: clean
 	@python setup.py install
