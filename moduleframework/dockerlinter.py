@@ -33,17 +33,14 @@ class DockerfileLinter(object):
     dfp_structure = {}
     docker_dict = {}
 
-    def __init__(self, dir_name="../"):
-        dockerfile = get_docker_file(dir_name)
+    def __init__(self):
+        dockerfile = get_docker_file()
         if dockerfile:
             self.dockerfile = dockerfile
             with open(self.dockerfile, "r") as f:
                 self.dfp = DockerfileParser(fileobj=f)
                 self.dfp_structure = self.dfp.structure
                 self._get_structure_as_dict()
-        else:
-            self.dfp = None
-            self.dockerfile = None
 
     def _get_general(self, value):
         """
