@@ -33,11 +33,11 @@ packages:
         - default
 # packages what will be installed on host machine (for example nc (netcat) for testing if module
 # provides service on port exported to host)
+# This dependencies are installed by mtf-set-env script
 testdependencies:
     rpms:
         - nc
 # default module type for testing if not set by env variable.
-# This dependencies are installed by mtf-set-env script
 # env var: MODULE   (docker, nspawn, rpm)
 default_module: docker
 # various module types setup and configuration (nspawn = rpm)

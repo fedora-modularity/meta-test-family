@@ -57,6 +57,8 @@ hostpackager = subprocess.check_output([PACKAGER_COMMAND], shell=True).strip()
 guestpackager = hostpackager
 ARCH = "x86_64"
 DOCKERFILE = "Dockerfile"
+HELP_MD_FILE = "help.md"
+DEFAULT_DIR_OF_DOCKER_RELATED_STUFF = os.path.abspath("../")
 
 __persistent_config = None
 
@@ -867,7 +869,7 @@ def get_module_type_base():
     return parent
 
 
-def get_docker_file(dir_name="../"):
+def get_docker_file(dir_name=DEFAULT_DIR_OF_DOCKER_RELATED_STUFF):
     """
     Function returns full path to dockerfile.
     :param dir_name: dir_name, where should be Dockerfile located
@@ -876,13 +878,30 @@ def get_docker_file(dir_name="../"):
     fromenv = os.environ.get("DOCKERFILE")
     if fromenv:
         dockerfile = fromenv
-        dir_name = os.getcwd()
     else:
-        dir_name = os.path.abspath(dir_name)
-        dockerfile = DOCKERFILE
-    dockerfile = os.path.join(dir_name, dockerfile)
-
+        dockerfile = os.path.join(dir_name, DOCKERFILE)
     if not os.path.exists(dockerfile):
+        print_debug("Dockerfile does not exists (you can use DOCKERFILE "
+                    "envvar to set to another): %s" % dockerfile)
         dockerfile = None
-        print_debug("Dockerfile should exists in the %s directory." % os.path.abspath(dir_name))
     return dockerfile
+
+def get_helpmd_file(dir_name=DEFAULT_DIR_OF_DOCKER_RELATED_STUFF):
+    """
+    Function returns full path to HelpMD file.
+    :param dir_name: dir_name, where should be helpMD file located
+    :return: full_path to Dockerfile
+    """
+    fromenv = os.environ.get("HELPMDFILE")
+    if fromenv:
+        helpmdfile = fromenv
+    elif os.environ.get("DOCKERFILE"):
+        # when DOCKERFILE is placed, search for HelpMD file in same directory
+        helpmdfile = os.path.join(os.path.dirname(os.environ.get("DOCKERFILE")),HELP_MD_FILE)
+    else:
+        helpmdfile = os.path.join(dir_name, HELP_MD_FILE)
+    if not os.path.exists(helpmdfile):
+        print_debug("Help MD file does not exists (you can use HELPMDFILE "
+                    "envvar to set to another): %s" % helpmdfile)
+        helpmdfile = None
+    return helpmdfile

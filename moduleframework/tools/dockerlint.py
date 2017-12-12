@@ -42,9 +42,10 @@ class DockerInstructionsTests(module_framework.AvocadoTest):
         # actually properly signed
         self.dp = dockerlinter.DockerfileLinter()
         if self.dp.dockerfile is None:
-            dir_name = os.getcwd()
-            self.log.info("Dockerfile was not found in %s directory." % dir_name)
-            self.skip()
+            self.skip("Dockerfile was not found")
+
+    def tearDown(self, *args, **kwargs):
+        pass
 
     def test_from_is_first_directive(self):
         self.assertTrue(self.dp.check_from_is_first())
@@ -62,23 +63,12 @@ class DockerInstructionsTests(module_framework.AvocadoTest):
         self.assert_to_warn(self.assertTrue, self.dp.check_helpmd_is_present())
 
 
-class DockerLabelsTests(module_framework.AvocadoTest):
+class DockerLabelsTests(DockerInstructionsTests):
     """
     :avocado: enable
     :avocado: tags=sanity,rhel,fedora,docker,docker_labels_test
 
     """
-
-    dp = None
-
-    def setUp(self):
-        # it is not intended just for docker, but just docker packages are
-        # actually properly signed
-        self.dp = dockerlinter.DockerfileLinter()
-        if self.dp.dockerfile is None:
-            dir_name = os.getcwd()
-            self.log.info("Dockerfile was not found in %s directory." % dir_name)
-            self.skip()
 
     def _test_for_env_and_label(self, docker_env, docker_label, env=True):
         label_found = True
