@@ -32,6 +32,7 @@ This project defines file strucuture and tooling to work with general test metad
     * optional scope: it can be part of scope here after some discussion, but just as an optional feature
 * __NO test linking__ - each framework has to known how to interpret filtered tests format (eg. set of: local files, python classes, URLs)
     * optional scope: could be transform formats to format of selected framework (backend) (eg. download tests from URLs and store it locally)
+    * test can be downloaded via simple url downloader mentioned in metadata file before importing (`download_urls` key)
 
 ## How it works
 * Tree structure of metadata splitted to two types

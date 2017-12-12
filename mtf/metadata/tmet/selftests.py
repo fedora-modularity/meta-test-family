@@ -1,6 +1,7 @@
 from common import MetadataLoader, MetadataLoaderMTF, SOURCE, print_debug, logic_formula
 from filter import filtertests
 import yaml
+import os
 
 __TC_GENERAL_COMPONENT = "examples/general-component/tests"
 __TC_MTF_COMPOMENT = "examples/mtf-clean/tests"
@@ -13,10 +14,15 @@ def test_loader():
     Test general backend loader for complex case
     :return:
     """
+    downloaded_test = "sample_test.py"
+    if os.path.exists(downloaded_test):
+        os.remove(downloaded_test)
     mt = MetadataLoader(location=__TC_GENERAL_COMPONENT)
     print_debug(yaml.dump(mt.get_metadata()))
     print_debug(mt.get_backends())
     assert 'sanity/generaltest.py' in [x[SOURCE] for x in mt.backend_tests()]
+    assert os.path.exists(downloaded_test)
+    os.remove(downloaded_test)
 
 
 def test_mtf_metadata_linters_and_tests_noconfig():

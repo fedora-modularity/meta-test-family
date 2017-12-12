@@ -4,6 +4,9 @@ document: test-metadata
 subtype: general
 # enable linters for selected module type (not supported for generic class)
 enable_lint: False
+# Download resources from location to actual directory (stored as key value of dict).
+download_urls:
+    sample_test.py: https://raw.githubusercontent.com/fedora-modularity/meta-test-family/devel/mtf/metadata/examples/general-component/tests/simple.py
 # Import tests by path glob or by name, without complex features for coverage mapping
 import_tests:
     - "*.py"
