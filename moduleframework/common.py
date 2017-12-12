@@ -895,6 +895,9 @@ def get_helpmd_file(dir_name=DEFAULT_DIR_OF_DOCKER_RELATED_STUFF):
     fromenv = os.environ.get("HELPMDFILE")
     if fromenv:
         helpmdfile = fromenv
+    elif os.environ.get("DOCKERFILE"):
+        # when DOCKERFILE is placed, search for HelpMD file in same directory
+        helpmdfile = os.path.join(os.path.dirname(os.environ.get("DOCKERFILE")),HELP_MD_FILE)
     else:
         helpmdfile = os.path.join(dir_name, HELP_MD_FILE)
     if not os.path.exists(helpmdfile):

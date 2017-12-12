@@ -25,7 +25,7 @@ Environment variables allow to overwrite some values of a module configuration f
 - **MTF_REMOTE_REPOS=yes** disables downloading of Koji packages and creating a local repo, and speeds up test execution.
 - **MTF_DISABLE_MODULE=yes** disables module handling to use nonmodular test mode (see `multihost tests`_ as an example).
 - **DOCKERFILE="<path_to_dockerfile"** overwrites the location of a Dockerfile.
-- **HELPMDFILE="<path_to_helpmdfile"** overwrites the location of a HelpMD file.
+- **HELPMDFILE="<path_to_helpmdfile"** overwrites the location of a HelpMD file, If not set, search for mdfile in same directory where is Dockerfile.
 - **OPENSHIFT_LOCAL=yes** enables installing ``origin`` and ``origin-clients`` on local machine
 - **OPENSHIFT_IP=openshift_ip_address** uses this IP address for connecting to an OpenShift environment.
 - **OPENSHIFT_USER=developer** uses this ``USER`` name for login to an OpenShift environment.
