@@ -124,8 +124,11 @@ class MetadataLoader(object):
     def _url_download_files(self,testdict):
         print_debug("Downloading resources via URL")
         for test in testdict:
-            print_debug("Storing %s as file %s" % (testdict[test], test))
-            urlretrieve(testdict[test],filename=test)
+            if os.path.exists(test):
+                print_debug("File %s already exist locally" % test)
+            else:
+                print_debug("Storing %s as file %s" % (testdict[test], test))
+                urlretrieve(testdict[test],filename=test)
 
     def _import_tests(self, testglob, pathlenght=0):
         """
