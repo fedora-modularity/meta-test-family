@@ -33,6 +33,7 @@ This project defines file strucuture and tooling to work with general test metad
 * __NO test linking__ - each framework has to known how to interpret filtered tests format (eg. set of: local files, python classes, URLs)
     * optional scope: could be transform formats to format of selected framework (backend) (eg. download tests from URLs and store it locally)
     * test can be downloaded via simple url downloader mentioned in metadata file before importing (`download_urls` key)
+    * test can be cloned via git repository cloning (`clone_gits` key) to directories and then referenced
 
 ## How it works
 * Tree structure of metadata splitted to two types

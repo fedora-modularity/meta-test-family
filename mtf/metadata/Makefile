@@ -4,7 +4,7 @@ all: check
 
 integrationtests: install
 	cd examples/general-component/tests; tmet-agregator
-	cd examples/general-component/tests; tmet-agregator |grep -o 66
+	cd examples/general-component/tests; tmet-agregator |grep -o 69
 	cd examples/general-component/tests; tmet-filter
 	cd examples/general-component/tests; tmet-filter | grep 'sanity/generaltest.py'
 	cd examples/general-component/tests; tmet-filter -b generic | grep 'sanity/generaltest.py'

@@ -2,6 +2,7 @@ from common import MetadataLoader, MetadataLoaderMTF, SOURCE, print_debug, logic
 from filter import filtertests
 import yaml
 import os
+import shutil
 
 __TC_GENERAL_COMPONENT = "examples/general-component/tests"
 __TC_MTF_COMPOMENT = "examples/mtf-clean/tests"
@@ -23,6 +24,9 @@ def test_loader():
     assert 'sanity/generaltest.py' in [x[SOURCE] for x in mt.backend_tests()]
     assert os.path.exists(downloaded_test)
     os.remove(downloaded_test)
+    git_dir_name="directory_name"
+    assert os.path.exists(git_dir_name)
+    shutil.rmtree(git_dir_name)
 
 
 def test_mtf_metadata_linters_and_tests_noconfig():

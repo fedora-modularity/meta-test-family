@@ -35,6 +35,7 @@ MODULELINT = "enable_lint"
 IMPORT_TESTS = "import_tests"
 TAG_FILETERS = "tag_filters"
 URL_DOWNLOAD = "download_urls"
+GIT_DOWNLOAD = "clone_gits"
 
 
 def print_debug(*args):
@@ -115,11 +116,23 @@ class MetadataLoader(object):
             self._import_linters()
         if URL_DOWNLOAD in self.base_element:
             self._url_download_files(self.base_element[URL_DOWNLOAD])
+        if GIT_DOWNLOAD in self.base_element:
+            self._git_clone_files(self.base_element[GIT_DOWNLOAD])
         if IMPORT_TESTS in self.base_element:
             for testglob in self.base_element.get(IMPORT_TESTS):
                 self._import_tests(os.path.join(self.location, testglob))
         if TAG_FILETERS in self.base_element:
             self.add_filter(tags=self.base_element.get(TAG_FILETERS))
+
+    def _git_clone_files(self,gitdict):
+        print_debug("Cloning resources via GIT (you have to have git installed)")
+        for test in gitdict:
+            if os.path.exists(test):
+                print_debug("Directory %s already exist" % test)
+            else:
+                print_debug("Cloning git %s to directory %s" % (gitdict[test], test))
+                process.run("git clone %s %s" % (gitdict[test], test))
+
 
     def _url_download_files(self,testdict):
         print_debug("Downloading resources via URL")
