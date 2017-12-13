@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           meta-test-family
-Version:        0.7.8
+Version:        0.7.9
 Release:        1%{?dist}
 Summary:        Tool to test components of a modular Fedora
 
@@ -61,6 +61,23 @@ install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
 
 
 %changelog
+* Wed Dec 13 2017 Jan Scotka <jscotka@redhat.com> 0.7.9-1
+- fix metadata if bug is found (jscotka@redhat.com)
+- add tests for tooling if imported tests are included (jscotka@redhat.com)
+- add git cloning abilities to metadata (jscotka@redhat.com)
+- existing file should not be replaced via metadata (keep local version)
+  (jscotka@redhat.com)
+- url_downloader option in metadata.yaml allows download tests via URLlib
+  (jscotka@redhat.com)
+- improve search for helpMD file (jscotka@redhat.com)
+- helpmd and docker lint cleanup of loading classes (jscotka@redhat.com)
+- Update PR with PEP 8 and use @property also for avocado_test.py
+  (phracek@redhat.com)
+- Keep backwards compatibility (phracek@redhat.com)
+- Couple updates. dependency_list and remove getters (phracek@redhat.com)
+- Remove obsolete function which is not used anywhere (phracek@redhat.com)
+- Fixes #167 First try for property, setter and getter (phracek@redhat.com)
+
 * Wed Dec 06 2017 Jan Scotka <jscotka@redhat.com> 0.7.8-1
 - remove mtf-env-clean from runthem script, it is on not good place and cleanup
   of env is not important to have it ther (jscotka@redhat.com)
