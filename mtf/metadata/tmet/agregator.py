@@ -12,7 +12,7 @@ import os
 def get_options():
     parser = argparse.ArgumentParser(description='Create Coverage reports')
     parser.add_argument('-a', dest='action', default="statistic",
-                        help='print to stdout in selected format')
+                        help='print to stdout in selected format (statistic - get covered percentage, md - get wiki format as MD file)')
     args = parser.parse_args()
     return args
 

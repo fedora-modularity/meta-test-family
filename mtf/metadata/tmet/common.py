@@ -217,9 +217,11 @@ class MetadataLoader(object):
         if DESC in base:
             if path:
                 self._insert_to_coverage(path, base)
-        else:
+        elif isinstance(base, dict):
             for key, value in base.iteritems():
                 self._parse_base_coverage(base=value, path=path + [key])
+        else:
+            print_debug("Try to parse element what is not parsable, check your structure: %s" % base)
 
     def _insert_to_test_tree(self, path_list, test):
         """
