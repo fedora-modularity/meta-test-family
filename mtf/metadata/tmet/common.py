@@ -3,9 +3,11 @@ import yaml
 import os
 import sys
 import glob
+from urllib import urlretrieve
 from avocado.utils import process
 from urlparse import urlparse
 from warnings import warn
+
 
 """
 Basic classes for metatadata handling, it contains classes derived from general metadata parser
@@ -32,6 +34,9 @@ COVPATH = "coverage_path"
 MODULELINT = "enable_lint"
 IMPORT_TESTS = "import_tests"
 TAG_FILETERS = "tag_filters"
+URL_DOWNLOAD = "download_urls"
+GIT_DOWNLOAD = "clone_gits"
+
 
 def print_debug(*args):
     """
@@ -109,11 +114,34 @@ class MetadataLoader(object):
         self._load_recursive()
         if linters or self.base_element.get(MODULELINT):
             self._import_linters()
+        if URL_DOWNLOAD in self.base_element:
+            self._url_download_files(self.base_element[URL_DOWNLOAD])
+        if GIT_DOWNLOAD in self.base_element:
+            self._git_clone_files(self.base_element[GIT_DOWNLOAD])
         if IMPORT_TESTS in self.base_element:
             for testglob in self.base_element.get(IMPORT_TESTS):
                 self._import_tests(os.path.join(self.location, testglob))
         if TAG_FILETERS in self.base_element:
             self.add_filter(tags=self.base_element.get(TAG_FILETERS))
+
+    def _git_clone_files(self,gitdict):
+        print_debug("Cloning resources via GIT (you have to have git installed)")
+        for test in gitdict:
+            if os.path.exists(test):
+                print_debug("Directory %s already exist" % test)
+            else:
+                print_debug("Cloning git %s to directory %s" % (gitdict[test], test))
+                process.run("git clone %s %s" % (gitdict[test], test))
+
+
+    def _url_download_files(self,testdict):
+        print_debug("Downloading resources via URL")
+        for test in testdict:
+            if os.path.exists(test):
+                print_debug("File %s already exist locally" % test)
+            else:
+                print_debug("Storing %s as file %s" % (testdict[test], test))
+                urlretrieve(testdict[test],filename=test)
 
     def _import_tests(self, testglob, pathlenght=0):
         """
@@ -189,9 +217,11 @@ class MetadataLoader(object):
         if DESC in base:
             if path:
                 self._insert_to_coverage(path, base)
-        else:
+        elif isinstance(base, dict):
             for key, value in base.iteritems():
                 self._parse_base_coverage(base=value, path=path + [key])
+        else:
+            print_debug("Try to parse element what is not parsable, check your structure: %s" % base)
 
     def _insert_to_test_tree(self, path_list, test):
         """
