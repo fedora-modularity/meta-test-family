@@ -43,7 +43,7 @@ class OpenShiftHelper(ContainerHelper):
         self.name = None
         self.icontainer = self.get_url()
         self.pod_id = None
-        self._pod_status = None
+        self._ip_address = None
         if not self.icontainer:
             raise ConfigExc("No container image specified in the configuration file or environment variable.")
         if "docker=" in self.icontainer:
@@ -66,7 +66,7 @@ class OpenShiftHelper(ContainerHelper):
         if int(oc_status.exit_status) == 0:
             common.print_info("Application already exists.")
             return True
-        oc_services = self.runHost("oc get services -o json", ignore_status=True).stdout
+        oc_services = self.runHost("oc get pods -o json", ignore_status=True).stdout
         oc_services = self._convert_string_to_json(oc_services)
         # Check if 'items' in json output is empty or not
         if not oc_services:
@@ -88,7 +88,6 @@ class OpenShiftHelper(ContainerHelper):
         try:
             try:
                 labels = item.get('metadata').get('labels')
-                common.print_info("CHECK LABELS")
                 if labels.get('app') == self.app_name:
                     # In metadata dictionary and name is stored pod_name
                     self.pod_id = item.get('metadata', {}).get('name')
@@ -146,7 +145,6 @@ class OpenShiftHelper(ContainerHelper):
         oc_new_app = self.runHost("oc new-app -l mtf_testing=true %s --name=%s" % (self.container_name,
                                                                                    self.app_name),
                                   ignore_status=True)
-        common.print_info(oc_new_app.stdout)
         time.sleep(1)
 
     def _get_pod_status(self):

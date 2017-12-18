@@ -69,8 +69,9 @@ class EnvOpenShift(CommonFunctions):
             if int(self.__oc_status()) == 0:
                 common.print_info("Seems like OpenShift is already started.")
             else:
-                common.print_info("Starting OpenShift")
-                self.runHost("oc cluster up", verbose=common.is_not_silent())
+                oc_run = self.runHost("oc cluster up", ignore_status=True)
+                common.print_info(oc_run.stdout)
+                common.print_info(oc_run.stderr)
 
     def __stop_openshift_cluster(self):
         """

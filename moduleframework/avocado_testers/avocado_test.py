@@ -238,7 +238,7 @@ class AvocadoTest(Test):
         return self.backend.ip_address
 
     @property
-    def ip_address(self, *args, **kwargs):
+    def ip_address(self):
         """
         Return ip address string of guest machine
         In many cases it should be same as host machine and port should be forwarded to host
