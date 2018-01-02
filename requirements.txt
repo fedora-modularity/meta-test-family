@@ -4,4 +4,3 @@ dockerfile-parse
 modulemd
 netifaces
 pdc-client
-odcs

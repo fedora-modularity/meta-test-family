@@ -103,5 +103,5 @@ setup(
         'Topic :: Software Development',
     ],
     install_requires=open('requirements.txt').read().splitlines(),
-    zip_safe=False
+    zip_safe=True
 )
