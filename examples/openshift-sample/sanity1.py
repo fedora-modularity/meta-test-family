@@ -34,20 +34,10 @@ class SanityCheck1(module_framework.AvocadoTest):
     :avocado: enable
     """
 
-    def test1(self):
+    def test_sanity(self):
         self.start()
-        time.sleep(5)
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((self.ip_address, self.getConfig()['service']['port']))
-        s.sendall('set Test 0 100 4\r\n\n')
-        s.sendall('JournalDev\r\n\n')
-        data = s.recv(1024)
-        common.print_info(data)
-        s.close()
-
-    def test2(self):
-        self.start()
-        self.run("ls / | grep bin")
+        time.sleep(1)
+        self.run("ls /usr/bin/memcached")
 
 if __name__ == '__main__':
     main()

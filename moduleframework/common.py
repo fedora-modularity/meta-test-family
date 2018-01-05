@@ -442,7 +442,7 @@ class CommonFunctions(object):
                 self.info["url"] = url
 
         if not self.info.get("url"):
-            if get_module_type_base() in ["docker"]:
+            if get_module_type_base() in ["docker", "openshift"]:
                 self.info["url"]=self.info.get("container")
             elif get_module_type_base() in ["rpm", "nspawn"]:
                 self.info["url"] = self.info.get("repo") or self.info.get("repos")

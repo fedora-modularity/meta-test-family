@@ -183,7 +183,7 @@ class ContainerHelper(CommonFunctions):
                 print_debug(e, "docker already removed")
                 pass
 
-    def status(self):
+    def status(self, command=None):
         """
         get status if container is running
 

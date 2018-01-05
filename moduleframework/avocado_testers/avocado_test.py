@@ -226,7 +226,7 @@ class AvocadoTest(Test):
         """
         return self.backend.copyFrom(*args, **kwargs)
 
-    def getIPaddr(self, *args, **kwargs):
+    def getIPaddr(self):
         """
         Return ip address string of guest machine
         In many cases it should be same as host machine and port should be forwarded to host
@@ -235,7 +235,7 @@ class AvocadoTest(Test):
         """
         warnings.warn("Function getIPaddr is deprecated. Use self.ip_address instead",
                       DeprecationWarning)
-        return self.backend.ip_address(*args, **kwargs)
+        return self.backend.ip_address
 
     @property
     def ip_address(self, *args, **kwargs):
@@ -245,7 +245,7 @@ class AvocadoTest(Test):
 
         :return: str
         """
-        return self.backend.ip_address(*args, **kwargs)
+        return self.backend.ip_address
 
     def getArch(self):
         """
