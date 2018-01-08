@@ -3,8 +3,8 @@ PYTHONSITE=/usr/lib/python2.7/site-packages
 all: check
 
 integrationtests: install
-	cd examples/general-component/tests; tmet-agregator
-	cd examples/general-component/tests; tmet-agregator |grep -o 69
+	cd examples/general-component/tests; tmet-agregator | tee | grep 64
+	cd examples/general-component/tests; tmet-agregator | tee | grep 64
 	cd examples/general-component/tests; tmet-filter
 	cd examples/general-component/tests; tmet-filter | grep 'sanity/generaltest.py'
 	cd examples/general-component/tests; tmet-filter -b generic | grep 'sanity/generaltest.py'
@@ -16,9 +16,8 @@ integrationtests: install
 	cd examples/general-component/tests; tmet-filter -b generic -t tag1 | grep -v meta-test-family.git
 	cd examples/general-component/tests; tmet-filter -b generic -t optional | grep meta-test-family.git
 	cd examples/general-component/tests; tmet-filter -b generic -t optional | grep -v fedora_specific
-	cd examples/general-component/tests; tmet-filter -b generic | grep sample_test.py
-	cd examples/general-component/tests; tmet-filter -b generic | grep directory_name/tests/sanity1.py
-
+	cd examples/general-component/tests; tmet-filter -b generic | grep downloaded_test.py
+	cd examples/general-component/tests; tmet-filter -b generic | grep downloaded_git/tests/sanity1.py
 
 unittests:
 	py.test tmet/selftests.py
