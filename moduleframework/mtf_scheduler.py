@@ -26,8 +26,9 @@ import os
 import moduleframework
 import tempfile
 import json
+import glob
 
-from avocado.utils import process
+import subprocess
 from moduleframework import common
 from mtf.metadata.tmet.filter import filtertests
 from mtf.metadata.tmet import common as metadata_common
@@ -188,24 +189,26 @@ def cli():
 class AvocadoStart(object):
     tests = []
     json_tmppath = None
-    additionalAvocadoArg = ''
+    additionalAvocadoArg = []
+    AVOCADO = "avocado"
 
     def __init__(self, args, unknown):
         # choose between TESTS and ADDITIONAL ENVIRONMENT from options
         if args.linter:
-            self.tests.append(
-                "{MTF_TOOLS}/*.py".format(MTF_TOOLS=metadata_common.MetadataLoaderMTF.MTF_LINTER_PATH))
+            self.tests += glob.glob("{MTF_TOOLS}/*.py".format(
+                MTF_TOOLS=metadata_common.MetadataLoaderMTF.MTF_LINTER_PATH))
         self.args = args
 
         for param in unknown:
             # take care of this, see tags for safe/unsafe:
             # http://avocado-framework.readthedocs.io/en/52.0/WritingTests.html#categorizing-tests
-            if os.path.exists(param):
+            testlist = glob.glob(param)
+            if testlist:
                 # this is list of tests in local file
-                self.tests.append(param)
+                self.tests += testlist
             else:
                 # this is additional avocado param
-                self.additionalAvocadoArg += " {0} ".format(param)
+                self.additionalAvocadoArg.append(param)
         if self.args.metadata:
             common.print_info("Using Metadata loader for tests and filtering")
             metadata_tests = filtertests(backend="mtf", location=os.getcwd(), linters=False, tests=[], tags=[], relevancy="")
@@ -219,31 +222,21 @@ class AvocadoStart(object):
 
     def avocado_run(self):
         self.json_tmppath = tempfile.mktemp()
-        avocado_args = "--json {JSON_LOG}".format(
-            JSON_LOG=self.json_tmppath)
+        avocado_args = ["--json", self.json_tmppath]
         if self.args.xunit:
-            avocado_args += " --xunit {XUNIT} ".format(XUNIT=self.args.xunit)
-        avocadoAction = "avocado {ACTION} {AVOCADO_ARGS}".format(
-            ACTION=self.args.action, AVOCADO_ARGS=avocado_args)
+            avocado_args += ["--xunit", self.args.xunit]
+        return self.avocado_general(avocado_default_args=avocado_args)
 
-        # run avocado with right cmd arguments
-        bash = process.run("{AVOCADO} {a} {b}".format(
-            AVOCADO=avocadoAction, a=self.additionalAvocadoArg, b=" ".join(self.tests)), shell=True, ignore_status=True)
-        common.print_info(bash.stdout, bash.stderr)
-        common.print_debug("Command used: ", bash.command)
-        return bash.exit_status
-
-    def avocado_general(self):
+    def avocado_general(self, avocado_default_args=[]):
         # additional parameters
         # self.additionalAvocadoArg: its from cmd line, whats unknown to this tool
-        avocado_args = ""  # when needed => specify HERE your additional stuff
-        avocadoAction = "avocado {ACTION} {AVOCADO_ARGS}".format(
-            ACTION=self.args.action, AVOCADO_ARGS=avocado_args)
-        bash = process.run("{AVOCADO} {a} {b}".format(
-            AVOCADO=avocadoAction, a=self.additionalAvocadoArg, b=" ".join(self.tests)), shell=True, ignore_status=True)
-        common.print_info(bash.stdout, bash.stderr)
-        common.print_debug("Command used: ", bash.command)
-        return bash.exit_status
+        avocadoAction = [self.AVOCADO, self.args.action] + avocado_default_args
+        rc=0
+        try:
+            subprocess.check_call(avocadoAction + self.additionalAvocadoArg + self.tests)
+        except subprocess.CalledProcessError as cpe:
+            rc = cpe.return_code
+        return rc
 
     def show_error(self):
         if os.path.exists(self.json_tmppath):
