@@ -15,7 +15,7 @@ def test_loader():
     Test general backend loader for complex case
     :return:
     """
-    downloaded_test = "sample_test.py"
+    downloaded_test = "downloaded_test.py"
     if os.path.exists(downloaded_test):
         os.remove(downloaded_test)
     mt = MetadataLoader(location=__TC_GENERAL_COMPONENT)
@@ -24,7 +24,7 @@ def test_loader():
     assert 'sanity/generaltest.py' in [x[SOURCE] for x in mt.backend_tests()]
     assert os.path.exists(downloaded_test)
     os.remove(downloaded_test)
-    git_dir_name="directory_name"
+    git_dir_name="downloaded_git"
     assert os.path.exists(git_dir_name)
     shutil.rmtree(git_dir_name)
 
@@ -161,7 +161,7 @@ def test_filter_general():
                           tests=[],
                           tags=[],
                           relevancy="")
-    print_debug(out)
+    print_debug([x.get(SOURCE) for x in out])
     assert len(out) == 6
 
 

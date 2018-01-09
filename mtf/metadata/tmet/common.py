@@ -112,17 +112,21 @@ class MetadataLoader(object):
     def __init__(self, location=".", linters=False, **kwargs):
         self.location = os.path.abspath(location)
         self._load_recursive()
-        if linters or self.base_element.get(MODULELINT):
-            self._import_linters()
         if URL_DOWNLOAD in self.base_element:
             self._url_download_files(self.base_element[URL_DOWNLOAD])
         if GIT_DOWNLOAD in self.base_element:
             self._git_clone_files(self.base_element[GIT_DOWNLOAD])
+        # VERY IMPORTANT
+        # Do it once more time, because coverage may changed after downloading urls and gits
+        self._load_recursive()
+
         if IMPORT_TESTS in self.base_element:
             for testglob in self.base_element.get(IMPORT_TESTS):
                 self._import_tests(os.path.join(self.location, testglob))
         if TAG_FILETERS in self.base_element:
             self.add_filter(tags=self.base_element.get(TAG_FILETERS))
+        if linters or self.base_element.get(MODULELINT):
+            self._import_linters()
 
     def _git_clone_files(self,gitdict):
         print_debug("Cloning resources via GIT (you have to have git installed)")
@@ -368,6 +372,7 @@ class MetadataLoaderMTF(MetadataLoader):
         MTF_LINTER_PATH = None
     listcmd = "avocado list"
     backends = ["mtf", "avocado"]
+    VALID_TEST_TYPES = ["EXTERNAL", "INSTRUMENTED", "SIMPLE", "PYUNITTEST"]
 
     def _import_tests(self, testglob, pathlenght=0):
         pathglob = testglob if testglob.startswith(os.pathsep) else os.path.join(self.location, testglob)
@@ -403,10 +408,17 @@ class MetadataLoaderMTF(MetadataLoader):
 
     def filter_tags(self, tests, tag_list):
         output = []
+        test_sources = [x[SOURCE] for x in tests]
+        cmd = process.run("%s %s %s" % (self.listcmd, self.__avcado_tag_args(tag_list), " ".join(test_sources)))
+        testlist = []
+        for line in cmd.stdout.splitlines():
+            splittedline = line.split(" ", 1)
+            if splittedline[0].strip() in self.VALID_TEST_TYPES:
+                testlist.append(splittedline[1].strip())
+            else:
+                warn("NOT A TEST (may cause error when schedule): %s" % splittedline)
         for test in tests:
-            cmd = process.run("%s %s %s" % (self.listcmd, self.__avcado_tag_args(tag_list), test[SOURCE]),
-                              shell=True, verbose=False)
-            if len(cmd.stdout) > 10:
+            if test[SOURCE] in testlist:
                 output.append(test)
         return output
 
