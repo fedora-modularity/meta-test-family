@@ -231,8 +231,12 @@ class AvocadoStart(object):
         # additional parameters
         # self.additionalAvocadoArg: its from cmd line, whats unknown to this tool
         avocadoAction = [self.AVOCADO, self.args.action] + avocado_default_args
-        command = subprocess.check_call(avocadoAction + self.additionalAvocadoArg + self.tests)
-        return command
+        rc=0
+        try:
+            subprocess.check_call(avocadoAction + self.additionalAvocadoArg + self.tests)
+        except subprocess.CalledProcessError as cpe:
+            rc = cpe.return_code
+        return rc
 
     def show_error(self):
         if os.path.exists(self.json_tmppath):
