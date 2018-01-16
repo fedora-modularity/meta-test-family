@@ -305,9 +305,7 @@ class OpenShiftHelper(ContainerHelper):
         status = False
         if self._app_exists():
             command = self.info.get('start') or command
-            return self.runHost('oc exec %s "%s"' % (self.pod_id,
-                                                     common.sanitize_cmd(command)),
-                                **kwargs)
+            return self.runHost('oc exec %s %s' % (self.pod_id, common.sanitize_cmd(command)))
 
     def run(self, command="ls /", **kwargs):
         """
@@ -318,6 +316,4 @@ class OpenShiftHelper(ContainerHelper):
         :param kwargs: dict
         :return: avocado.process.run
         """
-        return self.runHost('oc exec %s "%s"' % (self.pod_id,
-                                               common.sanitize_cmd(command)),
-                            **kwargs)
+        return self.runHost('oc exec %s %s' % (self.pod_id, common.sanitize_cmd(command)))
