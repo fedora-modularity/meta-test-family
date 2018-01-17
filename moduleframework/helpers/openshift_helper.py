@@ -176,7 +176,7 @@ class OpenShiftHelper(ContainerHelper):
                  True, application is initiated and ready for testing
         """
         pod_initiated = False
-        for x in range(0, 50):
+        for x in range(0, common.OPENSHIFT_INIT_WAIT):
             # We need wait a second before pod is really initiated.
             time.sleep(1)
             if self._get_pod_status():

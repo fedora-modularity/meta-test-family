@@ -90,6 +90,7 @@ DEFAULTRETRYTIMEOUT = 30
 DEFAULTNSPAWNTIMEOUT = 10
 MODULE_DEFAULT_PROFILE = "default"
 TRUE_VALUES_DICT = ['yes', 'YES', 'yes', 'True', 'true', 'ok', 'OK']
+OPENSHIFT_INIT_WAIT = 50
 
 def generate_unique_name(size=10):
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(size))
