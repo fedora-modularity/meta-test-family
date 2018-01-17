@@ -72,26 +72,29 @@ class OpenShiftHelper(ContainerHelper):
         if not oc_services:
             return False
         # check if 'items', which is not empty, in json output contains app_name
-        if not self._check_app_in_json(oc_services, self.app_name):
+        if not self._check_app_in_json(oc_services):
             return False
         return True
 
-    def _check_app_in_json(self, json_output, app_name):
+    def _check_app_in_json(self, item):
         """
         Function checks if json_output contains container with specified name
 
 
         :param json_output: json output from an OpenShift command
-        :param app_name: an application which should be checked
         :return: True if the application exists
                  False if the application does not exist
         """
         try:
-            labels = json_output.get('metadata').get('labels')
-            if labels.get('app') == app_name:
-                # In metadata dictionary and name is stored pod_name
-                self.pod_id = json_output.get('metadata').get('name')
-                return True
+            try:
+                labels = item.get('metadata').get('labels')
+                common.print_info("CHECK LABELS")
+                if labels.get('app') == self.app_name:
+                    # In metadata dictionary and name is stored pod_name
+                    self.pod_id = item.get('metadata', {}).get('name')
+                    return True
+            except AttributeError:
+                return False
         except KeyError:
             return False
 
@@ -120,7 +123,7 @@ class OpenShiftHelper(ContainerHelper):
         # memcached   172.30.1.1:5000/myproject/memcached   latest    13 minutes ago
 
         for item in oc_get:
-            if self._check_app_in_json(item, self.app_name):
+            if self._check_app_in_json(item):
                 # If application exists in svc / dc / is namespace, then remove it
                 oc_delete = self.runHost("oc delete %s %s" % (oc_service, self.app_name),
                                          ignore_status=True,
@@ -156,10 +159,10 @@ class OpenShiftHelper(ContainerHelper):
         pod_state = self.runHost("oc get pods -o json",
                                  ignore_status=True,
                                  verbose=common.is_not_silent())
-
         pod_state = self._convert_string_to_json(pod_state.stdout)
         for pod in pod_state:
-            if self._check_app_in_json(pod, self.app_name):
+            common.print_debug(self.pod_id)
+            if self._check_app_in_json(pod):
                 self._pod_status = pod.get('status').get('phase')
                 if self._pod_status == "Running":
                     pod_initiated = True
@@ -173,10 +176,11 @@ class OpenShiftHelper(ContainerHelper):
                  True, application is initiated and ready for testing
         """
         pod_initiated = False
-        for x in range(0, 20):
+        for x in range(0, common.OPENSHIFT_INIT_WAIT):
             # We need wait a second before pod is really initiated.
             time.sleep(1)
             if self._get_pod_status():
+                pod_initiated = True
                 break
         return pod_initiated
 
@@ -260,7 +264,7 @@ class OpenShiftHelper(ContainerHelper):
     def ip_address(self, value):
         self._ip_address = value
 
-    def start(self):
+    def start(self, command="/bin/bash"):
         """
         starts the OpenShift application
 
@@ -270,7 +274,8 @@ class OpenShiftHelper(ContainerHelper):
         if not self._app_exists():
             self._create_app()
             # Verify application is really deploy and prepared for testing.
-            self._verify_pod()
+            if not self._verify_pod():
+                return False
         self._get_ip_instance()
 
     def stop(self):
@@ -287,19 +292,20 @@ class OpenShiftHelper(ContainerHelper):
                 common.print_info(e, "OpenShift application already removed")
                 pass
 
-    def status(self):
+    def status(self, command="ls /"):
+
         """
         Function returns whether the application exists
         and is Running in OpenShift environment
 
-        :return: True application exists
-                 False application does not exist.
+        :param command: Do not use it directly (It is defined in config.yaml)
+        :return: bool
+
         """
         status = False
         if self._app_exists():
-            if self._get_pod_status():
-                status = True
-        return status
+            command = self.info.get('start') or command
+            return self.runHost('oc exec %s %s' % (self.pod_id, common.sanitize_cmd(command)))
 
     def run(self, command="ls /", **kwargs):
         """
@@ -310,6 +316,4 @@ class OpenShiftHelper(ContainerHelper):
         :param kwargs: dict
         :return: avocado.process.run
         """
-        return self.runHost("oc exec %s %s" % (self.pod_id,
-                                               common.sanitize_cmd(command)),
-                            **kwargs)
+        return self.runHost('oc exec %s %s' % (self.pod_id, common.sanitize_cmd(command)))

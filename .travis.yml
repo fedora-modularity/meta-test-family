@@ -14,8 +14,22 @@ before_install:
 
 install: sudo make install_pip
 
+before_script:
+  - |
+    wget https://github.com/openshift/origin/releases/download/v3.6.0/openshift-origin-client-tools-v3.6.0-c4dd4cf-linux-64bit.tar.gz -O ~/openshift-origin-client-tools-v3.6.0-c4dd4cf-linux-64bit.tar.gz
+    tar -xzvf ~/openshift-origin-client-tools-v3.6.0-c4dd4cf-linux-64bit.tar.gz
+    sudo ln -s $PWD/openshift-origin-client-tools-v3.6.0-c4dd4cf-linux-64bit/oc /usr/bin/oc
+    tmp=`mktemp`
+    echo 'DOCKER_OPTS="$DOCKER_OPTS --insecure-registry 172.30.0.0/16"' > ${tmp}
+    sudo mv ${tmp} /etc/default/docker
+    sudo mount --make-shared /
+    sudo service docker restart
+    docker info
+    export PATH=$PATH:$PWD/openshift-origin-client-tools-v3.6.0-c4dd4cf-linux-64bit/
+
 script:
   - sudo make travis
+  - sudo make -C examples/testing-module check-openshift-memcached
   - sudo make -C examples/testing-module check-inheritance
   - sudo make -C examples/testing-module check-default-config
   - sudo make -C examples/testing-module check-pure-docker
@@ -23,8 +37,8 @@ script:
   - sudo make -C examples/testing-module check-test-mtf-bin-modulelint
   - sudo make -C examples/testing-module check-real-rpm-destructive
   - sudo make -C examples/testing-module check-docker-scl-multi-travis
-  - sudo make -C examples/testing-module check-mtf-pdc-module-info-reader
+  #- sudo make -C examples/testing-module check-mtf-pdc-module-info-reader
   - sudo make -C mtf/metadata check
   - sudo make -C examples/testing-module check-mtf-metadata
 
-after_script: sudo cat ~/avocado/job-results/latest/job.log
+after_script: sudo cat /home/travis/avocado/job-results/latest/job.log

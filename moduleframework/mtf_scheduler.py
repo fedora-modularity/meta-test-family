@@ -235,7 +235,7 @@ class AvocadoStart(object):
         try:
             subprocess.check_call(avocadoAction + self.additionalAvocadoArg + self.tests)
         except subprocess.CalledProcessError as cpe:
-            rc = cpe.return_code
+            rc = cpe.returncode
         return rc
 
     def show_error(self):

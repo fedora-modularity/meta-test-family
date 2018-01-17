@@ -12,6 +12,8 @@ testdependencies:
     rpms:
         - nc
 module:
+    openshift:
+        container: docker.io/modularitycontainers/memcached
     docker:
         start: "docker run -it -e CACHE_SIZE=128 -p 11211:11211"
         labels:
