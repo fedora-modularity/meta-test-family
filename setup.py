@@ -50,7 +50,7 @@ def get_dir(system_path=None, virtual_path=None):
 
 data_files = {}
 
-paths = ['docs', 'examples', 'tools']
+paths = ['docs', 'examples', 'tests']
 
 for path in paths:
     for root, dirs, files in os.walk(path, followlinks=True):
@@ -77,7 +77,7 @@ setup(
     author_email='jscotka@redhat.com',
     url='https://github.com/fedora-modularity/meta-test-family',
     license='GPLv2+',
-    packages=find_packages(exclude=['docs', 'examples', 'tools']),
+    packages=find_packages(exclude=['docs', 'examples', 'tests']),
     include_package_data=True,
     data_files=data_files.items(),
     scripts=[],

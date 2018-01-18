@@ -21,9 +21,6 @@ class DockerInstructionsTests(module_framework.AvocadoTest):
         if self.dp.dockerfile is None:
             self.skip("Dockerfile was not found")
 
-    def tearDown(self, *args, **kwargs):
-        pass
-
     def test_from_is_first_directive(self):
         self.assertTrue(self.dp.check_from_is_first())
 

@@ -197,13 +197,13 @@ class AvocadoStart(object):
     def __init__(self, args, unknown):
         # choose between TESTS and ADDITIONAL ENVIRONMENT from options
         if args.static_linters:
-            for test in common.STATIC_CHECKS:
-                self.tests.append("{MTF_TOOLS}/{test}.py".format(
+            self.tests += glob.glob("{MTF_TOOLS}/{STATIC_LINTERS}/*.py".format(
                 MTF_TOOLS=metadata_common.MetadataLoaderMTF.MTF_LINTER_PATH,
-                test=test))
+                STATIC_LINTERS=common.STATIC_LINTERS))
         if args.linter:
-            self.tests += glob.glob("{MTF_TOOLS}/*.py".format(
-                MTF_TOOLS=metadata_common.MetadataLoaderMTF.MTF_LINTER_PATH))
+            self.tests += glob.glob("{MTF_TOOLS}/{GENERIC_TEST}/*.py".format(
+                MTF_TOOLS=metadata_common.MetadataLoaderMTF.MTF_LINTER_PATH,
+                GENERIC_TEST=common.GENERIC_TEST))
         self.args = args
 
         for param in unknown:
@@ -237,9 +237,6 @@ class AvocadoStart(object):
     def avocado_general(self, avocado_default_args=[]):
         # additional parameters
         # self.additionalAvocadoArg: its from cmd line, whats unknown to this tool
-        if self.args.static_linters and self.args.linter:
-            common.print_info("--static-linters and --linter can not be used together")
-            return 0
         avocadoAction = [self.AVOCADO, self.args.action] + avocado_default_args
         rc=0
         try:
