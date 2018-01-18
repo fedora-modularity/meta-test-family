@@ -396,7 +396,8 @@ class MetadataLoaderMTF(MetadataLoader):
 
     def _import_linters(self):
         if self.MTF_LINTER_PATH:
-            self._import_tests(os.path.join(self.MTF_LINTER_PATH, "*.py"), pathlenght=-3)
+            self._import_tests(os.path.join(self.MTF_LINTER_PATH, "generic", "*.py"), pathlenght=-3)
+            self._import_tests(os.path.join(self.MTF_LINTER_PATH, "static", "*.py"), pathlenght=-3)
 
     def __avcado_tag_args(self, tag_list, defaultparam="--filter-by-tags-include-empty"):
         output = []
