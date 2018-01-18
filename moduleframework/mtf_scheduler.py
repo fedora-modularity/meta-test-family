@@ -84,6 +84,8 @@ VARIABLES
     )
     parser.add_argument("--linter", "-l", action="store_true",
                         default=False, help='adds additional compose checks')
+    parser.add_argument("--static-linters", action="store_true",
+                        default=False, help='adds static linters checks, like dockerfile and helpmdfile')
     parser.add_argument("--setup", action="store_true",
                         default=False, help='Setup by mtfenvset')
     parser.add_argument("--action", action="store", default='run',
@@ -194,6 +196,11 @@ class AvocadoStart(object):
 
     def __init__(self, args, unknown):
         # choose between TESTS and ADDITIONAL ENVIRONMENT from options
+        if args.static_linters:
+            for test in common.STATIC_CHECKS:
+                self.tests.append("{MTF_TOOLS}/{test}.py".format(
+                MTF_TOOLS=metadata_common.MetadataLoaderMTF.MTF_LINTER_PATH,
+                test=test))
         if args.linter:
             self.tests += glob.glob("{MTF_TOOLS}/*.py".format(
                 MTF_TOOLS=metadata_common.MetadataLoaderMTF.MTF_LINTER_PATH))
@@ -230,6 +237,9 @@ class AvocadoStart(object):
     def avocado_general(self, avocado_default_args=[]):
         # additional parameters
         # self.additionalAvocadoArg: its from cmd line, whats unknown to this tool
+        if self.args.static_linters and self.args.linter:
+            common.print_info("--static-linters and --linter can not be used together")
+            return 0
         avocadoAction = [self.AVOCADO, self.args.action] + avocado_default_args
         rc=0
         try:
