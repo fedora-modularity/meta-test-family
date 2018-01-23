@@ -29,7 +29,7 @@ from moduleframework import module_framework
 class HelpFileSanity(module_framework.AvocadoTest):
     """
     :avocado: enable
-    :avocado: tags=optional,rhel,fedora,docker,helpmd_sanity_test
+    :avocado: tags=optional,rhel,fedora,docker,helpmd_sanity_test,static
 
     """
 

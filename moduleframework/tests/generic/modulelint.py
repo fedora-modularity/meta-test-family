@@ -28,7 +28,7 @@ from moduleframework import module_framework
 class ModuleLintSigning(module_framework.AvocadoTest):
     """
     :avocado: disable
-    :avocado: tags=WIP,rhel,fedora,docker,module,package_signing_test
+    :avocado: tags=WIP,rhel,fedora,docker,module,package_signing_test,generic
     """
 
     def setUp(self):

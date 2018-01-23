@@ -33,7 +33,7 @@ class ComposeTest(module_framework.NspawnAvocadoTest):
     Validate overall module compose.
 
     :avocado: enable
-    :avocado: tags=sanity,rhel,fedora,compose_test,module
+    :avocado: tags=sanity,rhel,fedora,compose_test,module,generic
     """
 
     def test_component_profile_installability(self):

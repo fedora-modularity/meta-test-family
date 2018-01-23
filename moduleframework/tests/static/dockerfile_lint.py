@@ -8,7 +8,7 @@ from moduleframework import dockerlinter
 class DockerInstructionsTests(module_framework.AvocadoTest):
     """
     :avocado: enable
-    :avocado: tags=sanity,rhel,fedora,docker,docker_instruction_test
+    :avocado: tags=sanity,rhel,fedora,docker,docker_instruction_test,static
 
     """
 

@@ -31,7 +31,7 @@ from moduleframework.avocado_testers import container_avocado_test
 class DockerfileLinterInContainer(container_avocado_test.ContainerAvocadoTest):
     """
     :avocado: enable
-    :avocado: tags=sanity,rhel,fedora,docker,docker_lint_inside_test
+    :avocado: tags=sanity,rhel,fedora,docker,docker_lint_inside_test,generic
 
     """
 
