@@ -78,7 +78,12 @@ check-memcached-both: prepare-docker prepare-nspawn
 
 check-openshift-memcached:
 	sudo oc cluster up
-	cd ../openshift-sample; MODULE=openshift DEBUG=yes OPENSHIFT_USER=developer OPENSHIFT_PASSWORD=developer $(CMD) sanity1.py
+	cd ../openshift/registry; MODULE=openshift DEBUG=yes OPENSHIFT_USER=developer OPENSHIFT_PASSWORD=developer $(CMD) sanity1.py
+	sudo oc cluster down
+
+check-openshift-template:
+	sudo oc cluster up
+	cd ../openshift/template; MODULE=openshift DEBUG=yes OPENSHIFT_USER=developer OPENSHIFT_PASSWORD=developer $(CMD) sanity1.py
 	sudo oc cluster down
 
 check-minimal-config-rpm-noenvvar: prepare-nspawn
