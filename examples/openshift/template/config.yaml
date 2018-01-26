@@ -1,0 +1,9 @@
+document: meta-test
+version: 1
+name: memcached
+service:
+    port: 11211
+module:
+    openshift:
+        template: https://raw.githubusercontent.com/container-images/memcached/master/openshift-template.yml
+        container: docker.io/modularitycontainers/memcached

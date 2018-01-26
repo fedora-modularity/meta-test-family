@@ -42,6 +42,7 @@ class OpenShiftHelper(ContainerHelper):
         super(OpenShiftHelper, self).__init__()
         self.name = None
         self.icontainer = self.get_url()
+        self.template = self.get_template()
         self.pod_id = None
         self._ip_address = None
         if not self.icontainer:
@@ -55,6 +56,36 @@ class OpenShiftHelper(ContainerHelper):
         self.app_name = self.container_name.split('/')[-1]
         self.app_ip = None
         common.print_debug(self.icontainer, self.app_name)
+
+    def _get_openshift_ip_registry(self):
+        openshift_ip_register = None
+        docker_registry = self.runHost('oc get svc -n default -o json', ignore_status=True).stdout
+        docker_registry = self._convert_string_to_json(docker_registry)
+        for reg in docker_registry:
+            try:
+                name = reg.get("metadata").get("name")
+                if name == common.OPENSHIFT_DOCKER_REGISTER:
+                    openshift_ip_register = reg.get("spec").get("clusterIP")
+            except AttributeError:
+                pass
+
+        return openshift_ip_register
+
+    def _register_docker_to_openshift_register(self):
+        whoami = self.runHost("oc whoami -t", ignore_status=True).stdout
+        common.print_debug(whoami)
+        self._switch_to_account()
+        openshift_ip_register = self._get_openshift_ip_registry()
+        self._switch_to_account(account=common.get_openshift_user(),
+                                password=common.get_openshift_passwd())
+        self.runHost('docker login -u mtf -p %s %s:5000' % (whoami, openshift_ip_register))
+        self.runHost('docker pull %s' % self.container_name)
+        self.runHost('docker tag {id} {ip}/myproject/{name}'.format(id=self.container_name,
+                                                                    name=self.app_name,
+                                                                    ip=openshift_ip_register))
+        self.runHost('docker push %s/myproject/%s' % (openshift_ip_register,
+                                                      self.app_name), ignore_status=True)
+        self._switch_to_account(account="developer", password="developer")
 
     def _app_exists(self):
         """
@@ -76,7 +107,7 @@ class OpenShiftHelper(ContainerHelper):
             return False
         return True
 
-    def _check_app_in_json(self, item):
+    def _check_app_in_json(self, item, name=None):
         """
         Function checks if json_output contains container with specified name
 
@@ -96,6 +127,13 @@ class OpenShiftHelper(ContainerHelper):
                 return False
         except KeyError:
             return False
+
+    def _switch_to_account(self, account="system:admin", password=None):
+        if password is None:
+            s = self.runHost("oc login -u %s" % account)
+        else:
+            s = self.runHost("oc login -u %s -p %s" % (account, password))
+        common.print_debug(s.stdout)
 
     def _convert_string_to_json(self, inp_string):
         """
@@ -146,6 +184,25 @@ class OpenShiftHelper(ContainerHelper):
                                                                                    self.app_name),
                                   ignore_status=True)
         time.sleep(1)
+
+    def _create_app_by_template(self):
+        """
+        It creates an application in OpenShift environment by OpenShift template
+        Steps:
+        * oc cluster up
+        * oc create -f <template> -n openshift
+        * oc new-app memcached --template memcached
+        :return:
+        """
+        self._register_docker_to_openshift_register()
+        #oc_template_app = self.runHost('oc process -f "%s"' % self.template)
+        #common.print_debug(oc_template_app.stdout)
+        #oc_template_create = self.runHost('oc create -f %s -n openshift' % self.template)
+        #common.print_debug(oc_template_create.stdout)
+        time.sleep(1)
+
+    def _create_app_as_s2i(self):
+        pass
 
     def _get_pod_status(self):
         """
@@ -269,11 +326,19 @@ class OpenShiftHelper(ContainerHelper):
         :param command: Do not use it directly (It is defined in config.yaml)
         :return: None
         """
+        self._switch_to_account(account=common.get_openshift_user(),
+                                password=common.get_openshift_passwd())
         if not self._app_exists():
-            self._create_app()
+            # This part is used for running an application without template or s2i
+            common.print_debug(self.template)
+            if self.template is None:
+                self._create_app()
+            else:
+                self._create_app_by_template()
             # Verify application is really deploy and prepared for testing.
             if not self._verify_pod():
                 return False
+
         self._get_ip_instance()
 
     def stop(self):
