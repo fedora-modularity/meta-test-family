@@ -365,8 +365,8 @@ class MetadataLoaderMTF(MetadataLoader):
     metadata specific class for MTF (avocado) tests
     """
     try:
-        import moduleframework.tools
-        MTF_LINTER_PATH = os.path.dirname(moduleframework.tools.__file__)
+        import moduleframework.tests
+        MTF_LINTER_PATH = os.path.dirname(moduleframework.tests.__file__)
     except:
         warn("MTF library not installed, linters are ignored")
         MTF_LINTER_PATH = None
@@ -396,7 +396,8 @@ class MetadataLoaderMTF(MetadataLoader):
 
     def _import_linters(self):
         if self.MTF_LINTER_PATH:
-            self._import_tests(os.path.join(self.MTF_LINTER_PATH, "*.py"), pathlenght=-3)
+            self._import_tests(os.path.join(self.MTF_LINTER_PATH, "generic", "*.py"), pathlenght=-3)
+            self._import_tests(os.path.join(self.MTF_LINTER_PATH, "static", "*.py"), pathlenght=-3)
 
     def __avcado_tag_args(self, tag_list, defaultparam="--filter-by-tags-include-empty"):
         output = []

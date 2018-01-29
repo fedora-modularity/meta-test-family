@@ -1,5 +1,5 @@
 CMD=mtf
-TESTS=$(shell ls *.py *.sh ../../moduleframework/tools/*.py)
+TESTS=$(shell ls *.py *.sh ../../moduleframework/tests/generic/*.py ../../moduleframework/tests/static/*.py)
 SIMPLE=simpleTest.py
 export MTF_REMOTE_REPOS=yes
 export DEBUG=yes

@@ -195,8 +195,12 @@ class AvocadoStart(object):
     def __init__(self, args, unknown):
         # choose between TESTS and ADDITIONAL ENVIRONMENT from options
         if args.linter:
-            self.tests += glob.glob("{MTF_TOOLS}/*.py".format(
-                MTF_TOOLS=metadata_common.MetadataLoaderMTF.MTF_LINTER_PATH))
+            self.tests += glob.glob("{MTF_TOOLS}/{GENERIC_TEST}/*.py".format(
+                MTF_TOOLS=metadata_common.MetadataLoaderMTF.MTF_LINTER_PATH,
+                GENERIC_TEST=common.GENERIC_TEST))
+            self.tests += glob.glob("{MTF_TOOLS}/{STATIC_LINTERS}/*.py".format(
+                MTF_TOOLS=metadata_common.MetadataLoaderMTF.MTF_LINTER_PATH,
+                STATIC_LINTERS=common.STATIC_LINTERS))
         self.args = args
 
         for param in unknown:

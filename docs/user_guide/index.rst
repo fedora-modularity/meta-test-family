@@ -24,7 +24,7 @@ User Guide
 
  .. code-block:: makefile
 
-    MODULE_LINT=/usr/share/moduleframework/tools/modulelint/*.py
+    MODULE_LINT=/usr/share/moduleframework/tests/generic/*.py
     TESTS=*.py
     CMD=avocado run $(MODULE_LINT) $(TESTS)
 
