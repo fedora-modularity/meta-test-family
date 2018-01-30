@@ -21,7 +21,7 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
-import socket
+import pexpect
 from avocado import main
 from avocado.core import exceptions
 from moduleframework import module_framework
@@ -29,12 +29,22 @@ from moduleframework import common
 import time
 
 
-class SanityCheck1(module_framework.AvocadoTest):
+class SanityMemcached(module_framework.AvocadoTest):
     """
     :avocado: enable
     """
 
-    def test_sanity(self):
+    def test_smoke(self):
+        self.start()
+        time.sleep(1)
+        session = pexpect.spawn("telnet %s %s" % (self.ip_address, self.getConfig()['service']['port']))
+        session.sendline('set Test 0 100 4\r\n\n')
+        session.sendline('JournalDev\r\n\n')
+        common.print_info('Expecting STORED')
+        session.expect('STORED')
+        session.close()
+
+    def test_memcached_bin_exists(self):
         self.start()
         time.sleep(1)
         self.run("ls /usr/bin/memcached")

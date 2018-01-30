@@ -94,6 +94,8 @@ OPENSHIFT_INIT_WAIT = 50
 STATIC_LINTERS = 'static'
 GENERIC_TEST = 'generic'
 OPENSHIFT_DOCKER_REGISTER = "docker-registry"
+TEMPLATE = 'template'
+PROJECT = 'project'
 
 def generate_unique_name(size=10):
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(size))

@@ -29,8 +29,7 @@ before_script:
 
 script:
   - sudo make travis
-  - sudo make -C examples/testing-module check-openshift-memcached
-  - sudo make -C examples/testing-module check-openshift-template
+  - sudo make -C examples/testing-module check-openshift
   - sudo make -C examples/testing-module check-inheritance
   - sudo make -C examples/testing-module check-default-config
   - sudo make -C examples/testing-module check-pure-docker
