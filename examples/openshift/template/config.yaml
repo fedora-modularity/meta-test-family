@@ -5,5 +5,5 @@ service:
     port: 11211
 module:
     openshift:
-        template: https://raw.githubusercontent.com/container-images/memcached/master/openshift-template.yml
+        template: ./memcached.yaml
         container: docker.io/modularitycontainers/memcached
