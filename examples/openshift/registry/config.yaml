@@ -1,0 +1,8 @@
+document: meta-test
+version: 1
+name: memcached
+service:
+    port: 11211
+module:
+    openshift:
+        container: docker.io/modularitycontainers/memcached

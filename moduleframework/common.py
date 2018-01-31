@@ -93,6 +93,8 @@ TRUE_VALUES_DICT = ['yes', 'YES', 'yes', 'True', 'true', 'ok', 'OK']
 OPENSHIFT_INIT_WAIT = 50
 STATIC_LINTERS = 'static'
 GENERIC_TEST = 'generic'
+OPENSHIFT_DOCKER_REGISTER = "docker-registry"
+TEMPLATE = 'template'
 
 def generate_unique_name(size=10):
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(size))
@@ -460,6 +462,13 @@ class CommonFunctions(object):
         :return:
         """
         return self.info.get("url")
+
+    def get_template(self):
+        """
+        get location of template
+        :return:
+        """
+        return self.info.get("template")
 
     def getArch(self):
         """
