@@ -32,7 +32,7 @@ Taskotron Wokflow
                 - checkout to proper version found by PDC (scmurl)
                 - Try to find tests there ( if exist `Makefile` in `tests` directory)
             - If None: Try to find module dir in MTF project tests in `/usr/share/moduleframework/examples` directory
-            - If None: Run at least general ModuleLinter (`/usr/share/moduleframework/tools/modulelint`) with general minimal config.yaml located in `docs` directory
+            - If None: Run at least general ModuleLinter (`/usr/share/moduleframework/tests/modulelint`) with general minimal config.yaml located in `docs` directory
 
 Arbitrary Jenkins Instance
 ----------------------------

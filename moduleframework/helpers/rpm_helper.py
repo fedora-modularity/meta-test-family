@@ -31,6 +31,7 @@ class RpmHelper(CommonFunctions):
 
     :avocado: disable
     """
+    _URL = None
 
     def __init__(self):
         """
@@ -53,7 +54,23 @@ class RpmHelper(CommonFunctions):
 
         :return: str
         """
-        return ";".join(self.repos)
+        warnings.warn("Function getURL is deprecated. Use self.URL instead",
+                      DeprecationWarning)
+        return ';'.join(self.repos)
+
+    @property
+    def URL(self):
+        """
+        Return semicolon separated string of repositories what will be used, could be simialr to URL param,
+         it contains also dependent repositories from PDC
+
+        :return: str
+        """
+        return ';'.join(self.repos)
+
+    @URL.setter
+    def URL(self, value):
+        self._URL = value
 
     def setUp(self):
         """
@@ -123,7 +140,7 @@ gpgcheck=0
             f.write(add)
         f.close()
         self.install_packages()
-        self.ipaddr = trans_dict["GUESTIPADDR"]
+        self.ip_address = trans_dict["GUESTIPADDR"]
 
     def copyTo(self, src, dest):
         """

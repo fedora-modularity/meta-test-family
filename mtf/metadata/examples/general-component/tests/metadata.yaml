@@ -4,10 +4,18 @@ document: test-metadata
 subtype: general
 # enable linters for selected module type (not supported for generic class)
 enable_lint: False
+# Download resources from location to actual directory (stored as key value of dict).
+download_urls:
+    downloaded_test.py: "https://raw.githubusercontent.com/fedora-modularity/meta-test-family/devel/mtf/metadata/examples/general-component/tests/simple.py"
+# Clone resources via git clone, it clone git repository to directory_name
+clone_gits:
+    downloaded_git: "https://github.com/container-images/memcached.git"
+
 # Import tests by path glob or by name, without complex features for coverage mapping
 import_tests:
     - "*.py"
     - "/bin/true"
+    - "downloaded_git/tests/sanity1.py"
 # DNF form of tags: Lines are logical OR, "," is logical AND, "-" is logical NOT
 tag_filters:
     - tier1

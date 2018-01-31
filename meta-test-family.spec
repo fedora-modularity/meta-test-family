@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           meta-test-family
-Version:        0.7.8
+Version:        0.7.10
 Release:        1%{?dist}
 Summary:        Tool to test components of a modular Fedora
 
@@ -61,6 +61,36 @@ install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
 
 
 %changelog
+* Wed Jan 17 2018 Petr "Stone" Hracek <phracek@redhat.com> 0.7.10-1
+- Couple fixes based on #195 Pull Request (phracek@redhat.com)
+- DISABLE CHECK-MTF-METADATA, PDC-MODULE and MTF/METADATA. IT FAILS
+  (phracek@redhat.com)
+- Using OpenShift 3.6.0 (phracek@redhat.com)
+- Include OpenShift into Travis CI and testing (phracek@redhat.com)
+- Fix typo in returncode (phracek@redhat.com)
+- cath exception from subprocess to know return code (jscotka@redhat.com)
+- remove avocado.run and replace it by subprocess to see outputs on the fly
+  (jscotka@redhat.com)
+- add tee to all integration tests for easier debugging (jscotka@redhat.com)
+- speed optimization for avocado based test tag filtering (jscotka@redhat.com)
+
+* Wed Dec 13 2017 Jan Scotka <jscotka@redhat.com> 0.7.9-1
+- fix metadata if bug is found (jscotka@redhat.com)
+- add tests for tooling if imported tests are included (jscotka@redhat.com)
+- add git cloning abilities to metadata (jscotka@redhat.com)
+- existing file should not be replaced via metadata (keep local version)
+  (jscotka@redhat.com)
+- url_downloader option in metadata.yaml allows download tests via URLlib
+  (jscotka@redhat.com)
+- improve search for helpMD file (jscotka@redhat.com)
+- helpmd and docker lint cleanup of loading classes (jscotka@redhat.com)
+- Update PR with PEP 8 and use @property also for avocado_test.py
+  (phracek@redhat.com)
+- Keep backwards compatibility (phracek@redhat.com)
+- Couple updates. dependency_list and remove getters (phracek@redhat.com)
+- Remove obsolete function which is not used anywhere (phracek@redhat.com)
+- Fixes #167 First try for property, setter and getter (phracek@redhat.com)
+
 * Wed Dec 06 2017 Jan Scotka <jscotka@redhat.com> 0.7.8-1
 - remove mtf-env-clean from runthem script, it is on not good place and cleanup
   of env is not important to have it ther (jscotka@redhat.com)

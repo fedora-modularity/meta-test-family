@@ -26,9 +26,9 @@ main module provides all helpers for various module types and AVOCADO(unittest) 
 what you should use for your tests (inherited)
 """
 
-
 from avocado import Test
 from avocado.core import exceptions
+import warnings
 
 from moduleframework.common import *
 from moduleframework.helpers.container_helper import ContainerHelper
@@ -226,14 +226,26 @@ class AvocadoTest(Test):
         """
         return self.backend.copyFrom(*args, **kwargs)
 
-    def getIPaddr(self, *args, **kwargs):
+    def getIPaddr(self):
         """
-        Return ip addr string of guest machine
+        Return ip address string of guest machine
         In many cases it should be same as host machine and port should be forwarded to host
 
         :return: str
         """
-        return self.backend.getIPaddr(*args, **kwargs)
+        warnings.warn("Function getIPaddr is deprecated. Use self.ip_address instead",
+                      DeprecationWarning)
+        return self.backend.ip_address
+
+    @property
+    def ip_address(self):
+        """
+        Return ip address string of guest machine
+        In many cases it should be same as host machine and port should be forwarded to host
+
+        :return: str
+        """
+        return self.backend.ip_address
 
     def getArch(self):
         """
@@ -251,7 +263,20 @@ class AvocadoTest(Test):
 
         :return: dict
         """
-        return self.backend.getModuleDependencies()
+        warnings.warn("Function getModuleDependencies is deprecated. Use self.dependency_list instead",
+                      DeprecationWarning)
+        return self.dependency_list()
+
+    @property
+    def dependency_list(self):
+        """
+        get list of module dependencies dictionary, there is structure like:
+        {module_name: {stream: master, urls=[repo_url1, repo_url2]},
+         dependent_module_name: {stream: f26, urls=[repo_url3]}}
+
+        :return: dict
+        """
+        return self.backend.dependency_list
 
     def run_script(self, *args, **kwargs):
         """

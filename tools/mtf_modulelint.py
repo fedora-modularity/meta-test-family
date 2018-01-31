@@ -27,9 +27,11 @@
 # TODO: This is not working now, because it is still not  implemented in upsteram avocado:
 # TODO: https://github.com/avocado-framework/avocado/issues/1792
 
-from moduleframework.tools.check_compose import ComposeTest
-from moduleframework.tools.rpmvalidation import rpmvalidation
-from moduleframework.tools.modulelint import *
+from moduleframework.tests.generic.check_compose import ComposeTest
+from moduleframework.tests.generic.rpmvalidation import rpmvalidation
+from moduleframework.tests.generic.modulelint import *
+from moduleframework.tests.generic.dockerlint import *
+from moduleframework.tests.static.dockerfile_lint import *
 
 class MTFComposeTest(ComposeTest):
     """
@@ -45,7 +47,7 @@ class MTFRpmValidation(rpmvalidation):
     pass
 
 
-class MTFDockerFileLinter(DockerFileLinter):
+class MTFDockerFileLinter(DockerfileLinterInContainer):
     """
     :avocado: recursive
     """

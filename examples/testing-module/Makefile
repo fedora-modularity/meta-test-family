@@ -1,5 +1,5 @@
 CMD=mtf
-TESTS=$(shell ls *.py *.sh ../../moduleframework/tools/*.py)
+TESTS=$(shell ls *.py *.sh ../../moduleframework/tests/generic/*.py ../../moduleframework/tests/static/*.py)
 SIMPLE=simpleTest.py
 export MTF_REMOTE_REPOS=yes
 export DEBUG=yes
@@ -76,6 +76,10 @@ check-memcached-both: prepare-docker prepare-nspawn
 	cd ../memcached; MODULE=docker $(CMD) sanity1.py
 	cd ../memcached; MODULE=nspawn $(CMD) sanity1.py
 
+check-openshift-memcached:
+	sudo oc cluster up
+	cd ../openshift-sample; MODULE=openshift DEBUG=yes OPENSHIFT_USER=developer OPENSHIFT_PASSWORD=developer $(CMD) sanity1.py
+	sudo oc cluster down
 
 check-minimal-config-rpm-noenvvar: prepare-nspawn
 	MTF_REMOTE_REPOS= DOCKERFILE= MODULE=nspawn $(CMD) $(TESTS)

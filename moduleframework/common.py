@@ -37,6 +37,7 @@ import sys
 import random
 import string
 import requests
+import warnings
 from avocado.utils import process
 from moduleframework.mtfexceptions import ModuleFrameworkException, ConfigExc, CmdExc
 
@@ -56,6 +57,8 @@ hostpackager = subprocess.check_output([PACKAGER_COMMAND], shell=True).strip()
 guestpackager = hostpackager
 ARCH = "x86_64"
 DOCKERFILE = "Dockerfile"
+HELP_MD_FILE = "help.md"
+DEFAULT_DIR_OF_DOCKER_RELATED_STUFF = os.path.abspath("../")
 
 __persistent_config = None
 
@@ -87,6 +90,9 @@ DEFAULTRETRYTIMEOUT = 30
 DEFAULTNSPAWNTIMEOUT = 10
 MODULE_DEFAULT_PROFILE = "default"
 TRUE_VALUES_DICT = ['yes', 'YES', 'yes', 'True', 'true', 'ok', 'OK']
+OPENSHIFT_INIT_WAIT = 50
+STATIC_LINTERS = 'static'
+GENERIC_TEST = 'generic'
 
 def generate_unique_name(size=10):
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(size))
@@ -389,13 +395,14 @@ class CommonFunctions(object):
     source = None
     arch = None
     sys_arch = None
-    dependencylist = {}
     is_it_module = False
     packager = None
     # general use case is to have forwarded services to host (so thats why it is same)
-    ipaddr = trans_dict["HOSTIPADDR"]
+    _ip_address = trans_dict["HOSTIPADDR"]
+    _dependency_list = None
 
     def __init__(self, *args, **kwargs):
+        # general use case is to have forwarded services to host (so thats why it is same)
         trans_dict["GUESTARCH"] = self.getArch()
         self.loadconfig()
 
@@ -438,7 +445,7 @@ class CommonFunctions(object):
                 self.info["url"] = url
 
         if not self.info.get("url"):
-            if get_module_type_base() in ["docker"]:
+            if get_module_type_base() in ["docker", "openshift"]:
                 self.info["url"]=self.info.get("container")
             elif get_module_type_base() in ["rpm", "nspawn"]:
                 self.info["url"] = self.info.get("repo") or self.info.get("repos")
@@ -516,7 +523,7 @@ class CommonFunctions(object):
         mddata = self.getModulemdYamlconfig()
         if not profile:
             if 'packages' in self.config:
-                packages_rpm = self.config.get('packages',{}).get('rpms', [])
+                packages_rpm = self.config.get('packages', {}).get('rpms', [])
                 packages_profiles = []
                 for profile_in_conf in self.config.get('packages', {}).get('profiles', []):
                     packages_profiles += mddata['data']['profiles'][profile_in_conf]['rpms']
@@ -536,8 +543,23 @@ class CommonFunctions(object):
 
         :return: list
         """
+        warnings.warn("Function getModuleDependencies is deprecated. Use self.dependency_list instead",
+                      DeprecationWarning)
+        return self.dependency_list
 
-        return self.dependencylist
+    @property
+    def dependency_list(self):
+        """
+        Return module dependencies.
+
+        :return: list
+        """
+
+        return self._dependency_list
+
+    @dependency_list.setter
+    def dependency_list(self, value):
+        self._dependency_list = value
 
     def getModulemdYamlconfig(self, urllink=None):
         """
@@ -580,7 +602,23 @@ class CommonFunctions(object):
 
         :return: str
         """
-        return self.ipaddr
+        return self.ip_address
+
+    @property
+    def ip_address(self):
+        """
+        Return protocol (IP or IPv6) address on a guest machine.
+
+        In many cases it should be same as a host machine's and a port
+        should be forwarded to a host.
+
+        :return: str
+        """
+        return self._ip_address
+
+    @ip_address.setter
+    def ip_address(self, value):
+        self._ip_address = value
 
     def _callSetupFromConfig(self):
         """
@@ -834,7 +872,7 @@ def get_module_type_base():
     return parent
 
 
-def get_docker_file(dir_name="../"):
+def get_docker_file(dir_name=DEFAULT_DIR_OF_DOCKER_RELATED_STUFF):
     """
     Function returns full path to dockerfile.
     :param dir_name: dir_name, where should be Dockerfile located
@@ -843,13 +881,30 @@ def get_docker_file(dir_name="../"):
     fromenv = os.environ.get("DOCKERFILE")
     if fromenv:
         dockerfile = fromenv
-        dir_name = os.getcwd()
     else:
-        dir_name = os.path.abspath(dir_name)
-        dockerfile = DOCKERFILE
-    dockerfile = os.path.join(dir_name, dockerfile)
-
+        dockerfile = os.path.join(dir_name, DOCKERFILE)
     if not os.path.exists(dockerfile):
+        print_debug("Dockerfile does not exists (you can use DOCKERFILE "
+                    "envvar to set to another): %s" % dockerfile)
         dockerfile = None
-        print_debug("Dockerfile should exists in the %s directory." % os.path.abspath(dir_name))
     return dockerfile
+
+def get_helpmd_file(dir_name=DEFAULT_DIR_OF_DOCKER_RELATED_STUFF):
+    """
+    Function returns full path to HelpMD file.
+    :param dir_name: dir_name, where should be helpMD file located
+    :return: full_path to Dockerfile
+    """
+    fromenv = os.environ.get("HELPMDFILE")
+    if fromenv:
+        helpmdfile = fromenv
+    elif os.environ.get("DOCKERFILE"):
+        # when DOCKERFILE is placed, search for HelpMD file in same directory
+        helpmdfile = os.path.join(os.path.dirname(os.environ.get("DOCKERFILE")),HELP_MD_FILE)
+    else:
+        helpmdfile = os.path.join(dir_name, HELP_MD_FILE)
+    if not os.path.exists(helpmdfile):
+        print_debug("Help MD file does not exists (you can use HELPMDFILE "
+                    "envvar to set to another): %s" % helpmdfile)
+        helpmdfile = None
+    return helpmdfile

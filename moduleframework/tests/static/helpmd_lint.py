@@ -20,36 +20,32 @@
 #
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
-from __future__ import print_function
 
-import os
 from moduleframework import helpfile_linter
 from moduleframework import dockerlinter
 from moduleframework import module_framework
-from moduleframework.common import get_docker_file
 
 
 class HelpFileSanity(module_framework.AvocadoTest):
     """
     :avocado: enable
-    :avocado: tags=optional,rhel,fedora,docker,helpmd_sanity_test
+    :avocado: tags=optional,rhel,fedora,docker,helpmd_sanity_test,static
 
     """
 
+    helpmd = None
     dp = None
 
     def setUp(self):
         # it is not intended just for docker, but just docker packages are
         # actually properly signed
+        self.helpmd = helpfile_linter.HelpMDLinter()
         self.dp = dockerlinter.DockerfileLinter()
-        if self.dp.dockerfile is None:
-            dir_name = os.getcwd()
-            self.log.info("Dockerfile was not found in %s directory." % dir_name)
-            self.skip()
-        self.helpmd = helpfile_linter.HelpMDLinter(dockerfile=self.dp.dockerfile)
-        if self.helpmd.help_md is None:
-            self.log.info("help.md file was not found in Dockerfile directory")
-            self.skip("help.md file was not found in Dockerfile directory")
+        if self.helpmd.help_md is None or self.dp.dockerfile is None:
+            self.skip("HelpMD or Docker file was not found")
+
+    def tearDown(self, *args, **kwargs):
+        pass
 
     def test_helpmd_exists(self):
         self.assertTrue(self.helpmd)

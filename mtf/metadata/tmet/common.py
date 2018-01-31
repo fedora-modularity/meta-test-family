@@ -3,9 +3,11 @@ import yaml
 import os
 import sys
 import glob
+from urllib import urlretrieve
 from avocado.utils import process
 from urlparse import urlparse
 from warnings import warn
+
 
 """
 Basic classes for metatadata handling, it contains classes derived from general metadata parser
@@ -32,6 +34,9 @@ COVPATH = "coverage_path"
 MODULELINT = "enable_lint"
 IMPORT_TESTS = "import_tests"
 TAG_FILETERS = "tag_filters"
+URL_DOWNLOAD = "download_urls"
+GIT_DOWNLOAD = "clone_gits"
+
 
 def print_debug(*args):
     """
@@ -107,13 +112,40 @@ class MetadataLoader(object):
     def __init__(self, location=".", linters=False, **kwargs):
         self.location = os.path.abspath(location)
         self._load_recursive()
-        if linters or self.base_element.get(MODULELINT):
-            self._import_linters()
+        if URL_DOWNLOAD in self.base_element:
+            self._url_download_files(self.base_element[URL_DOWNLOAD])
+        if GIT_DOWNLOAD in self.base_element:
+            self._git_clone_files(self.base_element[GIT_DOWNLOAD])
+        # VERY IMPORTANT
+        # Do it once more time, because coverage may changed after downloading urls and gits
+        self._load_recursive()
+
         if IMPORT_TESTS in self.base_element:
             for testglob in self.base_element.get(IMPORT_TESTS):
                 self._import_tests(os.path.join(self.location, testglob))
         if TAG_FILETERS in self.base_element:
             self.add_filter(tags=self.base_element.get(TAG_FILETERS))
+        if linters or self.base_element.get(MODULELINT):
+            self._import_linters()
+
+    def _git_clone_files(self,gitdict):
+        print_debug("Cloning resources via GIT (you have to have git installed)")
+        for test in gitdict:
+            if os.path.exists(test):
+                print_debug("Directory %s already exist" % test)
+            else:
+                print_debug("Cloning git %s to directory %s" % (gitdict[test], test))
+                process.run("git clone %s %s" % (gitdict[test], test))
+
+
+    def _url_download_files(self,testdict):
+        print_debug("Downloading resources via URL")
+        for test in testdict:
+            if os.path.exists(test):
+                print_debug("File %s already exist locally" % test)
+            else:
+                print_debug("Storing %s as file %s" % (testdict[test], test))
+                urlretrieve(testdict[test],filename=test)
 
     def _import_tests(self, testglob, pathlenght=0):
         """
@@ -189,9 +221,11 @@ class MetadataLoader(object):
         if DESC in base:
             if path:
                 self._insert_to_coverage(path, base)
-        else:
+        elif isinstance(base, dict):
             for key, value in base.iteritems():
                 self._parse_base_coverage(base=value, path=path + [key])
+        else:
+            print_debug("Try to parse element what is not parsable, check your structure: %s" % base)
 
     def _insert_to_test_tree(self, path_list, test):
         """
@@ -331,13 +365,14 @@ class MetadataLoaderMTF(MetadataLoader):
     metadata specific class for MTF (avocado) tests
     """
     try:
-        import moduleframework.tools
-        MTF_LINTER_PATH = os.path.dirname(moduleframework.tools.__file__)
+        import moduleframework.tests
+        MTF_LINTER_PATH = os.path.dirname(moduleframework.tests.__file__)
     except:
         warn("MTF library not installed, linters are ignored")
         MTF_LINTER_PATH = None
     listcmd = "avocado list"
     backends = ["mtf", "avocado"]
+    VALID_TEST_TYPES = ["EXTERNAL", "INSTRUMENTED", "SIMPLE", "PYUNITTEST"]
 
     def _import_tests(self, testglob, pathlenght=0):
         pathglob = testglob if testglob.startswith(os.pathsep) else os.path.join(self.location, testglob)
@@ -361,7 +396,8 @@ class MetadataLoaderMTF(MetadataLoader):
 
     def _import_linters(self):
         if self.MTF_LINTER_PATH:
-            self._import_tests(os.path.join(self.MTF_LINTER_PATH, "*.py"), pathlenght=-3)
+            self._import_tests(os.path.join(self.MTF_LINTER_PATH, "generic", "*.py"), pathlenght=-3)
+            self._import_tests(os.path.join(self.MTF_LINTER_PATH, "static", "*.py"), pathlenght=-3)
 
     def __avcado_tag_args(self, tag_list, defaultparam="--filter-by-tags-include-empty"):
         output = []
@@ -373,10 +409,17 @@ class MetadataLoaderMTF(MetadataLoader):
 
     def filter_tags(self, tests, tag_list):
         output = []
+        test_sources = [x[SOURCE] for x in tests]
+        cmd = process.run("%s %s %s" % (self.listcmd, self.__avcado_tag_args(tag_list), " ".join(test_sources)))
+        testlist = []
+        for line in cmd.stdout.splitlines():
+            splittedline = line.split(" ", 1)
+            if splittedline[0].strip() in self.VALID_TEST_TYPES:
+                testlist.append(splittedline[1].strip())
+            else:
+                warn("NOT A TEST (may cause error when schedule): %s" % splittedline)
         for test in tests:
-            cmd = process.run("%s %s %s" % (self.listcmd, self.__avcado_tag_args(tag_list), test[SOURCE]),
-                              shell=True, verbose=False)
-            if len(cmd.stdout) > 10:
+            if test[SOURCE] in testlist:
                 output.append(test)
         return output
 

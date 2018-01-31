@@ -25,6 +25,7 @@ import socket
 from avocado import main
 from avocado.core import exceptions
 from moduleframework import module_framework
+from moduleframework import common
 import time
 
 
@@ -37,14 +38,11 @@ class SanityCheck1(module_framework.AvocadoTest):
         self.start()
         time.sleep(5)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(('localhost', self.getConfig()['service']['port']))
+        s.connect((self.ip_address, self.getConfig()['service']['port']))
         s.sendall('set Test 0 100 4\r\n\n')
-        #data = s.recv(1024)
-        # print data
-
-        s.sendall('get Test\r\n')
-        #data = s.recv(1024)
-        # print data
+        s.sendall('JournalDev\r\n\n')
+        data = s.recv(1024)
+        common.print_info(data)
         s.close()
 
     def test2(self):

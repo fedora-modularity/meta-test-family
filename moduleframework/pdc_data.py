@@ -41,7 +41,7 @@ from timeoutlib import Retry
 try:
     from odcs.client.odcs import ODCS, AuthMech
 except:
-    print_info("ODCS  library cannot be imported. ODCS is not supported")
+    print_debug("ODCS  library cannot be imported. ODCS is not supported")
 
 
 PDC_SERVER = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
