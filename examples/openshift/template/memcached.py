@@ -44,10 +44,6 @@ class SanityMemcached(module_framework.AvocadoTest):
         session.expect('STORED')
         session.close()
 
-    def test_memcached_bin_exists(self):
-        self.start()
-        time.sleep(1)
-        self.run("ls /usr/bin/memcached")
 
 if __name__ == '__main__':
     main()

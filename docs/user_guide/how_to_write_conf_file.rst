@@ -43,6 +43,10 @@ An example of module types specification:
 
     default_module: docker
     module:
+        openshift:
+            template: ./memcached.yaml
+            docker_pull: True
+            container: docker.io/modularitycontainers/memcached
         docker:
             setup: "docker run -it -e CACHE_SIZE=128 -p 11211:11211"
             cleanup:"echo Cleanup magic"
@@ -62,16 +66,18 @@ An example of module types specification:
             parent: docker
             start: "docker run -it -p 11211:11211"
 * **default_module**, if specified, sets the default tested module type
-* **setup** runs setup commands on a host machine, not in container, and prepares the environemt for tests, for example changes selinux policy or hostname
+* **setup** runs setup commands on a host machine, not in container, and prepares the environment for tests, for example changes selinux policy or hostname
 * **cleanup**: similar to setup but done after test finished
 * **start** defines how to start module service if there is any
 * **stop**  defines how to stop module service if there is any
 * **status** defines how to check the status of module service if there is any
 * **labels** contains docker labels to check if there is any
 * **url** contains link to a container or repo (same meaning as container or repo)
-* **container** contains a link to a container (docker.io or local tar.gz file) (obsolote)
-* **repo** is used when **compose-url** is not set and contains a repo to be used for rpm module type testing (obsolote)
+* **container** contains a link to a container (docker.io or local tar.gz file) (obsolete)
+* **repo** is used when **compose-url** is not set and contains a repo to be used for rpm module type testing (obsolete)
 * **parent** if you would like to have more configs for same module type, it is possible to do it via inheritance. There will be used parent module + overwritten values with this one, you can rewrite whatever you want. You have to set parent (base) module type allowed are just **rpm/docker**
+* **template** contains a link to a OpenShift template. The template is added into OpenShift resources, like template and new application is created based on the template. If `template` is not specified, then new application is created based on container link, by command `oc new-app ...`
+* **docker_pull** specifies if image is pulled by command `docker pull` or not before adding to an OpenShift registry. Turning off does not overwrite your local image.
 
 Multiline Bash snippet tests
 -----------------------------

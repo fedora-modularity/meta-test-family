@@ -38,6 +38,7 @@ import random
 import string
 import requests
 import warnings
+import ast
 from avocado.utils import process
 from moduleframework.mtfexceptions import ModuleFrameworkException, ConfigExc, CmdExc
 
@@ -470,6 +471,20 @@ class CommonFunctions(object):
         :return: str
         """
         return self.info.get("template")
+
+    def get_docker_pull(self):
+        """
+        Gets boolean value if image should be pulled or not.
+        :return: bool
+        """
+        docker_pull = self.info.get("docker_pull")
+        print_debug(docker_pull)
+        if docker_pull is None:
+            return True
+        try:
+            return ast.literal_eval(docker_pull)
+        except ValueError:
+            return False
 
     def getArch(self):
         """

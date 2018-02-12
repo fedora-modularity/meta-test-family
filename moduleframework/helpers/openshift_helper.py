@@ -73,6 +73,7 @@ class OpenShiftHelper(ContainerHelper):
         docker_registry = self.runHost('oc get svc -n default %s -o json' % common.OPENSHIFT_DOCKER_REGISTRY,
                                        ignore_status=True).stdout
         try:
+            docker_registry = json.loads(docker_registry)
             openshift_ip_register = docker_registry.get("spec").get("clusterIP")
         except AttributeError:
             pass
@@ -102,9 +103,17 @@ class OpenShiftHelper(ContainerHelper):
         * tag container name
         * push container name into docker
         """
-        whoami = self.runHost("oc whoami -t", ignore_status=True, verbose=common.is_not_silent()).stdout
+        token = None
+        for i in range(0,5):
+            whoami = self.runHost("oc whoami -t", ignore_status=True, verbose=common.is_not_silent())
+            if whoami.exit_status == 0:
+                token = whoami.stdout.strip()
+                break
+            time.sleep(1)
+
         self._change_openshift_account()
-        self.runHost('docker pull %s' % self.container_name)
+        if self.get_docker_pull():
+            self.runHost('docker pull %s' % self.container_name)
         openshift_ip_register = self._get_openshift_ip_registry()
         self._change_openshift_account(account=common.get_openshift_user(),
                                 password=common.get_openshift_passwd())
@@ -112,8 +121,8 @@ class OpenShiftHelper(ContainerHelper):
         for i in range(0,5):
             docker_login = self.runHost('docker login -u {user} -p {token} {ip}:5000'.format(
                 user=common.get_openshift_user(),
-                token=whoami,
-                ip=openshift_ip_register))
+                token=token,
+                ip=openshift_ip_register), ignore_status=True, verbose=common.is_not_silent())
             if docker_login.exit_status == 0:
                 break
             time.sleep(3)
@@ -123,7 +132,7 @@ class OpenShiftHelper(ContainerHelper):
 
 
         self.runHost('docker tag %s %s' % (self.container_name,
-                                           oc_path))
+                                           oc_path), ignore_status=True)
         self.runHost('docker push %s' % oc_path, ignore_status=True)
 
     def _app_exists(self):
@@ -145,7 +154,7 @@ class OpenShiftHelper(ContainerHelper):
             return False
         return True
 
-    def _check_resource_in_json(self, json_output, resource=common.APP):
+    def _check_resource_in_json(self, json_output, resource='svc'):
         """
         Function checks if json_output contains container with specified name
 
@@ -155,14 +164,13 @@ class OpenShiftHelper(ContainerHelper):
         :return: str if the application exists
                  None if the application does not exist
         """
-        app = None
         try:
             if resource in ['svc', 'dc', 'is', 'pod']:
                 labels = json_output.get('metadata').get('labels')
                 if labels.get('app') == self.app_name:
                     # In metadata dictionary and name is stored pod_name
                     self.pod_id = json_output.get('metadata', {}).get('name')
-                    app = self.pod_id
+                    return self.pod_id
             elif resource == common.TEMPLATE:
                 if json_output.get('metadata').get('name') == self.app_name:
                     return json_output.get('metadata').get('name')
@@ -195,7 +203,6 @@ class OpenShiftHelper(ContainerHelper):
         """
         template_name = self._oc_get_output('template')
         common.print_debug(template_name)
-        return template_name
 
     def _oc_get_output(self, resource):
         """
@@ -430,7 +437,7 @@ class OpenShiftHelper(ContainerHelper):
             common.print_debug(self.template)
             self._change_openshift_account(account=common.get_openshift_user(),
                                            password=common.get_openshift_passwd())
-            self._remove_apps_from_openshift_namespaces('template')
+            self._remove_apps_from_openshift_resources(common.TEMPLATE)
             if not self._create_app_by_template():
                 return False
         # Verify application is really deploy and prepared for testing.
