@@ -58,24 +58,32 @@ class OpenShiftHelper(ContainerHelper):
         # application name is taken from docker.io/modularitycontainer/memcached
         self.app_name = self.container_name.split('/')[-1]
         self.app_ip = None
-        self.project_name = "%s-%s" % (''.join(random.choice(string.lowercase) for _ in range(3)), self.app_name)
+        random_str = ''.join(random.choice(string.lowercase) for _ in range(3))
+        self.project_name = "{project}-{random_str}".format(project=self.app_name,
+                                                            random_str=random_str)
         common.print_debug(self.icontainer, self.app_name)
 
     def _get_openshift_ip_registry(self):
+        """
+        Function returns an IP of OpenShift registry.
+        Command which is used for getting this info is `oc get svc -n default docker-registry`
+        :return: str or None
+        """
         openshift_ip_register = None
-        docker_registry = self.runHost('oc get svc -n default -o json', ignore_status=True).stdout
-        docker_registry = self._convert_string_to_json(docker_registry)
-        for reg in docker_registry:
-            try:
-                name = reg.get("metadata").get("name")
-                if name == common.OPENSHIFT_DOCKER_REGISTER:
-                    openshift_ip_register = reg.get("spec").get("clusterIP")
-            except AttributeError:
-                pass
-
+        docker_registry = self.runHost('oc get svc -n default %s -o json' % common.OPENSHIFT_DOCKER_REGISTRY,
+                                       ignore_status=True).stdout
+        try:
+            openshift_ip_register = docker_registry.get("spec").get("clusterIP")
+        except AttributeError:
+            pass
         return openshift_ip_register
 
     def _change_openshift_account(self, account="system:admin", password=None):
+        """
+        Function switches to specific account inside OpenShift environment
+        :param account: Either user specified account or 'system:admin'
+        :param password: Either user specified account
+        """
         if password is None:
             s = self.runHost("oc login -u %s" % account, verbose=common.is_not_silent())
         else:
@@ -83,6 +91,17 @@ class OpenShiftHelper(ContainerHelper):
 
 
     def _register_docker_to_openshift_register(self):
+        """
+        Function registers an OpenShift docker-registry into docker
+        Commands which are use are in this order
+        * oc whoami -t
+        * switch to OpenShift system:admin account
+        * gets an IP of OpenShift registry
+        * switch to user defined OpenShift user and password.
+        * runs docker login with token and IP:5000
+        * tag container name
+        * push container name into docker
+        """
         whoami = self.runHost("oc whoami -t", ignore_status=True, verbose=common.is_not_silent()).stdout
         self._change_openshift_account()
         self.runHost('docker pull %s' % self.container_name)
@@ -91,7 +110,10 @@ class OpenShiftHelper(ContainerHelper):
                                 password=common.get_openshift_passwd())
 
         for i in range(0,5):
-            docker_login = self.runHost('docker login -u developer -p %s %s:5000' % (whoami, openshift_ip_register))
+            docker_login = self.runHost('docker login -u {user} -p {token} {ip}:5000'.format(
+                user=common.get_openshift_user(),
+                token=whoami,
+                ip=openshift_ip_register))
             if docker_login.exit_status == 0:
                 break
             time.sleep(3)
@@ -114,56 +136,45 @@ class OpenShiftHelper(ContainerHelper):
         if int(oc_status.exit_status) == 0:
             common.print_info("Application already exists.")
             return True
-        oc_services = self._oc_get_output('pods')
+        oc_pods = self._oc_get_output('pods')
         # Check if 'items' in json output is empty or not
-        if not oc_services:
+        if not oc_pods:
             return False
         # check if 'items', which is not empty, in json output contains app_name
-        if not self._check_app_in_json(oc_services):
+        if not self._check_resource_in_json(oc_pods):
             return False
         return True
 
-    def _check_app_in_json(self, item, name=None):
+    def _check_resource_in_json(self, json_output, resource=common.APP):
         """
         Function checks if json_output contains container with specified name
 
 
-        :param json_output: json output from an OpenShift command
-        :return: True if the application exists
-                 False if the application does not exist
+        :param json_output: an output from an OpenShift command
+        :param resource: an resource which is checked in an OpenShift environment
+        :return: str if the application exists
+                 None if the application does not exist
         """
+        app = None
         try:
-            try:
-                labels = item.get('metadata').get('labels')
+            if resource in ['svc', 'dc', 'is', 'pod']:
+                labels = json_output.get('metadata').get('labels')
                 if labels.get('app') == self.app_name:
                     # In metadata dictionary and name is stored pod_name
-                    self.pod_id = item.get('metadata', {}).get('name')
-                    return True
-            except AttributeError:
-                return False
-        except KeyError:
-            return False
-
-    def _check_template_in_json(self, item):
-        """
-        Function checks if json_output contains container with specified name
-
-
-        :param json_output: json output from an OpenShift command
-        :return: True if the application exists
-                 False if the application does not exist
-        """
-        try:
-            try:
-                if item.get('kind') == "Template":
-                    if item.get('metadata').get('name') == self.app_name:
-                        return True
-                else:
-                    return False
-            except AttributeError:
-                return False
-        except KeyError:
-            return False
+                    self.pod_id = json_output.get('metadata', {}).get('name')
+                    app = self.pod_id
+            elif resource == common.TEMPLATE:
+                if json_output.get('metadata').get('name') == self.app_name:
+                    return json_output.get('metadata').get('name')
+            elif resource == common.PROJECT:
+                for prj in json_output:
+                    name = prj.get('metadata').get('name')
+                    if self.app_name in name:
+                        return name
+            else:
+                return None
+        except (KeyError, AttributeError) as ex:
+            return None
 
     def _convert_string_to_json(self, inp_string):
         """
@@ -178,54 +189,57 @@ class OpenShiftHelper(ContainerHelper):
             return None
 
     def _get_openshift_template(self):
+        """
+        Function returns template name from OpenShift environment
+        :return: dictionary
+        """
         template_name = self._oc_get_output('template')
         common.print_debug(template_name)
+        return template_name
 
-    def _oc_get_output(self, namespace):
+    def _oc_get_output(self, resource):
         """
         Function returns json output for specific namespace
-        :param namespace:
-        :return:
+        :param resource:
+        :return: dict ['item'] from JSON output for specific resource
         """
         # Check status of svc/dc/is
-        oc_get = self.runHost("oc get %s -o json" % namespace, ignore_status=True).stdout
+        oc_get = self.runHost("oc get %s -o json" % resource, ignore_status=True).stdout
         oc_get = self._convert_string_to_json(oc_get)
         return oc_get
 
-    def _remove_apps_from_openshift_namespaces(self, oc_service="svc"):
+    def _oc_delete(self, resource, name):
         """
-        It removes an application from specific "namespace" like svc, dc, is.
+        Function removes a resource with given name from OpenShift environment
+        :param resource: a name of resource
+        :param name: a name in given resource
+        :return: return value from oc delete command
+        """
+
+        oc_delete = self.runHost("oc delete %s %s" % (resource, name),
+                                 ignore_status=True,
+                                 verbose=common.is_not_silent())
+        return oc_delete.exit_status
+
+    def _remove_apps_from_openshift_resources(self, oc_service="svc"):
+        """
+        It removes an application from specific "resource" like svc, dc, is.
         :param oc_service: Service from which we would like to remove application
         """
         oc_get = self._oc_get_output(oc_service)
         for item in oc_get:
-            if oc_service == common.TEMPLATE:
-                if self._check_template_in_json(item):
-                    # If application exists in svc / dc / is namespace, then remove it
-                    oc_delete = self.runHost("oc delete %s %s" % (oc_service, self.app_name),
-                                             ignore_status=True,
-                                             verbose=common.is_not_silent())
-            elif oc_service == common.PROJECT:
-                if self._check_app_in_json(item):
-                    # If application exists in svc / dc / is namespace, then remove it
-                    oc_delete = self.runHost("oc delete %s %s" % (oc_service, self.app_name),
-                                             ignore_status=True,
-                                             verbose=common.is_not_silent())
-            else:
-                if self._get_project_name(item):
-                    # If application exists in svc / dc / is namespace, then remove it
-                    oc_delete = self.runHost("oc delete %s %s" % (oc_service, self.project_name),
-                                             ignore_status=True,
-                                             verbose=common.is_not_silent())
+            # If application exists in svc / dc / is resource, then remove it
+            if self._check_resource_in_json(item, resource=oc_service):
+                self._oc_delete(oc_service, self.app_name)
 
     def _app_remove(self):
         """
-        Function removes an application from all OpenShift namespaces like 'svc', 'dc', 'is'
+        Function removes an application from all OpenShift resources like 'svc', 'dc', 'is'
         """
         if self._app_exists():
             # TODO get info from oc status and delete relevant svc/dc/is/pods
-            for ns in ['svc', 'dc', 'is', 'pod', 'template']:
-                self._remove_apps_from_openshift_namespaces(ns)
+            for ns in ['svc', 'dc', 'is', 'pod', common.TEMPLATE, common.PROJECT]:
+                self._remove_apps_from_openshift_resources(ns)
 
     def _create_app(self, template=None):
         """
@@ -290,7 +304,7 @@ class OpenShiftHelper(ContainerHelper):
         pod_initiated = False
         for pod in self._oc_get_output('pod'):
             common.print_debug(self.pod_id)
-            if self._check_app_in_json(pod):
+            if self._check_resource_in_json(pod):
                 self._pod_status = pod.get('status').get('phase')
                 if self._pod_status == "Running":
                     pod_initiated = True
@@ -354,15 +368,6 @@ class OpenShiftHelper(ContainerHelper):
         except Exception as e:
             common.print_info(e, "OpenShift application already removed")
             pass
-
-    def _get_project_name(self):
-        project_name = None
-        project = self._oc_get_output('project')
-        for prj in project:
-            name = prj.get('metadata').get('name')
-            if self.app_name in name:
-                return name
-        return project_name
 
     def _get_ip_instance(self):
         """

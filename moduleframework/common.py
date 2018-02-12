@@ -93,7 +93,7 @@ TRUE_VALUES_DICT = ['yes', 'YES', 'yes', 'True', 'true', 'ok', 'OK']
 OPENSHIFT_INIT_WAIT = 50
 STATIC_LINTERS = 'static'
 GENERIC_TEST = 'generic'
-OPENSHIFT_DOCKER_REGISTER = "docker-registry"
+OPENSHIFT_DOCKER_REGISTRY = "docker-registry"
 TEMPLATE = 'template'
 PROJECT = 'project'
 
@@ -460,14 +460,14 @@ class CommonFunctions(object):
         """
         get location of repo(s) or image
 
-        :return:
+        :return: str
         """
         return self.info.get("url")
 
     def get_template(self):
         """
-        get location of template
-        :return:
+        get location of template from config.yaml file
+        :return: str
         """
         return self.info.get("template")
 
