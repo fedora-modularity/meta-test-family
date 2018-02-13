@@ -117,7 +117,10 @@ class DockerfileLinter(object):
         if env_name is None:
             return []
         env_list = self.get_docker_env()
-        return [x for x in env_list if env_name in x]
+        try:
+            return [x for x in env_list if env_name in x]
+        except TypeError:
+            return None
 
     def get_docker_expose(self):
         """

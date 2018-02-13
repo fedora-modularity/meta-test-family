@@ -48,9 +48,10 @@ class DockerfileLinterInContainer(container_avocado_test.ContainerAvocadoTest):
         self.start()
         all_docs = self.run("rpm -qad", verbose=False).stdout
         test_failed = self._file_to_check(all_docs.split('\n'))
+        msg = "Documentation files exist in container. They are installed by Platform or by RUN commands."
         if test_failed:
-            self.log.warn("Documentation files exist in container. They are installed by Platform or by RUN commands.")
-        self.assertTrue(True)
+            self.log.warn(msg)
+        self.assertTrue(True, msg=msg)
 
     def test_installed_docs(self):
         """
@@ -70,7 +71,7 @@ class DockerfileLinterInContainer(container_avocado_test.ContainerAvocadoTest):
             pkg_doc = self.run("rpm -qd %s" % pkg, verbose=False).stdout
             if self._file_to_check(pkg_doc.split('\n')):
                 test_failed = True
-        self.assertFalse(test_failed)
+        self.assertFalse(test_failed, msg="In container are installed some docs.")
 
     def _check_container_files(self, exts, pkg_mgr):
         found_files = False
@@ -120,9 +121,9 @@ class DockerfileLinterInContainer(container_avocado_test.ContainerAvocadoTest):
         # Detect distro in image
         distro = self.run("cat /etc/os-release").stdout
         if 'Fedora' in distro:
-            self.assertFalse(self._dnf_clean_all())
+            self.assertFalse(self._dnf_clean_all(), msg="`dnf clean all` is not present in Dockerfile.")
         else:
-            self.assertFalse(self._yum_clean_all())
+            self.assertFalse(self._yum_clean_all(), msg="`yum clean all` is not present in Dockerfile.")
 
 
 class DockerLint(container_avocado_test.ContainerAvocadoTest):
@@ -141,5 +142,6 @@ class DockerLint(container_avocado_test.ContainerAvocadoTest):
             self.log.info("No labels defined in config to check")
             self.cancel()
         for key in self.getConfigModule()['labels']:
+            print(self.getConfigModule()['labels'][key])
             aaa = self.checkLabel(key, self.getConfigModule()['labels'][key])
-            self.assertTrue(aaa)
+            self.assertTrue(aaa, msg="Label %s is not set properly in modulemd YAML file." % key)
