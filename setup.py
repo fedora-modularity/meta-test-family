@@ -50,7 +50,7 @@ def get_dir(system_path=None, virtual_path=None):
 
 data_files = {}
 
-paths = ['docs', 'examples', 'tests']
+paths = ['docs', 'examples', 'tools']
 
 for path in paths:
     for root, dirs, files in os.walk(path, followlinks=True):
