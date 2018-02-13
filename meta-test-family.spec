@@ -17,17 +17,19 @@ BuildRequires:  python2-devel
 BuildRequires:  python2-setuptools
 Requires:       python2-avocado
 Requires:       python2-avocado-plugins-output-html
-Requires:       python2-netifaces
 Requires:       docker
 Requires:       python2-pdc-client
 Requires:       python2-modulemd
 %if 0%{?fedora}
 Requires:       python2-dockerfile-parse
+Requires:       python2-netifaces
+Requires:       python2-mistune
 %else
 #For EPEL7
 Requires:       python-dockerfile-parse
+Requires:       python-netifaces
+Requires:       python-mistune
 %endif
-Requires:       python2-mistune
 Requires:       python2-odcs-client
 Provides:       modularity-testing-framework = %{version}-%{release}
 Obsoletes:      modularity-testing-framework < 0.5.18-2
