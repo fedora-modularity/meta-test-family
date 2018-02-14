@@ -77,7 +77,7 @@ setup(
     author_email='jscotka@redhat.com',
     url='https://github.com/fedora-modularity/meta-test-family',
     license='GPLv2+',
-    packages=find_packages(exclude=['docs', 'examples', 'tests']),
+    packages=find_packages(exclude=['docs', 'examples', 'tools']),
     include_package_data=True,
     data_files=data_files.items(),
     scripts=[],
