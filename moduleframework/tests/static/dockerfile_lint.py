@@ -31,10 +31,10 @@ class DockerInstructionsTests(module_framework.AvocadoTest):
         self.assertTrue(self.dp.check_chained_run_dnf_commands(), msg="dnf/yum commands are not chained.")
 
     def test_chained_run_rest_commands(self):
-        self.assertTrue(self.dp.check_chained_run_rest_commands(), msg="rest dnf/yum commands in image are not chained.")
+        self.assertTrue(self.dp.check_chained_run_rest_commands(), msg="RUN instructions are not chained.")
 
     def test_helpmd_is_present(self):
-        self.assert_to_warn(self.assertTrue, self.dp.check_helpmd_is_present(), msg="helpmd is not present for this container.")
+        self.assert_to_warn(self.assertTrue, self.dp.check_helpmd_is_present(), msg="Help file is not present for this container.")
 
 
 class DockerLabelsTests(DockerInstructionsTests):

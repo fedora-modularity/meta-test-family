@@ -67,11 +67,13 @@ class DockerfileLinterInContainer(container_avocado_test.ContainerAvocadoTest):
         defined_pkgs = self.backend.getPackageList()
         list_pkg = set(installed_pkgs).intersection(set(defined_pkgs))
         test_failed = False
+        docu_pkg = []
         for pkg in list_pkg:
             pkg_doc = self.run("rpm -qd %s" % pkg, verbose=False).stdout
             if self._file_to_check(pkg_doc.split('\n')):
+                docu_pkg.append(pkg)
                 test_failed = True
-        self.assertFalse(test_failed, msg="In container are installed some docs.")
+        self.assertFalse(test_failed, msg="There is documentation installed for packages: %s" % ','.join(docu_pkg))
 
     def _check_container_files(self, exts, pkg_mgr):
         found_files = False
