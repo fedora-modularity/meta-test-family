@@ -33,6 +33,9 @@ class DockerInstructionsTests(module_framework.AvocadoTest):
     def test_chained_run_rest_commands(self):
         self.assertTrue(self.dp.check_chained_run_rest_commands())
 
+    def test_copy_files_exist(self):
+        self.assertTrue(self.dp.check_copy_files_exist())
+
     def test_helpmd_is_present(self):
         self.assert_to_warn(self.assertTrue, self.dp.check_helpmd_is_present())
 

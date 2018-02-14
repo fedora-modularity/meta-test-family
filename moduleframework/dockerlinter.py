@@ -1,5 +1,6 @@
 import re
 import ast
+import os
 
 from dockerfile_parse import DockerfileParser
 from moduleframework.common import get_docker_file, print_info
@@ -244,18 +245,40 @@ class DockerfileLinter(object):
                         return True
         return False
 
+    def _get_copy_add_files(self):
+        """
+        Function gets all COPY and ADD files from Dockerfile into list.
+        It contains only source files not target files
+        :return: list
+        """
+        files = []
+        for instruction in [COPY, ADD]:
+            try:
+                # Get only source files, not the target
+                files.extend([x for x in self.docker_dict[instruction] if not x.startswith('/')])
+            except KeyError:
+                print_info("Instruction %s is not present in Dockerfile", instruction)
+        return files
+
     def check_helpmd_is_present(self):
         """
         Function checks if helpmd. is present in COPY or ADD directives
         :return: True if help.md is present
                  False if help.md is not specified in Dockerfile
         """
-        helpmd_present = False
-        for instruction in [COPY, ADD]:
-            try:
-                helpmd = [help for help in self.docker_dict[instruction] if "help.md" in help]
-                if helpmd:
-                    helpmd_present = True
-            except KeyError:
-                print_info("Instruction %s is not present in Dockerfile", instruction)
-        return helpmd_present
+        files = self._get_copy_add_files()
+        return [help for help in files if "help.md" in help]
+
+    def check_copy_files_exist(self):
+        """
+        Function checks if COPY instructions contain files which really exist
+        :return: True if all files/directories exist
+                 False otherwise
+        """
+        dir_name = os.path.abspath(os.path.dirname(self.dockerfile))
+        files = self._get_copy_add_files()
+        f_exists = False
+        for f in files:
+            if os.path.exists(os.path.join(dir_name, f)):
+                f_exists = True
+        return f_exists
