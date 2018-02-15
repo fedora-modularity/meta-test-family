@@ -42,7 +42,7 @@ class HelpFileSanity(module_framework.AvocadoTest):
         self.helpmd = helpfile_linter.HelpMDLinter()
         self.dp = dockerlinter.DockerfileLinter()
         if self.helpmd.help_md is None or self.dp.dockerfile is None:
-            self.skip("HelpMD or Docker file was not found")
+            self.skip("Help file or Dockerfile was not found")
 
     def tearDown(self, *args, **kwargs):
         pass
@@ -54,13 +54,13 @@ class HelpFileSanity(module_framework.AvocadoTest):
         container_name = self.dp.get_docker_specific_env("NAME=")
         if container_name:
             self.assertTrue(self.helpmd.get_image_name(container_name[0].split('=')[1]),
-                            msg="%s . Format is like %% MEMCACHED(1)" % self._get_msg("Image name"))
+                            msg="%s The correct format is %% MEMCACHED(1)" % self._get_msg("Image name"))
 
     def test_helpmd_maintainer_name(self):
         maintainer_name = self.dp.get_specific_label("maintainer")
         if maintainer_name:
             self.assertTrue(self.helpmd.get_maintainer_name(maintainer_name[0]),
-                            msg="%s Format is like '%% User Name'. Or you have a typo in help file." % self._get_msg("maintainer"))
+                            msg="%s The correct format is '%% User Name'. Or you have a typo in the help file." % self._get_msg("maintainer"))
 
     def test_helpmd_name(self):
         self.assertTrue(self.helpmd.get_tag("NAME"),
