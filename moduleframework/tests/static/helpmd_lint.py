@@ -42,36 +42,43 @@ class HelpFileSanity(module_framework.AvocadoTest):
         self.helpmd = helpfile_linter.HelpMDLinter()
         self.dp = dockerlinter.DockerfileLinter()
         if self.helpmd.help_md is None or self.dp.dockerfile is None:
-            self.skip("HelpMD or Docker file was not found")
+            self.skip("Help file or Dockerfile was not found")
 
     def tearDown(self, *args, **kwargs):
         pass
 
-    def test_helpmd_exists(self):
-        self.assertTrue(self.helpmd)
+    def _get_msg(self, msg):
+        return msg + " is missing in help file."
 
     def test_helpmd_image_name(self):
         container_name = self.dp.get_docker_specific_env("NAME=")
         if container_name:
-            self.assertTrue(self.helpmd.get_image_name(container_name[0].split('=')[1]))
+            self.assertTrue(self.helpmd.get_image_name(container_name[0].split('=')[1]),
+                            msg="%s The correct format is %% MEMCACHED(1)" % self._get_msg("Image name"))
 
     def test_helpmd_maintainer_name(self):
         maintainer_name = self.dp.get_specific_label("maintainer")
         if maintainer_name:
-            self.assertTrue(self.helpmd.get_maintainer_name(maintainer_name[0]))
+            self.assertTrue(self.helpmd.get_maintainer_name(maintainer_name[0]),
+                            msg="%s The correct format is '%% User Name'. Or you have a typo in the help file." % self._get_msg("maintainer"))
 
     def test_helpmd_name(self):
-        self.assertTrue(self.helpmd.get_tag("NAME"))
+        self.assertTrue(self.helpmd.get_tag("NAME"),
+                        msg=self._get_msg("NAME section"))
 
     def test_helpmd_description(self):
-        self.assertTrue(self.helpmd.get_tag("DESCRIPTION"))
+        self.assertTrue(self.helpmd.get_tag("DESCRIPTION"),
+                        msg=self._get_msg("DESCRIPTION section"))
 
     def test_helpmd_usage(self):
-        self.assertTrue(self.helpmd.get_tag("USAGE"))
+        self.assertTrue(self.helpmd.get_tag("USAGE"),
+                        msg=self._get_msg("USAGE section"))
 
     def test_helpmd_environment_variables(self):
-        self.assert_to_warn(self.assertTrue, self.helpmd.get_tag("ENVIRONMENT VARIABLES"))
+        self.assert_to_warn(self.assertTrue, self.helpmd.get_tag("ENVIRONMENT VARIABLES"),
+                            msg=self._get_msg("ENVIRONMENT VARIABLES section"))
 
     def test_helpmd_security_implications(self):
         if self.dp.get_docker_expose():
-            self.assertTrue(self.helpmd.get_tag("SECURITY IMPLICATIONS"))
+            self.assertTrue(self.helpmd.get_tag("SECURITY IMPLICATIONS"),
+                            msg=self._get_msg("SECURITY IMPLICATIONS section"))
