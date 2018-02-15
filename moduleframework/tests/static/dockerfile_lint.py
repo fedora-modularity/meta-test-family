@@ -57,8 +57,8 @@ class DockerLabelsTests(DockerInstructionsTests):
     def _get_msg(self, label):
         return label + " is missing in Dockerfile."
 
-    def test_architecture_in_env_and_label_exists(self):
-        self.assertTrue(self.dp.get_specific_label("architecture"),msg=self._get_msg("architecture env and label"))
+    def test_architecture_label_exists(self):
+        self.assertTrue(self.dp.get_specific_label("architecture"),msg=self._get_msg("architecture label"))
 
     def test_name_in_env_and_label_exists(self):
         self.assertTrue(self.dp.get_docker_specific_env("NAME="), msg=self._get_msg("Environment variable NAME"))
