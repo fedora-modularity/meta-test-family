@@ -69,15 +69,15 @@ class OpenShiftHelper(ContainerHelper):
         Command which is used for getting this info is `oc get svc -n default docker-registry`
         :return: str or None
         """
-        openshift_ip_register = None
+        openshift_ip_registry = None
         docker_registry = self.runHost('oc get svc -n default %s -o json' % common.OPENSHIFT_DOCKER_REGISTRY,
                                        ignore_status=True).stdout
         try:
             docker_registry = json.loads(docker_registry)
-            openshift_ip_register = docker_registry.get("spec").get("clusterIP")
+            openshift_ip_registry = docker_registry.get("spec").get("clusterIP")
         except AttributeError:
             pass
-        return openshift_ip_register
+        return openshift_ip_registry
 
     def _change_openshift_account(self, account="system:admin", password=None):
         """
@@ -91,9 +91,9 @@ class OpenShiftHelper(ContainerHelper):
             s = self.runHost("oc login -u %s -p %s" % (account, password), verbose=common.is_not_silent())
 
 
-    def _register_docker_to_openshift_register(self):
+    def _register_docker_to_openshift_registry(self):
         """
-        Function registers an OpenShift docker-registry into docker
+        Function pushes an OpenShift docker-registry into docker
         Commands which are use are in this order
         * oc whoami -t
         * switch to OpenShift system:admin account
@@ -277,7 +277,7 @@ class OpenShiftHelper(ContainerHelper):
         * oc new-app memcached -p APPLICATION_NAME=memcached
         :return:
         """
-        self._register_docker_to_openshift_register()
+        self._register_docker_to_openshift_registry()
         self.runHost('oc get is')
         oc_template_app = self.runHost('oc process -f "%s"' % self.template, verbose=common.is_not_silent())
         self._change_openshift_account()

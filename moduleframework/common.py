@@ -470,7 +470,7 @@ class CommonFunctions(object):
         get location of template from config.yaml file
         :return: str
         """
-        return self.info.get("template")
+        return self.info.get(TEMPLATE)
 
     def get_docker_pull(self):
         """
@@ -478,7 +478,6 @@ class CommonFunctions(object):
         :return: bool
         """
         docker_pull = self.info.get("docker_pull")
-        print_debug(docker_pull)
         if docker_pull is None:
             return True
         try:

@@ -76,8 +76,8 @@ An example of module types specification:
 * **container** contains a link to a container (docker.io or local tar.gz file) (obsolete)
 * **repo** is used when **compose-url** is not set and contains a repo to be used for rpm module type testing (obsolete)
 * **parent** if you would like to have more configs for same module type, it is possible to do it via inheritance. There will be used parent module + overwritten values with this one, you can rewrite whatever you want. You have to set parent (base) module type allowed are just **rpm/docker**
-* **template** contains a link to a OpenShift template. The template is added into OpenShift resources, like template and new application is created based on the template. If `template` is not specified, then new application is created based on container link, by command `oc new-app ...`
-* **docker_pull** specifies if image is pulled by command `docker pull` or not before adding to an OpenShift registry. Turning off does not overwrite your local image.
+* **template** contains an URL link or a path to an OpenShift template. The template is added into OpenShift resources, like template and new application is created based on the template. The `template` is used to deploy your application inside OpenShift using command  `oc new-app ...`
+* **docker_pull** specifies if image is pulled by command `docker pull` or not before adding to an OpenShift registry. Disabling this prevents your local image being overwritten. If it is not present then default value is `True`. You can specify 'True' or 'False'.
 
 Multiline Bash snippet tests
 -----------------------------
