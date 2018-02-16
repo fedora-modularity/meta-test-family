@@ -103,13 +103,7 @@ class OpenShiftHelper(ContainerHelper):
         * tag container name
         * push container name into docker
         """
-        token = None
-        for i in range(0,5):
-            whoami = self.runHost("oc whoami -t", ignore_status=True, verbose=common.is_not_silent())
-            if whoami.exit_status == 0:
-                token = whoami.stdout.strip()
-                break
-            time.sleep(1)
+        whoami = self.runHost("oc whoami -t", ignore_status=True, verbose=common.is_not_silent())
 
         self._change_openshift_account()
         if self.get_docker_pull():
@@ -118,14 +112,10 @@ class OpenShiftHelper(ContainerHelper):
         self._change_openshift_account(account=common.get_openshift_user(),
                                 password=common.get_openshift_passwd())
 
-        for i in range(0,5):
-            docker_login = self.runHost('docker login -u {user} -p {token} {ip}:5000'.format(
-                user=common.get_openshift_user(),
-                token=token,
-                ip=openshift_ip_register), ignore_status=True, verbose=common.is_not_silent())
-            if docker_login.exit_status == 0:
-                break
-            time.sleep(3)
+        docker_login = self.runHost('docker login -u {user} -p {token} {ip}:5000'.format(
+            user=common.get_openshift_user(),
+            token=whoami.stdout.strip(),
+            ip=openshift_ip_register), ignore_status=True, verbose=common.is_not_silent())
         oc_path = "{ip}:5000/{project}/{name}".format(ip=openshift_ip_register,
                                                       name=self.app_name,
                                                       project=self.project_name)
