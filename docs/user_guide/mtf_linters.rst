@@ -1,22 +1,22 @@
 Linters
 =================
 
-MTF provides a set of linters for checking containers and help files
+MTF provides a set of linters for checking containers, help files and dockerfiles.
 
 Dockerfile linters
 ~~~~~~~~~~~~~~~~~~
-Dockerfile linters are divided into two python files, like `dockerlint.py`_ and `dockerfile_lint.py`_.
+Dockerfile linters are divided into two python files: `dockerlint.py`_ and `dockerfile_lint.py`_.
 
 .. _dockerlint.py: https://github.com/fedora-modularity/meta-test-family/blob/master/moduleframework/tests/generic/dockerlint.py
 .. _dockerfile_lint.py: https://github.com/fedora-modularity/meta-test-family/blob/master/moduleframework/tests/static/dockerfile_lint.py
 
-`dockerlint.py`_ contains those checks inside built image:
+`dockerlint.py`_ performs these checks on an existing container image:
 
-* **test_all_nodocs** checks if documentation files exist in image. There are installed in the ``base image`` or by ``RUN`` commands." . This is only ``WARN`` check.
-* **test_installed_docs** checks if packages installed by ``RUN dnf`` command installs also documentation files.
+* **test_all_nodocs** checks if documentation files shipped by an install RPM packages. There are installed in the ``base image`` or by ``RUN`` commands." . This is only ``WARN`` check.
+* **test_installed_docs** checks if RPM packages installed by ``RUN dnf`` command installs also documentation files. Except ``base image``.
 * **test_clean_all** checks if ``dnf/yum clean all`` is present in Dockerfile.
 
-`dockerfile_lint.py`_ contains those checks in Dockerfile file:
+`dockerfile_lint.py`_ these checks are performed on a Dockerfile:
 
 * **test_from_is_first_directive** checks if FROM instruction is really first in Dockerfile.
 * **test_from_directive_is_valid** checks if FROM instruction has proper format.
