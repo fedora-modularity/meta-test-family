@@ -12,8 +12,8 @@ Dockerfile linters are divided into two python files: `dockerlint.py`_ and `dock
 
 `dockerlint.py`_ performs these checks on an existing container image:
 
-* **test_all_nodocs** checks if documentation files shipped by an install RPM packages. There are installed by the ``base image`` or by the ``RUN`` commands." . This is only ``WARN`` check.
-* **test_installed_docs** checks if RPM packages installed by the ``RUN dnf`` command also installs documentation files. The ``base image`` is an exception.
+* **test_all_nodocs** checks if documentation files shipped by installed RPM packages have been removed. They are usually installed in the ``base image`` and inherited by child layer or installed via the ``RUN`` instruction. This is only ``WARN`` check.
+* **test_installed_docs** checks if RPM packages installed by the ``RUN dnf`` command also install documentation files. The ``base image`` is an exception.
 * **test_clean_all** checks if ``dnf/yum clean all`` is present in Dockerfile.
 
 `dockerfile_lint.py`_ these checks are performed on a Dockerfile:
