@@ -38,6 +38,7 @@ import random
 import string
 import requests
 import warnings
+import ast
 from avocado.utils import process
 from moduleframework.mtfexceptions import ModuleFrameworkException, ConfigExc, CmdExc
 
@@ -93,6 +94,9 @@ TRUE_VALUES_DICT = ['yes', 'YES', 'yes', 'True', 'true', 'ok', 'OK']
 OPENSHIFT_INIT_WAIT = 50
 STATIC_LINTERS = 'static'
 GENERIC_TEST = 'generic'
+OPENSHIFT_DOCKER_REGISTRY = "docker-registry"
+TEMPLATE = 'template'
+PROJECT = 'project'
 
 def generate_unique_name(size=10):
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(size))
@@ -457,9 +461,29 @@ class CommonFunctions(object):
         """
         get location of repo(s) or image
 
-        :return:
+        :return: str
         """
         return self.info.get("url")
+
+    def get_template(self):
+        """
+        get location of template from config.yaml file
+        :return: str
+        """
+        return self.info.get(TEMPLATE)
+
+    def get_docker_pull(self):
+        """
+        Gets boolean value if image should be pulled or not.
+        :return: bool
+        """
+        docker_pull = self.info.get("docker_pull")
+        if docker_pull is None:
+            return True
+        try:
+            return ast.literal_eval(docker_pull)
+        except ValueError:
+            return False
 
     def getArch(self):
         """

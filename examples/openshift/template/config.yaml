@@ -5,5 +5,5 @@ service:
     port: 11211
 module:
     openshift:
-        start: oc expose svc memcached
+        template: ./memcached.yaml
         container: docker.io/modularitycontainers/memcached

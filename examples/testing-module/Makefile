@@ -76,10 +76,17 @@ check-memcached-both: prepare-docker prepare-nspawn
 	cd ../memcached; MODULE=docker $(CMD) sanity1.py
 	cd ../memcached; MODULE=nspawn $(CMD) sanity1.py
 
-check-openshift-memcached:
+check-openshift-registry:
 	sudo oc cluster up
-	cd ../openshift-sample; MODULE=openshift DEBUG=yes OPENSHIFT_USER=developer OPENSHIFT_PASSWORD=developer $(CMD) sanity1.py
+	cd ../openshift/registry; MODULE=openshift DEBUG=yes OPENSHIFT_USER=developer OPENSHIFT_PASSWORD=developer $(CMD) sanity1.py
 	sudo oc cluster down
+
+check-openshift-template:
+	sudo oc cluster up
+	cd ../openshift/template; MODULE=openshift DEBUG=yes OPENSHIFT_USER=developer OPENSHIFT_PASSWORD=developer $(CMD) memcached.py
+	sudo oc cluster down
+
+check-openshift: check-openshift-registry check-openshift-template
 
 check-minimal-config-rpm-noenvvar: prepare-nspawn
 	MTF_REMOTE_REPOS= DOCKERFILE= MODULE=nspawn $(CMD) $(TESTS)

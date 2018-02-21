@@ -29,7 +29,6 @@ before_script:
 
 script:
   - sudo make travis
-  - sudo make -C examples/testing-module check-openshift-memcached
   - sudo make -C examples/testing-module check-inheritance
   - sudo make -C examples/testing-module check-default-config
   - sudo make -C examples/testing-module check-pure-docker
@@ -37,8 +36,9 @@ script:
   - sudo make -C examples/testing-module check-test-mtf-bin-modulelint
   - sudo make -C examples/testing-module check-real-rpm-destructive
   - sudo make -C examples/testing-module check-docker-scl-multi-travis
-  #- sudo make -C examples/testing-module check-mtf-pdc-module-info-reader
   - sudo make -C mtf/metadata check
   - sudo make -C examples/testing-module check-mtf-metadata
+  - sudo make -C examples/testing-module check-openshift
+  #- sudo make -C examples/testing-module check-mtf-pdc-module-info-reader
 
 after_script: sudo cat /home/travis/avocado/job-results/latest/job.log
