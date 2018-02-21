@@ -22,14 +22,14 @@ Dockerfile linters are divided into two python files: `dockerlint.py`_ and `dock
 * **test_from_directive_is_valid** checks if the FROM instruction has proper format.
 * **test_chained_run_dnf_commands** checks if dnf/yum commands are chained or not.
 * **test_checked_run_rest_commands** checks if the RUN instructions, except dnf/yum, are chained or not.
-* **test_helpmd_is_present** checks if help file is present for this container.
-* **test_architecture_label_exists** checks if architecture label is present in the Dockerfile.
-* **test_name_in_env_and_label_exists** checks if name label is present in the Dockerfile and NAME is present as ENV variable.
-* **test_maintainer_label_exists** checks if maintainer label is present in the Dockerfile.
-* **test_release_label_exists** checks if release label is present in the Dockerfile.
-* **test_version_label_exists** checks if version label is present in Dockerfile.
-* **test_com_redhat_component_label_exists** checks if com.redhat.component label is present in the Dockerfile.
-* **test_summary_label_exists** checks if summary label is present in the Dockerfile.
+* **test_helpmd_is_present** checks if the help file is present for this container.
+* **test_architecture_label_exists** checks if the architecture label is present in the Dockerfile.
+* **test_name_in_env_and_label_exists** checks if the name label is present in the Dockerfile and NAME is present as ENV variable.
+* **test_maintainer_label_exists** checks if the maintainer label is present in the Dockerfile.
+* **test_release_label_exists** checks if the release label is present in the Dockerfile.
+* **test_version_label_exists** checks if the version label is present in Dockerfile.
+* **test_com_redhat_component_label_exists** checks if the com.redhat.component label is present in the Dockerfile.
+* **test_summary_label_exists** checks if the summary label is present in the Dockerfile.
 * **test_run_or_usage_label_exists** check if the run or usage label is present in the Dockerfile.
 
 Help file linter
