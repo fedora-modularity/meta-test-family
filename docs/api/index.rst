@@ -16,7 +16,6 @@ This section contains the MTF API, auto generated from `the source code`_.
    dockerlinter
    bashhelper
    timeoutlib
-   version
 
 .. seealso::
 

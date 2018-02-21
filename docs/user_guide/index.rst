@@ -94,10 +94,8 @@ Contents:
    how_to_write_conf_file
    environment_setup
    environment_variables
-   #bash_tests
-   #python_tests
    scheduling
-   #general-reference
+   mtf_linters
    glossary
    troubleshooting
 

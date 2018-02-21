@@ -37,6 +37,8 @@ Content
 
    installation
    user_guide/index
+   how_to_schedule
+   levels
    contributing
    api/index
    license
