@@ -33,6 +33,9 @@ class DockerInstructionsTests(module_framework.AvocadoTest):
     def test_chained_run_rest_commands(self):
         self.assertTrue(self.dp.check_chained_run_rest_commands(), msg="RUN instructions are not chained.")
 
+    def test_copy_files_exist(self):
+        self.assertTrue(self.dp.check_copy_files_exist(), msg="Some files in the COPY or ADD instruction do not exist.")
+
     def test_helpmd_is_present(self):
         self.assert_to_warn(self.assertTrue, self.dp.check_helpmd_is_present(), msg="Help file is not present for this container.")
 

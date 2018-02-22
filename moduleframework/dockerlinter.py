@@ -1,5 +1,7 @@
 import re
 import ast
+import os
+import glob
 
 from dockerfile_parse import DockerfileParser
 from moduleframework.common import get_docker_file, print_info
@@ -247,18 +249,48 @@ class DockerfileLinter(object):
                         return True
         return False
 
+    def _get_copy_add_files(self, dirname):
+        """
+        Function gets all COPY and ADD files from Dockerfile into list.
+        It contains only source files not target files
+        :param dirname: Dirname where we look for COPY and ADD files.
+        :return: list
+        """
+        files = []
+        for instruction in [COPY, ADD]:
+            try:
+                # Get only source files, not the target
+                for x in self.docker_dict[instruction]:
+                    if not x.startswith('/'):
+                        files.extend(glob.glob(os.path.join(dirname, x)))
+            except KeyError:
+                print_info("Instruction %s is not present in Dockerfile" % instruction)
+        return files
+
     def check_helpmd_is_present(self):
         """
         Function checks if helpmd. is present in COPY or ADD directives
         :return: True if help.md is present
                  False if help.md is not specified in Dockerfile
         """
-        helpmd_present = False
-        for instruction in [COPY, ADD]:
-            try:
-                helpmd = [help for help in self.docker_dict[instruction] if "help.md" in help]
-                if helpmd:
-                    helpmd_present = True
-            except KeyError:
-                print_info("Instruction %s is not present in Dockerfile", instruction)
-        return helpmd_present
+        files = self._get_copy_add_files(os.path.dirname(self.dockerfile))
+        return [help for help in files if "help.md" in help]
+
+    def check_copy_files_exist(self):
+        """
+        Function checks if COPY instructions contain files which really exist
+        :return: True if all files/directories exist
+                 False otherwise
+        """
+        dir_name = os.getcwd()
+        files = self._get_copy_add_files(os.path.dirname(self.dockerfile))
+        f_exists = False
+        for f in files:
+            if f.startswith('http'):
+                f_exists = True
+                continue
+            if os.path.exists(os.path.join(dir_name, f)):
+                f_exists = True
+            else:
+                print_info("The file %s does not exist." % f)
+        return f_exists
