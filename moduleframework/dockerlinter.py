@@ -285,6 +285,9 @@ class DockerfileLinter(object):
         for f in files:
             if f.startswith('http'):
                 f_exists = True
+                continue
             if os.path.exists(os.path.join(dir_name, f)):
                 f_exists = True
+            else:
+                print_info("The file %s does not exist." % f)
         return f_exists
