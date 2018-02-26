@@ -258,11 +258,11 @@ class AvocadoStart(object):
             # errors follow after 'normal' output with no delimiter, then with -------
             delimiter = ""
             for testcase in data['tests']:
-                if testcase.get('status') in ['ERROR', 'FAIL']:
+                if testcase.get('status') in ['ERROR', 'FAIL', 'SKIP', 'CANCEL']:
                     common.print_info(delimiter)
                     common.print_info("TEST:   {0}".format(testcase.get('id')))
-                    common.print_info("ERROR:  {0}".format(
-                        testcase.get('fail_reason')))
+                    common.print_info("{0}:  {1}".format(testcase.get('status'),
+                                                         testcase.get('fail_reason')))
                     common.print_info("        {0}".format(
                         testcase.get('logfile')))
                     delimiter = "-------------------------"

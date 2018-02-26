@@ -34,8 +34,8 @@ class ModuleLintSigning(module_framework.AvocadoTest):
     def setUp(self):
         # it is not intended just for docker, but just docker packages are
         # actually properly signed
-        if self.moduleType != "docker":
-            self.skip("Docker specific test")
+        if self.moduleType != "docker" and self.moduleType != "openshift":
+            self.cancel("Docker or OpenShift specific test")
         super(self.__class__, self).setUp()
 
     def test(self):

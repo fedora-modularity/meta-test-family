@@ -19,7 +19,7 @@ class DockerInstructionsTests(module_framework.AvocadoTest):
         # actually properly signed
         self.dp = dockerlinter.DockerfileLinter()
         if self.dp.dockerfile is None:
-            self.skip("Dockerfile was not found")
+            self.cancel("Dockerfile was not found")
 
     def test_from_is_first_directive(self):
         self.assertTrue(self.dp.check_from_is_first(), msg="FROM instruction is not first.")

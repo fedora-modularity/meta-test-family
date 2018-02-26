@@ -42,7 +42,7 @@ class HelpFileSanity(module_framework.AvocadoTest):
         self.helpmd = helpfile_linter.HelpMDLinter()
         self.dp = dockerlinter.DockerfileLinter()
         if self.helpmd.help_md is None or self.dp.dockerfile is None:
-            self.skip("Help file or Dockerfile was not found")
+            self.cancel("Help file or Dockerfile was not found")
 
     def tearDown(self, *args, **kwargs):
         pass
