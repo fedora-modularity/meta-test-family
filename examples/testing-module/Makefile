@@ -120,7 +120,7 @@ check-mtf-pdc-module-info-reader:
 	mtf-pdc-module-info-reader -r $(MODNVR) --commit | grep $(COMMITHASH)
 	mtf-pdc-module-info-reader -r $(MODNVR) | grep 'MODULE=nspawn'
 	mtf-pdc-module-info-reader -r $(MODNVR) | grep 'MODULEMDURL=file:/'
-	mtf-pdc-module-info-reader -r $(MODNVR) | grep 'URL=https://koj'
+	mtf-pdc-module-info-reader -r $(MODNVR) | grep 'URL=http://ftp.fi.muni'
 
 check-mtf-metadata:
 	make -C ../test_metadata_loader test

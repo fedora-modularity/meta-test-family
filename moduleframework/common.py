@@ -417,7 +417,7 @@ class CommonFunctions(object):
         :return: None
         """
         # we have to copy object. because there is just one global object, to improve performance
-        self.config = copy.deepcopy(get_config())
+        self.config = copy.deepcopy(get_config(reload=True))
         self.info = self.config.get("module", {}).get(get_module_type_base())
         # if there is inheritance join both dictionary
         self.info.update(self.config.get("module", {}).get(get_module_type()))
@@ -787,7 +787,7 @@ class CommonFunctions(object):
         return self.run("bash " + dest + parameters, **kwargs)
 
 
-def get_config(fail_without_url=True):
+def get_config(fail_without_url=True, reload=False):
     """
     Read the module's configuration file.
 
@@ -797,7 +797,7 @@ def get_config(fail_without_url=True):
     :return: str
     """
     global __persistent_config
-    if not __persistent_config:
+    if not __persistent_config or reload:
         cfgfile = os.environ.get('CONFIG')
         if cfgfile:
             if os.path.exists(cfgfile):
@@ -809,10 +809,11 @@ def get_config(fail_without_url=True):
             if os.path.exists(cfgfile):
                 print_debug("Using module config file: %s" % cfgfile)
             else:
-                cfgfile = "/usr/share/moduleframework/docs/example-config-minimal.yaml"
-                print_debug("Using default minimal config: %s" % cfgfile)
                 if fail_without_url and not get_url():
                     raise DefaultConfigExc("You have to use URL envvar for testing your images or repos")
+                cfgfile = "/usr/share/moduleframework/docs/example-config-minimal.yaml"
+                print_debug("Using default minimal config: %s" % cfgfile)
+
 
         try:
             with open(cfgfile, 'r') as ymlfile:
