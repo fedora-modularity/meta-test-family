@@ -1,8 +1,8 @@
 %global framework_name moduleframework
 
 Name:           meta-test-family
-Version:        0.8.0
-Release:        1%{?dist}
+Version:        0.8.1
+Release:        0%{?dist}
 Summary:        Tool to test components of a modular Fedora
 
 License:        GPLv2+
@@ -68,6 +68,30 @@ install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
 
 
 %changelog
+* Tue Feb 27 2018 Petr Hracek <phracek@redhat.com> - 0.8.1-1
+- Print into log if file does not exist, so user is informed (phracek@redhat.com)
+- Add http check for ADD instruction and support globs (phracek@redhat.com)
+- Fixes #207 Inform user, why test is cancelled or skipped. (phracek@redhat.com)
+- some articles are missing. (phracek@redhat.com)
+- Update documentation. The other grammar issues. (phracek@redhat.com)
+- Fixes according the other review. (phracek@redhat.com)
+- Couple updates based on PR review. (phracek@redhat.com)
+- Remove workarounds for oc whoami -t and docker login (phracek@redhat.com)
+- Copy more docu updates (phracek@redhat.com)
+- Documentation for MTF linters (phracek@redhat.com)
+- Couple more updates. (phracek@redhat.com)
+- Check only architecture label (phracek@redhat.com)
+- Fixes #198 dockerlinter checks files in COPY instruction (phracek@redhat.com)
+- Fix packaging stuff. (phracek@redhat.com)
+- Add docu about OpenShift template (phracek@redhat.com)
+- Couple string updates based on the PR comments #211 (phracek@redhat.com)
+- Fixes #209 Messages for linter errors (phracek@redhat.com)
+- Fix wrong EPEL7 dependencies (phracek@redhat.com)
+- Fix typo in paths. It is regresion (phracek@redhat.com)
+- Couple updates based on PR comments. (phracek@redhat.com)
+- Add support for openshift templates (phracek@redhat.com)
+- OpenShift template support (phracek@redhat.com)
+
 * Tue Feb 13 2018 Petr "Stone" Hracek <phracek@redhat.com> 0.8.0-1
 - New upstream release (phracek@redhat.com)
 - remove option --static-linters and use tag (phracek@redhat.com)
