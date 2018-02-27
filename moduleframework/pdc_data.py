@@ -44,10 +44,10 @@ except:
     print_debug("ODCS  library cannot be imported. ODCS is not supported")
 
 
-PDC_SERVER = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
+PDC_SERVER = "https://pdc.fedoraproject.org/rest_api/v1/modules"
 ODCS_URL = "https://odcs.fedoraproject.org"
 DEFAULT_MODULE_STREAM = "master"
-BASE_REPO_URL = "https://kojipkgs.fedoraproject.org/compose/latest-Fedora-Modular-{}/compose/Server/{}/os"
+BASE_REPO_URL = "http://ftp.fi.muni.cz/pub/linux/fedora/linux/releases/{}/Workstation/{}/"
 
 def get_module_nsv(name=None, stream=None, version=None):
     name = name or os.environ.get('MODULE_NAME')
@@ -89,18 +89,18 @@ class PDCParserGeneral():
         self.stream = modulensv['stream']
         self.version = modulensv['version']
 
-    def __getDataFromPdc(self):
+    def __getDataFromPdc(self, active=True):
         """
         Internal method, do not use it
 
         :return: None
         """
         if not self.pdcdata:
-            pdc_query = { 'variant_id' : self.name, 'active': True }
+            pdc_query = { 'name' : self.name, 'active': active }
             if self.stream:
-                pdc_query['variant_version'] = self.stream
+                pdc_query['stream'] = self.stream
             if self.version:
-                pdc_query['variant_release'] = self.version
+                pdc_query['version'] = self.version
             @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, error=mtfexceptions.PDCExc("Could not query PDC server"))
             def retry_tmpfunc():
                 # Using develop=True to not authenticate to the server

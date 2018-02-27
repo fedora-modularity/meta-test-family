@@ -32,6 +32,7 @@ import subprocess
 from moduleframework import common
 from mtf.metadata.tmet.filter import filtertests
 from mtf.metadata.tmet import common as metadata_common
+from moduleframework.mtfexceptions import ConfigExc, DefaultConfigExc
 
 
 def mtfparser():
@@ -172,15 +173,20 @@ def cli():
     if args.module:
         # setup also environment
         os.environ['MODULE'] = args.module
-
-    if args.module in common.get_backend_list():
+    if not os.environ.get('URL'):
+        try:
+            common.get_config()
+        except DefaultConfigExc:
+            raise DefaultConfigExc("You have to set URL variable (via URL envar or --url parameter) in case of default config")
+    supported_modules = set(common.get_backend_list() + common.list_modules_from_config())
+    if args.module in supported_modules:
         # for debug purposes, to be sure about module variables or options
         common.print_debug("MODULE={0}, options={1}".format(
             os.environ.get('MODULE'), args.module))
     else:
         # TODO: what to do here? whats the defaults value for MODULE, do I know it?
-        common.print_info("MODULE={0} ; we support {1} \n === expecting your magic, enjoy! === ".format(
-            os.environ.get('MODULE'), common.get_backend_list()))
+        raise ModuleFrameworkException("MODULE={0} ; we support {1}".format(
+            os.environ.get('MODULE'), supported_modules))
 
     common.print_debug("MODULE={0}".format(os.environ.get('MODULE')))
     return args, unknown

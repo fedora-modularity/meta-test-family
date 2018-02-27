@@ -40,7 +40,7 @@ import requests
 import warnings
 import ast
 from avocado.utils import process
-from moduleframework.mtfexceptions import ModuleFrameworkException, ConfigExc, CmdExc
+from moduleframework.mtfexceptions import ModuleFrameworkException, ConfigExc, CmdExc, DefaultConfigExc
 
 defroutedev = netifaces.gateways().get('default').values(
 )[0][1] if netifaces.gateways().get('default') else "lo"
@@ -787,7 +787,7 @@ class CommonFunctions(object):
         return self.run("bash " + dest + parameters, **kwargs)
 
 
-def get_config():
+def get_config(fail_without_url=True):
     """
     Read the module's configuration file.
 
@@ -811,8 +811,8 @@ def get_config():
             else:
                 cfgfile = "/usr/share/moduleframework/docs/example-config-minimal.yaml"
                 print_debug("Using default minimal config: %s" % cfgfile)
-                if not get_url():
-                    raise ModuleFrameworkException("You have to use URL envvar for testing your images or repos")
+                if fail_without_url and not get_url():
+                    raise DefaultConfigExc("You have to use URL envvar for testing your images or repos")
 
         try:
             with open(cfgfile, 'r') as ymlfile:
@@ -846,7 +846,7 @@ def list_modules_from_config():
 
     :return: list
     """
-    modulelist = get_config().get("module").keys()
+    modulelist = get_config(fail_without_url=False).get("module",{}).keys()
     return modulelist
 
 
@@ -867,7 +867,7 @@ def get_module_type():
     :return: str
     """
     amodule = os.environ.get('MODULE')
-    readconfig = get_config()
+    readconfig = get_config(fail_without_url=False)
     if "default_module" in readconfig and readconfig[
         "default_module"] is not None and amodule is None:
         amodule = readconfig["default_module"]
