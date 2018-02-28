@@ -73,6 +73,9 @@ class AvocadoTest(Test):
         except AttributeError:
             raise exceptions.TestDecoratorSkip(*args, **kwargs)
 
+    def skip(self, *args, **kwargs):
+        self.cancel(*args, **kwargs)
+
     def setUp(self):
         """
         Unittest setUp method. It prepares environment for selected module type like NSPAWN, DOCKER, RPM
