@@ -41,7 +41,7 @@ from common import print_info, get_config
 
 class TestGenerator(object):
 
-    def __arguments(self):
+    def _arguments(self):
         parser = argparse.ArgumentParser(
             description="""Tool what generates tests defined in configuration file""",
             epilog="see http://meta-test-family.readthedocs.io for more info"
@@ -56,7 +56,7 @@ class TestGenerator(object):
         """
         The ``tests/generated.py`` file constructor.
         """
-        self.__arguments()
+        self._arguments()
         self.config = get_config()
         self.output = ""
         self.templateClassBefore()

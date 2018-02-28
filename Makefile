@@ -19,6 +19,12 @@ travis:
 	make -C examples/testing-module travis
 	cd examples/linter/tools && PYTHONPATH=${PWD} MODULE=docker mtf -l
 
+check-mtf-default-config-loader:
+	mtf -l && false || true
+	mtf -l --url fedora && false || true
+	mtf -l --url fedora --module docker
+
+
 .PHONY: clean
 
 clean_pip:

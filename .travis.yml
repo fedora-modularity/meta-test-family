@@ -41,9 +41,6 @@ script:
   - sudo make -C examples/testing-module check-openshift
   - sudo make -C examples/testing-module check-mtf-pdc-module-info-reader
   - sudo make -C examples/s2i-python-sample check
-  - sudo make -C examples/s2i-python-sample check-python-3.5
-  - sudo mtf -l && false || true
-  - sudo mtf -l --url fedora && false || true
-  - sudo mtf -l --url fedora --module docker
+  - sudo make check-mtf-default-config-loader
 
 after_script: sudo cat /home/travis/avocado/job-results/latest/job.log
