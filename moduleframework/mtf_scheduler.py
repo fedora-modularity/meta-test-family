@@ -27,6 +27,8 @@ import moduleframework
 import tempfile
 import json
 import glob
+import imp
+import re
 
 import subprocess
 from moduleframework import common
@@ -248,6 +250,60 @@ class AvocadoStart(object):
             rc = cpe.returncode
         return rc
 
+    def _tcinfo(self, testcases, header, logs=True, description=True):
+        """
+        Parse testcases dics and print output for them in nicer format
+        Main purpose is to display docstrings of testcases for failures
+        example:
+            def test_some(something)
+                \"\"\"
+                This is line1.
+                This is line2.
+                :return: None
+                \"\"\"\
+                assert(Fasle)
+        procudes line:    desc -> This is line1. This is line2.
+        :param testcases: dict of testcases
+        :param header: str what to print as header
+        :param logs: boolean if print logs for these testcases (default True)
+        :param description: boolean if print description = docs strings for test class + function
+        :return: None
+        """
+        if testcases:
+            emptydelimiter = ""
+            harddelimiter = "------------------------"
+            common.print_info(emptydelimiter, "{0} {1} {0}".format(harddelimiter, header))
+            for testcase in testcases:
+                tcname = testcase
+                if re.search('^[0-9]+-', testcase.get('id',"")):
+                    tcname = testcase.get('id').split("-", 1)[1]
+                tcnameoutput = tcname
+                splitted = re.search("(.*):(.+)\.(.+)$", tcname)
+                if splitted:
+                    docstrcls = []
+                    docstrtst = []
+                    testfile, classname, fnname = splitted.groups()
+                    try:
+                        testmodule = imp.load_source("test", testfile)
+                        if getattr(testmodule, classname).__doc__:
+                            docstrcls = getattr(testmodule, classname).__doc__.strip().split("\n")
+                        if getattr(getattr(testmodule, classname), fnname).__doc__:
+                            docstrtst = getattr(getattr(testmodule, classname), fnname).__doc__.strip().split("\n")
+                        tcnameoutput = " ".join([x for x in docstrcls + docstrtst if not re.search(":.*:", x)])
+                        # TODO: replace more whitespaces just by one - we should find better solution how to that
+                        tcnameoutput = ' '.join(tcnameoutput.split())
+                    except Exception as e:
+                        common.print_debug("(INFO) Error happen when parsing testcase name ({})".format(tcname), e)
+                        pass
+                common.print_info("TEST {0}:  {1}".format(testcase.get('status'), tcname))
+                if description and tcnameoutput!=tcname and tcnameoutput and tcnameoutput.strip():
+                    common.print_info("     desc -> {0}".format(tcnameoutput))
+                if testcase.get('fail_reason') and testcase.get('fail_reason') != "None":
+                    common.print_info("     reason -> {0}".format(testcase.get('fail_reason')))
+                if logs:
+                    common.print_info("     {0}".format(testcase.get('logfile')))
+                common.print_info(emptydelimiter)
+
     def show_error(self):
         if os.path.exists(self.json_tmppath):
             try:
@@ -261,28 +317,12 @@ class AvocadoStart(object):
                 os.remove(self.json_tmppath)
                 # fatal error when this command fails, its unexpected
                 exit(127)
-            # errors follow after 'normal' output with no delimiter, then with -------
-            emptydelimiter = ""
-            harddelimiter = "------------------------"
             FAILS = ['ERROR', 'FAIL']
             SKIPS = ['SKIP', 'CANCEL']
             skipstatuses = [x for x in data['tests'] if x.get('status') in SKIPS]
             failstatuses = [x for x in data['tests'] if x.get('status') in FAILS]
-            if skipstatuses:
-                common.print_info(emptydelimiter, "{0} SKIPPED TESTS {0}".format(harddelimiter))
-                for testcase in skipstatuses:
-                    common.print_info("TEST {0}:  {1}".format(testcase.get('status'), testcase.get('id')))
-                    if testcase.get('fail_reason') and testcase.get('fail_reason') != "None":
-                        common.print_info("     reason -> {0}".format(testcase.get('fail_reason')))
-                    common.print_info(emptydelimiter)
-            if failstatuses:
-                common.print_info(emptydelimiter, "{0} FAILED TESTS {0}".format(harddelimiter))
-                for testcase in failstatuses:
-                    common.print_info("TEST {0}:  {1}".format(testcase.get('status'), testcase.get('id')))
-                    if testcase.get('fail_reason') and testcase.get('fail_reason') != "None":
-                        common.print_info("     reason -> {0}".format(testcase.get('fail_reason')))
-                    common.print_info("     {0}".format(testcase.get('logfile')))
-                    common.print_info(emptydelimiter)
+            self._tcinfo(skipstatuses, "SKIPPED TESTS", logs=False)
+            self._tcinfo(failstatuses, "FAILED TESTS")
             os.remove(self.json_tmppath)
 
 
