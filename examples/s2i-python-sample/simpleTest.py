@@ -22,6 +22,7 @@
 #
 
 from moduleframework import module_framework
+from moduleframework import common
 import time
 import urllib
 
@@ -30,7 +31,7 @@ class SimpleTests(module_framework.ContainerAvocadoTest):
     """
     :avocado: enable
     """
-    ip_address = module_framework.trans_dict["GUESTIPADDR"]
+    ip_address = common.trans_dict["GUESTIPADDR"]
     port = "8080"
 
     def life_check(self, ip_address=None, port=None, textcheck="Hello from gunicorn WSGI application!"):

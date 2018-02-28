@@ -33,15 +33,31 @@ See `Multiline Bash snippet tests`_ for more information.
 .. _Multiline Bash snippet tests: ../user_guide/how_to_write_conf_file#multiline-bash-snippet-tests
 """
 
-from common import print_info, CommonFunctions
+import os
+import argparse
+from common import print_info, get_config
 
 
-class TestGenerator(CommonFunctions):
+
+class TestGenerator(object):
+
+    def _arguments(self):
+        parser = argparse.ArgumentParser(
+            description="""Tool what generates tests defined in configuration file""",
+            epilog="see http://meta-test-family.readthedocs.io for more info"
+        )
+        parser.add_argument("--config", action="store",
+                           help='defines the module configuration file')
+        args = parser.parse_args()
+        if args.config:
+            os.environ['CONFIG'] = args.config
+
     def __init__(self):
         """
         The ``tests/generated.py`` file constructor.
         """
-        self.loadconfig()
+        self._arguments()
+        self.config = get_config()
         self.output = ""
         self.templateClassBefore()
         if 'test' in self.config:

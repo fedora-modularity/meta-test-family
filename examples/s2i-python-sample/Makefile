@@ -5,7 +5,7 @@ MINIMAL_CONFIG=/usr/share/moduleframework/docs/example-config-minimal.yaml
 prepare:
 	mtf-env-set
 
-check: check-python-2.7
+check: check-python-3.5 check-python-2.7
 
 check-python-2.7: prepare
 	# run modulelint explicitly in examples if you want

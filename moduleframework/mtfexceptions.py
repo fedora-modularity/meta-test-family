@@ -71,6 +71,15 @@ class ConfigExc(ModuleFrameworkException):
     def __init__(self, *args, **kwargs):
         super(ConfigExc, self).__init__('TYPE config', *args, **kwargs)
 
+class DefaultConfigExc(ModuleFrameworkException):
+    """
+    Indicates that MTF tries to use default config, but URL variable is not set
+    It can lead to testing some default artifacts mentioned there for testing purpose
+    like URL=fedora for MODULE=docker
+    """
+    def __init__(self, *args, **kwargs):
+        super(DefaultConfigExc, self).__init__('TYPE config', *args, **kwargs)
+
 
 class PDCExc(ModuleFrameworkException):
     """

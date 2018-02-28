@@ -32,6 +32,7 @@ import subprocess
 from moduleframework import common
 from mtf.metadata.tmet.filter import filtertests
 from mtf.metadata.tmet import common as metadata_common
+from moduleframework.mtfexceptions import ConfigExc, DefaultConfigExc, ModuleFrameworkException
 
 
 def mtfparser():
@@ -172,15 +173,20 @@ def cli():
     if args.module:
         # setup also environment
         os.environ['MODULE'] = args.module
-
-    if args.module in common.get_backend_list():
+    if not os.environ.get('URL'):
+        try:
+            common.get_config(reload=True)
+        except DefaultConfigExc:
+            raise DefaultConfigExc("You have to set URL variable (via URL envar or --url parameter) in case of default config")
+    supported_modules = set(common.get_backend_list() + common.list_modules_from_config())
+    if args.module in supported_modules:
         # for debug purposes, to be sure about module variables or options
         common.print_debug("MODULE={0}, options={1}".format(
             os.environ.get('MODULE'), args.module))
     else:
         # TODO: what to do here? whats the defaults value for MODULE, do I know it?
-        common.print_info("MODULE={0} ; we support {1} \n === expecting your magic, enjoy! === ".format(
-            os.environ.get('MODULE'), common.get_backend_list()))
+        raise ModuleFrameworkException("MODULE={0} ; we support {1}".format(
+            os.environ.get('MODULE'), supported_modules))
 
     common.print_debug("MODULE={0}".format(os.environ.get('MODULE')))
     return args, unknown
@@ -256,16 +262,27 @@ class AvocadoStart(object):
                 # fatal error when this command fails, its unexpected
                 exit(127)
             # errors follow after 'normal' output with no delimiter, then with -------
-            delimiter = ""
-            for testcase in data['tests']:
-                if testcase.get('status') in ['ERROR', 'FAIL', 'SKIP', 'CANCEL']:
-                    common.print_info(delimiter)
-                    common.print_info("TEST:   {0}".format(testcase.get('id')))
-                    common.print_info("{0}:  {1}".format(testcase.get('status'),
-                                                         testcase.get('fail_reason')))
-                    common.print_info("        {0}".format(
-                        testcase.get('logfile')))
-                    delimiter = "-------------------------"
+            emptydelimiter = ""
+            harddelimiter = "------------------------"
+            FAILS = ['ERROR', 'FAIL']
+            SKIPS = ['SKIP', 'CANCEL']
+            skipstatuses = [x for x in data['tests'] if x.get('status') in SKIPS]
+            failstatuses = [x for x in data['tests'] if x.get('status') in FAILS]
+            if skipstatuses:
+                common.print_info(emptydelimiter, "{0} SKIPPED TESTS {0}".format(harddelimiter))
+                for testcase in skipstatuses:
+                    common.print_info("TEST {0}:  {1}".format(testcase.get('status'), testcase.get('id')))
+                    if testcase.get('fail_reason') and testcase.get('fail_reason') != "None":
+                        common.print_info("     reason -> {0}".format(testcase.get('fail_reason')))
+                    common.print_info(emptydelimiter)
+            if failstatuses:
+                common.print_info(emptydelimiter, "{0} FAILED TESTS {0}".format(harddelimiter))
+                for testcase in failstatuses:
+                    common.print_info("TEST {0}:  {1}".format(testcase.get('status'), testcase.get('id')))
+                    if testcase.get('fail_reason') and testcase.get('fail_reason') != "None":
+                        common.print_info("     reason -> {0}".format(testcase.get('fail_reason')))
+                    common.print_info("     {0}".format(testcase.get('logfile')))
+                    common.print_info(emptydelimiter)
             os.remove(self.json_tmppath)
 
 

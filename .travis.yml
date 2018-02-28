@@ -39,6 +39,7 @@ script:
   - sudo make -C mtf/metadata check
   - sudo make -C examples/testing-module check-mtf-metadata
   - sudo make -C examples/testing-module check-openshift
-  #- sudo make -C examples/testing-module check-mtf-pdc-module-info-reader
+  - sudo make -C examples/testing-module check-mtf-pdc-module-info-reader
+  - sudo make check-mtf-default-config-loader
 
-after_script: sudo cat /home/travis/avocado/job-results/latest/job.log
+#after_script: sudo cat /home/travis/avocado/job-results/latest/job.log

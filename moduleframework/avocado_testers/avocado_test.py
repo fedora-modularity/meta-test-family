@@ -64,15 +64,17 @@ class AvocadoTest(Test):
             (self.moduleType, self.moduleType_base, self.moduleProfile))
 
     def __print_breaks(self, message):
-        delimiterStart = '\n::::::::::::::::::::::::'
-        delimiterEnd = '::::::::::::::::::::::::\n'
-        self.log.debug("\n{0} {1} {2}".format(delimiterStart, message, delimiterEnd))
+        delimiter = ':::::::::::::'
+        self.log.debug("\n{0} {1} {0}\n".format(delimiter, message))
 
     def cancel(self, *args, **kwargs):
         try:
             super(AvocadoTest, self).cancel(*args, **kwargs)
         except AttributeError:
             raise exceptions.TestDecoratorSkip(*args, **kwargs)
+
+    def skip(self, *args, **kwargs):
+        self.cancel(*args, **kwargs)
 
     def setUp(self):
         """
@@ -84,7 +86,9 @@ class AvocadoTest(Test):
         :return: None
         """
         self.__print_breaks("SETUP")
-        return self.backend.setUp()
+        out = self.backend.setUp()
+        self.__print_breaks("SETUP FINISHED")
+        return out
 
     def tearDown(self, *args, **kwargs):
         """
@@ -96,7 +100,9 @@ class AvocadoTest(Test):
         :return: None
         """
         self.__print_breaks("TEARDOWN")
-        return self.backend.tearDown(*args, **kwargs)
+        out = self.backend.tearDown(*args, **kwargs)
+        self.__print_breaks("TEARDOWN FINISHED")
+        return out
 
     def start(self, *args, **kwargs):
         """
@@ -107,8 +113,11 @@ class AvocadoTest(Test):
         :param kwargs: Do not use it directly (It is defined in config.yaml)
         :return: None
         """
-        self.__print_breaks("START MODULE")
-        return self.backend.start(*args, **kwargs)
+
+        self.__print_breaks("MODULE START")
+        out = self.backend.start(*args, **kwargs)
+        self.__print_breaks("MODULE STARTED")
+        return out
 
     def stop(self, *args, **kwargs):
         """
@@ -120,8 +129,10 @@ class AvocadoTest(Test):
         :param kwargs: Do not use it directly (It is defined in config.yaml)
         :return: None
         """
-        self.__print_breaks("STOP")
-        return self.backend.stop(*args, **kwargs)
+        self.__print_breaks("MODULE STOP")
+        out = self.backend.stop(*args, **kwargs)
+        self.__print_breaks("MODULE STOPED")
+        return out
 
     def run(self, *args, **kwargs):
         """
@@ -131,7 +142,8 @@ class AvocadoTest(Test):
         :param kwargs: shell, ignore_status, verbose
         :return: object avocado.process.run
         """
-        self.__print_breaks("COMMAND IN MODULE <->")
+        if is_debug():
+            self.__print_breaks("COMMAND IN MODULE <->")
         return self.backend.run(*args, **kwargs)
 
     def runCheckState(self, command="ls /", expected_state=0,
@@ -182,7 +194,8 @@ class AvocadoTest(Test):
         :param kwargs: pass thru
         :return: object of avocado.process.run
         """
-        self.__print_breaks("COMMAND ON HOST <!>")
+        if is_debug():
+            self.__print_breaks("COMMAND ON HOST <!>")
         return self.backend.runHost(*args, **kwargs)
 
     def getModulemdYamlconfig(self, *args, **kwargs):
