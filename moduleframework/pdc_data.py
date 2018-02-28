@@ -297,7 +297,7 @@ def getBasePackageSet(modulesDict=None, isModule=True, isContainer=False):
     # https://pagure.io/fedora-kickstarts/blob/f27/f/fedora-modular-container-base.ks
     BASE_MODULAR_CONTAINER = ["rootfiles", "tar", "vim-minimal", "dnf", "dnf-yum", "sssd-client"]
     # https://pagure.io/fedora-kickstarts/blob/f27/f/fedora-modular-container-common.ks
-    BASE_MODULAR = ["fedora-modular-release", "bash", "coreutils-single", "glibc-minimal-langpack",
+    BASE_MODULAR = ["bash", "coreutils-single", "glibc-minimal-langpack",
                     "libcrypt", "rpm", "shadow-utils", "sssd-client", "util-linux"]
     if isModule:
         if isContainer:

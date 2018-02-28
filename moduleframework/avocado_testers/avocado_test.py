@@ -65,7 +65,7 @@ class AvocadoTest(Test):
 
     def __print_breaks(self, message):
         delimiter = ':::::::::::::'
-        self.log.debug("\n{0} {1}  {2}\n".format(delimiter, message, delimiter))
+        self.log.debug("\n{0} {1} {0}\n".format(delimiter, message))
 
     def cancel(self, *args, **kwargs):
         try:

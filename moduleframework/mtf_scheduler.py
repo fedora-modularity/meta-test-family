@@ -270,19 +270,19 @@ class AvocadoStart(object):
             failstatuses = [x for x in data['tests'] if x.get('status') in FAILS]
             if skipstatuses:
                 common.print_info(emptydelimiter, "{0} SKIPPED TESTS {0}".format(harddelimiter))
-            for testcase in skipstatuses:
-                common.print_info("TEST {0}:  {1}".format(testcase.get('status'), testcase.get('id')))
-                if testcase.get('fail_reason'):
-                    common.print_info("     reason -> {0}".format(testcase.get('fail_reason')))
-                common.print_info(emptydelimiter)
+                for testcase in skipstatuses:
+                    common.print_info("TEST {0}:  {1}".format(testcase.get('status'), testcase.get('id')))
+                    if testcase.get('fail_reason') and testcase.get('fail_reason') != "None":
+                        common.print_info("     reason -> {0}".format(testcase.get('fail_reason')))
+                    common.print_info(emptydelimiter)
             if failstatuses:
                 common.print_info(emptydelimiter, "{0} FAILED TESTS {0}".format(harddelimiter))
-            for testcase in failstatuses:
-                common.print_info("TEST {0}:  {1}".format(testcase.get('status'), testcase.get('id')))
-                if testcase.get('fail_reason'):
-                    common.print_info("     reason -> {0}".format(testcase.get('fail_reason')))
-                common.print_info("     {0}".format(testcase.get('logfile')))
-                common.print_info(emptydelimiter)
+                for testcase in failstatuses:
+                    common.print_info("TEST {0}:  {1}".format(testcase.get('status'), testcase.get('id')))
+                    if testcase.get('fail_reason') and testcase.get('fail_reason') != "None":
+                        common.print_info("     reason -> {0}".format(testcase.get('fail_reason')))
+                    common.print_info("     {0}".format(testcase.get('logfile')))
+                    common.print_info(emptydelimiter)
             os.remove(self.json_tmppath)
 
 

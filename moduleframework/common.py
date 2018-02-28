@@ -80,7 +80,6 @@ trans_dict = {"HOSTIPADDR": hostipaddr,
 
 
 BASEPATHDIR = "/opt"
-PDCURL = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
 REPOMD = "repodata/repomd.xml"
 MODULEFILE = 'tempmodule.yaml'
 # default value of process timeout in seconds
