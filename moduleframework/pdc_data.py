@@ -47,7 +47,7 @@ except:
 PDC_SERVER = "https://pdc.fedoraproject.org/rest_api/v1/modules"
 ODCS_URL = "https://odcs.fedoraproject.org"
 DEFAULT_MODULE_STREAM = "master"
-BASE_REPO_URL = "http://ftp.fi.muni.cz/pub/linux/fedora/linux/releases/{}/Workstation/{}/"
+BASE_REPO_URL = "https://download.fedoraproject.org/pub/fedora/linux/releases/{}/Workstation/{}/os"
 
 def get_module_nsv(name=None, stream=None, version=None):
     name = name or os.environ.get('MODULE_NAME')
