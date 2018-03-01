@@ -1,8 +1,8 @@
 %global framework_name moduleframework
 
 Name:           meta-test-family
-Version:        0.8.1
-Release:        0%{?dist}
+Version:        0.8.2
+Release:        1%{?dist}
 Summary:        Tool to test components of a modular Fedora
 
 License:        GPLv2+
@@ -68,6 +68,19 @@ install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
 
 
 %changelog
+* Thu Mar 01 2018 Petr Hracek <phracek@redhat.com> - 0.8.2-1
+- add example how reason constsructed is used in case of assert (jscotka@redhat.com)
+- print tc info in separate function, to not duplicate code    and print doc string there (jscotka@redhat.com)
+- forgot to change this line, after changing base url (jscotka@redhat.com)
+- change base url repository to use mirror instead of direct link (jscotka@redhat.com)
+- do not cat log at the end, causes travis issue -> failed result (jscotka@redhat.com)
+- remove s2i tests  from travis. unable to run them in travis (jscotka@redhat.com)
+- adapt changes based on PR review in #216 (jscotka@redhat.com)
+- add backward compatibility to skip, to remove this deprecated message (jscotka@redhat.com)
+- add more travis checks that mtf command works as expected in clean env (using default config) (jscotka@redhat.com)
+- Do not show log links in case skip or cancel, it does not make sense (jscotka@redhat.com)
+- fix various issues mentioned in  issue  #201 (jscotka@redhat.com)
+
 * Tue Feb 27 2018 Petr Hracek <phracek@redhat.com> - 0.8.1-1
 - Print into log if file does not exist, so user is informed (phracek@redhat.com)
 - Add http check for ADD instruction and support globs (phracek@redhat.com)
