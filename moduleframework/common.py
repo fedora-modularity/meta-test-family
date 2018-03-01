@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # Meta test family (MTF) is a tool to test components of a modular Fedora:
 # https://docs.pagure.org/modularity/
@@ -24,8 +25,6 @@
 Custom configuration and debugging library.
 """
 
-from __future__ import print_function
-
 import netifaces
 import socket
 import os
@@ -39,8 +38,35 @@ import string
 import requests
 import warnings
 import ast
+from glob import glob
 from avocado.utils import process
-from moduleframework.mtfexceptions import ModuleFrameworkException, ConfigExc, CmdExc, DefaultConfigExc
+from mtfexceptions import ModuleFrameworkException, ConfigExc, CmdExc, DefaultConfigExc
+from core import DATADIR, is_debug, is_not_silent, print_info, print_debug
+
+
+
+class MTFConfParser(dict):
+    configdir = "mtf.conf.d"
+    source_cfg = os.path.join(*(["/"] + DATADIR + [configdir]))
+    default_cfg = os.path.join("/etc", configdir)
+    user_cfg = os.path.expanduser("~/." + configdir)
+    pattern = "*.yaml"
+
+    def __init__(self):
+        config = {}
+        for cfgdir in [self.source_cfg, self.default_cfg, self.user_cfg]:
+            print_debug("MTF config dir search: {}".format(cfgdir))
+            if os.path.exists(cfgdir):
+                print_info("MTF config dir exists, search for {}/{}".format(cfgdir, self.pattern))
+                for cfgfile in glob(os.path.join(cfgdir, self.pattern)):
+                    print_info("MTF config load: {}".format(cfgfile))
+                    config.update(yaml.load(open(cfgfile)))
+        assert config.get("generic")
+        super(MTFConfParser, self).__init__(config)
+
+
+conf = MTFConfParser()
+
 
 defroutedev = netifaces.gateways().get('default').values(
 )[0][1] if netifaces.gateways().get('default') else "lo"
@@ -49,17 +75,8 @@ hostname = socket.gethostname()
 dusername = "test"
 dpassword = "test"
 ddatabase = "basic"
-PACKAGER_COMMAND = "test -e /usr/bin/dnf && echo 'dnf -y'   ||" \
-                   "( test -e /usr/bin/microdnf && echo 'microdnf' ||" \
-                   "( test -e /usr/bin/yum && echo 'yum -y'        ||" \
-                   "echo 'apt-get -y' " \
-                   ") )"
-hostpackager = subprocess.check_output([PACKAGER_COMMAND], shell=True).strip()
+hostpackager = subprocess.check_output([conf["generic"]["packager_cmd"]], shell=True).strip()
 guestpackager = hostpackager
-ARCH = "x86_64"
-DOCKERFILE = "Dockerfile"
-HELP_MD_FILE = "help.md"
-DEFAULT_DIR_OF_DOCKER_RELATED_STUFF = os.path.abspath("../")
 
 __persistent_config = None
 
@@ -74,49 +91,13 @@ trans_dict = {"HOSTIPADDR": hostipaddr,
               "DATABASENAME": ddatabase,
               "HOSTPACKAGER": hostpackager,
               "GUESTPACKAGER": guestpackager,
-              "GUESTARCH": ARCH,
-              "HOSTARCH": ARCH
+              "GUESTARCH": conf["generic"]["arch"],
+              "HOSTARCH": conf["generic"]["arch"]
               }
 
 
-BASEPATHDIR = "/opt"
-REPOMD = "repodata/repomd.xml"
-MODULEFILE = 'tempmodule.yaml'
-# default value of process timeout in seconds
-DEFAULTPROCESSTIMEOUT = 2 * 60
-DEFAULTRETRYCOUNT = 3
-# time in seconds
-DEFAULTRETRYTIMEOUT = 30
-DEFAULTNSPAWNTIMEOUT = 10
-MODULE_DEFAULT_PROFILE = "default"
-TRUE_VALUES_DICT = ['yes', 'YES', 'yes', 'True', 'true', 'ok', 'OK']
-OPENSHIFT_INIT_WAIT = 50
-STATIC_LINTERS = 'static'
-GENERIC_TEST = 'generic'
-OPENSHIFT_DOCKER_REGISTRY = "docker-registry"
-TEMPLATE = 'template'
-PROJECT = 'project'
-
 def generate_unique_name(size=10):
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(size))
-
-
-def is_debug():
-    """
-    Return the **DEBUG** envvar.
-
-    :return: bool
-    """
-    return bool(os.environ.get("DEBUG"))
-
-
-def is_not_silent():
-    """
-    Return the opposite of the **DEBUG** envvar.
-
-    :return: bool
-    """
-    return is_debug()
 
 
 def get_openshift_local():
@@ -132,10 +113,7 @@ def get_openshift_ip():
     Return the **OPENSHIFT_IP** envvar or None.
     :return: OpenShift IP or None
     """
-    try:
-        return os.environ.get('OPENSHIFT_IP')
-    except KeyError:
-        return None
+    return os.environ.get('OPENSHIFT_IP') or conf.get("openshift",{}).get("ip")
 
 
 def get_openshift_user():
@@ -143,10 +121,7 @@ def get_openshift_user():
     Return the **OPENSHIFT_USER** envvar or None.
     :return: OpenShift User or None
     """
-    try:
-        return os.environ.get('OPENSHIFT_USER')
-    except KeyError:
-        return None
+    return os.environ.get('OPENSHIFT_USER') or conf.get("openshift",{}).get("user")
 
 
 def get_openshift_passwd():
@@ -154,43 +129,7 @@ def get_openshift_passwd():
     Return the **OPENSHIFT_PASSWORD** envvar or None.
     :return: OpenShift password or None
     """
-    try:
-        return os.environ.get('OPENSHIFT_PASSWORD')
-    except KeyError:
-        return None
-
-
-def print_info(*args):
-    """
-    Print information from the expected stdout and
-    stderr files from the native test scope.
-
-    See `Test log, stdout and stderr in native Avocado modules
-    <https://avocado-framework.readthedocs.io/en/latest/WritingTests.html
-    #test-log-stdout-and-stderr-in-native-avocado-modules>`_ for more information.
-
-    :param args: object
-    :return: None
-    """
-    for arg in args:
-        print(arg, file=sys.stderr)
-
-
-def print_debug(*args):
-    """
-    Print information from the expected stdout and
-    stderr files from the native test scope if
-    the **DEBUG** envvar is set to True.
-
-    See `Test log, stdout and stderr in native Avocado modules
-    <https://avocado-framework.readthedocs.io/en/latest/WritingTests.html
-    #test-log-stdout-and-stderr-in-native-avocado-modules>`_ for more information.
-
-    :param args: object
-    :return: None
-    """
-    if is_debug():
-        print_info(*args)
+    return os.environ.get('OPENSHIFT_PASSWORD') or conf.get("openshift",{}).get("password")
 
 
 def get_if_install_default_profile():
@@ -242,7 +181,19 @@ def get_if_remoterepos():
     return bool(remote_repos)
 
 
-def get_odcs_auth():
+def get_odcs_envvar():
+    return os.environ.get('MTF_ODCS')
+
+
+def is_true(value):
+    # which values are considered as true
+    true_values = ['yes', 'YES', 'yes', 'True', 'true', 'ok', 'OK']
+    if isinstance(value, str) and value in true_values:
+        return True
+    return False
+
+
+def get_openidc_auth():
     """
     use ODCS for creating composes as URL parameter
     It enables this feature in case MTF_ODCS envvar is set
@@ -252,29 +203,18 @@ def get_odcs_auth():
     :envvar MTF_ODCS: yes or token
     :return:
     """
-    odcstoken = os.environ.get('MTF_ODCS')
+    odcstoken = get_odcs_envvar()
 
     # in case you dont have token enabled, try to ask for openidc via web browser
-    if odcstoken in TRUE_VALUES_DICT:
+    if is_true(odcstoken):
+        if conf.get("openidc").get("token"):
+            # use value defined in config file if defined
+            return conf["openidc"]["token"]
         # to not have hard dependency on openidc (use just when using ODCS without defined token)
         import openidc_client
-        id_provider = 'https://id.fedoraproject.org/openidc/'
         # Get the auth token using the OpenID client.
-        oidc = openidc_client.OpenIDCClient(
-            'odcs',
-            id_provider,
-            {'Token': 'Token', 'Authorization': 'Authorization'},
-            'odcs-authorizer',
-            'notsecret',
-        )
-
-        scopes = [
-            'openid',
-            'https://id.fedoraproject.org/scope/groups',
-            'https://pagure.io/odcs/new-compose',
-            'https://pagure.io/odcs/renew-compose',
-            'https://pagure.io/odcs/delete-compose',
-        ]
+        oidc = openidc_client.OpenIDCClient(*conf["openidc"]["auth"])
+        scopes = conf["openidc"]["scopes"]
         try:
             odcstoken = oidc.get_token(scopes, new_token=True)
         except requests.exceptions.HTTPError as e:
@@ -348,7 +288,7 @@ def get_profile():
     :return: str
     """
 
-    return os.environ.get('PROFILE') or MODULE_DEFAULT_PROFILE
+    return os.environ.get('PROFILE') or conf["modularity"]["default_profile"]
 
 
 def get_url():
@@ -469,7 +409,7 @@ class CommonFunctions(object):
         get location of template from config.yaml file
         :return: str
         """
-        return self.info.get(TEMPLATE)
+        return self.info.get(conf["openshift"]["template"])
 
     def get_docker_pull(self):
         """
@@ -674,7 +614,7 @@ class CommonFunctions(object):
 
     def get_packager(self):
         if not self.packager:
-            self.packager = self.run(PACKAGER_COMMAND, verbose=False).stdout.strip()
+            self.packager = self.run(conf["generic"]["packager_cmd"], verbose=False).stdout.strip()
         return self.packager
 
     def status(self, command="/bin/true"):
@@ -868,9 +808,10 @@ def get_module_type():
     """
     amodule = os.environ.get('MODULE')
     readconfig = get_config(fail_without_url=False)
-    if "default_module" in readconfig and readconfig[
-        "default_module"] is not None and amodule is None:
+    if amodule is None and readconfig.get("default_module"):
         amodule = readconfig["default_module"]
+    if amodule is None and conf.get("default_module"):
+        amodule = conf["default_module"]
     if amodule in list_modules_from_config():
         return amodule
     else:
@@ -896,7 +837,7 @@ def get_module_type_base():
     return parent
 
 
-def get_docker_file(dir_name=DEFAULT_DIR_OF_DOCKER_RELATED_STUFF):
+def get_docker_file(dir_name=conf["docker"]["dockerfiledefaultlocation"]):
     """
     Function returns full path to dockerfile.
     :param dir_name: dir_name, where should be Dockerfile located
@@ -906,14 +847,14 @@ def get_docker_file(dir_name=DEFAULT_DIR_OF_DOCKER_RELATED_STUFF):
     if fromenv:
         dockerfile = fromenv
     else:
-        dockerfile = os.path.join(dir_name, DOCKERFILE)
+        dockerfile = os.path.join(dir_name, conf["docker"]["dockerfile"])
     if not os.path.exists(dockerfile):
         print_debug("Dockerfile does not exists (you can use DOCKERFILE "
                     "envvar to set to another): %s" % dockerfile)
         dockerfile = None
     return dockerfile
 
-def get_helpmd_file(dir_name=DEFAULT_DIR_OF_DOCKER_RELATED_STUFF):
+def get_helpmd_file(dir_name=conf["docker"]["dockerfiledefaultlocation"]):
     """
     Function returns full path to HelpMD file.
     :param dir_name: dir_name, where should be helpMD file located
@@ -924,9 +865,9 @@ def get_helpmd_file(dir_name=DEFAULT_DIR_OF_DOCKER_RELATED_STUFF):
         helpmdfile = fromenv
     elif os.environ.get("DOCKERFILE"):
         # when DOCKERFILE is placed, search for HelpMD file in same directory
-        helpmdfile = os.path.join(os.path.dirname(os.environ.get("DOCKERFILE")),HELP_MD_FILE)
+        helpmdfile = os.path.join(os.path.dirname(os.environ.get("DOCKERFILE")), conf["docker"]["helpmdfile"])
     else:
-        helpmdfile = os.path.join(dir_name, HELP_MD_FILE)
+        helpmdfile = os.path.join(dir_name, conf["docker"]["helpmdfile"])
     if not os.path.exists(helpmdfile):
         print_debug("Help MD file does not exists (you can use HELPMDFILE "
                     "envvar to set to another): %s" % helpmdfile)

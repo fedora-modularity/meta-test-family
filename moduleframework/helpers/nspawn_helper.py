@@ -24,7 +24,7 @@ import time
 import hashlib
 import os
 
-from moduleframework.common import BASEPATHDIR, translate_cmd, \
+from moduleframework.common import translate_cmd, conf, \
     get_if_reuse, trans_dict, print_info, is_debug, get_if_do_cleanup
 from moduleframework.helpers.rpm_helper import RpmHelper
 from mtf.backend.nspawn import Image, Container
@@ -45,7 +45,7 @@ class NspawnHelper(RpmHelper):
         relative change root path
         """
         super(NspawnHelper, self).__init__()
-        self.baseprefix = os.path.join(BASEPATHDIR, "chroot_")
+        self.baseprefix = os.path.join(conf["nspawn"]["basedir"], "chroot_")
         time.time()
         actualtime = time.time()
         self.chrootpath_baseimage = ""
@@ -80,7 +80,7 @@ class NspawnHelper(RpmHelper):
         self.__image = self.__image_base.create_snapshot(self.chrootpath)
         self.__container = Container(image=self.__image, name=self.name)
         self._callSetupFromConfig()
-        self.__container.boot_machine()
+        self.__container.boot_machine(nspawn_add_option_list=conf["nspawn"]["additional_boot_options"])
 
     def run(self, command, **kwargs):
         return self.__container.execute(command=translate_cmd(command, translation_dict=trans_dict), **kwargs)

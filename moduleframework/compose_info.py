@@ -30,7 +30,10 @@ MODULE for reading data from compose. There are stored:
 import xml.etree.ElementTree
 import gzip
 import tempfile
-from common import *
+import urllib
+import yaml
+import os
+from common import conf
 
 
 class ComposeParser(object):
@@ -40,7 +43,7 @@ class ComposeParser(object):
 
     def __init__(self, compose):
         self.compose = compose
-        xmlrepomd = compose + "/" + REPOMD
+        xmlrepomd = compose + "/" + conf["compose"]["repomd"]
         e = xml.etree.ElementTree.parse(urllib.urlopen(xmlrepomd)).getroot()
         modulelocaltion = e.findall(
             ".//{http://linux.duke.edu/metadata/repo}data[@type='modules']/{http://linux.duke.edu/metadata/repo}location")[0]
@@ -85,11 +88,11 @@ class ComposeParser(object):
             if foo['data']['name'] == name:
                 thismodule = foo
         if thismodule:
-            mdo = file(MODULEFILE, mode="w")
+            mdo = file(conf["modularity"]["tempmodulefile"], mode="w")
             yaml.dump(foo, mdo)
             mdo.close()
             out.append("MODULENAME=%s" % foo['data']['name'])
             out.append("MODULE=%s" % "nspawn")
             out.append("URL=%s" % self.compose)
-            out.append("MODULEMDURL=file://%s" % os.path.abspath(MODULEFILE))
+            out.append("MODULEMDURL=file://%s" % os.path.abspath(conf["modularity"]["tempmodulefile"]))
             return out

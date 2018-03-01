@@ -32,26 +32,16 @@ import yaml
 import os
 import sys
 from avocado.utils import process
-from common import print_info, DEFAULTRETRYCOUNT, DEFAULTRETRYTIMEOUT, \
-    get_if_remoterepos, BASEPATHDIR, MODULEFILE, print_debug,\
-    is_debug, ARCH, is_recursive_download, trans_dict, get_odcs_auth
+from common import print_info, get_if_remoterepos, print_debug, is_debug, \
+    is_recursive_download, trans_dict, get_openidc_auth, conf, get_odcs_envvar
 from moduleframework import mtfexceptions
 from pdc_client import PDCClient
 from timeoutlib import Retry
-try:
-    from odcs.client.odcs import ODCS, AuthMech
-except:
-    print_debug("ODCS  library cannot be imported. ODCS is not supported")
 
-
-PDC_SERVER = "https://pdc.fedoraproject.org/rest_api/v1/modules"
-ODCS_URL = "https://odcs.fedoraproject.org"
-DEFAULT_MODULE_STREAM = "master"
-BASE_REPO_URL = "https://download.fedoraproject.org/pub/fedora/linux/releases/{}/Workstation/{}/os"
 
 def get_module_nsv(name=None, stream=None, version=None):
     name = name or os.environ.get('MODULE_NAME')
-    stream = stream or os.environ.get('MODULE_STREAM') or DEFAULT_MODULE_STREAM
+    stream = stream or os.environ.get('MODULE_STREAM') or conf["modularity"]["default_module_stream"]
     version = version or os.environ.get('MODULE_VERSION')
     return {'name':name, 'stream':stream, 'version':version}
 
@@ -61,7 +51,12 @@ def get_base_compose():
     release = os.environ.get("MTF_FEDORA_RELEASE") or default_release
     if release == "master":
         release = default_release
-    compose_url = os.environ.get("MTF_COMPOSE_BASE") or BASE_REPO_URL.format(release, ARCH)
+    compose_url = os.environ.get("MTF_COMPOSE_BASE")
+    if not compose_url:
+        tmpcompose = conf.get("compose", {}).get("baseurlrepo")
+        if tmpcompose:
+            compose_url = tmpcompose.format(
+                RELEASE=release, ARCH=conf["generic"]["arch"])
     return compose_url
 
 class PDCParserGeneral():
@@ -101,10 +96,10 @@ class PDCParserGeneral():
                 pdc_query['stream'] = self.stream
             if self.version:
                 pdc_query['version'] = self.version
-            @Retry(attempts=DEFAULTRETRYCOUNT, timeout=DEFAULTRETRYTIMEOUT, error=mtfexceptions.PDCExc("Could not query PDC server"))
+            @Retry(attempts=conf["generic"]["retrycount"], timeout=conf["generic"]["retrytimeout"], error=mtfexceptions.PDCExc("Could not query PDC server"))
             def retry_tmpfunc():
                 # Using develop=True to not authenticate to the server
-                pdc_session = PDCClient(PDC_SERVER, ssl_verify=True, develop=True)
+                pdc_session = PDCClient(conf["pdc"]["pdc_server"], ssl_verify=True, develop=True)
                 print_debug(pdc_session, pdc_query)
                 return pdc_session(**pdc_query)
             mod_info = retry_tmpfunc()
@@ -146,7 +141,7 @@ class PDCParserGeneral():
 
         :return: str url of file
         """
-        omodulefile = MODULEFILE
+        omodulefile = conf["modularity"]["tempmodulefile"]
         mdfile = open(omodulefile, mode="w")
         mdfile.write(yaml.dump(self.getmoduleMD()))
         mdfile.close()
@@ -208,13 +203,14 @@ class PDCParserKoji(PDCParserGeneral):
             if len(pkgbouid) > 4:
                 print_debug("DOWNLOADING: %s" % foo)
 
-                @Retry(attempts=DEFAULTRETRYCOUNT * 10, timeout=DEFAULTRETRYTIMEOUT * 60, delay=DEFAULTRETRYTIMEOUT,
+                @Retry(attempts=conf["generic"]["retrycount"] * 10, timeout=conf["generic"]["retrytimeout"] * 60,
+                       delay=conf["generic"]["retrytimeout"],
                        error=mtfexceptions.KojiExc(
-                           "RETRY: Unbale to fetch package from koji after %d attempts" % (DEFAULTRETRYCOUNT * 10)))
+                           "RETRY: Unbale to fetch package from koji after %d attempts" % (conf["generic"]["retrycount"] * 10)))
                 def tmpfunc():
                     a = process.run(
                         "cd %s; koji download-build %s  -a %s -a noarch" %
-                        (dirname, pkgbouid, ARCH), shell=True, verbose=is_debug(), ignore_status=True)
+                        (dirname, pkgbouid, conf["generic"]["arch"]), shell=True, verbose=is_debug(), ignore_status=True)
                     if a.exit_status == 1:
                         if "packages available for" in a.stdout.strip():
                             print_debug(
@@ -233,7 +229,7 @@ class PDCParserKoji(PDCParserGeneral):
 
         :return: str
         """
-        dir_prefix = BASEPATHDIR
+        dir_prefix = conf["nspawn"]["basedir"]
         process.run("{HOSTPACKAGER} install createrepo koji".format(
             **trans_dict), ignore_status=True)
         if is_recursive_download():
@@ -261,19 +257,27 @@ class PDCParserKoji(PDCParserGeneral):
 
 
 class PDCParserODCS(PDCParserGeneral):
-    compose_type = "module"
-    auth_token = get_odcs_auth()
+    compose_type = conf["odcs"]["compose_type"]
+    odcsauth = conf["odcs"]["auth"]
 
     def get_repo(self):
-        odcs = ODCS(ODCS_URL, auth_mech=AuthMech.OpenIDC, openidc_token=self.auth_token)
+        # import moved here, to avoid messages when you don't need to use ODCS
+        from odcs.client.odcs import ODCS, AuthMech
+
+        if self.odcsauth.get("auth_mech") == AuthMech.OpenIDC:
+            if not self.odcsauth.get("openidc_token"):
+                self.odcsauth["openidc_token"] = get_openidc_auth()
+        odcs = ODCS(conf["odcs"]["url"], **self.odcsauth)
         print_debug("ODCS Starting module composing: %s" % odcs,
                     "%s compose for: %s" % (self.compose_type, self.get_module_identifier()))
-        compose_builder = odcs.new_compose(self.get_module_identifier(), self.compose_type)
-        timeout_time=600
+        compose_builder = odcs.new_compose(self.get_module_identifier(),
+                                           self.compose_type,
+                                           **conf["odcs"]["new_compose_dict"])
+        timeout_time=conf["odcs"]["timeout"]
         print_debug("ODCS Module compose started, timeout set to %ss" % timeout_time)
         compose_state = odcs.wait_for_compose(compose_builder["id"], timeout=timeout_time)
         if compose_state["state_name"] == "done":
-            compose = "{compose}/{arch}/os".format(compose=compose_state["result_repo"], arch=ARCH)
+            compose = "{compose}/{arch}/os".format(compose=compose_state["result_repo"], arch=conf["generic"]["arch"])
             print_info("ODCS Compose done, URL with repo file", compose)
             return compose
         else:
@@ -292,24 +296,18 @@ def getBasePackageSet(modulesDict=None, isModule=True, isContainer=False):
     """
     # nspawn container need to install also systemd to be able to boot
     out = []
-    BASEPACKAGESET_WORKAROUND = ["systemd"]
-    BASEPACKAGESET_WORKAROUND_NOMODULE = BASEPACKAGESET_WORKAROUND + ["dnf"]
-    # https://pagure.io/fedora-kickstarts/blob/f27/f/fedora-modular-container-base.ks
-    BASE_MODULAR_CONTAINER = ["rootfiles", "tar", "vim-minimal", "dnf", "dnf-yum", "sssd-client"]
-    # https://pagure.io/fedora-kickstarts/blob/f27/f/fedora-modular-container-common.ks
-    BASE_MODULAR = ["bash", "coreutils-single", "glibc-minimal-langpack",
-                    "libcrypt", "rpm", "shadow-utils", "sssd-client", "util-linux"]
+
     if isModule:
         if isContainer:
-            out =  BASE_MODULAR_CONTAINER
+            out = conf["packages"]["container"]
         else:
 
-            out = BASE_MODULAR + BASEPACKAGESET_WORKAROUND
+            out = conf["packages"]["common"] + conf["packages"]["basic_modular"]
     else:
         if isContainer:
             out = []
         else:
-            out = BASEPACKAGESET_WORKAROUND_NOMODULE
+            out = conf["packages"]["common"] + conf["packages"]["basic"]
     print_info("Base packages to install:", out)
     return out
 
@@ -331,10 +329,11 @@ def get_repo_url(wmodule="base-runtime", wstream="master"):
 
 
 PDCParser = PDCParserGeneral
-if get_odcs_auth():
+if get_odcs_envvar():
     PDCParser = PDCParserODCS
 elif not get_if_remoterepos():
     PDCParser = PDCParserKoji
+
 
 def test_PDC_general_base_runtime():
     print_info(sys._getframe().f_code.co_name)
@@ -342,12 +341,13 @@ def test_PDC_general_base_runtime():
     assert not parser.generateDepModules()
     assert "module-" in parser.get_pdc_info()["koji_tag"]
     print_info(parser.get_repo())
-    assert BASE_REPO_URL[:30] in parser.get_repo()
+    assert conf["compose"]["baseurlrepo"][:30] in parser.get_repo()
     print_info(parser.generateParams())
     assert len(parser.generateParams()) == 3
     assert "MODULE=nspawn" in " ".join(parser.generateParams())
-    print_info("URL=%s" % BASE_REPO_URL[:30])
-    assert "URL=%s" % BASE_REPO_URL[:30] in " ".join(parser.generateParams())
+    print_info("URL=%s" % conf["compose"]["baseurlrepo"][:30])
+    assert "URL=%s" % conf["compose"]["baseurlrepo"][:30] in " ".join(parser.generateParams())
+
 
 def test_PDC_general_nodejs():
     print_info(sys._getframe().f_code.co_name)
@@ -355,25 +355,19 @@ def test_PDC_general_nodejs():
     deps = parser.generateDepModules()
     print_info(deps)
     assert 'platform' in deps
-    assert 'host' in deps
-    assert 'python2' in deps
-    assert 'python3' in deps
+
 
 def test_PDC_koji_nodejs():
-    global BASEPATHDIR
-    BASEPATHDIR = "."
 
+    conf["nspawn"]["basedir"]="."
     print_info(sys._getframe().f_code.co_name)
     parser = PDCParserKoji("nodejs", "8")
     deps = parser.generateDepModules()
     print_info(deps)
     assert 'platform' in deps
-    assert 'host' in deps
-    assert 'python2' in deps
-    assert 'python3' in deps
     print_info(parser.get_repo())
     assert "file://" in parser.get_repo()
-    assert os.path.abspath(BASEPATHDIR) in parser.get_repo()
+    assert os.path.abspath(conf["nspawn"]["basedir"]) in parser.get_repo()
     assert "MODULE=nspawn" in " ".join(parser.generateParams())
     assert "URL=file://" in " ".join(parser.generateParams())
     # TODO: this subtest is too slow, commented out
@@ -381,12 +375,13 @@ def test_PDC_koji_nodejs():
     #is_recursive_download = lambda: True
     #print_info(parser.get_repo())
 
+
 def test_PDC_ODCS_nodejs():
     print_info(sys._getframe().f_code.co_name)
     parser = PDCParserODCS("nodejs", "8")
     # TODO: need to setup MTF_ODCS variable with odcs token, and ODCS version at least 0.1.2
     # or your user will be asked to for token interactively
-    if get_odcs_auth():
+    if get_odcs_envvar():
         print_info(parser.get_repo())
 
 

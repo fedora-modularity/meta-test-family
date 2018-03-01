@@ -22,7 +22,7 @@
 
 import os
 import sys
-
+from moduleframework.core import DATADIR
 from setuptools import setup, find_packages
 
 # copy from https://github.com/avocado-framework/avocado/blob/master/setup.py
@@ -50,13 +50,13 @@ def get_dir(system_path=None, virtual_path=None):
 
 data_files = {}
 
-paths = ['docs', 'examples', 'tools']
+paths = ['docs', 'examples', 'tools', 'mtf.conf.d']
 
 for path in paths:
     for root, dirs, files in os.walk(path, followlinks=True):
         data_files[
             get_dir(
-                ['usr', 'share', 'moduleframework', root])] = [
+                DATADIR + [root])] = [
             os.path.join(root, f) for f in files]
 
 paths = ['man']

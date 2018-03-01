@@ -31,7 +31,7 @@ import imp
 import re
 
 import subprocess
-from moduleframework import common
+from moduleframework.common import conf, print_info, print_debug, get_module_type, get_config, get_backend_list, list_modules_from_config
 from mtf.metadata.tmet.filter import filtertests
 from mtf.metadata.tmet import common as metadata_common
 from moduleframework.mtfexceptions import ConfigExc, DefaultConfigExc, ModuleFrameworkException
@@ -119,7 +119,7 @@ It tests container images and/or modules with user defined tests using avocado f
     group = parser.add_argument_group(
         'additional arguments are like environment variables up to the http://meta-test-family.readthedocs.io/en/latest/user_guide/environment_variables.html ')
     group.add_argument("--module", action="store",
-                       help='Module type, like: docker, nspawn or rpm')
+                       help='Module type, like: docker, nspawn, rpm or openshift')
     group.add_argument("--debug", action="store_true", help='more logging')
     group.add_argument("--config", action="store",
                        help='defines the module configuration file')
@@ -149,9 +149,9 @@ def cli():
     if args.modulemdurl:
         os.environ['MODULEMDURL'] = args.modulemdurl
 
-    common.print_debug("Options: linter={0}, setup={1}, action={2}, module={3}".format(
+    print_debug("Options: linter={0}, setup={1}, action={2}, module={3}".format(
         args.linter, args.setup, args.action, args.module))
-    common.print_debug(
+    print_debug(
         "remaining options for avocado or test files: {0}".format(unknown))
 
     # environment usage:
@@ -159,38 +159,35 @@ def cli():
     #   write: os.environ['MODULE']
 
     # MODULE could be from:
-    #   1. common.get_module_type() ... it reads config.yaml and treceback if it doesn't exist
-    #   2. environment ... MODULE=docker etc
-    #   3. argument ... --module=docker
-    try:
-        args.module = common.get_module_type()
-        # TODO it wrongly writes: 'Using default minimal config ...', change in common.py
-    except moduleframework.mtfexceptions.ModuleFrameworkException:
-        pass
+    #   1. environment ... MODULE=docker etc
+    #   2. argument ... --module=docker
+    #   3. from config.yaml in default_module
+    #   4. default module stored in general mtf config yaml file
 
     if os.environ.get('MODULE') is not None:
         # environment is the highest priority because mtf uses environment (too much)
         args.module = os.environ['MODULE']
+    if not args.module:
+        args.module = get_module_type()
 
-    if args.module:
-        # setup also environment
-        os.environ['MODULE'] = args.module
+    os.environ['MODULE'] = args.module
+
     if not os.environ.get('URL'):
         try:
-            common.get_config(reload=True)
+            get_config(reload=True)
         except DefaultConfigExc:
             raise DefaultConfigExc("You have to set URL variable (via URL envar or --url parameter) in case of default config")
-    supported_modules = set(common.get_backend_list() + common.list_modules_from_config())
+    supported_modules = set(get_backend_list() + list_modules_from_config())
     if args.module in supported_modules:
         # for debug purposes, to be sure about module variables or options
-        common.print_debug("MODULE={0}, options={1}".format(
+        print_debug("MODULE={0}, options={1}".format(
             os.environ.get('MODULE'), args.module))
     else:
         # TODO: what to do here? whats the defaults value for MODULE, do I know it?
         raise ModuleFrameworkException("MODULE={0} ; we support {1}".format(
             os.environ.get('MODULE'), supported_modules))
 
-    common.print_debug("MODULE={0}".format(os.environ.get('MODULE')))
+    print_debug("MODULE={0}".format(os.environ.get('MODULE')))
     return args, unknown
 
 
@@ -205,10 +202,10 @@ class AvocadoStart(object):
         if args.linter:
             self.tests += glob.glob("{MTF_TOOLS}/{GENERIC_TEST}/*.py".format(
                 MTF_TOOLS=metadata_common.MetadataLoaderMTF.MTF_LINTER_PATH,
-                GENERIC_TEST=common.GENERIC_TEST))
+                GENERIC_TEST=conf["generic"]["generic_tests"]))
             self.tests += glob.glob("{MTF_TOOLS}/{STATIC_LINTERS}/*.py".format(
                 MTF_TOOLS=metadata_common.MetadataLoaderMTF.MTF_LINTER_PATH,
-                STATIC_LINTERS=common.STATIC_LINTERS))
+                STATIC_LINTERS=conf["generic"]["static_tests"]))
         self.args = args
 
         for param in unknown:
@@ -222,13 +219,13 @@ class AvocadoStart(object):
                 # this is additional avocado param
                 self.additionalAvocadoArg.append(param)
         if self.args.metadata:
-            common.print_info("Using Metadata loader for tests and filtering")
+            print_info("Using Metadata loader for tests and filtering")
             metadata_tests = filtertests(backend="mtf", location=os.getcwd(), linters=False, tests=[], tags=[], relevancy="")
             tests_dict = [x[metadata_common.SOURCE] for x in metadata_tests]
             self.tests += tests_dict
-            common.print_debug("Loaded tests via metadata file: %s" % tests_dict)
-        common.print_debug("tests = {0}".format(self.tests))
-        common.print_debug("additionalAvocadoArg = {0}".format(
+            print_debug("Loaded tests via metadata file: %s" % tests_dict)
+        print_debug("tests = {0}".format(self.tests))
+        print_debug("additionalAvocadoArg = {0}".format(
             self.additionalAvocadoArg))
 
 
@@ -273,7 +270,7 @@ class AvocadoStart(object):
         if testcases:
             emptydelimiter = ""
             harddelimiter = "------------------------"
-            common.print_info(emptydelimiter, "{0} {1} {0}".format(harddelimiter, header))
+            print_info(emptydelimiter, "{0} {1} {0}".format(harddelimiter, header))
             for testcase in testcases:
                 tcname = testcase
                 if re.search('^[0-9]+-', testcase.get('id',"")):
@@ -294,16 +291,16 @@ class AvocadoStart(object):
                         # TODO: replace more whitespaces just by one - we should find better solution how to that
                         tcnameoutput = ' '.join(tcnameoutput.split())
                     except Exception as e:
-                        common.print_debug("(INFO) Error happen when parsing testcase name ({})".format(tcname), e)
+                        print_debug("(INFO) Error happen when parsing testcase name ({})".format(tcname), e)
                         pass
-                common.print_info("TEST {0}:  {1}".format(testcase.get('status'), tcname))
+                print_info("TEST {0}:  {1}".format(testcase.get('status'), tcname))
                 if description and tcnameoutput!=tcname and tcnameoutput and tcnameoutput.strip():
-                    common.print_info("     desc -> {0}".format(tcnameoutput))
+                    print_info("     desc -> {0}".format(tcnameoutput))
                 if testcase.get('fail_reason') and testcase.get('fail_reason') != "None":
-                    common.print_info("     reason -> {0}".format(testcase.get('fail_reason')))
+                    print_info("     reason -> {0}".format(testcase.get('fail_reason')))
                 if logs:
-                    common.print_info("     {0}".format(testcase.get('logfile')))
-                common.print_info(emptydelimiter)
+                    print_info("     {0}".format(testcase.get('logfile')))
+                print_info(emptydelimiter)
 
     def show_error(self):
         if os.path.exists(self.json_tmppath):
@@ -328,7 +325,7 @@ class AvocadoStart(object):
 
 
 def main():
-    common.print_debug('verbose/debug mode')
+    print_debug('verbose/debug mode')
     args, unknown = cli()
 
     if args.setup:
