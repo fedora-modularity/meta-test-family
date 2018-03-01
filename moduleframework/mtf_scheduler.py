@@ -256,13 +256,14 @@ class AvocadoStart(object):
         Main purpose is to display docstrings of testcases for failures
         example:
             def test_some(something)
-                \"\"\"
+                '''
                 This is line1.
                 This is line2.
                 :return: None
-                \"\"\"\
-                assert(Fasle)
+                '''
+                self.assertTrue(False, msg="This is fail reason")
         procudes line:    desc -> This is line1. This is line2.
+                          reason -> This is fail reason
         :param testcases: dict of testcases
         :param header: str what to print as header
         :param logs: boolean if print logs for these testcases (default True)
