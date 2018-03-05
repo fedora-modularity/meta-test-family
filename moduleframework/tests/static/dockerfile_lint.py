@@ -43,7 +43,7 @@ class DockerInstructionsTests(module_framework.AvocadoTest):
 class DockerLabelsTests(DockerInstructionsTests):
     """
     :avocado: enable
-    :avocado: tags=sanity,rhel,fedora,docker,docker_labels_test
+    :avocado: tags=sanity,docker,docker_labels_test
 
     """
 
@@ -60,46 +60,70 @@ class DockerLabelsTests(DockerInstructionsTests):
     def _get_msg(self, label, reference=None):
         msg = label + " is missing in Dockerfile."
         if reference:
-            msg = msg + '\n\tMore info: ' +reference
+            msg = msg + '\n\tMore info: ' + reference
         return msg
 
     def test_architecture_label_exists(self):
+        """
+        :avocado: tags=rhel,fedora
+        """
         self.assertTrue(self.dp.get_specific_label("architecture"),
                         msg=self._get_msg("architecture label",
                                           reference='https://docs.docker.com/engine/reference/builder/#from'))
 
     def test_name_in_env_and_label_exists(self):
+        """
+        :avocado: tags=fedora
+        """
         self.assertTrue(self.dp.get_docker_specific_env("NAME="), msg=self._get_msg("Environment variable NAME"))
         self.assertTrue(self.dp.get_specific_label("name"),
                         msg=self._get_msg("Label name",
                                           reference='https://fedoraproject.org/wiki/Container:Guidelines#LABELS'))
 
     def test_maintainer_label_exists(self):
+        """
+        :avocado: tags=fedora
+        """
         self.assertTrue(self.dp.get_specific_label("maintainer"),
                         msg=self._get_msg("Label maintainer",
                                           reference='https://fedoraproject.org/wiki/Container:Guidelines#LABELS'))
 
     def test_release_label_exists(self):
+        """
+        :avocado: tags=fedora
+        """
         self.assertTrue(self.dp.get_specific_label("release"),
                         msg=self._get_msg("Label release",
                                           reference='https://fedoraproject.org/wiki/Container:Guidelines#LABELS'))
 
     def test_version_label_exists(self):
+        """
+        :avocado: tags=rhel,fedora
+        """
         self.assertTrue(self.dp.get_specific_label("version"),
                         msg=self._get_msg("Label version",
                                           reference='https://fedoraproject.org/wiki/Container:Guidelines#LABELS'))
 
     def test_com_redhat_component_label_exists(self):
+        """
+        :avocado: tags=rhel,fedora
+        """
         self.assertTrue(self.dp.get_specific_label("com.redhat.component"),
                         msg=self._get_msg("Label com.redhat.component",
                                           reference='https://fedoraproject.org/wiki/Container:Guidelines#LABELS'))
 
     def test_summary_label_exists(self):
+        """
+        :avocado: tags=rhel,fedora
+        """
         self.assertTrue(self.dp.get_specific_label("summary"),
                         msg=self._get_msg("Label summary",
                                           reference='https://fedoraproject.org/wiki/Container:Guidelines#LABELS'))
 
     def test_run_or_usage_label_exists(self):
+        """
+        :avocado: tags=fedora
+        """
         self.assertTrue(self._test_for_env_and_label("run", "usage", env=False),
                         msg=self._get_msg("Label run or usage",
                                           reference='https://fedoraproject.org/wiki/Container:Guidelines#LABELS'))
