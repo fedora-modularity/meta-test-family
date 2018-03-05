@@ -22,16 +22,16 @@ class DockerInstructionsTests(module_framework.AvocadoTest):
             self.cancel("Dockerfile was not found")
 
     def test_from_is_first_directive(self):
-        self.assertTrue(self.dp.check_from_is_first(), msg="FROM instruction is not first.")
+        self.assertTrue(self.dp.check_from_is_first(), msg="FROM instruction is not first.\n\tMore info: https://docs.docker.com/engine/reference/builder/#from")
 
     def test_from_directive_is_valid(self):
-        self.assertTrue(self.dp.check_from_directive_is_valid(), msg="FROM instruction is not valid.")
+        self.assertTrue(self.dp.check_from_directive_is_valid(), msg="FROM instruction is not valid.\n\tMore info: https://docs.docker.com/engine/reference/builder/#from")
 
     def test_chained_run_dnf_commands(self):
-        self.assertTrue(self.dp.check_chained_run_dnf_commands(), msg="dnf/yum commands are not chained.")
+        self.assertTrue(self.dp.check_chained_run_dnf_commands(), msg="dnf/yum commands are not chained.\n\tMore info: https://github.com/projectatomic/container-best-practices/blob/master/creating/creating_index.adoc#clearing-package-cache-and-squashing")
 
     def test_chained_run_rest_commands(self):
-        self.assertTrue(self.dp.check_chained_run_rest_commands(), msg="RUN instructions are not chained.")
+        self.assertTrue(self.dp.check_chained_run_rest_commands(), msg="RUN instructions are not chained.\n\tMore info: https://github.com/projectatomic/container-best-practices/blob/master/creating/creating_index.adoc#chaining-commands")
 
     def test_copy_files_exist(self):
         self.assertTrue(self.dp.check_copy_files_exist(), msg="Some files in the COPY or ADD instruction do not exist.")
@@ -57,34 +57,51 @@ class DockerLabelsTests(DockerInstructionsTests):
             label_found = self.dp.get_specific_label(docker_label)
         return label_found
 
-    def _get_msg(self, label):
-        return label + " is missing in Dockerfile."
+    def _get_msg(self, label, reference=None):
+        msg = label + " is missing in Dockerfile."
+        if reference:
+            msg = msg + '\n\tMore info: ' +reference
+        return msg
 
     def test_architecture_label_exists(self):
-        self.assertTrue(self.dp.get_specific_label("architecture"),msg=self._get_msg("architecture label"))
+        self.assertTrue(self.dp.get_specific_label("architecture"),
+                        msg=self._get_msg("architecture label",
+                                          reference='https://docs.docker.com/engine/reference/builder/#from'))
 
     def test_name_in_env_and_label_exists(self):
         self.assertTrue(self.dp.get_docker_specific_env("NAME="), msg=self._get_msg("Environment variable NAME"))
-        self.assertTrue(self.dp.get_specific_label("name"), msg=self._get_msg("Label name"))
+        self.assertTrue(self.dp.get_specific_label("name"),
+                        msg=self._get_msg("Label name",
+                                          reference='https://fedoraproject.org/wiki/Container:Guidelines#LABELS'))
 
     def test_maintainer_label_exists(self):
-        self.assertTrue(self.dp.get_specific_label("maintainer"), msg=self._get_msg("Label maintainer"))
+        self.assertTrue(self.dp.get_specific_label("maintainer"),
+                        msg=self._get_msg("Label maintainer",
+                                          reference='https://fedoraproject.org/wiki/Container:Guidelines#LABELS'))
 
     def test_release_label_exists(self):
-        self.assertTrue(self.dp.get_specific_label("release"), msg=self._get_msg("Label release"))
+        self.assertTrue(self.dp.get_specific_label("release"),
+                        msg=self._get_msg("Label release",
+                                          reference='https://fedoraproject.org/wiki/Container:Guidelines#LABELS'))
 
     def test_version_label_exists(self):
-        self.assertTrue(self.dp.get_specific_label("version"), msg=self._get_msg("Label version"))
+        self.assertTrue(self.dp.get_specific_label("version"),
+                        msg=self._get_msg("Label version",
+                                          reference='https://fedoraproject.org/wiki/Container:Guidelines#LABELS'))
 
     def test_com_redhat_component_label_exists(self):
         self.assertTrue(self.dp.get_specific_label("com.redhat.component"),
-                        msg=self._get_msg("Label com.redhat.component"))
+                        msg=self._get_msg("Label com.redhat.component",
+                                          reference='https://fedoraproject.org/wiki/Container:Guidelines#LABELS'))
 
     def test_summary_label_exists(self):
-        self.assertTrue(self.dp.get_specific_label("summary"), msg=self._get_msg("Label summary"))
+        self.assertTrue(self.dp.get_specific_label("summary"),
+                        msg=self._get_msg("Label summary",
+                                          reference='https://fedoraproject.org/wiki/Container:Guidelines#LABELS'))
 
     def test_run_or_usage_label_exists(self):
         self.assertTrue(self._test_for_env_and_label("run", "usage", env=False),
-                        msg=self._get_msg("Label run or usage"))
+                        msg=self._get_msg("Label run or usage",
+                                          reference='https://fedoraproject.org/wiki/Container:Guidelines#LABELS'))
 
 
