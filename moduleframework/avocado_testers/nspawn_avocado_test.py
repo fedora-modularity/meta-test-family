@@ -19,11 +19,12 @@
 #
 # Authors: Petr Hracek <phracek@redhat.com>
 #
-from moduleframework.module_framework import AvocadoTest
-from moduleframework.common import get_module_type_base
+
+from moduleframework import common
+import avocado_test
 
 
-class NspawnAvocadoTest(AvocadoTest):
+class NspawnAvocadoTest(avocado_test.AvocadoTest):
     """
     Class for writing tests specific just for RPM module testing inside NSPAWN env
     derived from AvocadoTest class.
@@ -32,7 +33,7 @@ class NspawnAvocadoTest(AvocadoTest):
     """
 
     def setUp(self):
-        if get_module_type_base() != "nspawn":
+        if common.get_module_type_base() != "nspawn":
             self.cancel("Nspawn specific test")
         super(NspawnAvocadoTest, self).setUp()
 

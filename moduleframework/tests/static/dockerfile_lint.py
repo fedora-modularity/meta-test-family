@@ -1,9 +1,5 @@
-from __future__ import print_function
+from moduleframework import dockerlinter, module_framework
 
-import os
-from avocado import Test
-from moduleframework import module_framework
-from moduleframework import dockerlinter
 
 class DockerInstructionsTests(module_framework.AvocadoTest):
     """

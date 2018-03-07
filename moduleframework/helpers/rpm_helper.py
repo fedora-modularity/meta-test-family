@@ -22,11 +22,10 @@
 
 import os
 import warnings
-from moduleframework import pdc_data
-from moduleframework.common import CommonFunctions, get_compose_url, trans_dict, is_debug
+from moduleframework import pdc_data, common, core
 
 
-class RpmHelper(CommonFunctions):
+class RpmHelper(common.CommonFunctions):
     """
     Class for testing "modules" on local machine (host) directly. It could be used for scheduling tests for
     system packages
@@ -107,10 +106,10 @@ class RpmHelper(CommonFunctions):
         if repos:
             self.repos = repos
         else:
-            self.repos += get_compose_url() or self.get_url()
+            self.repos += common.get_compose_url() or self.get_url()
             # add also all dependent modules repositories if it is module
             # TODO: removed this dependency search
-            if self.is_it_module and not get_compose_url():
+            if self.is_it_module and not common.get_compose_url():
                 # inside this code we don't know anything about modules, this leads to
                 # generic repositories in pdc_data.PDCParserGeneral
                 pdcsolver = pdc_data.PDCParserGeneral(self.component_name)
@@ -145,7 +144,7 @@ gpgcheck=0
             f.write(add)
         f.close()
         self.install_packages()
-        self.ip_address = trans_dict["GUESTIPADDR"]
+        self.ip_address = common.trans_dict["GUESTIPADDR"]
 
     def copyTo(self, src, dest):
         """
@@ -155,7 +154,7 @@ gpgcheck=0
         :param dest: str
         :return: None
         """
-        self.runHost("cp -r %s %s" % (src, dest), verbose=is_debug())
+        self.runHost("cp -r %s %s" % (src, dest), verbose=core.is_debug())
 
     def copyFrom(self, src, dest):
         """
@@ -165,5 +164,5 @@ gpgcheck=0
         :param dest: str
         :return: None
         """
-        self.runHost("cp -r %s %s" % (src, dest), verbose=is_debug())
+        self.runHost("cp -r %s %s" % (src, dest), verbose=core.is_debug())
 

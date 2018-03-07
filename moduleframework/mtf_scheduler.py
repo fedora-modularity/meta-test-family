@@ -23,7 +23,6 @@
 
 import argparse
 import os
-import moduleframework
 import tempfile
 import json
 import glob
@@ -31,10 +30,12 @@ import imp
 import re
 
 import subprocess
-from moduleframework.common import conf, print_info, print_debug, get_module_type, get_config, get_backend_list, list_modules_from_config
+import core, common, mtfexceptions
+#from moduleframework.common import conf, get_module_type, get_config, get_backend_list, list_modules_from_config
+#from moduleframework.core import print_info, print_debug
 from mtf.metadata.tmet.filter import filtertests
 from mtf.metadata.tmet import common as metadata_common
-from moduleframework.mtfexceptions import ConfigExc, DefaultConfigExc, ModuleFrameworkException
+#from moduleframework.mtfexceptions import DefaultConfigExc, ModuleFrameworkException
 
 
 def mtfparser():
@@ -149,9 +150,9 @@ def cli():
     if args.modulemdurl:
         os.environ['MODULEMDURL'] = args.modulemdurl
 
-    print_debug("Options: linter={0}, setup={1}, action={2}, module={3}".format(
+    core.print_debug("Options: linter={0}, setup={1}, action={2}, module={3}".format(
         args.linter, args.setup, args.action, args.module))
-    print_debug(
+    core.print_debug(
         "remaining options for avocado or test files: {0}".format(unknown))
 
     # environment usage:
@@ -168,26 +169,26 @@ def cli():
         # environment is the highest priority because mtf uses environment (too much)
         args.module = os.environ['MODULE']
     if not args.module:
-        args.module = get_module_type()
+        args.module = common.get_module_type()
 
     os.environ['MODULE'] = args.module
 
     if not os.environ.get('URL'):
         try:
-            get_config(reload=True)
-        except DefaultConfigExc:
-            raise DefaultConfigExc("You have to set URL variable (via URL envar or --url parameter) in case of default config")
-    supported_modules = set(get_backend_list() + list_modules_from_config())
+            common.get_config(reload=True)
+        except mtfexceptions.DefaultConfigExc:
+            raise mtfexceptions.DefaultConfigExc("You have to set URL variable (via URL envar or --url parameter) in case of default config")
+    supported_modules = set(common.get_backend_list() + common.list_modules_from_config())
     if args.module in supported_modules:
         # for debug purposes, to be sure about module variables or options
-        print_debug("MODULE={0}, options={1}".format(
+        core.print_debug("MODULE={0}, options={1}".format(
             os.environ.get('MODULE'), args.module))
     else:
         # TODO: what to do here? whats the defaults value for MODULE, do I know it?
-        raise ModuleFrameworkException("MODULE={0} ; we support {1}".format(
+        raise mtfexceptions.ModuleFrameworkException("MODULE={0} ; we support {1}".format(
             os.environ.get('MODULE'), supported_modules))
 
-    print_debug("MODULE={0}".format(os.environ.get('MODULE')))
+    core.print_debug("MODULE={0}".format(os.environ.get('MODULE')))
     return args, unknown
 
 
@@ -202,10 +203,10 @@ class AvocadoStart(object):
         if args.linter:
             self.tests += glob.glob("{MTF_TOOLS}/{GENERIC_TEST}/*.py".format(
                 MTF_TOOLS=metadata_common.MetadataLoaderMTF.MTF_LINTER_PATH,
-                GENERIC_TEST=conf["generic"]["generic_tests"]))
+                GENERIC_TEST=common.conf["generic"]["generic_tests"]))
             self.tests += glob.glob("{MTF_TOOLS}/{STATIC_LINTERS}/*.py".format(
                 MTF_TOOLS=metadata_common.MetadataLoaderMTF.MTF_LINTER_PATH,
-                STATIC_LINTERS=conf["generic"]["static_tests"]))
+                STATIC_LINTERS=common.conf["generic"]["static_tests"]))
         self.args = args
 
         for param in unknown:
@@ -219,13 +220,13 @@ class AvocadoStart(object):
                 # this is additional avocado param
                 self.additionalAvocadoArg.append(param)
         if self.args.metadata:
-            print_info("Using Metadata loader for tests and filtering")
+            core.print_info("Using Metadata loader for tests and filtering")
             metadata_tests = filtertests(backend="mtf", location=os.getcwd(), linters=False, tests=[], tags=[], relevancy="")
             tests_dict = [x[metadata_common.SOURCE] for x in metadata_tests]
             self.tests += tests_dict
-            print_debug("Loaded tests via metadata file: %s" % tests_dict)
-        print_debug("tests = {0}".format(self.tests))
-        print_debug("additionalAvocadoArg = {0}".format(
+            core.print_debug("Loaded tests via metadata file: %s" % tests_dict)
+        core.print_debug("tests = {0}".format(self.tests))
+        core.print_debug("additionalAvocadoArg = {0}".format(
             self.additionalAvocadoArg))
 
 
@@ -270,7 +271,7 @@ class AvocadoStart(object):
         if testcases:
             emptydelimiter = ""
             harddelimiter = "------------------------"
-            print_info(emptydelimiter, "{0} {1} {0}".format(harddelimiter, header))
+            core.print_info(emptydelimiter, "{0} {1} {0}".format(harddelimiter, header))
             for testcase in testcases:
                 tcname = testcase
                 if re.search('^[0-9]+-', testcase.get('id',"")):
@@ -291,16 +292,16 @@ class AvocadoStart(object):
                         # TODO: replace more whitespaces just by one - we should find better solution how to that
                         tcnameoutput = ' '.join(tcnameoutput.split())
                     except Exception as e:
-                        print_debug("(INFO) Error happen when parsing testcase name ({})".format(tcname), e)
+                        core.print_debug("(INFO) Error happen when parsing testcase name ({})".format(tcname), e)
                         pass
-                print_info("TEST {0}:  {1}".format(testcase.get('status'), tcname))
+                core.print_info("TEST {0}:  {1}".format(testcase.get('status'), tcname))
                 if description and tcnameoutput!=tcname and tcnameoutput and tcnameoutput.strip():
-                    print_info("     desc -> {0}".format(tcnameoutput))
+                    core.print_info("     desc -> {0}".format(tcnameoutput))
                 if testcase.get('fail_reason') and testcase.get('fail_reason') != "None":
-                    print_info("     reason -> {0}".format(testcase.get('fail_reason')))
+                    core.print_info("     reason -> {0}".format(testcase.get('fail_reason')))
                 if logs:
-                    print_info("     {0}".format(testcase.get('logfile')))
-                print_info(emptydelimiter)
+                    core.print_info("     {0}".format(testcase.get('logfile')))
+                core.print_info(emptydelimiter)
 
     def show_error(self):
         if os.path.exists(self.json_tmppath):
@@ -325,7 +326,7 @@ class AvocadoStart(object):
 
 
 def main():
-    print_debug('verbose/debug mode')
+    core.print_debug('verbose/debug mode')
     args, unknown = cli()
 
     if args.setup:

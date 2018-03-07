@@ -31,7 +31,7 @@ from moduleframework.avocado_testers.container_avocado_test import ContainerAvoc
 from moduleframework.avocado_testers.nspawn_avocado_test import NspawnAvocadoTest
 from moduleframework.avocado_testers.rpm_avocado_test import RpmAvocadoTest
 from moduleframework.avocado_testers.openshift_avocado_test import OpenShiftAvocadoTest
-from moduleframework.mtfexceptions import ModuleFrameworkException
+import mtfexceptions
 
 PROFILE = None
 
@@ -46,5 +46,5 @@ def skipTestIf(value, text="Test not intended for this module profile"):
     :return: None
     """
     if value:
-        raise ModuleFrameworkException(
+        raise mtfexceptions.ModuleFrameworkException(
             "DEPRECATED, don't use this skip, use self.cancel() inside test function, or self.skip() in setUp()")

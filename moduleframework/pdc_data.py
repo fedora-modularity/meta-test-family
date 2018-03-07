@@ -32,16 +32,15 @@ import yaml
 import os
 import sys
 from avocado.utils import process
-from common import print_info, get_if_remoterepos, print_debug, is_debug, \
-    is_recursive_download, trans_dict, get_openidc_auth, conf, get_odcs_envvar
-from moduleframework import mtfexceptions
 from pdc_client import PDCClient
-from timeoutlib import Retry
+
+import core, common, mtfexceptions, timeoutlib
+
 
 
 def get_module_nsv(name=None, stream=None, version=None):
     name = name or os.environ.get('MODULE_NAME')
-    stream = stream or os.environ.get('MODULE_STREAM') or conf["modularity"]["default_module_stream"]
+    stream = stream or os.environ.get('MODULE_STREAM') or common.conf["modularity"]["default_module_stream"]
     version = version or os.environ.get('MODULE_VERSION')
     return {'name':name, 'stream':stream, 'version':version}
 
@@ -53,10 +52,10 @@ def get_base_compose():
         release = default_release
     compose_url = os.environ.get("MTF_COMPOSE_BASE")
     if not compose_url:
-        tmpcompose = conf.get("compose", {}).get("baseurlrepo")
+        tmpcompose = common.conf.get("compose", {}).get("baseurlrepo")
         if tmpcompose:
             compose_url = tmpcompose.format(
-                RELEASE=release, ARCH=conf["generic"]["arch"])
+                RELEASE=release, ARCH=common.conf["generic"]["arch"])
     return compose_url
 
 class PDCParserGeneral():
@@ -96,11 +95,11 @@ class PDCParserGeneral():
                 pdc_query['stream'] = self.stream
             if self.version:
                 pdc_query['version'] = self.version
-            @Retry(attempts=conf["generic"]["retrycount"], timeout=conf["generic"]["retrytimeout"], error=mtfexceptions.PDCExc("Could not query PDC server"))
+            @timeoutlib.Retry(attempts=common.conf["generic"]["retrycount"], timeout=common.conf["generic"]["retrytimeout"], error=mtfexceptions.PDCExc("Could not query PDC server"))
             def retry_tmpfunc():
                 # Using develop=True to not authenticate to the server
-                pdc_session = PDCClient(conf["pdc"]["pdc_server"], ssl_verify=True, develop=True)
-                print_debug(pdc_session, pdc_query)
+                pdc_session = PDCClient(common.conf["pdc"]["pdc_server"], ssl_verify=True, develop=True)
+                core.print_debug(pdc_session, pdc_query)
                 return pdc_session(**pdc_query)
             mod_info = retry_tmpfunc()
             if not mod_info or "results" not in mod_info.keys() or not mod_info["results"]:
@@ -141,7 +140,7 @@ class PDCParserGeneral():
 
         :return: str url of file
         """
-        omodulefile = conf["modularity"]["tempmodulefile"]
+        omodulefile = common.conf["modularity"]["tempmodulefile"]
         mdfile = open(omodulefile, mode="w")
         mdfile.write(yaml.dump(self.getmoduleMD()))
         mdfile.close()
@@ -172,7 +171,7 @@ class PDCParserGeneral():
 
     def __generateDepModules_solver(self, parentdict):
         deps = self.__get_module_requires()
-        print_debug("tree traverse from %s: %s"% (self.name, deps))
+        core.print_debug("tree traverse from %s: %s"% (self.name, deps))
         for dep in deps:
             if dep not in parentdict:
                 parentdict[dep] = deps[dep]
@@ -197,30 +196,30 @@ class PDCParserKoji(PDCParserGeneral):
         :param dirname: string
         :return: None
         """
-        print_info("DOWNLOADING ALL packages for %s_%s_%s" % (self.name, self.stream, self.version))
-        for foo in process.run("koji list-tagged --quiet %s" % self.get_pdc_info()["koji_tag"], verbose=is_debug()).stdout.split("\n"):
+        core.print_info("DOWNLOADING ALL packages for %s_%s_%s" % (self.name, self.stream, self.version))
+        for foo in process.run("koji list-tagged --quiet %s" % self.get_pdc_info()["koji_tag"], verbose=core.is_debug()).stdout.split("\n"):
             pkgbouid = foo.strip().split(" ")[0]
             if len(pkgbouid) > 4:
-                print_debug("DOWNLOADING: %s" % foo)
+                core.print_debug("DOWNLOADING: %s" % foo)
 
-                @Retry(attempts=conf["generic"]["retrycount"] * 10, timeout=conf["generic"]["retrytimeout"] * 60,
-                       delay=conf["generic"]["retrytimeout"],
+                @timeoutlib.Retry(attempts=common.conf["generic"]["retrycount"] * 10, timeout=common.conf["generic"]["retrytimeout"] * 60,
+                       delay=common.conf["generic"]["retrytimeout"],
                        error=mtfexceptions.KojiExc(
-                           "RETRY: Unbale to fetch package from koji after %d attempts" % (conf["generic"]["retrycount"] * 10)))
+                           "RETRY: Unbale to fetch package from koji after %d attempts" % (common.conf["generic"]["retrycount"] * 10)))
                 def tmpfunc():
                     a = process.run(
                         "cd %s; koji download-build %s  -a %s -a noarch" %
-                        (dirname, pkgbouid, conf["generic"]["arch"]), shell=True, verbose=is_debug(), ignore_status=True)
+                        (dirname, pkgbouid, common.conf["generic"]["arch"]), shell=True, verbose=core.is_debug(), ignore_status=True)
                     if a.exit_status == 1:
                         if "packages available for" in a.stdout.strip():
-                            print_debug(
+                            core.print_debug(
                                 'UNABLE TO DOWNLOAD package (intended for other architectures, GOOD):', a.command)
                         else:
                             raise mtfexceptions.KojiExc(
                                 'UNABLE TO DOWNLOAD package (KOJI issue, BAD):', a.command)
 
                 tmpfunc()
-        print_info("DOWNLOADING finished")
+        core.print_info("DOWNLOADING finished")
 
     def get_repo(self):
         """
@@ -229,10 +228,10 @@ class PDCParserKoji(PDCParserGeneral):
 
         :return: str
         """
-        dir_prefix = conf["nspawn"]["basedir"]
+        dir_prefix = common.conf["nspawn"]["basedir"]
         process.run("{HOSTPACKAGER} install createrepo koji".format(
-            **trans_dict), ignore_status=True)
-        if is_recursive_download():
+            **common.trans_dict), ignore_status=True)
+        if common.is_recursive_download():
             dirname = os.path.join(dir_prefix,"localrepo_recursive")
         else:
             dirname = os.path.join(dir_prefix, "localrepo_%s_%s_%s" % (self.name, self.stream, self.version))
@@ -244,7 +243,7 @@ class PDCParserKoji(PDCParserGeneral):
             if not os.path.exists(absdir):
                 os.mkdir(absdir)
             self.download_tagged(absdir)
-            if is_recursive_download():
+            if common.is_recursive_download():
                 allmodules = self.generateDepModules()
                 for mo in allmodules:
                     localrepo = PDCParserKoji(mo, allmodules[mo])
@@ -252,13 +251,13 @@ class PDCParserKoji(PDCParserGeneral):
 
             process.run(
                 "cd %s; createrepo -v %s" %
-                (absdir, absdir), shell=True, verbose=is_debug())
+                (absdir, absdir), shell=True, verbose=core.is_debug())
         return "file://%s" % absdir
 
 
 class PDCParserODCS(PDCParserGeneral):
-    compose_type = conf["odcs"]["compose_type"]
-    odcsauth = conf["odcs"]["auth"]
+    compose_type = common.conf["odcs"]["compose_type"]
+    odcsauth = common.conf["odcs"]["auth"]
 
     def get_repo(self):
         # import moved here, to avoid messages when you don't need to use ODCS
@@ -266,19 +265,19 @@ class PDCParserODCS(PDCParserGeneral):
 
         if self.odcsauth.get("auth_mech") == AuthMech.OpenIDC:
             if not self.odcsauth.get("openidc_token"):
-                self.odcsauth["openidc_token"] = get_openidc_auth()
-        odcs = ODCS(conf["odcs"]["url"], **self.odcsauth)
-        print_debug("ODCS Starting module composing: %s" % odcs,
+                self.odcsauth["openidc_token"] = common.get_openidc_auth()
+        odcs = ODCS(common.conf["odcs"]["url"], **self.odcsauth)
+        core.print_debug("ODCS Starting module composing: %s" % odcs,
                     "%s compose for: %s" % (self.compose_type, self.get_module_identifier()))
         compose_builder = odcs.new_compose(self.get_module_identifier(),
                                            self.compose_type,
-                                           **conf["odcs"]["new_compose_dict"])
-        timeout_time=conf["odcs"]["timeout"]
-        print_debug("ODCS Module compose started, timeout set to %ss" % timeout_time)
+                                           **common.conf["odcs"]["new_compose_dict"])
+        timeout_time=common.conf["odcs"]["timeout"]
+        core.print_debug("ODCS Module compose started, timeout set to %ss" % timeout_time)
         compose_state = odcs.wait_for_compose(compose_builder["id"], timeout=timeout_time)
         if compose_state["state_name"] == "done":
-            compose = "{compose}/{arch}/os".format(compose=compose_state["result_repo"], arch=conf["generic"]["arch"])
-            print_info("ODCS Compose done, URL with repo file", compose)
+            compose = "{compose}/{arch}/os".format(compose=compose_state["result_repo"], arch=common.conf["generic"]["arch"])
+            core.print_info("ODCS Compose done, URL with repo file", compose)
             return compose
         else:
             raise mtfexceptions.PDCExc("ODCS: Failed to generate compose for module: %s" %
@@ -299,16 +298,16 @@ def getBasePackageSet(modulesDict=None, isModule=True, isContainer=False):
 
     if isModule:
         if isContainer:
-            out = conf["packages"]["container"]
+            out = common.conf["packages"]["container"]
         else:
 
-            out = conf["packages"]["common"] + conf["packages"]["basic_modular"]
+            out = common.conf["packages"]["common"] + common.conf["packages"]["basic_modular"]
     else:
         if isContainer:
             out = []
         else:
-            out = conf["packages"]["common"] + conf["packages"]["basic"]
-    print_info("Base packages to install:", out)
+            out = common.conf["packages"]["common"] + common.conf["packages"]["basic"]
+    core.print_info("Base packages to install:", out)
     return out
 
 
@@ -320,7 +319,6 @@ def get_repo_url(wmodule="base-runtime", wstream="master"):
 
     :param wmodule: module name
     :param wstream: module stream
-    :param fake:
     :return: str
     """
 
@@ -329,60 +327,60 @@ def get_repo_url(wmodule="base-runtime", wstream="master"):
 
 
 PDCParser = PDCParserGeneral
-if get_odcs_envvar():
+if common.get_odcs_envvar():
     PDCParser = PDCParserODCS
-elif not get_if_remoterepos():
+elif not common.get_if_remoterepos():
     PDCParser = PDCParserKoji
 
 
 def test_PDC_general_base_runtime():
-    print_info(sys._getframe().f_code.co_name)
+    core.print_info(sys._getframe().f_code.co_name)
     parser = PDCParserGeneral("base-runtime", "master")
     assert not parser.generateDepModules()
     assert "module-" in parser.get_pdc_info()["koji_tag"]
-    print_info(parser.get_repo())
-    assert conf["compose"]["baseurlrepo"][:30] in parser.get_repo()
-    print_info(parser.generateParams())
+    core.print_info(parser.get_repo())
+    assert common.conf["compose"]["baseurlrepo"][:30] in parser.get_repo()
+    core.print_info(parser.generateParams())
     assert len(parser.generateParams()) == 3
     assert "MODULE=nspawn" in " ".join(parser.generateParams())
-    print_info("URL=%s" % conf["compose"]["baseurlrepo"][:30])
-    assert "URL=%s" % conf["compose"]["baseurlrepo"][:30] in " ".join(parser.generateParams())
+    core.print_info("URL=%s" % common.conf["compose"]["baseurlrepo"][:30])
+    assert "URL=%s" % common.conf["compose"]["baseurlrepo"][:30] in " ".join(parser.generateParams())
 
 
 def test_PDC_general_nodejs():
-    print_info(sys._getframe().f_code.co_name)
+    core.print_info(sys._getframe().f_code.co_name)
     parser = PDCParserGeneral("nodejs", "8")
     deps = parser.generateDepModules()
-    print_info(deps)
+    core.print_info(deps)
     assert 'platform' in deps
 
 
 def test_PDC_koji_nodejs():
 
-    conf["nspawn"]["basedir"]="."
-    print_info(sys._getframe().f_code.co_name)
+    common.conf["nspawn"]["basedir"]="."
+    core.print_info(sys._getframe().f_code.co_name)
     parser = PDCParserKoji("nodejs", "8")
     deps = parser.generateDepModules()
-    print_info(deps)
+    core.print_info(deps)
     assert 'platform' in deps
-    print_info(parser.get_repo())
+    core.print_info(parser.get_repo())
     assert "file://" in parser.get_repo()
-    assert os.path.abspath(conf["nspawn"]["basedir"]) in parser.get_repo()
+    assert os.path.abspath(common.conf["nspawn"]["basedir"]) in parser.get_repo()
     assert "MODULE=nspawn" in " ".join(parser.generateParams())
     assert "URL=file://" in " ".join(parser.generateParams())
     # TODO: this subtest is too slow, commented out
-    #global is_recursive_download
-    #is_recursive_download = lambda: True
-    #print_info(parser.get_repo())
+    #global common.is_recursive_download
+    #common.is_recursive_download = lambda: True
+    #core.print_info(parser.get_repo())
 
 
 def test_PDC_ODCS_nodejs():
-    print_info(sys._getframe().f_code.co_name)
+    core.print_info(sys._getframe().f_code.co_name)
     parser = PDCParserODCS("nodejs", "8")
     # TODO: need to setup MTF_ODCS variable with odcs token, and ODCS version at least 0.1.2
     # or your user will be asked to for token interactively
-    if get_odcs_envvar():
-        print_info(parser.get_repo())
+    if common.get_odcs_envvar():
+        core.print_info(parser.get_repo())
 
 
 

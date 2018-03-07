@@ -20,7 +20,6 @@
 #
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
-from __future__ import print_function
 
 from moduleframework import module_framework
 

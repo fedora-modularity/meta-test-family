@@ -30,17 +30,17 @@ import shutil
 import glob
 import time
 import re
-
 from avocado import Test
 from avocado.utils import process
-from mtf import common
-from mtf import mtfexceptions
+
+from moduleframework import core, common, mtfexceptions
+
 
 DEFAULT_RETRYTIMEOUT = 30
 DEFAULT_SLEEP = 1
 base_package_set = ["systemd"]
 
-is_debug_low = common.is_debug
+is_debug_low = core.is_debug
 if is_debug_low():
     logging.basicConfig(level=logging.DEBUG)
 

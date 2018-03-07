@@ -32,22 +32,20 @@ import urllib
 import yaml
 import subprocess
 import copy
-import sys
 import random
 import string
 import requests
 import warnings
 import ast
-from glob import glob
-from avocado.utils import process
-from mtfexceptions import ModuleFrameworkException, ConfigExc, CmdExc, DefaultConfigExc
-from core import DATADIR, is_debug, is_not_silent, print_info, print_debug
-
+import glob
+import avocado.utils
+import mtfexceptions
+import core
 
 
 class MTFConfParser(dict):
     configdir = "mtf.conf.d"
-    source_cfg = os.path.join(*(["/"] + DATADIR + [configdir]))
+    source_cfg = os.path.join(*(["/"] + core.DATADIR + [configdir]))
     default_cfg = os.path.join("/etc", configdir)
     user_cfg = os.path.expanduser("~/." + configdir)
     pattern = "*.yaml"
@@ -55,11 +53,11 @@ class MTFConfParser(dict):
     def __init__(self):
         config = {}
         for cfgdir in [self.source_cfg, self.default_cfg, self.user_cfg]:
-            print_debug("MTF config dir search: {}".format(cfgdir))
+            core.print_debug("MTF config dir search: {}".format(cfgdir))
             if os.path.exists(cfgdir):
-                print_info("MTF config dir exists, search for {}/{}".format(cfgdir, self.pattern))
-                for cfgfile in glob(os.path.join(cfgdir, self.pattern)):
-                    print_info("MTF config load: {}".format(cfgfile))
+                core.print_info("MTF config dir exists, search for {}/{}".format(cfgdir, self.pattern))
+                for cfgfile in glob.glob(os.path.join(cfgdir, self.pattern)):
+                    core.print_info("MTF config load: {}".format(cfgfile))
                     config.update(yaml.load(open(cfgfile)))
         assert config.get("generic")
         super(MTFConfParser, self).__init__(config)
@@ -218,10 +216,10 @@ def get_openidc_auth():
         try:
             odcstoken = oidc.get_token(scopes, new_token=True)
         except requests.exceptions.HTTPError as e:
-            print_info(e.response.text)
-            raise ModuleFrameworkException("Unable to get token via OpenIDC for your user")
+            core.print_info(e.response.text)
+            raise mtfexceptions.ModuleFrameworkException("Unable to get token via OpenIDC for your user")
     if odcstoken and len(odcstoken)<10:
-        raise ModuleFrameworkException("Unable to parse token for ODCS, token is too short: %s" % odcstoken)
+        raise mtfexceptions.ModuleFrameworkException("Unable to parse token for ODCS, token is too short: %s" % odcstoken)
     return odcstoken
 
 
@@ -270,7 +268,7 @@ def translate_cmd(cmd, translation_dict=None):
     try:
         formattedcommand = cmd.format(**translation_dict)
     except KeyError:
-        raise ModuleFrameworkException(
+        raise mtfexceptions.ModuleFrameworkException(
             "Command is formatted by using trans_dict. If you want to use "
             "brackets { } in your code, please use {{ }}. Possible values "
             "in trans_dict are: %s. \nBAD COMMAND: %s"
@@ -361,7 +359,7 @@ class CommonFunctions(object):
         # if there is inheritance join both dictionary
         self.info.update(self.config.get("module", {}).get(get_module_type()))
         if not self.info:
-            raise ConfigExc("There is no section for (module: -> %s:) in the configuration file." %
+            raise mtfexceptions.ConfigExc("There is no section for (module: -> %s:) in the configuration file." %
                             get_module_type_base())
 
         if self.config.get('modulemd-url') and get_if_module():
@@ -439,11 +437,11 @@ class CommonFunctions(object):
         Run commands on a host.
 
         :param common: command to exectute
-        ** kwargs: avocado process.run params like: shell, ignore_status, verbose
+        ** kwargs: avocado.utils.process.run params like: shell, ignore_status, verbose
         :return: avocado.process.run
         """
 
-        return process.run("%s" % translate_cmd(command, translation_dict=trans_dict), **kwargs)
+        return avocado.utils.process.run("%s" % translate_cmd(command, translation_dict=trans_dict), **kwargs)
 
     def get_test_dependencies(self):
         """
@@ -465,15 +463,15 @@ class CommonFunctions(object):
             packages = self.get_test_dependencies()
 
         if packages:
-            print_info("Installs test dependencies: ", packages)
+            core.print_info("Installs test dependencies: ", packages)
             # you have to have root permission to install packages:
             try:
                 self.runHost(
                     "{HOSTPACKAGER} install " +
                     " ".join(packages),
-                    ignore_status=False, verbose=is_debug())
-            except process.CmdError as e:
-                raise CmdExc("Installation failed; Do you have permission to do that?", e)
+                    ignore_status=False, verbose=core.is_debug())
+            except avocado.utils.process.CmdError as e:
+                raise mtfexceptions.CmdExc("Installation failed; Do you have permission to do that?", e)
 
     def getPackageList(self, profile=None):
         """
@@ -497,7 +495,7 @@ class CommonFunctions(object):
                 package_list += profile_append
         else:
             package_list += mddata['data']['profiles'][profile].get('rpms', [])
-        print_info("PCKGs to install inside module:", package_list)
+        core.print_info("PCKGs to install inside module:", package_list)
         return package_list
 
     def getModuleDependencies(self):
@@ -549,9 +547,9 @@ class CommonFunctions(object):
             ymlfile = urllib.urlopen(modulemd)
             link = yaml.load(ymlfile)
         except IOError as e:
-            raise ConfigExc("File '%s' cannot be load" % modulemd, e)
+            raise mtfexceptions.ConfigExc("File '%s' cannot be load" % modulemd, e)
         except yaml.parser.ParserError as e:
-            raise ConfigExc("Module MD file contains errors: '%s'" % e, modulemd)
+            raise mtfexceptions.ConfigExc("Module MD file contains errors: '%s'" % e, modulemd)
         if not urllink:
             self.modulemdConf = link
         return link
@@ -590,7 +588,7 @@ class CommonFunctions(object):
         :return: None
         """
         if self.info.get("setup"):
-            self.runHost(self.info.get("setup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
+            self.runHost(self.info.get("setup"), shell=True, ignore_bg_processes=True, verbose=core.is_not_silent())
 
     def _callCleanupFromConfig(self):
         """
@@ -599,7 +597,7 @@ class CommonFunctions(object):
         :return: None
         """
         if self.info.get("cleanup"):
-            self.runHost(self.info.get("cleanup"), shell=True, ignore_bg_processes=True, verbose=is_not_silent())
+            self.runHost(self.info.get("cleanup"), shell=True, ignore_bg_processes=True, verbose=core.is_not_silent())
 
     def run(self, command, **kwargs):
         """
@@ -626,8 +624,8 @@ class CommonFunctions(object):
         """
         try:
             command = self.info.get('status') or command
-            a = self.run(command, shell=True, ignore_bg_processes=True, verbose=is_not_silent())
-            print_debug("command:", a.command, "stdout:", a.stdout, "stderr:", a.stderr)
+            a = self.run(command, shell=True, ignore_bg_processes=True, verbose=core.is_not_silent())
+            core.print_debug("command:", a.command, "stdout:", a.stdout, "stderr:", a.stderr)
             return True
         except BaseException:
             return False
@@ -640,7 +638,7 @@ class CommonFunctions(object):
         :return: None
         """
         command = self.info.get('start') or command
-        self.run(command, shell=True, ignore_bg_processes=True, verbose=is_debug())
+        self.run(command, shell=True, ignore_bg_processes=True, verbose=core.is_debug())
         self.status()
         trans_dict["GUESTPACKAGER"] = self.get_packager()
 
@@ -652,7 +650,7 @@ class CommonFunctions(object):
         :return: None
         """
         command = self.info.get('stop') or command
-        self.run(command, shell=True, ignore_bg_processes=True, verbose=is_not_silent())
+        self.run(command, shell=True, ignore_bg_processes=True, verbose=core.is_not_silent())
 
     def install_packages(self, packages=None):
         """
@@ -668,12 +666,12 @@ class CommonFunctions(object):
                          ignore_status=True,
                          verbose=False)
             if a.exit_status == 0:
-                print_info("Packages installed via %s" % self.get_packager(), a.stdout)
+                core.print_info("Packages installed via %s" % self.get_packager(), a.stdout)
             else:
-                print_info(
+                core.print_info(
                     "Nothing installed via %s, but package list is not empty" % self.get_packager(),
                     packages)
-                raise CmdExc("ERROR: Unable to install packages inside: %s" % packages)
+                raise mtfexceptions.CmdExc("ERROR: Unable to install packages inside: %s" % packages)
 
     def tearDown(self):
         """
@@ -685,7 +683,7 @@ class CommonFunctions(object):
             self.stop()
             self._callCleanupFromConfig()
         else:
-            print_info("TearDown phase skipped.")
+            core.print_info("TearDown phase skipped.")
 
     def copyTo(self, src, dest):
         """
@@ -740,18 +738,18 @@ def get_config(fail_without_url=True, reload=False):
         cfgfile = os.environ.get('CONFIG')
         if cfgfile:
             if os.path.exists(cfgfile):
-                print_debug("Config file defined via envvar: %s" % cfgfile)
+                core.print_debug("Config file defined via envvar: %s" % cfgfile)
             else:
-                raise ConfigExc("File does not exist although defined CONFIG envvar: %s" % cfgfile)
+                raise mtfexceptions.ConfigExc("File does not exist although defined CONFIG envvar: %s" % cfgfile)
         else:
             cfgfile = "./config.yaml"
             if os.path.exists(cfgfile):
-                print_debug("Using module config file: %s" % cfgfile)
+                core.print_debug("Using module config file: %s" % cfgfile)
             else:
                 if fail_without_url and not get_url():
-                    raise DefaultConfigExc("You have to use URL envvar for testing your images or repos")
+                    raise mtfexceptions.Defaultmtfexceptions.ConfigExc("You have to use URL envvar for testing your images or repos")
                 cfgfile = "/usr/share/moduleframework/docs/example-config-minimal.yaml"
-                print_debug("Using default minimal config: %s" % cfgfile)
+                core.print_debug("Using default minimal config: %s" % cfgfile)
 
 
         try:
@@ -759,12 +757,12 @@ def get_config(fail_without_url=True, reload=False):
                 xcfg = yaml.load(ymlfile.read())
             doc_name = ['modularity-testing', 'meta-test-family', 'meta-test']
             if xcfg.get('document') not in doc_name:
-                raise ConfigExc("bad yaml file: item (%s)" %
+                raise mtfexceptions.ConfigExc("bad yaml file: item (%s)" %
                                 doc_name, xcfg.get('document'))
             if not xcfg.get('name'):
-                raise ConfigExc("Missing (name:) in config file")
+                raise mtfexceptions.ConfigExc("Missing (name:) in config file")
             if not xcfg.get("module"):
-                raise ConfigExc("No module in yaml config defined")
+                raise mtfexceptions.ConfigExc("No module in yaml config defined")
             # copy rpm section to nspawn, in case not defined explicitly
             # make it backward compatible
             if xcfg.get("module", {}).get("rpm") and not xcfg.get("module", {}).get("nspawn"):
@@ -772,7 +770,7 @@ def get_config(fail_without_url=True, reload=False):
             __persistent_config = xcfg
             return xcfg
         except IOError:
-            raise ConfigExc(
+            raise mtfexceptions.ConfigExc(
                 "Error: File '%s' doesn't appear to exist or it's not a YAML file. "
                 "Tip: If the CONFIG envvar is not set, mtf-generator looks for './config'."
                 % cfgfile)
@@ -815,7 +813,7 @@ def get_module_type():
     if amodule in list_modules_from_config():
         return amodule
     else:
-        raise ModuleFrameworkException("Unsupported MODULE={0}".format(amodule),
+        raise mtfexceptions.ModuleFrameworkException("Unsupported MODULE={0}".format(amodule),
                                        "supported are: %s" % list_modules_from_config())
 
 
@@ -830,10 +828,10 @@ def get_module_type_base():
     if module_type not in get_backend_list():
         parent = get_config().get("module", {}).get(module_type, {}).get("parent")
         if not parent:
-            raise ModuleFrameworkException("Module (%s) does not provide parent backend parameter (there are: %s)" %
+            raise mtfexceptions.ModuleFrameworkException("Module (%s) does not provide parent backend parameter (there are: %s)" %
                                            (module_type, get_backend_list()))
     if parent not in get_backend_list():
-        raise ModuleFrameworkException("As parent is allowed just base type: %s" % get_backend_list)
+        raise mtfexceptions.ModuleFrameworkException("As parent is allowed just base type: %s" % get_backend_list)
     return parent
 
 
@@ -849,7 +847,7 @@ def get_docker_file(dir_name=conf["docker"]["dockerfiledefaultlocation"]):
     else:
         dockerfile = os.path.join(dir_name, conf["docker"]["dockerfile"])
     if not os.path.exists(dockerfile):
-        print_debug("Dockerfile does not exists (you can use DOCKERFILE "
+        core.print_debug("Dockerfile does not exists (you can use DOCKERFILE "
                     "envvar to set to another): %s" % dockerfile)
         dockerfile = None
     return dockerfile
@@ -869,7 +867,7 @@ def get_helpmd_file(dir_name=conf["docker"]["dockerfiledefaultlocation"]):
     else:
         helpmdfile = os.path.join(dir_name, conf["docker"]["helpmdfile"])
     if not os.path.exists(helpmdfile):
-        print_debug("Help MD file does not exists (you can use HELPMDFILE "
+        core.print_debug("Help MD file does not exists (you can use HELPMDFILE "
                     "envvar to set to another): %s" % helpmdfile)
         helpmdfile = None
     return helpmdfile

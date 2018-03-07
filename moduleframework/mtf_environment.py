@@ -24,20 +24,22 @@
 """
 Module to setup and cleanup the test environment.
 """
-from moduleframework.common import get_module_type_base, print_info
-from moduleframework.environment_prepare.docker_prepare import EnvDocker
-from moduleframework.environment_prepare.rpm_prepare import EnvRpm
-from moduleframework.environment_prepare.nspawn_prepare import EnvNspawn
-from moduleframework.environment_prepare.openshift_prepare import EnvOpenShift
-from moduleframework import mtf_scheduler
+import common
+import core
+
+import mtf_scheduler
+from environment_prepare.docker_prepare import EnvDocker
+from environment_prepare.rpm_prepare import EnvRpm
+from environment_prepare.nspawn_prepare import EnvNspawn
+from environment_prepare.openshift_prepare import EnvOpenShift
 
 # I'm lazy to do own argument parser here.
 args, unknown = mtf_scheduler.cli()
 if unknown:
     raise ValueError("unsupported option(s){0}".format(unknown))
 
-module_name = get_module_type_base()
-print_info("Setting environment for module: {} ".format(module_name))
+module_name = common.get_module_type_base()
+core.print_info("Setting environment for module: {} ".format(module_name))
 
 if module_name == "docker":
     env = EnvDocker()
@@ -50,7 +52,7 @@ elif module_name == "openshift":
 
 
 def mtfenvset():
-    print_info("Preparing environment ...")
+    core.print_info("Preparing environment ...")
     # cleanup_env exists in more forms for backend : EnvDocker/EnvRpm/EnvNspawn
     env.prepare_env()
 
@@ -58,5 +60,5 @@ def mtfenvset():
 def mtfenvclean():
     # cleanup_env exists in more forms for backend: EnvDocker/EnvRpm/EnvNspawn
     env.cleanup_env()
-    print_info("All clean")
+    core.print_info("All clean")
 

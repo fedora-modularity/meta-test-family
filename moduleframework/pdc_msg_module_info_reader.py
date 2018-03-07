@@ -22,10 +22,11 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
-from moduleframework.pdc_data import PDCParser
 from argparse import ArgumentParser
 import yaml
 import re
+
+import pdc_data
 
 def cli():
     parser = ArgumentParser()
@@ -69,7 +70,7 @@ def main():
             "(.*)-(.*)-(.*)", options.release).groups()
     elif options.latest:
         name = options.latest
-    pdc_solver = PDCParser(name, stream, version)
+    pdc_solver = pdc_data.PDCParser(name, stream, version)
     if options.commit:
         print pdc_solver.generateGitHash()
     else:

@@ -92,7 +92,7 @@ odcs:
 # set of packages what should/will be installed in various env
 packages:
 # packages for nspawn (called basic*)
-  common: ["iproute", "passwd", "systemd", "rpm", "dnf", "bash", "shadow-utils", "sssd-client", "util-linux", "libcrypt", "sssd-client"]
+  common: ["iproute", "dhcp-client", "initscripts", "passwd", "systemd", "rpm", "dnf", "bash", "shadow-utils", "sssd-client", "util-linux", "libcrypt", "sssd-client"]
 # basic package set for nonmodular nspawn testing
   basic: ["coreutils", "glibc-all-langpacks", "vim-minimal"]
 # basic package set for modular nspawn testing

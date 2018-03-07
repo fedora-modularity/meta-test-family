@@ -26,13 +26,11 @@ import time
 import random
 import string
 from avocado.utils.process import CmdError
-from moduleframework.common import conf, is_debug, print_debug, print_info, trans_dict, sanitize_cmd, \
-    get_openshift_ip, get_openshift_passwd, get_openshift_user
-from moduleframework.helpers.container_helper import ContainerHelper
-from moduleframework.mtfexceptions import ConfigExc
+from moduleframework import core, common, mtfexceptions
+import container_helper
 
 
-class OpenShiftHelper(ContainerHelper):
+class OpenShiftHelper(container_helper.ContainerHelper):
     """
     Basic Helper class for OpenShift container module type
 
@@ -50,7 +48,7 @@ class OpenShiftHelper(ContainerHelper):
         self.pod_id = None
         self._ip_address = None
         if not self.icontainer:
-            raise ConfigExc("No container image specified in the configuration file or environment variable.")
+            raise mtfexceptions.ConfigExc("No container image specified in the configuration file or environment variable.")
         if "docker=" in self.icontainer:
             self.container_name = self.icontainer[7:]
         else:
@@ -62,7 +60,7 @@ class OpenShiftHelper(ContainerHelper):
         random_str = ''.join(random.choice(string.lowercase) for _ in range(3))
         self.project_name = "{project}-{random_str}".format(project=self.app_name,
                                                             random_str=random_str)
-        print_debug(self.icontainer, self.app_name)
+        core.print_debug(self.icontainer, self.app_name)
 
     def _get_openshift_ip_registry(self):
         """
@@ -71,7 +69,7 @@ class OpenShiftHelper(ContainerHelper):
         :return: str or None
         """
         openshift_ip_registry = None
-        docker_registry = self.runHost('oc get svc -n default %s -o json' % conf["openshift"]["docker_registry"],
+        docker_registry = self.runHost('oc get svc -n default %s -o json' % common.conf["openshift"]["docker_registry"],
                                        ignore_status=True).stdout
         try:
             docker_registry = json.loads(docker_registry)
@@ -87,9 +85,9 @@ class OpenShiftHelper(ContainerHelper):
         :param password: Either user specified account
         """
         if password is None:
-            s = self.runHost("oc login -u %s" % account, verbose=is_debug())
+            s = self.runHost("oc login -u %s" % account, verbose=core.is_debug())
         else:
-            s = self.runHost("oc login -u %s -p %s" % (account, password), verbose=is_debug())
+            s = self.runHost("oc login -u %s -p %s" % (account, password), verbose=core.is_debug())
 
 
     def _register_docker_to_openshift_registry(self):
@@ -104,19 +102,19 @@ class OpenShiftHelper(ContainerHelper):
         * tag container name
         * push container name into docker
         """
-        whoami = self.runHost("oc whoami -t", ignore_status=True, verbose=is_debug())
+        whoami = self.runHost("oc whoami -t", ignore_status=True, verbose=core.is_debug())
 
         self._change_openshift_account()
         if self.get_docker_pull():
             self.runHost('docker pull %s' % self.container_name)
         openshift_ip_register = self._get_openshift_ip_registry()
-        self._change_openshift_account(account=get_openshift_user(),
-                                password=get_openshift_passwd())
+        self._change_openshift_account(account=common.get_openshift_user(),
+                                password=common.get_openshift_passwd())
 
         docker_login = self.runHost('docker login -u {user} -p {token} {ip}:5000'.format(
-            user=get_openshift_user(),
+            user=common.get_openshift_user(),
             token=whoami.stdout.strip(),
-            ip=openshift_ip_register), ignore_status=True, verbose=is_debug())
+            ip=openshift_ip_register), ignore_status=True, verbose=core.is_debug())
         oc_path = "{ip}:5000/{project}/{name}".format(ip=openshift_ip_register,
                                                       name=self.app_name,
                                                       project=self.project_name)
@@ -134,7 +132,7 @@ class OpenShiftHelper(ContainerHelper):
         """
         oc_status = self.runHost("oc get dc %s -o json" % self.app_name, ignore_status=True)
         if int(oc_status.exit_status) == 0:
-            print_info("Application already exists.")
+            core.print_info("Application already exists.")
             return True
         oc_pods = self._oc_get_output('pods')
         # Check if 'items' in json output is empty or not
@@ -162,10 +160,10 @@ class OpenShiftHelper(ContainerHelper):
                     # In metadata dictionary and name is stored pod_name
                     self.pod_id = json_output.get('metadata', {}).get('name')
                     return self.pod_id
-            elif resource == conf["openshift"]["template"]:
+            elif resource == common.conf["openshift"]["template"]:
                 if json_output.get('metadata').get('name') == self.app_name:
                     return json_output.get('metadata').get('name')
-            elif resource == conf["openshift"]["project"]:
+            elif resource == common.conf["openshift"]["project"]:
                 for prj in json_output:
                     name = prj.get('metadata').get('name')
                     if self.app_name in name:
@@ -193,7 +191,7 @@ class OpenShiftHelper(ContainerHelper):
         :return: dictionary
         """
         template_name = self._oc_get_output('template')
-        print_debug(template_name)
+        core.print_debug(template_name)
 
     def _oc_get_output(self, resource):
         """
@@ -216,7 +214,7 @@ class OpenShiftHelper(ContainerHelper):
 
         oc_delete = self.runHost("oc delete %s %s" % (resource, name),
                                  ignore_status=True,
-                                 verbose=is_debug())
+                                 verbose=core.is_debug())
         return oc_delete.exit_status
 
     def _remove_apps_from_openshift_resources(self, oc_service="svc"):
@@ -236,7 +234,7 @@ class OpenShiftHelper(ContainerHelper):
         """
         if self._app_exists():
             # TODO get info from oc status and delete relevant svc/dc/is/pods
-            for ns in ['svc', 'dc', 'is', 'pod', conf["openshift"]["template"], conf["openshift"]["project"]]:
+            for ns in ['svc', 'dc', 'is', 'pod', common.conf["openshift"]["template"], common.conf["openshift"]["project"]]:
                 self._remove_apps_from_openshift_resources(ns)
 
     def _create_app(self, template=None):
@@ -253,10 +251,10 @@ class OpenShiftHelper(ContainerHelper):
             cmd.extend([template, "-p", "APPLICATION_NAME=%s" % self.app_name])
         cmd.extend(["-l", "mtf_testing=true"])
         cmd.extend(["--name", self.app_name])
-        print_debug(cmd)
+        core.print_debug(cmd)
         oc_new_app = self.runHost(' '.join(cmd), ignore_status=True)
         time.sleep(1)
-        print_debug(oc_new_app.stdout)
+        core.print_debug(oc_new_app.stdout)
         return oc_new_app.exit_status
 
     def _create_app_by_template(self):
@@ -270,20 +268,20 @@ class OpenShiftHelper(ContainerHelper):
         """
         self._register_docker_to_openshift_registry()
         self.runHost('oc get is')
-        oc_template_app = self.runHost('oc process -f "%s"' % self.template, verbose=is_debug())
+        oc_template_app = self.runHost('oc process -f "%s"' % self.template, verbose=core.is_debug())
         self._change_openshift_account()
         oc_template_create = None
         try:
             oc_template_create = self.runHost('oc create -f %s -n %s' % (self.template,
                                                                          self.project_name),
-                                              verbose=is_debug())
+                                              verbose=core.is_debug())
         except CmdError as cme:
-            print_info('oc create -f failed with traceback %s' % cme.message)
+            core.print_info('oc create -f failed with traceback %s' % cme.message)
             self.runHost('oc status')
             self._oc_get_output('all')
             return False
-        self._change_openshift_account(account=get_openshift_user(),
-                                       password=get_openshift_passwd())
+        self._change_openshift_account(account=common.get_openshift_user(),
+                                       password=common.get_openshift_passwd())
         template_name = self._get_openshift_template()
         time.sleep(1)
         self._create_app(template=template_name)
@@ -301,7 +299,7 @@ class OpenShiftHelper(ContainerHelper):
         """
         pod_initiated = False
         for pod in self._oc_get_output('pod'):
-            print_debug(self.pod_id)
+            core.print_debug(self.pod_id)
             if self._check_resource_in_json(pod):
                 self._pod_status = pod.get('status').get('phase')
                 if self._pod_status == "Running":
@@ -316,7 +314,7 @@ class OpenShiftHelper(ContainerHelper):
                  True, application is initiated and ready for testing
         """
         pod_initiated = False
-        for x in range(0, conf["openshift"]["init_wait"]):
+        for x in range(0, common.conf["openshift"]["init_wait"]):
             # We need wait a second before pod is really initiated.
             time.sleep(1)
             if self._get_pod_status():
@@ -336,9 +334,9 @@ class OpenShiftHelper(ContainerHelper):
         self._icontainer = self.get_url()
 
     def _openshift_login(self,
-                         oc_ip=conf["openshift"]["local_ip"],
-                         oc_user=conf["openshift"]["local_user"],
-                         oc_passwd=conf["openshift"]["local_password"],
+                         oc_ip=common.conf["openshift"]["local_ip"],
+                         oc_user=common.conf["openshift"]["local_user"],
+                         oc_passwd=common.conf["openshift"]["local_password"],
                          env=False):
         """
         It logins to an OpenShift environment on specific IP and under user and his password.
@@ -349,13 +347,13 @@ class OpenShiftHelper(ContainerHelper):
         :return:
         """
         if env:
-            oc_ip = get_openshift_ip()
-            oc_user = get_openshift_user()
-            oc_passwd = get_openshift_passwd()
+            oc_ip = common.get_openshift_ip()
+            oc_user = common.get_openshift_user()
+            oc_passwd = common.get_openshift_passwd()
         oc_output = self.runHost("oc login %s:8443 --username=%s --password=%s" % (oc_ip,
                                                                                    oc_user,
                                                                                    oc_passwd),
-                                 verbose=is_debug())
+                                 verbose=core.is_debug())
         return oc_output.exit_status
 
     def tearDown(self):
@@ -368,7 +366,7 @@ class OpenShiftHelper(ContainerHelper):
         try:
             self._app_remove()
         except Exception as e:
-            print_info(e, "OpenShift application already removed")
+            core.print_info(e, "OpenShift application already removed")
             pass
 
     def _get_ip_instance(self):
@@ -383,13 +381,13 @@ class OpenShiftHelper(ContainerHelper):
             for svc in service:
                 if svc.get('metadata').get('labels').get('app') == self.app_name:
                     self.ip_address = svc.get('spec').get("clusterIP")
-                    trans_dict['GUESTIPADDR'] = self.ip_address
+                    common.trans_dict['GUESTIPADDR'] = self.ip_address
             return True
         except KeyError as e:
-            print_info(e.message)
+            core.print_info(e.message)
             return False
         except IndexError as e:
-            print_info(e.message)
+            core.print_info(e.message)
             return False
 
     @property
@@ -418,21 +416,21 @@ class OpenShiftHelper(ContainerHelper):
         try:
             self._app_remove()
         except Exception as e:
-            print_info(e, "OpenShift applications were removed")
+            core.print_info(e, "OpenShift applications were removed")
             pass
 
         project = self.runHost('oc new-project %s' % self.project_name,
                                ignore_status=True,
-                               verbose=is_debug())
+                               verbose=core.is_debug())
         if self.template is None:
             if not self._app_exists():
             # This part is used for running an application without template or s2i
                 self._create_app()
         else:
-            print_debug(self.template)
-            self._change_openshift_account(account=get_openshift_user(),
-                                           password=get_openshift_passwd())
-            self._remove_apps_from_openshift_resources(conf["openshift"]["template"])
+            core.print_debug(self.template)
+            self._change_openshift_account(account=common.get_openshift_user(),
+                                           password=common.get_openshift_passwd())
+            self._remove_apps_from_openshift_resources(common.conf["openshift"]["template"])
             if not self._create_app_by_template():
                 return False
         # Verify application is really deploy and prepared for testing.
@@ -448,14 +446,14 @@ class OpenShiftHelper(ContainerHelper):
 
         :return: None
         """
-        self._change_openshift_account(account=get_openshift_user(),
-                                       password=get_openshift_passwd())
+        self._change_openshift_account(account=common.get_openshift_user(),
+                                       password=common.get_openshift_passwd())
         self._oc_get_output('all')
         if self._app_exists():
             try:
                 self._app_remove()
             except Exception as e:
-                print_info(e, "OpenShift application already removed")
+                core.print_info(e, "OpenShift application already removed")
                 pass
 
     def status(self, command="ls /"):
@@ -471,7 +469,7 @@ class OpenShiftHelper(ContainerHelper):
         status = False
         if self._app_exists():
             command = self.info.get('start') or command
-            return self.runHost('oc exec %s %s' % (self.pod_id, sanitize_cmd(command)))
+            return self.runHost('oc exec %s %s' % (self.pod_id, common.sanitize_cmd(command)))
 
     def run(self, command="ls /", **kwargs):
         """
@@ -483,7 +481,7 @@ class OpenShiftHelper(ContainerHelper):
         :return: avocado.process.run
         """
         ret_val = 0
-        cmd_object = self.runHost('oc exec %s %s' % (self.pod_id, sanitize_cmd(command)))
+        cmd_object = self.runHost('oc exec %s %s' % (self.pod_id, common.sanitize_cmd(command)))
         if cmd_object.exit_status != 0:
             ret_val = 1
         return ret_val

@@ -25,8 +25,7 @@
 #
 
 
-from moduleframework import module_framework
-from moduleframework import common
+from moduleframework import core, module_framework
 
 
 class rpmvalidation(module_framework.AvocadoTest):
@@ -97,7 +96,7 @@ class rpmvalidation(module_framework.AvocadoTest):
     def testPaths(self):
         self.start()
         allpackages = filter(bool, self.run("rpm -qa").stdout.split("\n"))
-        common.print_debug(allpackages)
+        core.print_debug(allpackages)
         for package in allpackages:
             if 'filesystem' in package:
                 continue

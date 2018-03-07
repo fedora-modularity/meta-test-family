@@ -25,15 +25,16 @@
 module for environment setup and cleanup, to be able to split action for ansible, more steps instead of one complex
 """
 
-from avocado.utils import service
-from moduleframework.common import print_info, CommonFunctions
 import os
+from avocado.utils import service
+from moduleframework import core, common
 
 
-class EnvDocker(CommonFunctions):
+
+class EnvDocker(common.CommonFunctions):
 
     def prepare_env(self):
-        print_info('Loaded config for name: {}'.format(self.config['name']))
+        core.print_info('Loaded config for name: {}'.format(self.config['name']))
         self.installTestDependencies()
         self.__install_env()
         self.__start_service()
@@ -53,7 +54,7 @@ class EnvDocker(CommonFunctions):
         """
 
         if registry not in open('/etc/sysconfig/docker', 'r').read():
-            print_info("Adding %s to insecure registry" % registry)
+            core.print_info("Adding %s to insecure registry" % registry)
             with open("/etc/sysconfig/docker", "a") as myfile:
                 myfile.write(
                     "INSECURE_REGISTRY='--insecure-registry $REGISTRY %s'" % registry)
@@ -76,7 +77,7 @@ class EnvDocker(CommonFunctions):
         """
 
         if not os.path.exists('/var/run/docker.sock'):
-            print_info("Starting Docker")
+            core.print_info("Starting Docker")
             service_manager = service.ServiceManager()
             service_manager.start('docker')
 
@@ -88,7 +89,7 @@ class EnvDocker(CommonFunctions):
         """
 
         if os.path.exists('/var/run/docker.sock'):
-            print_info("Stopping Docker")
+            core.print_info("Stopping Docker")
             service_manager = service.ServiceManager()
             service_manager.stop('docker')
 
