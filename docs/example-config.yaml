@@ -99,3 +99,6 @@ module:
 # you have to set parent value for these inherited configs
         parent: docker
         start: "docker run -it -p 11211:11211"
+# Openshift module (it is similar to docker, but start action are another)
+    openshift:
+        container: fedora

@@ -1,6 +1,8 @@
 CMD=mtf
 TESTS=$(shell ls *.py *.sh ../../moduleframework/tests/generic/*.py ../../moduleframework/tests/static/*.py)
 SIMPLE=simpleTest.py
+MODNVR = testmodule-master-20180112204908
+COMMITHASH = e3e099a969c2f88204ae4661924e3930f017a6bb
 export MTF_REMOTE_REPOS=yes
 export DEBUG=yes
 export DOCKERFILE=./Dockerfile
@@ -31,17 +33,17 @@ check-multihost-testing:
 	cd ../multios_testing; MTF_DISABLE_MODULE=yes $(CMD) *.py
 
 check-run-them-pdc-testmodule: prepare-nspawn
-	../../tools/run-them.sh testmodule testmodule-master-20170413142055 pdc
+	../../tools/run-them.sh testmodule $(MODNVR) pdc
 
 check-run-them-pdc-testmodule-taskotron: prepare-nspawn
-	MTF_REMOTE_REPOS= DOCKERFILE= /usr/share/moduleframework/tools/run-them.sh testmodule testmodule-master-20170926102903 pdc
+	MTF_REMOTE_REPOS= DOCKERFILE= /usr/share/moduleframework/tools/run-them.sh testmodule $(MODNVR) pdc
 
 check-run-them-fedmsg-testmodule: prepare-nspawn
 	../../tools/run-them.sh testmodule ../../tools/example_message_module.yaml fedmsg
 
 check-exceptions: prepare-docker
-	URL=NOT_VALID_URL MODULE=docker $(CMD) --show-job-log simpleTest.py 2>&1 | grep 'raise CmdError'
-	CONFIG=NOT_VALID_CONFIG MODULE=docker $(CMD) --show-job-log simpleTest.py 2>&1 | grep 'raise ConfigExc'
+	URL=NOT_VALID_URL MODULE=docker $(CMD) --show-job-log simpleTest.py 2>&1 | grep 'raise.*CmdError'
+	CONFIG=NOT_VALID_CONFIG MODULE=docker $(CMD) --show-job-log simpleTest.py 2>&1 | grep 'raise.*ConfigExc'
 
 check-pure-rpm: prepare-nspawn
 	CONFIG=config-pure-rpm.yaml MODULE=nspawn $(CMD) $(SIMPLE)
@@ -110,9 +112,6 @@ check-mtf-options:
 	cd $(TEMPDIR); MODULE=docker $(CMD)  --module=nspawn --debug --config=$(MYPWD)/config.yaml $(MYPWD)/simpleTest.py &> log
 	cd $(TEMPDIR); grep 'MODULE=docker' log
 	rm -rf "$(TEMPDIR)"
-
-MODNVR = testmodule-master-20180112204908
-COMMITHASH = e3e099a969c2f88204ae4661924e3930f017a6bb
 
 check-mtf-pdc-module-info-reader:
 	mtf-pdc-module-info-reader -r $(MODNVR)

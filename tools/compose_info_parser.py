@@ -22,7 +22,8 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
-from moduleframework.compose_info import ComposeParser
+from __future__ import print_function
+from moduleframework import compose_info
 from optparse import OptionParser
 
 if __name__ == '__main__':
@@ -44,9 +45,9 @@ if __name__ == '__main__':
     (options, args) = parser.parse_args()
     # REPO=https://kojipkgs.stg.fedoraproject.org/compose/branched/jkaluza/latest-Boltron-26/compose/base-runtime/x86_64/os/
     if options.compose:
-        a = ComposeParser(options.compose)
+        a = compose_info.ComposeParser(options.compose)
         if options.list:
             for foo in a.getModuleList():
-                print foo
+                print(foo)
         if options.module:
-            print " ".join(a.variableListForModule(options.module))
+            print(" ".join(a.variableListForModule(options.module)))

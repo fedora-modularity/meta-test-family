@@ -35,8 +35,8 @@ See `Multiline Bash snippet tests`_ for more information.
 
 import os
 import argparse
-from common import print_info, get_config
-
+import core
+import common
 
 
 class TestGenerator(object):
@@ -57,7 +57,7 @@ class TestGenerator(object):
         The ``tests/generated.py`` file constructor.
         """
         self._arguments()
-        self.config = get_config()
+        self.config = common.get_config()
         self.output = ""
         self.templateClassBefore()
         if 'test' in self.config:
@@ -104,7 +104,7 @@ class GeneratedTestsConfig(module_framework.AvocadoTest):
             self.output = self.output + \
                 '        self.%s(""" %s """,  shell=%r)\n' % (
                     method, line, method == "runHost")
-        print_info("Added test (runmethod: %s): %s" % (method, testname))
+        core.print_info("Added test (runmethod: %s): %s" % (method, testname))
 
 
 def main():

@@ -4,7 +4,8 @@ import os
 import glob
 
 from dockerfile_parse import DockerfileParser
-from moduleframework.common import get_docker_file, print_info
+import common
+import core
 
 # Dockerfile path
 EXPOSE = "EXPOSE"
@@ -36,7 +37,7 @@ class DockerfileLinter(object):
     docker_dict = {}
 
     def __init__(self):
-        dockerfile = get_docker_file()
+        dockerfile = common.get_docker_file()
         if dockerfile:
             self.dockerfile = dockerfile
             with open(self.dockerfile, "r") as f:
@@ -105,7 +106,7 @@ class DockerfileLinter(object):
                     for v in ret_val:
                         self.docker_dict[key].append(v)
                 except KeyError:
-                    print_info("Dockerfile tag %s is not parsed by MTF" % key)
+                    core.print_info("Dockerfile tag %s is not parsed by MTF" % key)
 
     def get_docker_env(self):
         return self.docker_dict.get(ENV)
@@ -264,7 +265,7 @@ class DockerfileLinter(object):
                     if not x.startswith('/'):
                         files.extend(glob.glob(os.path.join(dirname, x)))
             except KeyError:
-                print_info("Instruction %s is not present in Dockerfile" % instruction)
+                core.print_info("Instruction %s is not present in Dockerfile" % instruction)
         return files
 
     def check_helpmd_is_present(self):
@@ -292,5 +293,5 @@ class DockerfileLinter(object):
             if os.path.exists(os.path.join(dir_name, f)):
                 f_exists = True
             else:
-                print_info("The file %s does not exist." % f)
+                core.print_info("The file %s does not exist." % f)
         return f_exists

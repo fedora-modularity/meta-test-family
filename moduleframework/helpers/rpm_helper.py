@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# This Modularity Testing Framework helps you to write tests for modules
+# Meta Test Family - tool what helps you write tests for various artifacts
 # Copyright (C) 2017 Red Hat, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -20,11 +20,12 @@
 # Authors: Petr Hracek <phracek@redhat.com>
 #
 
-from moduleframework import pdc_data
-from moduleframework.common import *
+import os
+import warnings
+from moduleframework import pdc_data, common, core
 
 
-class RpmHelper(CommonFunctions):
+class RpmHelper(common.CommonFunctions):
     """
     Class for testing "modules" on local machine (host) directly. It could be used for scheduling tests for
     system packages
@@ -86,6 +87,7 @@ class RpmHelper(CommonFunctions):
         self.__prepare()
 
     def __addModuleDependency(self, url, name=None, stream="master"):
+        raise Exception("This has to be repaired. now not used, self.dependencylist does not exist ")
         name = name if name else self.component_name
         if name in self.dependencylist:
             self.dependencylist[name]['urls'].append(url)
@@ -104,14 +106,16 @@ class RpmHelper(CommonFunctions):
         if repos:
             self.repos = repos
         else:
-            self.repos += get_compose_url() or self.get_url()
+            self.repos += common.get_compose_url() or self.get_url()
             # add also all dependent modules repositories if it is module
             # TODO: removed this dependency search
-            if self.is_it_module and not get_compose_url():
+            if self.is_it_module and not common.get_compose_url():
                 # inside this code we don't know anything about modules, this leads to
                 # generic repositories in pdc_data.PDCParserGeneral
                 pdcsolver = pdc_data.PDCParserGeneral(self.component_name)
-                self.repos += [pdcsolver.get_repo()]
+                baserepo = pdcsolver.get_repo()
+                if baserepo:
+                    self.repos += [baserepo]
         self.repos = list(set(self.repos))
         if whattooinstall:
             self.whattoinstallrpm = list(set(whattooinstall))
@@ -140,7 +144,7 @@ gpgcheck=0
             f.write(add)
         f.close()
         self.install_packages()
-        self.ip_address = trans_dict["GUESTIPADDR"]
+        self.ip_address = common.trans_dict["GUESTIPADDR"]
 
     def copyTo(self, src, dest):
         """
@@ -150,7 +154,7 @@ gpgcheck=0
         :param dest: str
         :return: None
         """
-        self.runHost("cp -r %s %s" % (src, dest), verbose=is_not_silent())
+        self.runHost("cp -r %s %s" % (src, dest), verbose=core.is_debug())
 
     def copyFrom(self, src, dest):
         """
@@ -160,5 +164,5 @@ gpgcheck=0
         :param dest: str
         :return: None
         """
-        self.runHost("cp -r %s %s" % (src, dest), verbose=is_not_silent())
+        self.runHost("cp -r %s %s" % (src, dest), verbose=core.is_debug())
 

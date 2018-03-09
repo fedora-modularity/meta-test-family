@@ -25,13 +25,13 @@
 """
 module for environment setup and cleanup, to be able to split action for ansible, more steps instead of one complex
 """
-from moduleframework.module_framework import *
+from moduleframework import common
 from moduleframework.environment_prepare.docker_prepare import EnvDocker
 from moduleframework.environment_prepare.rpm_prepare import EnvRpm
 from moduleframework.environment_prepare.nspawn_prepare import EnvNspawn
 from optparse import OptionParser
 
-module_name = get_base_module()
+module_name = common.get_module_type_base()
 
 parser = OptionParser()
 parser.add_option(

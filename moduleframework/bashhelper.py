@@ -1,24 +1,3 @@
-# -*- coding: utf-8 -*-
-#
-# Meta test family (MTF) is a tool to test components of a modular Fedora:
-# https://docs.pagure.org/modularity/
-# Copyright (C) 2017 Red Hat, Inc.
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# he Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-#
-# Authors: Jan Scotka <jscotka@redhat.com>
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
@@ -43,11 +22,14 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
+from __future__ import print_function
 import os
 import pickle
 import inspect
-from moduleframework import module_framework
+import core
+import module_framework
 from optparse import OptionParser
+
 
 
 def main():
@@ -78,7 +60,7 @@ def main():
 
     def printIfVerbose(*sargs):
         if options.verbose:
-            print sargs
+            core.print_info(sargs)
 
     if os.path.isfile(picklefile) and os.stat(picklefile).st_size > 100:
         printIfVerbose("reading from pickfile", picklefile)
@@ -95,9 +77,9 @@ def main():
     if "tearDown" != method:
         if options.printt:
             if len(args) == 1:
-                print getattr(helper, method)()
+                print(getattr(helper, method)())
             else:
-                print getattr(helper, method)(" ".join(args[1:]))
+                print(getattr(helper, method)(" ".join(args[1:])))
         else:
             if len(args) == 1:
                 getattr(helper, method)()

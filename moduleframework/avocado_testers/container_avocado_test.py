@@ -20,12 +20,12 @@
 # Authors: Petr Hracek <phracek@redhat.com>
 #
 
-from moduleframework.module_framework import AvocadoTest
-from moduleframework.common import get_module_type_base
+from moduleframework import common
+import avocado_test
 
 
 # INTERFACE CLASSES FOR SPECIFIC MODULE TESTS
-class ContainerAvocadoTest(AvocadoTest):
+class ContainerAvocadoTest(avocado_test.AvocadoTest):
     """
     Class for writing tests specific just for DOCKER
     derived from AvocadoTest class.
@@ -34,7 +34,7 @@ class ContainerAvocadoTest(AvocadoTest):
     """
 
     def setUp(self):
-        if get_module_type_base() != "docker":
+        if common.get_module_type_base() != "docker":
             self.cancel("Docker specific test")
         super(ContainerAvocadoTest, self).setUp()
 

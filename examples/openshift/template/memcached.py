@@ -24,8 +24,7 @@
 import pexpect
 from avocado import main
 from avocado.core import exceptions
-from moduleframework import module_framework
-from moduleframework import common
+from moduleframework import core, module_framework
 import time
 
 
@@ -40,7 +39,7 @@ class SanityMemcached(module_framework.AvocadoTest):
         session = pexpect.spawn("telnet %s %s" % (self.ip_address, self.getConfig()['service']['port']))
         session.sendline('set Test 0 100 4\r\n\n')
         session.sendline('JournalDev\r\n\n')
-        common.print_info('Expecting STORED')
+        core.print_info('Expecting STORED')
         session.expect('STORED')
         session.close()
 

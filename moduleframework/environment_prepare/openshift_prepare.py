@@ -26,17 +26,16 @@ module for OpenShift environment setup and cleanup
 """
 
 import os
-from moduleframework.common import CommonFunctions
-from moduleframework import common
+from moduleframework import common, core
 
 selinux_state_file="/var/tmp/mtf_selinux_state"
 setseto = "Permissive"
 
 
-class EnvOpenShift(CommonFunctions):
+class EnvOpenShift(common.CommonFunctions):
 
     def prepare_env(self):
-        common.print_info('Loaded config for name: {}'.format(self.config['name']))
+        core.print_info('Loaded config for name: {}'.format(self.config['name']))
         self.__start_openshift_cluster()
 
     def cleanup_env(self):
@@ -44,8 +43,8 @@ class EnvOpenShift(CommonFunctions):
 
     def __oc_status(self):
         oc_status = self.runHost("oc status", ignore_status=True, verbose=common.is_not_silent())
-        common.print_debug(oc_status.stdout)
-        common.print_debug(oc_status.stderr)
+        core.print_debug(oc_status.stdout)
+        core.print_debug(oc_status.stderr)
         return oc_status.exit_status
 
     def __install_env(self):
@@ -67,11 +66,11 @@ class EnvOpenShift(CommonFunctions):
 
         if common.get_openshift_local():
             if int(self.__oc_status()) == 0:
-                common.print_info("Seems like OpenShift is already started.")
+                core.print_info("Seems like OpenShift is already started.")
             else:
                 oc_run = self.runHost("oc cluster up", ignore_status=True)
-                common.print_info(oc_run.stdout)
-                common.print_info(oc_run.stderr)
+                core.print_info(oc_run.stdout)
+                core.print_info(oc_run.stderr)
 
     def __stop_openshift_cluster(self):
         """
@@ -81,8 +80,8 @@ class EnvOpenShift(CommonFunctions):
         """
         if common.get_openshift_local():
             if int(self.__oc_status()) == 0:
-                common.print_info("Stopping OpenShift")
+                core.print_info("Stopping OpenShift")
                 self.runHost("oc cluster down", verbose=common.is_not_silent())
             else:
-                common.print_info("OpenShift is already stopped.")
+                core.print_info("OpenShift is already stopped.")
 

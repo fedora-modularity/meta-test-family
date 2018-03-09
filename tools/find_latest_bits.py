@@ -21,14 +21,14 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
+from __future__ import print_function
 import yaml
-import sys
 import os
 import json
 import urllib
 import re
-
 from optparse import OptionParser
+
 
 ARCH = "x86_64"
 PDCURL = "https://pdc.fedoraproject.org/rest_api/v1/unreleasedvariants"
@@ -86,9 +86,9 @@ if options.filename:
     stdinput = "".join(flh.readlines()).strip()
     flh.close()
     a = FedMsgParser(stdinput)
-    print " ".join(a.generateParams())
+    print(" ".join(a.generateParams()))
 elif options.release:
     a = FedMsgParser(options.release, taskotron=True)
-    print " ".join(a.generateParams())
+    print(" ".join(a.generateParams()))
 else:
     raise Exception(parser.print_help())

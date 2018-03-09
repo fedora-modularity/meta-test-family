@@ -1,6 +1,4 @@
-from common import get_helpmd_file, print_info
-
-
+import core, common
 
 
 class HelpMDLinter(object):
@@ -13,7 +11,7 @@ class HelpMDLinter(object):
     help_md = None
 
     def __init__(self):
-        help_md_file = get_helpmd_file()
+        help_md_file = common.get_helpmd_file()
         if help_md_file:
             with open(help_md_file, 'r') as f:
                 lines = f.readlines()
@@ -21,7 +19,6 @@ class HelpMDLinter(object):
                 self.help_md = [x.strip() for x in lines if x.startswith('#')]
                 # Count with all lines which begins with %
                 self.help_md.extend([x.strip() for x in lines if x.startswith('%')])
-
 
     def get_image_name(self, name):
         name = '%% %s' % name
@@ -41,7 +38,7 @@ class HelpMDLinter(object):
         name = '# %s' % name
         tag_found = True
         if not self.help_md:
-            print_info("help md does not exist.")
+            core.print_info("help md does not exist.")
             return False
         if not [x for x in self.help_md if name.upper() in x]:
             tag_found = False

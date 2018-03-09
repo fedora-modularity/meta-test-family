@@ -21,9 +21,7 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
-from moduleframework import helpfile_linter
-from moduleframework import dockerlinter
-from moduleframework import module_framework
+from moduleframework import helpfile_linter, dockerlinter, module_framework
 
 
 class HelpFileSanity(module_framework.AvocadoTest):

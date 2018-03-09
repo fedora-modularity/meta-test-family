@@ -21,11 +21,11 @@
 #
 
 import json
-from moduleframework.common import *
-from moduleframework.mtfexceptions import ContainerExc
+import warnings
+from moduleframework import common, core, mtfexceptions
 
 
-class ContainerHelper(CommonFunctions):
+class ContainerHelper(common.CommonFunctions):
     """
     Basic Helper class for Docker container module type
 
@@ -43,7 +43,7 @@ class ContainerHelper(CommonFunctions):
         self.docker_id = None
         self._icontainer = self.get_url()
         if not self._icontainer:
-            raise ConfigExc("No container image specified in the configuration file or environment variable.")
+            raise mtfexceptions.ConfigExc("No container image specified in the configuration file or environment variable.")
         if ".tar" in self._icontainer:
             self.name = static_name
             self.tarbased = True
@@ -55,7 +55,7 @@ class ContainerHelper(CommonFunctions):
             self.tarbased = False
             self.name = self._icontainer
         self.docker_static_name = ""
-        if get_if_reuse():
+        if common.get_if_reuse():
             self.docker_static_name = "--name %s" % static_name
 
     def getURL(self):
@@ -111,8 +111,8 @@ class ContainerHelper(CommonFunctions):
         :return: None
         """
         super(ContainerHelper, self).tearDown()
-        if get_if_do_cleanup():
-            print_info("To run a command inside a container execute: ",
+        if common.get_if_do_cleanup():
+            core.print_info("To run a command inside a container execute: ",
                         "docker exec %s /bin/bash" % self.docker_id)
 
     def __pullContainer(self):
@@ -124,11 +124,11 @@ class ContainerHelper(CommonFunctions):
         if self.tarbased:
             self.runHost(
                 "docker import %s %s" %
-                (self._icontainer, self.name), verbose=is_not_silent())
+                (self._icontainer, self.name), verbose=core.is_not_silent())
         elif "docker=" in self._icontainer:
             pass
         else:
-            self.runHost("docker pull %s" % self.name, verbose=is_not_silent())
+            self.runHost("docker pull %s" % self.name, verbose=core.is_not_silent())
 
     def __load_inspect_json(self):
         """
@@ -139,7 +139,7 @@ class ContainerHelper(CommonFunctions):
         return json.loads(
             self.runHost(
                 "docker inspect %s" %
-                self.name, verbose=is_not_silent()).stdout)[0]["Config"]
+                self.name, verbose=core.is_not_silent()).stdout)[0]["Config"]
 
     def start(self, args="-it -d", command="/bin/bash"):
         """
@@ -154,17 +154,17 @@ class ContainerHelper(CommonFunctions):
                 self.docker_id = self.runHost(
                     "%s -d %s %s" %
                     (self.info['start'], self.docker_static_name, self.name), shell=True, ignore_bg_processes=True,
-                    verbose=is_not_silent()).stdout
+                    verbose=core.is_not_silent()).stdout
             else:
                 self.docker_id = self.runHost(
                     "docker run %s %s %s %s" %
                     (args, self.docker_static_name, self.name, command),
-                    shell=True, ignore_bg_processes=True, verbose=is_not_silent()).stdout
+                    shell=True, ignore_bg_processes=True, verbose=core.is_not_silent()).stdout
             self.docker_id = self.docker_id.strip()
             # It installs packages in container is removed by default, in future maybe reconciled.
             # self.install_packages()
         if self.status() is False:
-            raise ContainerExc(
+            raise mtfexceptions.ContainerExc(
                 "Container %s (for module %s) is not running, probably DEAD immediately after start (ID: %s)" % (
                     self.name, self.moduleName, self.docker_id))
             trans_dict["GUESTPACKAGER"] = self.get_packager()
@@ -177,10 +177,10 @@ class ContainerHelper(CommonFunctions):
         """
         if self.status():
             try:
-                self.runHost("docker stop %s" % self.docker_id, verbose=is_not_silent())
-                self.runHost("docker rm %s" % self.docker_id, verbose=is_not_silent())
+                self.runHost("docker stop %s" % self.docker_id, verbose=core.is_not_silent())
+                self.runHost("docker rm %s" % self.docker_id, verbose=core.is_not_silent())
             except Exception as e:
-                print_debug(e, "docker already removed")
+                core.print_debug(e, "docker already removed")
                 pass
 
     def status(self, command=None):
@@ -189,17 +189,17 @@ class ContainerHelper(CommonFunctions):
 
         :return: bool
         """
-        if not self.docker_id and get_if_reuse():
+        if not self.docker_id and common.get_if_reuse():
             result = self.runHost("docker ps -q --filter %s" % self.docker_static_name[2:],
                                   ignore_status=True,
-                                  verbose=is_debug())
+                                  verbose=core.is_debug())
             # lenght of docker id  number is 12
             if result.exit_status == 0 and len(result.stdout) > 10:
                 self.docker_id = result.stdout.strip()
                 return True
         if self.docker_id and self.docker_id[
                               : 12] in self.runHost(
-            "docker ps", shell=True, verbose=is_not_silent()).stdout:
+            "docker ps", shell=True, verbose=core.is_not_silent()).stdout:
             return True
         else:
             return False
@@ -214,7 +214,7 @@ class ContainerHelper(CommonFunctions):
         """
         return self.runHost(
             'docker exec %s bash -c "%s"' %
-            (self.docker_id, sanitize_cmd(command)),
+            (self.docker_id, common.sanitize_cmd(command)),
             **kwargs)
 
     def copyTo(self, src, dest):
@@ -226,7 +226,7 @@ class ContainerHelper(CommonFunctions):
         :return: None
         """
         self.start()
-        self.runHost("docker cp %s %s:%s" % (src, self.docker_id, dest), verbose=is_not_silent())
+        self.runHost("docker cp %s %s:%s" % (src, self.docker_id, dest), verbose=core.is_not_silent())
 
     def copyFrom(self, src, dest):
         """
@@ -237,5 +237,5 @@ class ContainerHelper(CommonFunctions):
         :return: None
         """
         self.start()
-        self.runHost("docker cp %s:%s %s" % (self.docker_id, src, dest), verbose=is_not_silent())
+        self.runHost("docker cp %s:%s %s" % (self.docker_id, src, dest), verbose=core.is_not_silent())
 

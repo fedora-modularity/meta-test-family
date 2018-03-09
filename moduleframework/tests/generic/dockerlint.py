@@ -20,11 +20,7 @@
 #
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
-from __future__ import print_function
 
-import os
-from moduleframework import module_framework
-from moduleframework import dockerlinter
 from moduleframework.avocado_testers import container_avocado_test
 
 

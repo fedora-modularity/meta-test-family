@@ -25,17 +25,17 @@
 module for environment setup and cleanup, to be able to split action for ansible, more steps instead of one complex
 """
 
-from moduleframework.common import CommonFunctions, print_info
+from moduleframework import common, core
 
 
-class EnvRpm(CommonFunctions):
+class EnvRpm(common.CommonFunctions):
 
     def prepare_env(self):
-        print_info('Loaded config for name: {}'.format(self.config['name']))
+        core.print_info('Loaded config for name: {}'.format(self.config['name']))
         self.installTestDependencies()
-        print_info("WARNING: Testing is going to be performed on this machine")
+        core.print_info("WARNING: Testing is going to be performed on this machine")
         pass
 
     def cleanup_env(self):
-        print_info("WARNING: No cleanup as it can destroy this machine")
+        core.print_info("WARNING: No cleanup as it can destroy this machine")
         pass

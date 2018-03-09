@@ -20,12 +20,12 @@
 # Authors: Petr Hracek <phracek@redhat.com>
 #
 
-from moduleframework.module_framework import AvocadoTest
-from moduleframework.common import get_module_type_base
+from moduleframework import common
+import avocado_test
 
 
 # INTERFACE CLASSES FOR SPECIFIC MODULE TESTS
-class OpenShiftAvocadoTest(AvocadoTest):
+class OpenShiftAvocadoTest(avocado_test.AvocadoTest):
     """
     Class for writing tests specific just for OpenShift
     derived from AvocadoTest class.
@@ -34,6 +34,6 @@ class OpenShiftAvocadoTest(AvocadoTest):
     """
 
     def setUp(self):
-        if get_module_type_base() != "openshift":
+        if common.get_module_type_base() != "openshift":
             self.cancel("OpenShift specific test")
         super(OpenShiftAvocadoTest, self).setUp()

@@ -1,0 +1,104 @@
+# default module type in case you don't wath everytime use MODULE=docker or define it in config.yaml
+default_module: docker
+
+# openshift specific section
+openshift:
+  init_wait: 50
+  docker_registry: "docker-registry"
+  project: 'project'
+  template: 'template'
+  ip:
+  user:
+  password:
+  local_ip: "127.0.0.1"
+  local_user: "developer"
+  local_password: "developer"
+
+# docker specific section
+docker:
+# default name of Docker file
+  dockerfile: "Dockerfile"
+# default name of HeplMD file
+  helpmdfile: "help.md"
+# default location of these files (based on axiom that you are in tests/ subdir)
+  dockerfiledefaultlocation: "../"
+
+# modularity specific  section
+modularity:
+  tempmodulefile: "tempmodule.yaml"
+  default_module_stream: "master"
+  default_profile: "default"
+
+# systemd-nspawn config
+nspawn:
+# default location where images (directories) lives
+  basedir: "/opt"
+  additional_boot_options: []
+
+# generic section mainly contains timeouts
+generic:
+# default architecture
+  arch: "x86_64"
+# command to find which packager to use (yum, dnf, apt-get)
+  packager_cmd: "test -e /usr/bin/dnf && echo 'dnf -y' ||
+   ( test -e /usr/bin/microdnf && echo 'microdnf'      ||
+   ( test -e /usr/bin/yum && echo 'yum -y'             ||
+   echo 'apt-get -y' ) )"
+# name of directory with static tests - linters
+  static_tests: 'static'
+# name of directory with generic tests - like rpm signarure check
+  generic_tests: 'generic'
+  # default timeout in secs of processes
+  processtimeout: 120
+# number of retry for @retry decorator
+  retrycount: 3
+  # default timeout in secs of for retry decorator
+  retrytimeout: 30
+  # default timeout to start nspawn container
+  nspawn_timeout: 10
+
+# pdc section, location of pdc server
+pdc:
+  pdc_server: "https://pdc.fedoraproject.org/rest_api/v1/modules"
+  # internal
+  #pdc_server: "https://pdc.engineering.redhat.com/rest_api/v1/modules"
+
+compose:
+  repomd: "repodata/repomd.xml"
+# basic repository for nspawn, RELEASE and ARCH will be replaced by .format function
+  baseurlrepo: "https://download.fedoraproject.org/pub/fedora/linux/releases/{RELEASE}/Workstation/{ARCH}/os"
+
+# openidc section used by ODCS for autentication against fedora
+openidc:
+  token:
+  auth: ["odcs", "https://id.fedoraproject.org/openidc/", {Token: "Token", Authorization: "Authorization"},"odcs-authorizer","notsecret"]
+  scopes: ['openid', 'https://id.fedoraproject.org/scope/groups', 'https://pagure.io/odcs/new-compose', 'https://pagure.io/odcs/renew-compose', 'https://pagure.io/odcs/delete-compose']
+
+# ODCS section
+odcs:
+  compose_type: "module"
+  # timeout in secs, how long wait for compose (composes are cached, but first round can take long time (createrepo of packages))
+  timeout: 1200
+  new_compose_dict: { sigkeys: [''] }
+  url: "https://odcs.fedoraproject.org"
+  auth: { auth_mech: 1 }
+  # auth_mech variable: 1 - openidc - fedora, 2 - kerberos
+  # internal
+  #url: "https://odcs.engineering.redhat.com"
+  #auth: { auth_mech: 2 }
+
+
+
+# set of packages what should/will be installed in various env
+packages:
+# packages for nspawn (called basic*)
+  common: ["iproute", "dhcp-client", "initscripts", "passwd", "systemd", "rpm", "dnf", "bash", "shadow-utils", "sssd-client", "util-linux", "libcrypt", "sssd-client"]
+# basic package set for nonmodular nspawn testing
+  basic: ["coreutils", "glibc-all-langpacks", "vim-minimal"]
+# basic package set for modular nspawn testing
+  # https://pagure.io/fedora-kickstarts/blob/f27/f/fedora-modular-container-common.ks
+  basic_modular: ["coreutils-single", "glibc-minimal-langpack"]
+# basic package set of containers (is not used anyhow now, could be used for check)
+  # https://pagure.io/fedora-kickstarts/blob/f27/f/fedora-modular-container-base.ks
+  container: ["rootfiles", "tar", "vim-minimal", "dnf", "dnf-yum", "sssd-client"]
+

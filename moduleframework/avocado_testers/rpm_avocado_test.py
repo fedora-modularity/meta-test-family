@@ -20,11 +20,11 @@
 # Authors: Petr Hracek <phracek@redhat.com>
 #
 
-from moduleframework.module_framework import AvocadoTest
-from moduleframework.common import get_module_type_base
+from moduleframework import common
+import avocado_test
 
 
-class RpmAvocadoTest(AvocadoTest):
+class RpmAvocadoTest(avocado_test.AvocadoTest):
     """
     Class for writing tests specific just for LOCAL (system) RPM testing
     derived from AvocadoTest class.
@@ -33,7 +33,7 @@ class RpmAvocadoTest(AvocadoTest):
     """
 
     def setUp(self):
-        if get_module_type_base() != "rpm":
+        if common.get_module_type_base() != "rpm":
             self.cancel("Rpm specific test")
         super(RpmAvocadoTest, self).setUp()
 

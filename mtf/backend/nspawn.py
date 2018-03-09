@@ -30,17 +30,17 @@ import shutil
 import glob
 import time
 import re
-
 from avocado import Test
 from avocado.utils import process
-from mtf import common
-from mtf import mtfexceptions
+
+from moduleframework import core, common, mtfexceptions
+
 
 DEFAULT_RETRYTIMEOUT = 30
 DEFAULT_SLEEP = 1
 base_package_set = ["systemd"]
 
-is_debug_low = common.is_debug
+is_debug_low = core.is_debug
 if is_debug_low():
     logging.basicConfig(level=logging.DEBUG)
 
@@ -269,7 +269,7 @@ class Container(object):
             output = [x.strip() for x in
                       process.run("systemctl show -M {} {}".format(machine, unit),
                                    verbose=is_debug_low()).stdout.split("\n")]
-            retcode = int([x[-1] for x in output if "ExecMainStatus=" in x][0])
+            retcode = int([x.rsplit("=", 1)[1] for x in output if "ExecMainStatus=" in x][0])
             if not ("SubState=exited" in output or "SubState=failed" in output):
                 time.sleep(0.1)
             else:
@@ -493,6 +493,7 @@ class testContainer(Test):
         self.c1 = Container(image=self.i1, name=self.cname)
         self.c1.boot_machine()
         assert "sbin" in self.c1.execute(command="ls /").stdout
+        assert 127 == self.c1.execute(command="non_existing_binary", ignore_status=True).exit_status
 
 
     def test_basic_noname(self):
@@ -573,7 +574,7 @@ class testContainer(Test):
         print ifaces
         assert "lo:" in ifaces.stdout
         assert len(ifaces.stdout.split("\n")) > 2
-        assert  len(ifaces.stdout.split("\n"))<=4
+        assert len(ifaces.stdout.split("\n")) <= 4
 
     def tearDown(self):
         self.c1.stop()

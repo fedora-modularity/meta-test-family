@@ -24,13 +24,12 @@ import time
 import hashlib
 import os
 
-from moduleframework.common import BASEPATHDIR, translate_cmd, \
-    get_if_reuse, trans_dict, print_info, is_debug, get_if_do_cleanup
-from moduleframework.helpers.rpm_helper import RpmHelper
-from mtf.backend.nspawn import Image, Container
+import rpm_helper
+from mtf.backend import nspawn
+from moduleframework import common, core
 
 
-class NspawnHelper(RpmHelper):
+class NspawnHelper(rpm_helper.RpmHelper):
     """
     Class for MODULE testing via NSPAWN created environment, it is type of virtualization,
     something between chroot (MOCK) and full virtualization. For more info read:
@@ -45,11 +44,11 @@ class NspawnHelper(RpmHelper):
         relative change root path
         """
         super(NspawnHelper, self).__init__()
-        self.baseprefix = os.path.join(BASEPATHDIR, "chroot_")
+        self.baseprefix = os.path.join(common.conf["nspawn"]["basedir"], "chroot_")
         time.time()
         actualtime = time.time()
         self.chrootpath_baseimage = ""
-        if not get_if_reuse():
+        if not common.get_if_reuse():
             self.name = "%s_%r" % (self.component_name, actualtime)
         else:
             self.name = self.component_name
@@ -65,25 +64,25 @@ class NspawnHelper(RpmHelper):
         :return: None
         """
 
-        trans_dict["ROOT"] = self.chrootpath
-        print_info("name of CHROOT directory:", self.chrootpath)
+        common.trans_dict["ROOT"] = self.chrootpath
+        core.print_info("name of CHROOT directory:", self.chrootpath)
         self.setRepositoriesAndWhatToInstall()
         # never move this line to __init__ this localtion can change before setUp (set repositories)
         self.chrootpath_baseimage = os.path.abspath(self.baseprefix +
                                                     self.component_name +
                                                     "_image_" +
                                                     hashlib.md5(" ".join(self.repos)).hexdigest())
-        self.__image_base = Image(location=self.chrootpath_baseimage,
+        self.__image_base = nspawn.Image(location=self.chrootpath_baseimage,
                                   packageset=self.whattoinstallrpm,
                                   repos=self.repos,
                                   ignore_installed=True)
         self.__image = self.__image_base.create_snapshot(self.chrootpath)
-        self.__container = Container(image=self.__image, name=self.name)
+        self.__container = nspawn.Container(image=self.__image, name=self.name)
         self._callSetupFromConfig()
-        self.__container.boot_machine()
+        self.__container.boot_machine(nspawn_add_option_list=common.conf["nspawn"]["additional_boot_options"])
 
     def run(self, command, **kwargs):
-        return self.__container.execute(command=translate_cmd(command, translation_dict=trans_dict), **kwargs)
+        return self.__container.execute(command=common.translate_cmd(command, translation_dict=common.trans_dict), **kwargs)
 
     def start(self, command="/bin/true"):
         """
@@ -94,9 +93,9 @@ class NspawnHelper(RpmHelper):
         :return: None
         """
         command = self.info.get('start') or command
-        self.run(command, internal_background=False, ignore_bg_processes=True, verbose=is_debug())
+        self.run(command, internal_background=False, ignore_bg_processes=True, verbose=core.is_debug())
         self.status()
-        trans_dict["GUESTPACKAGER"] = self.get_packager()
+        common.trans_dict["GUESTPACKAGER"] = self.get_packager()
 
     def selfcheck(self):
         """
@@ -133,7 +132,7 @@ class NspawnHelper(RpmHelper):
 
         :return: None
         """
-        if get_if_do_cleanup() and not get_if_reuse():
+        if common.get_if_do_cleanup() and not common.get_if_reuse():
             try:
                 self.__container.stop()
             except:
@@ -143,6 +142,6 @@ class NspawnHelper(RpmHelper):
             except:
                 pass
         else:
-            print_info("tearDown skipped", "running nspawn: %s" % self.name)
-            print_info("To connect to a machine use:",
+            core.print_info("tearDown skipped", "running nspawn: %s" % self.name)
+            core.print_info("To connect to a machine use:",
                        "machinectl shell root@%s /bin/bash" % self.name)

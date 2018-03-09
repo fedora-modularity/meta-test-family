@@ -30,7 +30,7 @@ from avocado import Test
 from avocado.core import exceptions
 import warnings
 
-from moduleframework.common import *
+from moduleframework import core, common
 from moduleframework.helpers.container_helper import ContainerHelper
 from moduleframework.helpers.nspawn_helper import NspawnHelper
 from moduleframework.helpers.rpm_helper import RpmHelper
@@ -56,10 +56,10 @@ class AvocadoTest(Test):
         super(AvocadoTest, self).__init__(*args, **kwargs)
 
         self.backend = get_backend()
-        self.moduleType = get_module_type()
-        self.moduleType_base = get_module_type_base()
-        self.moduleProfile = get_profile()
-        print_info(
+        self.moduleType = common.get_module_type()
+        self.moduleType_base = common.get_module_type_base()
+        self.moduleProfile = common.get_profile()
+        core.print_info(
             "Module Type: %s - Backend: %s - Profile: %s" %
             (self.moduleType, self.moduleType_base, self.moduleProfile))
 
@@ -142,7 +142,7 @@ class AvocadoTest(Test):
         :param kwargs: shell, ignore_status, verbose
         :return: object avocado.process.run
         """
-        if is_debug():
+        if core.is_debug():
             self.__print_breaks("COMMAND IN MODULE <->")
         return self.backend.run(*args, **kwargs)
 
@@ -194,7 +194,7 @@ class AvocadoTest(Test):
         :param kwargs: pass thru
         :return: object of avocado.process.run
         """
-        if is_debug():
+        if core.is_debug():
             self.__print_breaks("COMMAND ON HOST <!>")
         return self.backend.runHost(*args, **kwargs)
 
@@ -216,7 +216,7 @@ class AvocadoTest(Test):
         :return: str
         """
         self.start()
-        allpackages = self.run(r'rpm -qa --qf="%{{name}}\n"', verbose=is_not_silent()).stdout.split('\n')
+        allpackages = self.run(r'rpm -qa --qf="%{{name}}\n"', verbose=core.is_not_silent()).stdout.split('\n')
         return allpackages
 
     def copyTo(self, *args, **kwargs):
@@ -323,7 +323,7 @@ def get_backend():
 
     :return: module object
     """
-    parent = get_module_type_base()
+    parent = common.get_module_type_base()
 
     if parent == 'docker':
         return ContainerHelper()
