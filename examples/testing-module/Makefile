@@ -42,6 +42,10 @@ check-run-them-fedmsg-testmodule: prepare-nspawn
 	../../tools/run-them.sh testmodule ../../tools/example_message_module.yaml fedmsg
 
 check-exceptions: prepare-docker
+	$(CMD) bad_test_name second_invalid && false || true
+	$(CMD) bad_test_name second_invalid 2>&1 | grep 'bad_test_name: File not found'
+	$(CMD) bad_test_name second_invalid 2>&1 | grep 'second_invalid: File not found'
+
 	URL=NOT_VALID_URL MODULE=docker $(CMD) --show-job-log simpleTest.py 2>&1 | grep 'raise.*CmdError'
 	CONFIG=NOT_VALID_CONFIG MODULE=docker $(CMD) --show-job-log simpleTest.py 2>&1 | grep 'raise.*ConfigExc'
 

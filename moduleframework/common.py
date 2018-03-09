@@ -747,7 +747,7 @@ def get_config(fail_without_url=True, reload=False):
                 core.print_debug("Using module config file: %s" % cfgfile)
             else:
                 if fail_without_url and not get_url():
-                    raise mtfexceptions.Defaultmtfexceptions.ConfigExc("You have to use URL envvar for testing your images or repos")
+                    raise mtfexceptions.DefaultConfigExc("You have to use URL envvar for testing your images or repos")
                 cfgfile = "/usr/share/moduleframework/docs/example-config-minimal.yaml"
                 core.print_debug("Using default minimal config: %s" % cfgfile)
 
