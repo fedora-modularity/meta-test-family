@@ -108,7 +108,22 @@ class DockerfileLinter(object):
                 except KeyError:
                     core.print_info("Dockerfile tag %s is not parsed by MTF" % key)
 
+    def get_from_instruction(self):
+        """
+        Function returns FROM instruction from Dockerfile
+        :return: string or None
+        """
+        struct = self.dfp_structure[0]
+        if struct.get(INSTRUCT) == 'FROM':
+            return struct.get('value')
+        else:
+            return None
+
     def get_docker_env(self):
+        """
+        Function returns list of ENV variables or empty list
+        :return: dict
+        """
         return self.docker_dict.get(ENV)
 
     def get_docker_specific_env(self, env_name=None):

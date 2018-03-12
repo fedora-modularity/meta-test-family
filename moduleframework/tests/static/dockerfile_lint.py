@@ -9,7 +9,7 @@ class DockerInstructionsTests(module_framework.AvocadoTest):
     """
 
     dp = None
-
+    FROM = "https://docs.docker.com/engine/reference/builder/#from"
     def setUp(self):
         # it is not intended just for docker, but just docker packages are
         # actually properly signed
@@ -18,10 +18,14 @@ class DockerInstructionsTests(module_framework.AvocadoTest):
             self.cancel("Dockerfile was not found")
 
     def test_from_is_first_directive(self):
-        self.assertTrue(self.dp.check_from_is_first(), msg="FROM instruction is not first.\n\tMore info: https://docs.docker.com/engine/reference/builder/#from")
+        self.assertTrue(self.dp.check_from_is_first(),
+                        msg="FROM instruction is not first.\nMore info: %s" % self.FROM)
 
     def test_from_directive_is_valid(self):
-        self.assertTrue(self.dp.check_from_directive_is_valid(), msg="FROM instruction is not valid.\n\tMore info: https://docs.docker.com/engine/reference/builder/#from")
+        reg_exp = '^[a-z0-9.]+(\/[a-z0-9\D.]+)+$'
+        self.assertTrue(self.dp.check_from_directive_is_valid(),
+                        msg="FROM instruction (%s) is not valid. We use reg %s."
+                            "\nMore info: %s" % (self.dp.get_from_instruction(), reg_exp, self.FROM))
 
     def test_chained_run_dnf_commands(self):
         self.assertTrue(self.dp.check_chained_run_dnf_commands(), msg="dnf/yum commands are not chained.\n\tMore info: https://github.com/projectatomic/container-best-practices/blob/master/creating/creating_index.adoc#clearing-package-cache-and-squashing")
