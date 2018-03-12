@@ -223,12 +223,12 @@ class AvocadoStart(object):
                 self.additionalAvocadoArg.append(unknown[0])
                 unknown = unknown[1:]
             elif unknown[0].startswith("-"):
-                if len(unknown) >= 2:
-                    self.additionalAvocadoArg += unknown[0:2]
-                    unknown = unknown[2:]
-                else:
+                if "=" in unknown[0] or len(unknown) < 2:
                     self.additionalAvocadoArg.append(unknown[0])
                     unknown = unknown[1:]
+                else:
+                    self.additionalAvocadoArg += unknown[0:2]
+                    unknown = unknown[2:]
             elif glob.glob(unknown[0]):
                 # dereference filename via globs
                 testlist = glob.glob(unknown[0])
@@ -249,13 +249,23 @@ class AvocadoStart(object):
             self.additionalAvocadoArg))
 
     def check_tests(self):
+        summary_line = "TEST TYPES SUMMARY"
+        prefix_line = "Type"
         output = subprocess.check_output([self.AVOCADO, "list", "-V", "--"] + self.tests)
-        assert "TEST TYPES SUMMARY" in output
+        assert summary_line in output
         badstates = ["NOT_A_TEST", "MISSING", "ACCESS_DENIED", "BROKEN_SYMLINK"]
         badtests = []
-        # remove fist line, it is header, and remove last 11 lines, what is test summary
-        for testline in output.split("\n")[1:-11]:
-            splitted = testline.strip().split(" ", 1)
+        # remove header line and remove last lines with is test types summary
+        testlines = []
+        for line in output.split("\n"):
+            if line.startswith(prefix_line) or not line.strip():
+                continue
+            elif line.startswith(summary_line):
+                break
+            else:
+                testlines.append(line.strip())
+        for testline in testlines:
+            splitted = testline.split(" ", 1)
             if splitted[0] in badstates:
                 badtests.append(splitted[1].strip())
         if badtests:
