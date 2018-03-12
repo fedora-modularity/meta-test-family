@@ -197,7 +197,15 @@ class AvocadoStart(object):
     json_tmppath = None
     additionalAvocadoArg = []
     AVOCADO = "avocado"
-
+    A_KNOWN_PARAMS_SIMPLE=["-s", "-z", "-v", "-V",
+                           "--silent",
+                           "--show-job-log",
+                           "--replay-resume",
+                           "--filter-by-tags-include-empty",
+                           "--archive",
+                           "--journal",
+                           "--"
+                           ]
     def __init__(self, args, unknown):
         # choose between TESTS and ADDITIONAL ENVIRONMENT from options
         if args.linter:
@@ -209,16 +217,27 @@ class AvocadoStart(object):
                 STATIC_LINTERS=common.conf["generic"]["static_tests"]))
         self.args = args
 
-        for param in unknown:
-            # take care of this, see tags for safe/unsafe:
-            # http://avocado-framework.readthedocs.io/en/52.0/WritingTests.html#categorizing-tests
-            testlist = glob.glob(param)
-            if testlist:
-                # this is list of tests in local file
+        # parse unknow options and try to find what parameter is test
+        while unknown:
+            if unknown[0] in self.A_KNOWN_PARAMS_SIMPLE:
+                self.additionalAvocadoArg.append(unknown[0])
+                unknown = unknown[1:]
+            elif unknown[0].startswith("-"):
+                if "=" in unknown[0] or len(unknown) < 2:
+                    self.additionalAvocadoArg.append(unknown[0])
+                    unknown = unknown[1:]
+                else:
+                    self.additionalAvocadoArg += unknown[0:2]
+                    unknown = unknown[2:]
+            elif glob.glob(unknown[0]):
+                # dereference filename via globs
+                testlist = glob.glob(unknown[0])
                 self.tests += testlist
+                unknown = unknown[1:]
             else:
-                # this is additional avocado param
-                self.additionalAvocadoArg.append(param)
+                self.tests.append(unknown[0])
+                unknown = unknown[1:]
+
         if self.args.metadata:
             core.print_info("Using Metadata loader for tests and filtering")
             metadata_tests = filtertests(backend="mtf", location=os.getcwd(), linters=False, tests=[], tags=[], relevancy="")
@@ -229,21 +248,48 @@ class AvocadoStart(object):
         core.print_debug("additionalAvocadoArg = {0}".format(
             self.additionalAvocadoArg))
 
+    def check_tests(self):
+        summary_line = "TEST TYPES SUMMARY"
+        prefix_line = "Type"
+        output = subprocess.check_output([self.AVOCADO, "list", "-V", "--"] + self.tests)
+        assert summary_line in output
+        badstates = ["NOT_A_TEST", "MISSING", "ACCESS_DENIED", "BROKEN_SYMLINK"]
+        badtests = []
+        # remove header line and remove last lines with is test types summary
+        testlines = []
+        for line in output.split("\n"):
+            testline = line.strip()
+            if testline.startswith(prefix_line) or not testline:
+                continue
+            elif testline.startswith(summary_line):
+                break
+            else:
+                splitted = testline.split(" ", 1)
+                if splitted[0] in badstates:
+                    badtests.append(splitted[1].strip())
+        if badtests:
+            core.print_info("", "ERROR: There are bad tests:", "-------------")
+            core.print_info(*badtests)
+            exit(19)
 
     def avocado_run(self):
+        self.check_tests()
         self.json_tmppath = tempfile.mktemp()
         avocado_args = ["--json", self.json_tmppath]
         if self.args.xunit:
             avocado_args += ["--xunit", self.args.xunit]
-        return self.avocado_general(avocado_default_args=avocado_args)
+        return self.avocado_general(action=self.args.action, avocado_default_args=avocado_args)
 
-    def avocado_general(self, avocado_default_args=[]):
-        # additional parameters
-        # self.additionalAvocadoArg: its from cmd line, whats unknown to this tool
-        avocadoAction = [self.AVOCADO, self.args.action] + avocado_default_args
+    def avocado_general(self, action, avocado_default_args=[]):
+        """
+
+        :param action: what avocado action to run: run, list, ...
+        :param avocado_default_args: list avocado additional argument
+        :return: return code of executed avocado command
+        """
         rc=0
         try:
-            subprocess.check_call(avocadoAction + self.additionalAvocadoArg + self.tests)
+            subprocess.check_call([self.AVOCADO, action] + avocado_default_args + self.additionalAvocadoArg + self.tests)
         except subprocess.CalledProcessError as cpe:
             rc = cpe.returncode
         return rc
@@ -340,7 +386,7 @@ def main():
         a.show_error()
     else:
         # when there is any need, change general method or create specific one:
-        returncode = a.avocado_general()
+        returncode = a.avocado_general(action=args.action)
     exit(returncode)
 
 
