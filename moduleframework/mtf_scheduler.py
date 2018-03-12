@@ -258,18 +258,16 @@ class AvocadoStart(object):
         # remove header line and remove last lines with is test types summary
         testlines = []
         for line in output.split("\n"):
-            if line.startswith(prefix_line) or not line.strip():
+            testline = line.strip()
+            if testline.startswith(prefix_line) or not testline:
                 continue
-            elif line.startswith(summary_line):
+            elif testline.startswith(summary_line):
                 break
             else:
-                testlines.append(line.strip())
-        for testline in testlines:
-            splitted = testline.split(" ", 1)
-            if splitted[0] in badstates:
-                badtests.append(splitted[1].strip())
+                splitted = testline.split(" ", 1)
+                if splitted[0] in badstates:
+                    badtests.append(splitted[1].strip())
         if badtests:
-
             core.print_info("", "ERROR: There are bad tests:", "-------------")
             core.print_info(*badtests)
             exit(19)
