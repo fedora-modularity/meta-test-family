@@ -286,12 +286,15 @@ class DockerfileLinter(object):
         dir_name = os.getcwd()
         files = self._get_copy_add_files(os.path.dirname(self.dockerfile))
         f_exists = False
-        for f in files:
-            if f.startswith('http'):
-                f_exists = True
-                continue
-            if os.path.exists(os.path.join(dir_name, f)):
-                f_exists = True
-            else:
-                core.print_info("The file %s does not exist." % f)
+        if not files:
+            f_exists = True
+        else:
+            for f in files:
+                if f.startswith('http'):
+                    f_exists = True
+                    continue
+                if os.path.exists(os.path.join(dir_name, f)):
+                    f_exists = True
+                else:
+                    core.print_info("The file %s does not exist." % f)
         return f_exists
