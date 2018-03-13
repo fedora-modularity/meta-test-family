@@ -22,9 +22,9 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
+from __future__ import print_function
 from argparse import ArgumentParser
 import yaml
-import re
 
 import pdc_data
 
@@ -66,12 +66,19 @@ def main():
         version = raw["msg"]["version"]
         flh.close()
     elif options.release:
-        name, stream, version = re.search(
-            "(.*)-(.*)-(.*)", options.release).groups()
+        if ":" in options.release:
+            nvr = options.release.rsplit(":", 3)
+            if len(nvr) > 2:
+                version = nvr[2]
+            if len(nvr) > 1:
+                stream = nvr[1]
+            name = nvr[0]
+        else:
+            name, stream, version = options.release.rsplit("-",3)
     elif options.latest:
         name = options.latest
     pdc_solver = pdc_data.PDCParser(name, stream, version)
     if options.commit:
-        print pdc_solver.generateGitHash()
+        print(pdc_solver.generateGitHash())
     else:
-        print " ".join(pdc_solver.generateParams())
+        print(" ".join(pdc_solver.generateParams()))
