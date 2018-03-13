@@ -119,12 +119,12 @@ class Image(object):
             with open(insiderepopath, 'w') as f:
                 for repo in self.repos:
                     counter = counter + 1
-                    add = """[%s%d]
-            name=%s%d
-            baseurl=%s
-            enabled=1
-            gpgcheck=0
-    
+                    add = """
+[%s%d]
+name=%s%d
+baseurl=%s
+enabled=1
+gpgcheck=0    
             """ % (self.name, counter, self.name, counter, repo)
                     f.write(add)
             for repo in self.repos:
