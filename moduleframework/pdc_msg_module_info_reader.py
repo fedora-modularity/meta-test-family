@@ -73,8 +73,10 @@ def main():
             if len(nvr) > 1:
                 stream = nvr[1]
             name = nvr[0]
-        else:
+        elif "-" in options.release:
             name, stream, version = options.release.rsplit("-",3)
+        else:
+            name = options.release
     elif options.latest:
         name = options.latest
     pdc_solver = pdc_data.PDCParser(name, stream, version)
