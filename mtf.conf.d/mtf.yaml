@@ -26,7 +26,6 @@ docker:
 # modularity specific  section
 modularity:
   tempmodulefile: "tempmodule.yaml"
-  default_module_stream: "master"
   default_profile: "default"
 
 # systemd-nspawn config

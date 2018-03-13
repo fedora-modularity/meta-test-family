@@ -40,7 +40,7 @@ import core, common, mtfexceptions, timeoutlib
 
 def get_module_nsv(name=None, stream=None, version=None):
     name = name or os.environ.get('MODULE_NAME')
-    stream = stream or os.environ.get('MODULE_STREAM') or common.conf["modularity"]["default_module_stream"]
+    stream = stream or os.environ.get('MODULE_STREAM')
     version = version or os.environ.get('MODULE_VERSION')
     return {'name':name, 'stream':stream, 'version':version}
 
@@ -80,21 +80,26 @@ class PDCParserGeneral():
         """
         modulensv = get_module_nsv(name=name, stream=stream, version=version)
         self.name = modulensv['name']
-        self.stream = modulensv['stream']
-        self.version = modulensv['version']
+        if common.conf.get('pdc'):
+            pdcdata = self.__getDataFromPdc(name=name, stream=stream, version=version)
+            self.stream = pdcdata['stream']
+            self.version = pdcdata['version']
+        else:
+            self.stream = modulensv['stream']
+            self.version = modulensv['version']
 
-    def __getDataFromPdc(self, active=True):
+    def __getDataFromPdc(self, name, stream, version, active=True):
         """
         Internal method, do not use it
 
         :return: None
         """
         if not self.pdcdata:
-            pdc_query = { 'name' : self.name, 'active': active }
-            if self.stream:
-                pdc_query['stream'] = self.stream
-            if self.version:
-                pdc_query['version'] = self.version
+            pdc_query = {'name': name, 'active': active}
+            if stream:
+                pdc_query['stream'] = stream
+            if version:
+                pdc_query['version'] = version
             @timeoutlib.Retry(attempts=common.conf["generic"]["retrycount"], timeout=common.conf["generic"]["retrytimeout"], error=mtfexceptions.PDCExc("Could not query PDC server"))
             def retry_tmpfunc():
                 # Using develop=True to not authenticate to the server
@@ -127,11 +132,11 @@ class PDCParserGeneral():
         return self.getmoduleMD()['data']['xmd']['mbs']['commit']
 
     def getmoduleMD(self):
-        self.__getDataFromPdc()
+        self.get_pdc_info()
         return self.modulemd
 
     def get_pdc_info(self):
-        return self.__getDataFromPdc()
+        return self.__getDataFromPdc(name=self.name, stream=self.stream, version=self.version)
 
     def generateModuleMDFile(self):
         """
@@ -180,11 +185,11 @@ class PDCParserGeneral():
 
     def get_module_identifier(self):
         if self.version:
-            return "%s-%s-%s" % (self.name, self.stream, self.version)
+            return "%s:%s:%s" % (self.name, self.stream, self.version)
         elif self.stream:
-            return "%s-%s" % (self.name, self.stream)
+            return "%s:%s" % (self.name, self.stream)
         else:
-            return "%s-%s" % (self.name, "master")
+            return "%s" % (self.name)
 
 
 class PDCParserKoji(PDCParserGeneral):
@@ -275,6 +280,7 @@ class PDCParserODCS(PDCParserGeneral):
         timeout_time=common.conf["odcs"]["timeout"]
         core.print_debug("ODCS Module compose started, timeout set to %ss" % timeout_time)
         compose_state = odcs.wait_for_compose(compose_builder["id"], timeout=timeout_time)
+        core.print_debug("ODCS compose debug info for: %s" % self.get_module_identifier(), compose_state)
         if compose_state["state_name"] == "done":
             compose = "{compose}/{arch}/os".format(compose=compose_state["result_repo"], arch=common.conf["generic"]["arch"])
             core.print_info("ODCS Compose done, URL with repo file", compose)
@@ -311,7 +317,7 @@ def getBasePackageSet(modulesDict=None, isModule=True, isContainer=False):
     return out
 
 
-def get_repo_url(wmodule="base-runtime", wstream="master"):
+def get_repo_url(wmodule="base-runtime", wstream=None):
     """
     Return URL location of rpm repository.
     It reads data from PDC and construct url locator.
