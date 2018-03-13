@@ -286,6 +286,7 @@ class DockerfileLinter(object):
         dir_name = os.getcwd()
         files = self._get_copy_add_files(os.path.dirname(self.dockerfile))
         f_exists = False
+        missing_files = False
         if not files:
             f_exists = True
         else:
@@ -297,4 +298,8 @@ class DockerfileLinter(object):
                     f_exists = True
                 else:
                     core.print_info("The file %s does not exist." % f)
-        return f_exists
+                    missing_files = True
+        if missing_files:
+            return False
+        else:
+            return f_exists
