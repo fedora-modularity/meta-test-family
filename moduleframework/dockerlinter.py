@@ -33,10 +33,10 @@ class DockerfileLinter(object):
 
     dockerfile = None
     oc_template = None
-    dfp_structure = {}
-    docker_dict = {}
 
     def __init__(self):
+        self.dfp_structure = {}
+        self.docker_dict = {}
         dockerfile = common.get_docker_file()
         if dockerfile:
             self.dockerfile = dockerfile
@@ -60,7 +60,12 @@ class DockerfileLinter(object):
 
     def _get_volume(self, value):
         """Function evaluates a value and returns as string."""
-        return get_string(value)
+        try:
+            value = ast.literal_eval(value)
+        except SyntaxError:
+            # Convert string to list
+            return [value]
+        return value
 
     def _get_label(self, val):
         """
@@ -149,6 +154,13 @@ class DockerfileLinter(object):
         for p in self.docker_dict.get(EXPOSE, []):
             ports_list.append(int(p))
         return ports_list
+
+    def get_docker_volume(self):
+        """
+        Function return docker EXPOSE directives
+        :return: list of PORTS
+        """
+        return self.docker_dict.get(VOLUME, [])
 
     def get_docker_labels(self):
         """
