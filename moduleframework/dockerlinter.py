@@ -182,7 +182,7 @@ class DockerfileLinter(object):
         """
         Function checks if FROM directive contains valid format like is specified here
         http://docs.projectatomic.io/container-best-practices/#_line_rule_section
-        Regular expression is: ^[a-z0-9.]+(\/[a-z0-9\D.]+)+$
+        Regular expression is: ^[a-z0-9./-]+(:[a-z0-9.]+)?$
         Example registry:
             registry.fedoraproject.org/f26/etcd
             registry.fedoraproject.org/f26/flannel
@@ -195,7 +195,7 @@ class DockerfileLinter(object):
         correct_format = False
         struct = self.dfp_structure[0]
         if struct.get(INSTRUCT) == 'FROM':
-            p = re.compile("^[a-z0-9.]+(\/[a-z0-9\D.]+)+$")
+            p = re.compile("^[a-z0-9./-]+(:[a-z0-9\D.-]+)?$")
             if p.search(struct.get('value')) is not None:
                 correct_format = True
         return correct_format

@@ -29,6 +29,7 @@ before_script:
 
 script:
   - sudo make travis
+  - sudo make -C examples/mtf-linters check-linters
   - sudo make -C examples/testing-module check-inheritance
   - sudo make -C examples/testing-module check-default-config
   - sudo make -C examples/testing-module check-pure-docker
