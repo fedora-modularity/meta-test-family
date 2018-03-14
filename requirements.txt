@@ -5,3 +5,4 @@ modulemd
 netifaces
 pdc-client
 pexpect
+pytest
