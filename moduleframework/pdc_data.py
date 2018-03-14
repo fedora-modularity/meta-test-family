@@ -33,9 +33,7 @@ import os
 import sys
 from avocado.utils import process
 from pdc_client import PDCClient
-
 import core, common, mtfexceptions, timeoutlib
-
 
 
 def get_module_nsv(name=None, stream=None, version=None):
@@ -44,19 +42,6 @@ def get_module_nsv(name=None, stream=None, version=None):
     version = version or os.environ.get('MODULE_VERSION')
     return {'name':name, 'stream':stream, 'version':version}
 
-
-def get_base_compose():
-    default_release = "27"
-    release = os.environ.get("MTF_FEDORA_RELEASE") or default_release
-    if release == "master":
-        release = default_release
-    compose_url = os.environ.get("MTF_COMPOSE_BASE")
-    if not compose_url:
-        tmpcompose = common.conf.get("compose", {}).get("baseurlrepo")
-        if tmpcompose:
-            compose_url = tmpcompose.format(
-                RELEASE=release, ARCH=common.conf["generic"]["arch"])
-    return compose_url
 
 class PDCParserGeneral():
     """
@@ -120,7 +105,7 @@ class PDCParserGeneral():
 
         :return: str
         """
-        return get_base_compose()
+        return common.get_base_compose()
 
 
     def generateGitHash(self):
@@ -288,33 +273,6 @@ class PDCParserODCS(PDCParserGeneral):
         else:
             raise mtfexceptions.PDCExc("ODCS: Failed to generate compose for module: %s" %
                                        self.get_module_identifier())
-
-def getBasePackageSet(modulesDict=None, isModule=True, isContainer=False):
-    """
-    Get list of base packages (for bootstrapping of various module types)
-    It is used internally, you should not use it in case you don't know where to use it.
-
-    :param modulesDict: dictionary of dependent modules
-    :param isModule: bool is module
-    :param isContainer: bool is contaner?
-    :return: list of packages to install
-    """
-    # nspawn container need to install also systemd to be able to boot
-    out = []
-
-    if isModule:
-        if isContainer:
-            out = common.conf["packages"]["container"]
-        else:
-
-            out = common.conf["packages"]["common"] + common.conf["packages"]["basic_modular"]
-    else:
-        if isContainer:
-            out = []
-        else:
-            out = common.conf["packages"]["common"] + common.conf["packages"]["basic"]
-    core.print_info("Base packages to install:", out)
-    return out
 
 
 def get_repo_url(wmodule="base-runtime", wstream=None):

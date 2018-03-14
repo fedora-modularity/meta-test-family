@@ -22,7 +22,7 @@
 
 import os
 import warnings
-from moduleframework import pdc_data, common, core
+from moduleframework import common, core
 
 
 class RpmHelper(common.CommonFunctions):
@@ -112,15 +112,14 @@ class RpmHelper(common.CommonFunctions):
             if self.is_it_module and not common.get_compose_url():
                 # inside this code we don't know anything about modules, this leads to
                 # generic repositories in pdc_data.PDCParserGeneral
-                pdcsolver = pdc_data.PDCParserGeneral(self.component_name)
-                baserepo = pdcsolver.get_repo()
-                if baserepo:
-                    self.repos += [baserepo]
+                baserepo = common.get_base_compose()
+                if baserepo and baserepo not in self.repos:
+                    self.repos.append(baserepo)
         self.repos = list(set(self.repos))
         if whattooinstall:
             self.whattoinstallrpm = list(set(whattooinstall))
         else:
-            self.bootstrappackages = pdc_data.getBasePackageSet(modulesDict=None,
+            self.bootstrappackages = common.getBasePackageSet(modulesDict=None,
                                                                 isModule=self.is_it_module, isContainer=False)
             self.whattoinstallrpm = list(set(self.getPackageList() + self.bootstrappackages))
 
