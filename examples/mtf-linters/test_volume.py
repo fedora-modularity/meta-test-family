@@ -58,3 +58,16 @@ def test_docker_volume_one_string():
     assert ["/etc"] == dfl.get_docker_volume()
     os.unlink(os.environ.get('DOCKERFILE'))
 
+
+def test_docker_volume_one_string_quote():
+    volume = """VOLUME \"/etc\""""
+    dfl = prepare_linter(volume)
+    assert ["/etc"] == dfl.get_docker_volume()
+    os.unlink(os.environ.get('DOCKERFILE'))
+
+
+def test_docker_volume_one_string_single_quote():
+    volume = """VOLUME '/etc'"""
+    dfl = prepare_linter(volume)
+    assert ["/etc"] == dfl.get_docker_volume()
+    os.unlink(os.environ.get('DOCKERFILE'))

@@ -62,8 +62,9 @@ class DockerfileLinter(object):
         """Function evaluates a value and returns as string."""
         try:
             value = ast.literal_eval(value)
+            if isinstance(value, str):
+                return [value]
         except SyntaxError:
-            # Convert string to list
             return [value]
         return value
 
