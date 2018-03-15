@@ -1,4 +1,10 @@
-.PHONY: check-linters
+.PHONY: check-linters check-from check-volume
 
-check-linters:
-	pytest test_linters.py
+check-linters: check-from check-volume
+
+check-from:
+	pytest test_from.py
+
+check-volume:
+	pytest test_volume.py
+

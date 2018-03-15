@@ -14,10 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 from __future__ import print_function
-from moduleframework.dockerlinter import DockerfileLinter
-import pytest
+
 import os
 import tempfile
+
+from moduleframework.dockerlinter import DockerfileLinter
+
+
 def save_docker_file(content):
     temp = tempfile.NamedTemporaryFile(delete=False)
     try:
@@ -34,11 +37,13 @@ def prepare_linter(content):
     dfl = DockerfileLinter()
     return dfl
 
+
 def test_docker_from_etcd():
     Dockerfile_FROM = """FROM registry.fedoraproject.org/f26/etcd"""
     dfl = prepare_linter(Dockerfile_FROM)
     assert dfl.check_from_directive_is_valid()
     os.unlink(os.environ.get('DOCKERFILE'))
+
 
 def test_docker_from_nginx():
     Dockerfile_FROM = """FROM registry.access.redhat.com/rhscl/nginx-18-rhel7"""
@@ -46,17 +51,20 @@ def test_docker_from_nginx():
     assert dfl.check_from_directive_is_valid()
     os.unlink(os.environ.get('DOCKERFILE'))
 
+
 def test_docker_from_dash():
     Dockerfile_FROM = """FROM rhel7:7.5-175"""
     dfl = prepare_linter(Dockerfile_FROM)
     assert dfl.check_from_directive_is_valid()
     os.unlink(os.environ.get('DOCKERFILE'))
 
+
 def test_docker_from_first():
     Dockerfile_FROM = """FROM rhel7:7.5-175"""
     dfl = prepare_linter(Dockerfile_FROM)
     assert dfl.check_from_is_first()
     os.unlink(os.environ.get('DOCKERFILE'))
+
 
 def test_docker_from_is_not_first():
     Dockerfile_FROM = """LABEL name=test\nFROM rhel7:7.5-175"""
