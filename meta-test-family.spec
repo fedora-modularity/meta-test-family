@@ -1,7 +1,7 @@
 %global framework_name moduleframework
 
 Name:           meta-test-family
-Version:        0.8.2
+Version:        0.8.3
 Release:        1%{?dist}
 Summary:        Tool to test components of a modular Fedora
 
@@ -68,6 +68,27 @@ install -d -p -m 755 %{buildroot}%{_datadir}/%{framework_name}
 
 
 %changelog
+* Thu Mar 15 2018 Petr Hracek <phracek@redhat.com> - 0.8.3-1
+- Add more tests for VOLUME (phracek@redhat.com)
+- Fix issue with VOLUME and add VOLUME dockerlint tests (phracek@redhat.com)
+- Add dependency to pytest (phracek@redhat.com)
+- Fix calling MTF (phracek@redhat.com)
+- Fix regexp and add test suite for dockerfile linter (phracek@redhat.com)
+- moved functions not dependent on PDC to common and use then common in rpm helper (jscotka@redhat.com)
+- fix new modules (jscotka@redhat.com)
+- use new syntax for module parsing (jscotka@redhat.com)
+- fix repositories file, there were whitespaces, not possible to us (jscotka@redhat.com)
+- If a file is missing, test always fails (phracek@redhat.com)
+- Fixes #221 Showing reg exp for detection and FROM intruction. (phracek@redhat.com)
+- Fixes #220: If COPY or ADD not present, then True (phracek@redhat.com)
+- move to single cycle (jscotka@redhat.com)
+- better section check instead of constans and use = as filter to option parsing (jscotka@redhat.com)
+- before run avocado, list tests and find if there are some bad tests, missing (jscotka@redhat.com)
+- fix issues with imports over more levels (jscotka@redhat.com)
+- Use config file for MTF instead of values hardcoded in python code (jscotka@redhat.com)
+- Linters: tag distro specific methods (dhodovsk@redhat.com)
+- Linters: add links to guidelines (dhodovsk@redhat.com)
+
 * Thu Mar 01 2018 Petr Hracek <phracek@redhat.com> - 0.8.2-1
 - add example how reason constsructed is used in case of assert (jscotka@redhat.com)
 - print tc info in separate function, to not duplicate code    and print doc string there (jscotka@redhat.com)
