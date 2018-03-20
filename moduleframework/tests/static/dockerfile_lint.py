@@ -69,7 +69,7 @@ class DockerLabelsTests(DockerInstructionsTests):
         """
         self.assertTrue(self.dp.get_specific_label("architecture"),
                         msg=self._get_msg("architecture label",
-                                          reference='https://docs.docker.com/engine/reference/builder/#from'))
+                                          reference='https://fedoraproject.org/wiki/Container:Guidelines#LABELS'))
 
     def test_name_in_env_and_label_exists(self):
         """
