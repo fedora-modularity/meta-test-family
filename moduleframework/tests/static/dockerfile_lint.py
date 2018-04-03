@@ -63,14 +63,6 @@ class DockerLabelsTests(DockerInstructionsTests):
             msg = msg + '\n\tMore info: ' + reference
         return msg
 
-    def test_architecture_label_exists(self):
-        """
-        :avocado: tags=rhel,fedora
-        """
-        self.assertTrue(self.dp.get_specific_label("architecture"),
-                        msg=self._get_msg("architecture label",
-                                          reference='https://fedoraproject.org/wiki/Container:Guidelines#LABELS'))
-
     def test_name_in_env_and_label_exists(self):
         """
         :avocado: tags=fedora
