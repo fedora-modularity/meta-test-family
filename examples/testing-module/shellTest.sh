@@ -22,9 +22,8 @@
 # Authors: Jan Scotka <jscotka@redhat.com>
 #
 
-set -x
+set -ex
 CMD=mtf-cmd
-EC=0
 echo "Initialize module"
 $CMD -v setUp
 $CMD -v start
@@ -32,10 +31,8 @@ $CMD -v start
 echo "Start testing"
 
 echo "Test what run bash command inside module"
-$CMD -v -p run echo ahoj
-$CMD -v -p run ls / | grep bin
-EC=$(($EC+$?))
+$CMD -v -p run echo ahoj 2>&1 | grep ahoj
+$CMD -v -p run ls / 2>&1 | grep bin
 
 echo "Destroy module"
 $CMD -v tearDown
-exit $EC

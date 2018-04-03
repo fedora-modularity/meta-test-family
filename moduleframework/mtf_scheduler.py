@@ -97,6 +97,10 @@ VARIABLES
     parser.add_argument("--metadata", action="store_true",
                         default=False, help="""load configuration for test sets from metadata file
                         (https://github.com/fedora-modularity/meta-test-family/blob/devel/mtf/metadata/README.md)""")
+    parser.add_argument("--fmf", action="append",
+                        default=[], help="""Use FMF metadata format for test filtering http://fmf.readthedocs.io/en/latest/""")
+    parser.add_argument("--fmfpath", action="append",
+                        default=[], help="""Directory location of tests metadata to tests instead of actual directory""")
 
 
     # Solely for the purpose of manpage generator, copy&paste from setup.py
@@ -247,6 +251,27 @@ class AvocadoStart(object):
         core.print_debug("tests = {0}".format(self.tests))
         core.print_debug("additionalAvocadoArg = {0}".format(
             self.additionalAvocadoArg))
+
+        # Advanced filtering and testcases adding based on FMF metadata, see help
+        if self.args.fmf or self.args.fmfpath:
+            # if fmf path is empty, use actual directory
+            if not self.args.fmfpath:
+                self.args.fmfpath=["."]
+            try:
+                import fmf
+            except ImportError:
+                mtfexceptions.ModuleFrameworkException("FMF metadata format not installed on your system,"
+                                                       " see fmf.readthedocs.io/en/latest/"
+                                                       "for more info (how to install)")
+            core.print_debug("Using FMF metadata: path - {} and filters - {}".format(self.args.fmfpath, self.args.fmf))
+            for onepath in self.args.fmfpath:
+                tree = fmf.Tree(onepath)
+                for node in tree.prune(False, ["test"], [], self.args.fmf):
+                    testcase = node.show(False, "{}/{}", ["os.path.dirname(sources[-1])",
+                                                          "data['test'][0] if isinstance(data['test'],list) "
+                                                          "else data['test']"])
+                    core.print_debug("added test by FMF: {}".format(testcase))
+                    self.tests.append(testcase)
 
     def check_tests(self):
         summary_line = "TEST TYPES SUMMARY"

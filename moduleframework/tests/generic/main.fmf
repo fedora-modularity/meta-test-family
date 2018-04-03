@@ -1,0 +1,59 @@
+
+description: Generic tests
+
+
+# Child extends values instead of replacing them
+/check_compose:
+  description: Validate overall module compose.
+  test: check_compose.py
+  tags:
+    - sanity
+    - rhel
+    - fedora
+    - compose_test
+    - module
+    - generic
+/dockerlint_inside:
+  test: dockerlint.py:DockerfileLinterInContainer
+  tags:
+    - sanity
+    - rhel
+    - fedora
+    - docker
+    - docker_lint_inside_test
+    - generic
+/modulelint_ModuleLintSigning:
+  disabled: yes
+#  test: modulelint.py:ModuleLintSigning
+  tags:
+    - WIP
+    - rhel
+    - fedora
+    - docker
+    - module
+    - package_signing_test
+    - generic
+/modulelint_ModuleLintPackagesCheck:
+  description: Check if packages what are expected to be installed all installed
+  test: modulelint.py:ModuleLintPackagesCheck
+  tags:
+    - sanity
+    - rhel
+    - fedora
+    - docker
+    - module
+    - package_installed_test
+
+
+/rpmvalidation:
+  test: rpmvalidation.py
+  description: Provide a list of acceptable file paths based on http://refspecs.linuxfoundation.org/FHS_3.0/fhs/index.html
+  tags:
+    - sanity
+    - rhel
+    - fedora
+    - docker
+    - module
+    - rpmvalidation_test
+    - generic
+
