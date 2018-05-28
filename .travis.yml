@@ -43,4 +43,4 @@ script:
   - sudo make check-mtf-default-config-loader
   - sudo make -C examples/testing-module check-docker-scl-multi-travis
 
-after_script: sudo cat /home/travis/avocado/job-results/latest/job.log
+#after_script: sudo cat /home/travis/avocado/job-results/latest/job.log

@@ -27,18 +27,18 @@ class OneMachine(module_framework.ContainerAvocadoTest):
         """
         self.start()
         time.sleep(WAIT_TIME)
-        command = "echo select 1 | mysql -h 127.0.0.1 -u root -p{PASSWORD}"
+        command = "echo select 1 | mysql -P 3307 -h 127.0.0.1 -u root -p{PASSWORD}"
         self.assertIn("1", self.runHost(command, shell=True).stdout)
 
     def testNonDefaultStartAction(self):
         """
         Test connection to a port different from the one in config.yaml.
         """
-        docker_start = "docker run -p 3307:3306 -e MYSQL_ROOT_PASSWORD={PASSWORD}"
+        docker_start = "docker run -p 3308:3306 -e MYSQL_ROOT_PASSWORD={PASSWORD}"
         self.getConfig()["module"]["docker"]["start"] = docker_start
         self.start()
         time.sleep(WAIT_TIME)
-        command = "echo select 1 | mysql -P 3307 -h 127.0.0.1 -u root -p{PASSWORD}"
+        command = "echo select 1 | mysql -P 3308 -h 127.0.0.1 -u root -p{PASSWORD}"
         self.assertIn("1", self.runHost(command, shell=True).stdout)
 
     def testThisFail(self):
@@ -73,7 +73,7 @@ class OneMachineInSetup(module_framework.ContainerAvocadoTest):
         """
         Test modified setUp()
         """
-        command = "echo select 1 | mysql -h 127.0.0.1 -u root -p{PASSWORD} -P 3307"
+        command = "echo select 1 | mysql -P 3307 -h 127.0.0.1 -u root -p{PASSWORD} -P 3307"
         self.assertIn("1", self.runHost(command, shell=True).stdout)
 
 
@@ -95,12 +95,12 @@ class MultipleMachines(Test):
         Start and connect to two containers running on different ports.
         """
         self.docker1.start()
-        docker_start = "docker run -p 3307:3306 -e MYSQL_ROOT_PASSWORD={PASSWORD}"
+        docker_start = "docker run -p 3308:3306 -e MYSQL_ROOT_PASSWORD={PASSWORD}"
         self.docker2.config["module"]["docker"]["start"] = docker_start
         self.docker2.start()
         time.sleep(WAIT_TIME)
-        command_one = "echo select 1 | mysql -h 127.0.0.1 -u root -p{PASSWORD}"
-        command_two = "echo select 1 | mysql -h 127.0.0.1 -u root -p{PASSWORD} -P 3307"
+        command_one = "echo select 1 | mysql -P 3307 -h 127.0.0.1 -u root -p{PASSWORD}"
+        command_two = "echo select 1 | mysql -P 3308 -h 127.0.0.1 -u root -p{PASSWORD} -P 3307"
         self.assertIn("1", process.run(command_one.format(**common.trans_dict), \
             shell=True).stdout)
         self.assertIn("1", process.run(command_two.format(**common.trans_dict), \
