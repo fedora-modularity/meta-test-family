@@ -101,3 +101,11 @@ packages:
   # https://pagure.io/fedora-kickstarts/blob/f27/f/fedora-modular-container-base.ks
   container: ["rootfiles", "tar", "vim-minimal", "dnf", "dnf-yum", "sssd-client"]
 
+fmf:
+  keys: ['test']
+  names: []
+  filters: []
+  format: "{}/{}"
+  values:
+    - "os.path.dirname(sources[-1])"
+    - "data['test']"

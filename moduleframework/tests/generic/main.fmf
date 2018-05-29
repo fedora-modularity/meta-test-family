@@ -2,7 +2,6 @@
 description: Generic tests
 
 
-# Child extends values instead of replacing them
 /check_compose:
   description: Validate overall module compose.
   test: check_compose.py
