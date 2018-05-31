@@ -98,10 +98,12 @@ VARIABLES
                         default=False, help="""load configuration for test sets from metadata file
                         (https://github.com/fedora-modularity/meta-test-family/blob/devel/mtf/metadata/README.md)""")
     parser.add_argument("--fmffilter", action="append",
-                        default=[], help="""Use FMF metadata filter format for test filtering http://fmf.readthedocs.io/en/latest/""")
+                        default=[], help="""Use FMF metadata filter format for test filtering
+                         http://fmf.readthedocs.io/en/latest/""")
     parser.add_argument("--fmfpath", action="append",
-                        default=[], help="""Directory location of tests metadata to tests instead of actual directory
-                        you have to pass at least fmfpath or fmffilter argument to enable this feature""")
+                        default=[], help="""Path to a directory where FMF metadata are located.
+                         If FMF metadata are enabled (via --fmffilter) and this option is not specified,
+                         defaults to current directory""")
 
 
     # Solely for the purpose of manpage generator, copy&paste from setup.py
