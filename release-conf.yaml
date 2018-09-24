@@ -1,0 +1,7 @@
+python_versions:
+- 2
+fedora: true
+fedora_branches:
+- f29
+- f28
+trigger_on_issue: true
