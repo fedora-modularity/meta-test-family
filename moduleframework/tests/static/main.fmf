@@ -1,0 +1,30 @@
+description: Static tests
+
+/HelpFileSanity:
+  test: "helpmd_lint.py:HelpFileSanity"
+  tags:
+    - optional
+    - rhel
+    - fedora
+    - docker
+    - helpmd_sanity_test
+    - static
+
+/DockerInstructionsTests:
+  test: "dockerfile_lint.py:DockerInstructionsTests"
+  tags:
+    - sanity
+    - rhel
+    - fedora
+    - docker
+    - docker_instruction_test
+    - static
+
+
+/DockerLabelsTests:
+  test: "dockerfile_lint.py:DockerLabelsTests"
+  tags:
+    - sanity
+    - docker
+    - docker_labels_test
+    - static

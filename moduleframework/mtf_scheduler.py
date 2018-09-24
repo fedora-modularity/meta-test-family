@@ -97,6 +97,13 @@ VARIABLES
     parser.add_argument("--metadata", action="store_true",
                         default=False, help="""load configuration for test sets from metadata file
                         (https://github.com/fedora-modularity/meta-test-family/blob/devel/mtf/metadata/README.md)""")
+    parser.add_argument("--fmffilter", action="append",
+                        default=[], help="""Use FMF metadata filter format for test filtering
+                         http://fmf.readthedocs.io/en/latest/""")
+    parser.add_argument("--fmfpath", action="append",
+                        default=[], help="""Path to a directory where FMF metadata are located.
+                         If FMF metadata are enabled (via --fmffilter) and this option is not specified,
+                         defaults to current directory""")
 
 
     # Solely for the purpose of manpage generator, copy&paste from setup.py
@@ -247,6 +254,30 @@ class AvocadoStart(object):
         core.print_debug("tests = {0}".format(self.tests))
         core.print_debug("additionalAvocadoArg = {0}".format(
             self.additionalAvocadoArg))
+
+        # Advanced filtering and testcases adding based on FMF metadata, see help
+        if self.args.fmffilter or self.args.fmfpath:
+            # if fmf path is empty, use actual directory
+            if not self.args.fmfpath:
+                self.args.fmfpath=["."]
+            try:
+                import fmf
+            except ImportError:
+                mtfexceptions.ModuleFrameworkException("FMF metadata format not installed on your system,"
+                                                       " see fmf.readthedocs.io/en/latest/"
+                                                       "for more info (how to install)")
+            core.print_debug("Using FMF metadata: path - {} and filters - {}".format(self.args.fmfpath,
+                                                                                     common.conf["fmf"]["filters"]
+                                                                                     + self.args.fmffilter))
+            for onepath in self.args.fmfpath:
+                tree = fmf.Tree(onepath)
+                for node in tree.prune(False,
+                                       common.conf["fmf"]["keys"],
+                                       common.conf["fmf"]["names"],
+                                       common.conf["fmf"]["filters"] + self.args.fmffilter):
+                    testcase = node.show(False, common.conf["fmf"]["format"], common.conf["fmf"]["values"])
+                    core.print_debug("added test by FMF: {}".format(testcase))
+                    self.tests.append(testcase)
 
     def check_tests(self):
         summary_line = "TEST TYPES SUMMARY"

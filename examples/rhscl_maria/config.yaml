@@ -8,5 +8,5 @@ testdependencies:
 default_module: docker
 module:
     docker:
-        start: docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD={PASSWORD}
+        start: docker run -p 3307:3306 -e MYSQL_ROOT_PASSWORD={PASSWORD}
         container: docker.io/mariadb
