@@ -1,0 +1,6 @@
+specfile_path: meta-test-family.spec
+synced_files:
+  - .packit.yaml
+  - meta-test-family.spec
+upstream_project_name: meta-test-family
+downstream_package_name: meta-test-family
